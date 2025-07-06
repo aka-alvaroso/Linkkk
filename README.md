@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://linkkk.dev/"><img src="frontend/public/images/logo.png" height="128"></a>
+  <a href="https://linkkk.dev/"><img src="frontend/public/images/logo.png" width="128"></a>
   <h1 align="center"><a href="https://linkkk.dev">Linkkk</a></h1>
   <p align="center">Acortar, reunir estadísticas y aumentar la personalización de tus enlaces</p>
 </p>
