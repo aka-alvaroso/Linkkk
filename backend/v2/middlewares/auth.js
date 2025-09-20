@@ -1,0 +1,126 @@
+const jwt = require("jsonwebtoken");
+const prisma = require("../prisma/client");
+const AUTH_SECRET_KEY = process.env.V2_AUTH_SECRET_KEY;
+const GUEST_SECRET_KEY = process.env.V2_GUEST_SECRET_KEY;
+const { errorResponse } = require("../utils/response");
+
+const auth = (req, res, next) => {
+  let token = req.cookies.token;
+  let guestToken = req.cookies.guestToken;
+
+  if (!token && req.headers.authorization) {
+    const authHeader = req.headers.authorization;
+    if (authHeader.startsWith("Bearer ") && authHeader.length > 7) {
+      token = authHeader.substring(7);
+    }
+  }
+
+  if (!guestToken && req.headers["guest-token"]) {
+    const guestHeader = req.headers["guest-token"];
+    if (guestHeader.startsWith("Bearer ") && guestHeader.length > 7) {
+      guestToken = guestHeader.substring(7);
+    }
+  }
+
+  if (token) {
+    try {
+      const userDecoded = jwt.verify(token, AUTH_SECRET_KEY);
+      req.user = userDecoded;
+    } catch (error) {}
+  }
+
+  if (guestToken) {
+    try {
+      const guestDecoded = jwt.verify(guestToken, GUEST_SECRET_KEY);
+      req.guest = guestDecoded;
+    } catch (error) {}
+  }
+
+  if (!req.user && !req.guest) {
+    return errorResponse(res, {
+      code: "UNAUTHORIZED",
+      message: "Unauthorized",
+      statusCode: 401,
+    });
+  }
+
+  next();
+};
+
+const authUser = async (req, res, next) => {
+  const user = req.user;
+
+  if (!user) {
+    return errorResponse(res, {
+      code: "UNAUTHORIZED",
+      message: "Unauthorized",
+      statusCode: 401,
+    });
+  }
+
+  try {
+    const existingUser = await prisma.user.findUnique({
+      where: {
+        id: user.id,
+      },
+    });
+
+    if (!existingUser) {
+      return errorResponse(res, {
+        code: "UNAUTHORIZED",
+        message: "Unauthorized",
+        statusCode: 401,
+      });
+    }
+  } catch (error) {
+    return errorResponse(res, {
+      code: "UNAUTHORIZED",
+      message: "Unauthorized",
+      statusCode: 401,
+    });
+  }
+
+  next();
+};
+
+const authGuest = async (req, res, next) => {
+  const guest = req.guest;
+
+  if (!guest) {
+    return errorResponse(res, {
+      code: "UNAUTHORIZED",
+      message: "Unauthorized",
+      statusCode: 401,
+    });
+  }
+
+  try {
+    const existingGuest = await prisma.guestSession.findUnique({
+      where: {
+        id: guest.guestSessionId,
+      },
+    });
+
+    if (!existingGuest) {
+      return errorResponse(res, {
+        code: "UNAUTHORIZED",
+        message: "Unauthorized",
+        statusCode: 401,
+      });
+    }
+  } catch (error) {
+    return errorResponse(res, {
+      code: "UNAUTHORIZED",
+      message: "Unauthorized",
+      statusCode: 401,
+    });
+  }
+
+  next();
+};
+
+module.exports = {
+  auth,
+  authUser,
+  authGuest,
+};

@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Access" ALTER COLUMN "is_vpn" SET DATA TYPE TEXT;

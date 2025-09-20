@@ -2,25 +2,25 @@ const dotenv = require("dotenv");
 dotenv.config();
 const express = require("express");
 const cors = require("cors");
-const authRoutes = require("./routes/auth");
-const userRoutes = require("./routes/user");
-const linkRoutes = require("./routes/link");
-const linkController = require("./controllers/link");
-const accessRoutes = require("./routes/access");
-const groupRoutes = require("./routes/group");
-const tagRoutes = require("./routes/tag");
-const qrCodeRoutes = require("./routes/qrcode");
-const publicRoutes = require("./routes/public");
+const authRoutes = require("./v1/routes/auth");
+const userRoutes = require("./v1/routes/user");
+const linkRoutes = require("./v1/routes/link");
+const linkController = require("./v1/controllers/link");
+const accessRoutes = require("./v1/routes/access");
+const groupRoutes = require("./v1/routes/group");
+const tagRoutes = require("./v1/routes/tag");
+const qrCodeRoutes = require("./v1/routes/qrcode");
+const publicRoutes = require("./v1/routes/public");
 const cookieParser = require("cookie-parser");
-const validate = require("./middlewares/validate");
+const validate = require("./v1/middlewares/validate");
 const {
   shortCodeParamSchema,
   postLinkPassword,
-} = require("./validations/link");
+} = require("./v1/validations/link");
 const rateLimit = require("express-rate-limit");
-const webhookRoutes = require("./routes/webhook");
+const webhookRoutes = require("./v1/routes/webhook");
 
-const stripeRoutes = require("./routes/stripe");
+const stripeRoutes = require("./v1/routes/stripe");
 
 const app = express();
 const PORT = process.env.PORT || 3000;

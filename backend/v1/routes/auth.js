@@ -235,6 +235,7 @@ router.post(
     }
   }
 );
+
 router.get("/status", async (req, res) => {
   const token = req.cookies.token;
 
