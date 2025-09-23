@@ -14,6 +14,7 @@ const createLink = async (req, res) => {
 
   const {
     longUrl,
+    status,
     password,
     accessLimit,
     blockedCountries,
@@ -80,6 +81,7 @@ const createLink = async (req, res) => {
 
   const data = {};
   if (longUrl !== undefined) data.longUrl = longUrl;
+  if (status !== undefined && limits.status) data.status = status;
   if (metadataTitle !== undefined && limits.metadata)
     data.metadataTitle = metadataTitle;
   if (metadataDescription !== undefined && limits.metadata)
@@ -312,6 +314,7 @@ const updateLink = async (req, res) => {
 
   const {
     longUrl,
+    status,
     password,
     accessLimit,
     blockedCountries,
@@ -370,6 +373,7 @@ const updateLink = async (req, res) => {
 
     const updateData = {};
     if (longUrl !== undefined) updateData.longUrl = longUrl;
+    if (status !== undefined) updateData.status = status;
     if (metadataTitle !== undefined && limits.metadata)
       updateData.metadataTitle = metadataTitle;
     if (metadataDescription !== undefined && limits.metadata)
@@ -477,7 +481,7 @@ const generateShortCode = async () => {
 
   while (!isUnique) {
     shortCode = "";
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 8; i++) {
       const randomIndex = Math.floor(Math.random() * characters.length);
       shortCode += characters.charAt(randomIndex);
     }

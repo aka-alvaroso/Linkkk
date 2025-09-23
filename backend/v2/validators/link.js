@@ -14,6 +14,7 @@ const createLinkSchema = z.object({
     .refine((url) => !url.toLowerCase().startsWith("data:"), {
       message: "Data URLs are not allowed",
     }),
+  status: z.boolean().optional(),
   password: z.string().optional(),
   accessLimit: z
     .number()
@@ -35,9 +36,12 @@ const createLinkSchema = z.object({
     .string()
     .url()
     .max(2048, "Mobile URL too long")
-    .refine((url) => !url || url.startsWith("http://") || url.startsWith("https://"), {
-      message: "Mobile URL must start with 'http://' or 'https://'",
-    })
+    .refine(
+      (url) => !url || url.startsWith("http://") || url.startsWith("https://"),
+      {
+        message: "Mobile URL must start with 'http://' or 'https://'",
+      }
+    )
     .refine((url) => !url || !url.toLowerCase().startsWith("javascript:"), {
       message: "JavaScript URLs are not allowed",
     })
@@ -49,9 +53,12 @@ const createLinkSchema = z.object({
     .string()
     .url()
     .max(2048, "Desktop URL too long")
-    .refine((url) => !url || url.startsWith("http://") || url.startsWith("https://"), {
-      message: "Desktop URL must start with 'http://' or 'https://'",
-    })
+    .refine(
+      (url) => !url || url.startsWith("http://") || url.startsWith("https://"),
+      {
+        message: "Desktop URL must start with 'http://' or 'https://'",
+      }
+    )
     .refine((url) => !url || !url.toLowerCase().startsWith("javascript:"), {
       message: "JavaScript URLs are not allowed",
     })
@@ -82,9 +89,12 @@ const createLinkSchema = z.object({
     .url()
     .max(2048, "Metadata image URL too long")
     .optional()
-    .refine((url) => !url || url.startsWith("http://") || url.startsWith("https://"), {
-      message: "Metadata image must be a valid HTTP/HTTPS URL",
-    })
+    .refine(
+      (url) => !url || url.startsWith("http://") || url.startsWith("https://"),
+      {
+        message: "Metadata image must be a valid HTTP/HTTPS URL",
+      }
+    )
     .refine((url) => !url || !url.toLowerCase().includes("javascript:"), {
       message: "JavaScript URLs are not allowed",
     })
