@@ -27,6 +27,14 @@ const validateSession = (req, res) => {
 };
 
 const createGuestSession = async (req, res) => {
+  if (req.cookies.guestToken) {
+    return errorResponse(res, {
+      code: "GUEST_SESSION_EXISTS",
+      message: "Guest session already exists",
+      statusCode: 400,
+    });
+  }
+
   try {
     const guestSession = await prisma.guestSession.create({
       data: {
@@ -54,9 +62,13 @@ const createGuestSession = async (req, res) => {
     if (ENV === "development") {
       console.log("Guest token: ", token);
     }
-    return successResponse(res, {
-      guestSession,
-    });
+    return successResponse(
+      res,
+      {
+        guestSession,
+      },
+      201
+    );
   } catch (error) {
     return errorResponse(res, {
       code: "GUEST_CREATE_ERROR",
@@ -73,11 +85,22 @@ const register = async (req, res) => {
 
     const validate = registerSchema.safeParse(req.body);
     if (!validate.success) {
-      return errorResponse(res, {
-        code: "REGISTER_INVALID_DATA",
-        message: "Invalid register data",
-        statusCode: 400,
+      const issues = validate.error.issues.map((issue) => {
+        return {
+          field: issue.path[0],
+          message: issue.message,
+        };
       });
+
+      return errorResponse(
+        res,
+        {
+          code: "REGISTER_INVALID_DATA",
+          message: "Invalid register data",
+          statusCode: 400,
+        },
+        issues
+      );
     }
 
     const existingUser = await prisma.user.findFirst({
@@ -100,8 +123,24 @@ const register = async (req, res) => {
         username,
         email,
         password: hashedPassword,
-        planId: 1,
       },
+    });
+
+    res.clearCookie("guestToken", {
+      httpOnly: true,
+      secure: process.env.ENV === "production",
+      sameSite: "strict",
+    });
+
+    const token = jwt.sign({ id: user.id }, process.env.V2_AUTH_SECRET_KEY, {
+      expiresIn: "7d",
+    });
+
+    res.cookie("token", token, {
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+      httpOnly: true,
+      secure: process.env.ENV === "production",
+      sameSite: "strict",
     });
 
     await deleteGuestSession(guest.guestSessionId);
@@ -167,6 +206,12 @@ const login = async (req, res) => {
 
     await deleteGuestSession(guest.guestSessionId);
 
+    res.clearCookie("guestToken", {
+      httpOnly: true,
+      secure: process.env.ENV === "production",
+      sameSite: "strict",
+    });
+
     const token = jwt.sign({ id: user.id }, process.env.V2_AUTH_SECRET_KEY, {
       expiresIn: "7d",
     });
@@ -218,11 +263,11 @@ const transferLinks = async (guestSessionId, userId) => {
   try {
     await prisma.link.updateMany({
       where: {
-        guest_sessionId: guestSessionId,
+        guestSessionId: guestSessionId,
       },
       data: {
         userId: userId,
-        guest_sessionId: null,
+        guestSessionId: null,
       },
     });
   } catch (error) {

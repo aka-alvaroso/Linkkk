@@ -11,12 +11,14 @@ const errorResponse = (
     code = "INTERNAL_SERVER_ERROR",
     message = "Internal Server Error",
     statusCode = 500,
-  }
+  },
+  issue = null
 ) => {
   const response = {
     success: false,
     code,
     message,
+    issue,
   };
 
   return res.status(statusCode).json(response);

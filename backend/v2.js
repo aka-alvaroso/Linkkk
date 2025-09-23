@@ -5,9 +5,11 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
+const { errorResponse } = require("./v2/utils/response");
 
 // Routers
 const authRouter = require("./v2/routers/auth");
+const linkRouter = require("./v2/routers/link");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -39,10 +41,12 @@ app.use(
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 500,
-  message: {
-    error: "Too many requests",
-    message: "Please try again later",
-    retryAfter: "15 minutes",
+  handler: (req, res, next, options) => {
+    return errorResponse(res, {
+      code: "RATE_LIMIT_EXCEEDED",
+      message: "Too many requests",
+      statusCode: 429,
+    });
   },
   standardHeaders: true,
   legacyHeaders: false,
@@ -68,7 +72,10 @@ app.get("/status", (req, res) => {
 });
 
 app.use("/auth", authRouter);
+app.use("/link", linkRouter);
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
+
+module.exports = app;

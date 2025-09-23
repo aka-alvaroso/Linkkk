@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node --watch v1.js",
     "dev": "node --watch v2.js"
   },
@@ -28,6 +27,20 @@
     "zod": "^3.24.3"
   },
   "devDependencies": {
-    "prisma": "^6.8.2"
+    "jest": "^29.7.0",
+    "prisma": "^6.8.2",
+    "supertest": "^7.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/__tests__/**/*.js",
+      "**/?(*.)+(spec|test).js"
+    ],
+    "collectCoverageFrom": [
+      "v2/**/*.js",
+      "!v2/prisma/**",
+      "!v2/node_modules/**"
+    ]
   }
 }

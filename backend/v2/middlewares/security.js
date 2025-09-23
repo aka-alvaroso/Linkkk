@@ -72,9 +72,70 @@ const guestLimiter = rateLimit({
   },
 });
 
+// Link limiters
+const createLinkLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 50,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => req.ip,
+  handler: (req, res, next, options) => {
+    return rateLimitHandler(req, res, next, {
+      code: "CREATE_LINK_RATE_LIMIT_EXCEEDED",
+      message: "Too many link creation attempts. Please try again later.",
+    });
+  },
+});
+
+const updateLinkLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 50,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => req.ip,
+  handler: (req, res, next, options) => {
+    return rateLimitHandler(req, res, next, {
+      code: "UPDATE_LINK_RATE_LIMIT_EXCEEDED",
+      message: "Too many link update attempts. Please try again later.",
+    });
+  },
+});
+
+const getLinksLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => req.ip,
+  handler: (req, res, next, options) => {
+    return rateLimitHandler(req, res, next, {
+      code: "GET_LINKS_RATE_LIMIT_EXCEEDED",
+      message: "Too many link get attempts. Please try again later.",
+    });
+  },
+});
+
+const linkValidatorLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 50,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => req.ip,
+  handler: (req, res, next, options) => {
+    return rateLimitHandler(req, res, next, {
+      code: "LINK_VALIDATOR_RATE_LIMIT_EXCEEDED",
+      message: "Too many link validator attempts. Please try again later.",
+    });
+  },
+});
+
 module.exports = {
   authLimiter,
   loginLimiter,
   registerLimiter,
   guestLimiter,
+  createLinkLimiter,
+  updateLinkLimiter,
+  getLinksLimiter,
+  linkValidatorLimiter,
 };
