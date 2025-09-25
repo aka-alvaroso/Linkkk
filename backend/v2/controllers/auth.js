@@ -6,19 +6,12 @@ const GUEST_SECRET_KEY = process.env.V2_GUEST_SECRET_KEY;
 const ENV = process.env.ENV;
 
 const { successResponse, errorResponse } = require("../utils/response");
+const ERRORS = require("../constants/errorCodes");
 const { registerSchema, loginSchema } = require("../validators/auth");
 
 const validateSession = (req, res) => {
   const user = req.user;
   const guest = req.guest;
-
-  if (!user && !guest) {
-    return errorResponse(res, {
-      code: "UNAUTHORIZED",
-      message: "Unauthorized",
-      statusCode: 401,
-    });
-  }
 
   return successResponse(res, {
     user,
@@ -28,11 +21,7 @@ const validateSession = (req, res) => {
 
 const createGuestSession = async (req, res) => {
   if (req.cookies.guestToken) {
-    return errorResponse(res, {
-      code: "GUEST_SESSION_EXISTS",
-      message: "Guest session already exists",
-      statusCode: 400,
-    });
+    return errorResponse(res, ERRORS.GUEST_SESSION_EXISTS);
   }
 
   try {
@@ -70,11 +59,7 @@ const createGuestSession = async (req, res) => {
       201
     );
   } catch (error) {
-    return errorResponse(res, {
-      code: "GUEST_CREATE_ERROR",
-      message: "Error creating guest session",
-      statusCode: 500,
-    });
+    return errorResponse(res, ERRORS.INTERNAL_ERROR);
   }
 };
 
@@ -92,15 +77,7 @@ const register = async (req, res) => {
         };
       });
 
-      return errorResponse(
-        res,
-        {
-          code: "REGISTER_INVALID_DATA",
-          message: "Invalid register data",
-          statusCode: 400,
-        },
-        issues
-      );
+      return errorResponse(res, ERRORS.INVALID_DATA, issues);
     }
 
     const existingUser = await prisma.user.findFirst({
@@ -110,11 +87,7 @@ const register = async (req, res) => {
     });
 
     if (existingUser) {
-      return errorResponse(res, {
-        code: "REGISTER_USER_EXISTS",
-        message: "User already exists",
-        statusCode: 400,
-      });
+      return errorResponse(res, ERRORS.USER_EXISTS);
     }
 
     const hashedPassword = await bcryptjs.hash(password, 10);
@@ -126,11 +99,17 @@ const register = async (req, res) => {
       },
     });
 
-    res.clearCookie("guestToken", {
-      httpOnly: true,
-      secure: process.env.ENV === "production",
-      sameSite: "strict",
-    });
+    // Transferir links y limpiar sesión guest si existe
+    if (guest && guest.guestSessionId) {
+      await transferLinks(guest.guestSessionId, user.id);
+      await deleteGuestSession(guest.guestSessionId);
+
+      res.clearCookie("guestToken", {
+        httpOnly: true,
+        secure: process.env.ENV === "production",
+        sameSite: "strict",
+      });
+    }
 
     const token = jwt.sign({ id: user.id }, process.env.V2_AUTH_SECRET_KEY, {
       expiresIn: "7d",
@@ -143,8 +122,6 @@ const register = async (req, res) => {
       sameSite: "strict",
     });
 
-    await deleteGuestSession(guest.guestSessionId);
-
     return successResponse(
       res,
       {
@@ -156,11 +133,7 @@ const register = async (req, res) => {
       201
     );
   } catch (error) {
-    return errorResponse(res, {
-      code: "REGISTER_ERROR",
-      message: "Error registering user",
-      statusCode: 500,
-    });
+    return errorResponse(res, ERRORS.INTERNAL_ERROR);
   }
 };
 
@@ -171,11 +144,7 @@ const login = async (req, res) => {
 
     const validate = loginSchema.safeParse(req.body);
     if (!validate.success) {
-      return errorResponse(res, {
-        code: "LOGIN_INVALID_DATA",
-        message: "Invalid login data",
-        statusCode: 400,
-      });
+      return errorResponse(res, ERRORS.INVALID_DATA);
     }
 
     const user = await prisma.user.findFirst({
@@ -185,32 +154,26 @@ const login = async (req, res) => {
     });
 
     if (!user) {
-      return errorResponse(res, {
-        code: "LOGIN_INVALID_CREDENTIALS",
-        message: "Invalid credentials",
-        statusCode: 401,
-      });
+      return errorResponse(res, ERRORS.INVALID_CREDENTIALS);
     }
 
     const isPasswordCorrect = await bcryptjs.compare(password, user.password);
 
     if (!isPasswordCorrect) {
-      return errorResponse(res, {
-        code: "LOGIN_INVALID_CREDENTIALS",
-        message: "Invalid credentials",
-        statusCode: 401,
-      });
+      return errorResponse(res, ERRORS.INVALID_CREDENTIALS);
     }
 
-    await transferLinks(guest.guestSessionId, user.id);
+    // Transferir links y limpiar sesión guest si existe
+    if (guest && guest.guestSessionId) {
+      await transferLinks(guest.guestSessionId, user.id);
+      await deleteGuestSession(guest.guestSessionId);
 
-    await deleteGuestSession(guest.guestSessionId);
-
-    res.clearCookie("guestToken", {
-      httpOnly: true,
-      secure: process.env.ENV === "production",
-      sameSite: "strict",
-    });
+      res.clearCookie("guestToken", {
+        httpOnly: true,
+        secure: process.env.ENV === "production",
+        sameSite: "strict",
+      });
+    }
 
     const token = jwt.sign({ id: user.id }, process.env.V2_AUTH_SECRET_KEY, {
       expiresIn: "7d",
@@ -232,11 +195,7 @@ const login = async (req, res) => {
       },
     });
   } catch (error) {
-    return errorResponse(res, {
-      code: "LOGIN_ERROR",
-      message: "Error logging in",
-      statusCode: 500,
-    });
+    return errorResponse(res, ERRORS.INTERNAL_ERROR);
   }
 };
 

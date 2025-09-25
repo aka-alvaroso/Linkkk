@@ -4,6 +4,7 @@ const bcryptjs = require("bcryptjs");
 
 const planLimits = require("../utils/limits");
 const { successResponse, errorResponse } = require("../utils/response");
+const ERRORS = require("../constants/errorCodes");
 
 // 1. Create link
 const createLink = async (req, res) => {
@@ -37,15 +38,7 @@ const createLink = async (req, res) => {
       };
     });
 
-    return errorResponse(
-      res,
-      {
-        code: "LINK_CREATION_INVALID_DATA",
-        message: "Data validation failed",
-        statusCode: 400,
-      },
-      issues
-    );
+    return errorResponse(res, ERRORS.INVALID_DATA, issues);
   }
 
   if (isGuest) {
@@ -56,11 +49,7 @@ const createLink = async (req, res) => {
     });
 
     if (count >= limits.links) {
-      return errorResponse(res, {
-        code: "LINK_LIMIT_EXCEEDED",
-        message: "Link limit exceeded",
-        statusCode: 400,
-      });
+      return errorResponse(res, ERRORS.LINK_LIMIT_EXCEEDED);
     }
   } else {
     const count = await prisma.link.count({
@@ -71,11 +60,7 @@ const createLink = async (req, res) => {
     });
 
     if (count >= limits.links) {
-      return errorResponse(res, {
-        code: "LINK_LIMIT_EXCEEDED",
-        message: "Link limit exceeded",
-        statusCode: 400,
-      });
+      return errorResponse(res, ERRORS.LINK_LIMIT_EXCEEDED);
     }
   }
 
@@ -106,11 +91,7 @@ const createLink = async (req, res) => {
       });
 
       if (existingSufix) {
-        return errorResponse(res, {
-          code: "SUFIX_ALREADY_EXISTS",
-          message: "This custom URL is already taken",
-          statusCode: 400,
-        });
+        return errorResponse(res, ERRORS.SHORT_URL_EXISTS);
       }
       data.sufix = sufix.toLowerCase();
     }
@@ -134,11 +115,7 @@ const createLink = async (req, res) => {
     return successResponse(res, link, 201);
   } catch (error) {
     console.error("Link creation error:", error);
-    return errorResponse(res, {
-      code: "LINK_CREATION_ERROR",
-      message: "Error creating link",
-      statusCode: 500,
-    });
+    return errorResponse(res, ERRORS.INTERNAL_ERROR);
   }
 };
 
@@ -156,11 +133,7 @@ const getLink = async (req, res) => {
     });
 
     if (!link) {
-      return errorResponse(res, {
-        code: "LINK_NOT_FOUND",
-        message: "Link not found",
-        statusCode: 404,
-      });
+      return errorResponse(res, ERRORS.LINK_NOT_FOUND);
     }
 
     // Verificar que el usuario tiene permisos (CRÍTICO: evitar null bypass)
@@ -169,20 +142,12 @@ const getLink = async (req, res) => {
       guest && link.guestSessionId === guest.guestSessionId;
 
     if (!hasUserAccess && !hasGuestAccess) {
-      return errorResponse(res, {
-        code: "LINK_NOT_FOUND",
-        message: "Link not found",
-        statusCode: 404,
-      });
+      return errorResponse(res, ERRORS.LINK_ACCESS_DENIED);
     }
 
     return successResponse(res, link);
   } catch (error) {
-    return errorResponse(res, {
-      code: "LINK_INFO_ERROR",
-      message: "Error getting link info",
-      statusCode: 500,
-    });
+    return errorResponse(res, ERRORS.INTERNAL_ERROR);
   }
 };
 
@@ -198,11 +163,7 @@ const getAllLinks = async (req, res) => {
     } else if (guest) {
       whereClause.guestSessionId = guest.guestSessionId;
     } else {
-      return errorResponse(res, {
-        code: "UNAUTHORIZED",
-        message: "Unauthorized",
-        statusCode: 401,
-      });
+      return errorResponse(res, ERRORS.UNAUTHORIZED);
     }
 
     const links = await prisma.link.findMany({
@@ -210,20 +171,12 @@ const getAllLinks = async (req, res) => {
     });
 
     if (!links) {
-      return errorResponse(res, {
-        code: "LINK_NOT_FOUND",
-        message: "Links not found",
-        statusCode: 404,
-      });
+      return errorResponse(res, ERRORS.LINK_NOT_FOUND);
     }
 
     return successResponse(res, links);
   } catch (error) {
-    return errorResponse(res, {
-      code: "LINK_INFO_ERROR",
-      message: "Error getting link info",
-      statusCode: 500,
-    });
+    return errorResponse(res, ERRORS.INTERNAL_ERROR);
   }
 };
 
@@ -243,11 +196,7 @@ const validateLinkPassword = async (req, res) => {
     });
 
     if (!link) {
-      return errorResponse(res, {
-        code: "LINK_NOT_FOUND",
-        message: "Link not found",
-        statusCode: 404,
-      });
+      return errorResponse(res, ERRORS.LINK_NOT_FOUND);
     }
 
     const hasUserAccess = user && link.userId === user.id;
@@ -255,31 +204,19 @@ const validateLinkPassword = async (req, res) => {
       guest && link.guestSessionId === guest.guestSessionId;
 
     if (!hasUserAccess && !hasGuestAccess) {
-      return errorResponse(res, {
-        code: "LINK_NOT_FOUND",
-        message: "Link not found",
-        statusCode: 404,
-      });
+      return errorResponse(res, ERRORS.LINK_ACCESS_DENIED);
     }
 
     // Verificar si el link tiene contraseña
     if (!link.password) {
-      return errorResponse(res, {
-        code: "LINK_NO_PASSWORD",
-        message: "This link is not password protected",
-        statusCode: 400,
-      });
+      return errorResponse(res, ERRORS.LINK_NO_PASSWORD);
     }
 
     // Validar contraseña
     const isValidPassword = await bcryptjs.compare(password, link.password);
 
     if (!isValidPassword) {
-      return errorResponse(res, {
-        code: "INVALID_PASSWORD",
-        message: "Invalid password",
-        statusCode: 401,
-      });
+      return errorResponse(res, ERRORS.INVALID_CREDENTIALS);
     }
 
     // Si la contraseña es correcta, devolver info del link
@@ -296,11 +233,7 @@ const validateLinkPassword = async (req, res) => {
       // No devolver datos sensibles como password hash
     });
   } catch (error) {
-    return errorResponse(res, {
-      code: "PASSWORD_VALIDATION_ERROR",
-      message: "Error validating password",
-      statusCode: 500,
-    });
+    return errorResponse(res, ERRORS.INTERNAL_ERROR);
   }
 };
 
@@ -335,15 +268,7 @@ const updateLink = async (req, res) => {
       message: issue.message,
     }));
 
-    return errorResponse(
-      res,
-      {
-        code: "INVALID_DATA",
-        message: "Invalid data",
-        statusCode: 400,
-      },
-      issues
-    );
+    return errorResponse(res, ERRORS.INVALID_DATA, issues);
   }
 
   try {
@@ -352,11 +277,7 @@ const updateLink = async (req, res) => {
     });
 
     if (!existingLink) {
-      return errorResponse(res, {
-        code: "LINK_NOT_FOUND",
-        message: "Link not found",
-        statusCode: 404,
-      });
+      return errorResponse(res, ERRORS.LINK_NOT_FOUND);
     }
 
     const hasUserAccess = user && existingLink.userId === user.id;
@@ -364,11 +285,7 @@ const updateLink = async (req, res) => {
       guest && existingLink.guestSessionId === guest.guestSessionId;
 
     if (!hasUserAccess && !hasGuestAccess) {
-      return errorResponse(res, {
-        code: "LINK_NOT_FOUND",
-        message: "Link not found",
-        statusCode: 404,
-      });
+      return errorResponse(res, ERRORS.LINK_ACCESS_DENIED);
     }
 
     const updateData = {};
@@ -398,11 +315,7 @@ const updateLink = async (req, res) => {
         });
 
         if (existingSufix) {
-          return errorResponse(res, {
-            code: "SUFIX_ALREADY_EXISTS",
-            message: "This custom URL is already taken",
-            statusCode: 400,
-          });
+          return errorResponse(res, ERRORS.SHORT_URL_EXISTS);
         }
         updateData.sufix = sufix.toLowerCase();
       }
@@ -419,11 +332,7 @@ const updateLink = async (req, res) => {
 
     return successResponse(res, updatedLink);
   } catch (error) {
-    return errorResponse(res, {
-      code: "LINK_UPDATE_ERROR",
-      message: "Error updating link",
-      statusCode: 500,
-    });
+    return errorResponse(res, ERRORS.INTERNAL_ERROR);
   }
 };
 
@@ -439,11 +348,7 @@ const deleteLink = async (req, res) => {
     });
 
     if (!existingLink) {
-      return errorResponse(res, {
-        code: "LINK_NOT_FOUND",
-        message: "Link not found",
-        statusCode: 404,
-      });
+      return errorResponse(res, ERRORS.LINK_NOT_FOUND);
     }
 
     const hasUserAccess = user && existingLink.userId === user.id;
@@ -451,11 +356,7 @@ const deleteLink = async (req, res) => {
       guest && existingLink.guestSessionId === guest.guestSessionId;
 
     if (!hasUserAccess && !hasGuestAccess) {
-      return errorResponse(res, {
-        code: "LINK_NOT_FOUND",
-        message: "Link not found",
-        statusCode: 404,
-      });
+      return errorResponse(res, ERRORS.LINK_ACCESS_DENIED);
     }
 
     const deletedLink = await prisma.link.delete({
@@ -464,11 +365,7 @@ const deleteLink = async (req, res) => {
 
     return successResponse(res, deletedLink);
   } catch (error) {
-    return errorResponse(res, {
-      code: "LINK_DELETE_ERROR",
-      message: "Error deleting link",
-      statusCode: 500,
-    });
+    return errorResponse(res, ERRORS.INTERNAL_ERROR);
   }
 };
 

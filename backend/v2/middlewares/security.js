@@ -1,132 +1,88 @@
 const rateLimit = require("express-rate-limit");
 const { errorResponse } = require("../utils/response");
+const ERRORS = require("../constants/errorCodes");
 
-// Handler personalizado para mantener formato consistente de respuestas
+// Handler simple para rate limiting
 const rateLimitHandler = (req, res, next, options) => {
-  return errorResponse(res, {
-    code: options.code || "RATE_LIMIT_EXCEEDED",
-    message: options.message || "Too many requests",
-    statusCode: 429,
-  });
+  return errorResponse(res, ERRORS.RATE_LIMIT_EXCEEDED);
 };
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 10,
+  max: process.env.ENV === "development" ? 1000 : 10,
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => {
     return req.ip + ":" + (req.get("User-Agent") || "");
   },
-  handler: (req, res, next, options) => {
-    return rateLimitHandler(req, res, next, {
-      code: "AUTH_RATE_LIMIT_EXCEEDED",
-      message: "Too many authentication attempts. Please try again later.",
-    });
-  },
+  handler: rateLimitHandler,
 });
 
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5,
+  max: process.env.ENV === "development" ? 1000 : 5,
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => {
     const identifier = req.body?.usernameOrEmail || "";
     return req.ip + ":" + identifier;
   },
-  handler: (req, res, next, options) => {
-    return rateLimitHandler(req, res, next, {
-      code: "LOGIN_RATE_LIMIT_EXCEEDED",
-      message:
-        "Too many login attempts. Account temporarily locked. Please try again later.",
-    });
-  },
+  handler: rateLimitHandler,
 });
 
 const registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: 5,
+  max: process.env.ENV === "development" ? 1000 : 5,
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => req.ip,
-  handler: (req, res, next, options) => {
-    return rateLimitHandler(req, res, next, {
-      code: "REGISTER_RATE_LIMIT_EXCEEDED",
-      message: "Too many registration attempts. Please try again later.",
-    });
-  },
+  handler: rateLimitHandler,
 });
 
 const guestLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: 10,
+  max: process.env.ENV === "development" ? 1000 : 10,
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => req.ip,
-  handler: (req, res, next, options) => {
-    return rateLimitHandler(req, res, next, {
-      code: "GUEST_RATE_LIMIT_EXCEEDED",
-      message: "Too many guest session requests. Please try again later.",
-    });
-  },
+  handler: rateLimitHandler,
 });
 
 // Link limiters
 const createLinkLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: 50,
+  max: process.env.ENV === "development" ? 1000 : 50,
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => req.ip,
-  handler: (req, res, next, options) => {
-    return rateLimitHandler(req, res, next, {
-      code: "CREATE_LINK_RATE_LIMIT_EXCEEDED",
-      message: "Too many link creation attempts. Please try again later.",
-    });
-  },
+  handler: rateLimitHandler,
 });
 
 const updateLinkLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: 50,
+  max: process.env.ENV === "development" ? 1000 : 50,
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => req.ip,
-  handler: (req, res, next, options) => {
-    return rateLimitHandler(req, res, next, {
-      code: "UPDATE_LINK_RATE_LIMIT_EXCEEDED",
-      message: "Too many link update attempts. Please try again later.",
-    });
-  },
+  handler: rateLimitHandler,
 });
 
 const getLinksLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: 100,
+  max: process.env.ENV === "development" ? 1000 : 100,
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => req.ip,
-  handler: (req, res, next, options) => {
-    return rateLimitHandler(req, res, next, {
-      code: "GET_LINKS_RATE_LIMIT_EXCEEDED",
-      message: "Too many link get attempts. Please try again later.",
-    });
-  },
+  handler: rateLimitHandler,
 });
 
 const linkValidatorLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: 50,
+  max: process.env.ENV === "development" ? 1000 : 50,
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => req.ip,
-  handler: (req, res, next, options) => {
-    return rateLimitHandler(req, res, next, {
-      code: "LINK_VALIDATOR_RATE_LIMIT_EXCEEDED",
-      message: "Too many link validator attempts. Please try again later.",
-    });
-  },
+  handler: rateLimitHandler,
 });
 
 module.exports = {

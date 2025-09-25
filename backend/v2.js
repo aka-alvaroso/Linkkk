@@ -6,6 +6,7 @@ const cookieParser = require("cookie-parser");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const { errorResponse } = require("./v2/utils/response");
+const ERRORS = require("./v2/constants/errorCodes");
 
 // Routers
 const authRouter = require("./v2/routers/auth");
@@ -40,13 +41,9 @@ app.use(
 
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 500,
+  max: process.env.ENV === "development" ? 1000 : 500,
   handler: (req, res, next, options) => {
-    return errorResponse(res, {
-      code: "RATE_LIMIT_EXCEEDED",
-      message: "Too many requests",
-      statusCode: 429,
-    });
+    return errorResponse(res, ERRORS.RATE_LIMIT_EXCEEDED);
   },
   standardHeaders: true,
   legacyHeaders: false,

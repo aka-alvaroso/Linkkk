@@ -12,14 +12,18 @@ const errorResponse = (
     message = "Internal Server Error",
     statusCode = 500,
   },
-  issue = null
+  validation = null
 ) => {
   const response = {
     success: false,
     code,
     message,
-    issue,
   };
+
+  // Solo agregar validation si existe
+  if (validation) {
+    response.validation = validation;
+  }
 
   return res.status(statusCode).json(response);
 };

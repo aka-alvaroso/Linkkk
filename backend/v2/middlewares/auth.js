@@ -3,6 +3,7 @@ const prisma = require("../prisma/client");
 const AUTH_SECRET_KEY = process.env.V2_AUTH_SECRET_KEY;
 const GUEST_SECRET_KEY = process.env.V2_GUEST_SECRET_KEY;
 const { errorResponse } = require("../utils/response");
+const ERRORS = require("../constants/errorCodes");
 
 const auth = (req, res, next) => {
   let token = req.cookies.token;
@@ -37,11 +38,7 @@ const auth = (req, res, next) => {
   }
 
   if (!req.user && !req.guest) {
-    return errorResponse(res, {
-      code: "UNAUTHORIZED",
-      message: "Unauthorized",
-      statusCode: 401,
-    });
+    return errorResponse(res, ERRORS.UNAUTHORIZED);
   }
 
   next();
@@ -51,11 +48,7 @@ const authUser = async (req, res, next) => {
   const user = req.user;
 
   if (!user) {
-    return errorResponse(res, {
-      code: "UNAUTHORIZED",
-      message: "Unauthorized",
-      statusCode: 401,
-    });
+    return errorResponse(res, ERRORS.UNAUTHORIZED);
   }
 
   try {
@@ -66,18 +59,10 @@ const authUser = async (req, res, next) => {
     });
 
     if (!existingUser) {
-      return errorResponse(res, {
-        code: "UNAUTHORIZED",
-        message: "Unauthorized",
-        statusCode: 401,
-      });
+      return errorResponse(res, ERRORS.USER_NOT_FOUND);
     }
   } catch (error) {
-    return errorResponse(res, {
-      code: "UNAUTHORIZED",
-      message: "Unauthorized",
-      statusCode: 401,
-    });
+    return errorResponse(res, ERRORS.DATABASE_ERROR);
   }
 
   next();
@@ -87,11 +72,7 @@ const authGuest = async (req, res, next) => {
   const guest = req.guest;
 
   if (!guest) {
-    return errorResponse(res, {
-      code: "UNAUTHORIZED",
-      message: "Unauthorized",
-      statusCode: 401,
-    });
+    return errorResponse(res, ERRORS.UNAUTHORIZED);
   }
 
   try {
@@ -102,20 +83,67 @@ const authGuest = async (req, res, next) => {
     });
 
     if (!existingGuest) {
-      return errorResponse(res, {
-        code: "UNAUTHORIZED",
-        message: "Unauthorized",
-        statusCode: 401,
-      });
+      return errorResponse(res, ERRORS.GUEST_SESSION_NOT_FOUND);
     }
   } catch (error) {
-    return errorResponse(res, {
-      code: "UNAUTHORIZED",
-      message: "Unauthorized",
-      statusCode: 401,
-    });
+    return errorResponse(res, ERRORS.DATABASE_ERROR);
   }
 
+  next();
+};
+
+const optionalGuest = (req, res, next) => {
+  let guestToken = req.cookies.guestToken;
+
+  if (guestToken) {
+    try {
+      const guestDecoded = jwt.verify(guestToken, GUEST_SECRET_KEY);
+      req.guest = guestDecoded;
+    } catch (error) {
+      // Si hay error, simplemente no asignamos guest
+      req.guest = null;
+    }
+  }
+
+  next();
+};
+
+// Middleware para validación que intenta obtener cualquier sesión disponible
+const optionalAuth = (req, res, next) => {
+  let token = req.cookies.token;
+  let guestToken = req.cookies.guestToken;
+
+  // Intentar obtener token user del header si no está en cookies
+  if (!token && req.headers.authorization) {
+    const authHeader = req.headers.authorization;
+    if (authHeader.startsWith("Bearer ") && authHeader.length > 7) {
+      token = authHeader.substring(7);
+    }
+  }
+
+  // Intentar verificar token de usuario
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, AUTH_SECRET_KEY);
+      req.user = decoded;
+    } catch (error) {
+      // Si hay error, no asignamos user
+      req.user = null;
+    }
+  }
+
+  // Intentar verificar token de guest
+  if (guestToken) {
+    try {
+      const guestDecoded = jwt.verify(guestToken, GUEST_SECRET_KEY);
+      req.guest = guestDecoded;
+    } catch (error) {
+      // Si hay error, no asignamos guest
+      req.guest = null;
+    }
+  }
+
+  // Siempre continúa, sin importar si hay tokens o no
   next();
 };
 
@@ -123,4 +151,6 @@ module.exports = {
   auth,
   authUser,
   authGuest,
+  optionalGuest,
+  optionalAuth,
 };

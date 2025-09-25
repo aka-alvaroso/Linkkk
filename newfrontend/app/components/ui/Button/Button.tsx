@@ -1,9 +1,9 @@
 import React from 'react';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'solid' | 'outline' | 'ghost';
+  variant?: 'solid' | 'outline' | 'ghost' | 'link';
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-  rounded?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  rounded?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | 'full';
   loading?: boolean;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
@@ -36,6 +36,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       md: 'rounded-md',
       lg: 'rounded-lg',
       xl: 'rounded-xl',
+      '2xl': 'rounded-2xl',
+      '3xl': 'rounded-3xl',
+      '4xl': 'rounded-4xl',
       full: 'rounded-full'
     };
 
@@ -58,22 +61,27 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     // Variantes de estilo
     const variantClasses = {
       solid: [
-        'bg-black',
-        'text-white',
-        'hover:bg-black/90'
+        'bg-dark',
+        'text-light',
+        'hover:bg-dark/90'
       ],
       outline: [
         'border-2',
-        'border-black',
+        'border-dark/90',
         'bg-transparent',
-        'text-black',
-        'hover:bg-black',
-        'hover:text-white'
+        'text-dark',
+        'hover:bg-dark/90',
+        'hover:text-light'
       ],
       ghost: [
         'bg-transparent',
-        'text-black',
-        'hover:bg-black/10'
+        'text-dark',
+        'hover:bg-dark/10'
+      ],
+      link: [
+        'bg-transparent',
+        'text-dark',
+        'hover:bg-dark/10'
       ]
     };
 
