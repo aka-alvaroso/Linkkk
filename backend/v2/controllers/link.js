@@ -96,7 +96,7 @@ const createLink = async (req, res) => {
       data.sufix = sufix.toLowerCase();
     }
   }
-  if (expirationDate !== undefined && limits.expirationDate)
+  if (expirationDate !== undefined)
     data.dateExpire = expirationDate;
   if (blockedCountries !== undefined && limits.blockedCountries)
     data.blockedCountries = blockedCountries;
@@ -320,7 +320,7 @@ const updateLink = async (req, res) => {
         updateData.sufix = sufix.toLowerCase();
       }
     }
-    if (expirationDate !== undefined && limits.expirationDate)
+    if (expirationDate !== undefined)
       updateData.dateExpire = expirationDate;
     if (blockedCountries !== undefined && limits.blockedCountries)
       updateData.blockedCountries = blockedCountries;

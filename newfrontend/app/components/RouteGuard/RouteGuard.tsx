@@ -7,19 +7,20 @@ interface RouteGuardProps {
   children: React.ReactNode;
   type: 'public' | 'guest-or-user' | 'user-only';
   redirectTo?: string;
+  title?: string;
 }
 
 export default function RouteGuard({ 
   children, 
   type, 
-  redirectTo = '/auth/login' 
+  redirectTo = '/auth/login',
+  title 
 }: RouteGuardProps) {
-  const { user, isAuthenticated, isGuest } = useAuth();
+  const { user, isAuthenticated, isGuest, createGuestSession } = useAuth();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Dar tiempo para que se verifique la sesión
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 100);
@@ -30,54 +31,53 @@ export default function RouteGuard({
   useEffect(() => {
     if (isLoading) return;
 
-    switch (type) {
-      case 'public':
-        // Rutas públicas - siempre permitidas
-        break;
-
-      case 'guest-or-user':
-        // Requiere al menos sesión guest o user
-        if (!isAuthenticated && !isGuest) {
-          router.push(redirectTo);
-        }
-        break;
-
-      case 'user-only':
-        // Solo usuarios autenticados
-        if (!isAuthenticated || !user) {
-          router.push(redirectTo);
-        }
-        break;
+    if (type === 'user-only' && (!isAuthenticated || !user)) {
+      router.push(redirectTo);
     }
-  }, [isLoading, isAuthenticated, isGuest, user, type, router, redirectTo]);
 
-  // Mostrar loading mientras se verifica
+    if (type === 'guest-or-user' && !isAuthenticated && !isGuest) {
+      createGuestSession();
+    }
+  }, [isLoading, type, isAuthenticated, isGuest, user, router, redirectTo, createGuestSession]);
+
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-dark"></div>
-      </div>
+      <>
+        {/* TODO: Add loading skeleton */}
+        LOADING
+      </>
     );
   }
 
-  // Verificar permisos después del loading
+  const wrapWithTitle = (content: React.ReactNode) => {
+    if (title) {
+      return (
+        <>
+          <title>{title}</title>
+          {content}
+        </>
+      );
+    }
+    return content;
+  };
+
   switch (type) {
     case 'public':
-      return <>{children}</>;
+      return wrapWithTitle(<>{children}</>);
 
     case 'guest-or-user':
       if (!isAuthenticated && !isGuest) {
-        return null; // Se está redirigiendo
+        return null;
       }
-      return <>{children}</>;
+      return wrapWithTitle(<>{children}</>);
 
     case 'user-only':
       if (!isAuthenticated || !user) {
-        return null; // Se está redirigiendo
+        return null;
       }
-      return <>{children}</>;
+      return wrapWithTitle(<>{children}</>);
 
     default:
-      return <>{children}</>;
+      return wrapWithTitle(<>{children}</>);
   }
 }

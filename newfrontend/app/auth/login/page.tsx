@@ -1,5 +1,5 @@
 "use client"
-import ProtectedPage from "../../components/ProtectedPage/ProtectedPage";
+import RouteGuard from "../../components/RouteGuard/RouteGuard";
 import Navbar from "../../components/Navbar/Navbar";
 import Link from "next/link";
 import { LuArrowUpRight } from "react-icons/lu";
@@ -24,7 +24,7 @@ export default function Login() {
     };
 
     return (
-        <ProtectedPage type="public" title="Login - Linkkk">
+        <RouteGuard type="public" title="Login - Linkkk">
             <Navbar />
             <main className="mt-20 w-full h-[calc(100dvh-10rem)] flex items-center justify-center">
                 <div className="bg-dark w-11/12 md:w-3/4 max-w-xl mx-auto p-1 text-light rounded-3xl">
@@ -76,6 +76,6 @@ export default function Login() {
                     </div>
                 </div>
             </main>
-        </ProtectedPage>
+        </RouteGuard>
     );
 }

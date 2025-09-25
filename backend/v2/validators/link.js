@@ -77,8 +77,12 @@ const createLinkSchema = z.object({
       message: "Custom URL must be between 3 and 25 characters long",
     }),
   expirationDate: z
-    .date()
+    .string()
     .optional()
+    .transform((str) => (str ? new Date(str) : undefined))
+    .refine((date) => date === undefined || !isNaN(date.getTime()), {
+      message: "Expiration date must be a valid date string",
+    })
     .refine((date) => date === undefined || date > new Date(), {
       message: "Expiration date must be a valid future date",
     }),

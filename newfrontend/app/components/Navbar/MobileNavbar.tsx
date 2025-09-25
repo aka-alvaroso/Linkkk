@@ -8,7 +8,7 @@ import { useAuthStore } from "../../stores/authStore";
 
 export default function MobileNavbar() {
     const [isOpen, setIsOpen] = useState(false);
-    const { logout, user } = useAuthStore();
+    const { logout, isAuthenticated } = useAuthStore();
     
     const toggleMenu = () => {
         setIsOpen(!isOpen);
@@ -19,7 +19,7 @@ export default function MobileNavbar() {
       <div className="md:hidden bg-light fixed top-0 left-0 right-0 z-40 flex items-center justify-between p-4">
           
           {/* Logo */}
-          <Link href="/" className="text-5xl font-black italic leading-10">
+          <Link href={isAuthenticated ? "/dashboard" : "/"} className="text-5xl font-black italic leading-10">
               k.
           </Link>
 
@@ -46,26 +46,39 @@ export default function MobileNavbar() {
                 <AiOutlineClose size={24}/>
             </Button>
 
-            <ul className="p-2 flex flex-col gap-4">
-                <li className="text-5xl font-black italic">
-                    <Link href="/">Home</Link>   
-                </li>
-                <li className="text-5xl font-black italic">
-                    <Link href="/dashboard">Dashboard</Link>
+            {
+            isAuthenticated ? (
+                <ul className="p-2 flex flex-col">
+                <li className="text-5xl font-black italic mb-4">
+                    <Link href="/dashboard">Home</Link>   
                 </li>
                 <p className="text-2xl font-black italic mt-6 text-black/30">Auth</p>
-                <li className="text-5xl font-black italic">
+                <li className="text-5xl font-black italic mb-4">
+                    <Link href="/profile">Profile</Link>
+                </li>
+                <li className="text-5xl font-black italic mb-4">
+                    <Button onClick={logout} variant="link" className="!p-0">
+                        <p className="text-danger">Log Out</p>
+                    </Button>
+                </li>
+            </ul>
+            ) : (
+                <ul className="p-2 flex flex-col">
+                <li className="text-5xl font-black italic mb-4">
+                    <Link href="/">Home</Link>   
+                </li>
+                <li className="text-5xl font-black italic mb-4">
+                    <Link href="/features">Features</Link>
+                </li>
+                <p className="text-2xl font-black italic mt-6 text-black/30">Auth</p>
+                <li className="text-5xl font-black italic mb-4">
                     <Link href="/auth/login">Log In</Link>
                 </li>
-                <li className="text-5xl font-black italic">
+                <li className="text-5xl font-black italic mb-4">
                     <Link href="/auth/register">Sign Up</Link>
                 </li>
-                {user && (
-                    <li className="text-5xl font-black italic">
-                        <Button onClick={logout} variant="link" className="text-red-600 !p-0">Log Out</Button>
-                    </li>
-                )}
             </ul>
+            )}
 
           </div>
       </div>

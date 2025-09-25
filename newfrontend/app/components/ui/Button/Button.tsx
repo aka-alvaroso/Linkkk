@@ -76,12 +76,12 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       ghost: [
         'bg-transparent',
         'text-dark',
-        'hover:bg-dark/10'
+        'hover:bg-dark/5'
       ],
       link: [
         'bg-transparent',
         'text-dark',
-        'hover:bg-dark/10'
+        'hover:bg-dark/5'
       ]
     };
 
