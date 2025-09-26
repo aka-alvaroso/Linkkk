@@ -4,7 +4,7 @@ interface ChipProps {
   children?: React.ReactNode;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
-  variant?: 'default' | 'success' | 'warning' | 'danger' | 'dark';
+  variant?: 'default' | 'success' | 'warning' | 'danger' | 'dark' | 'info' | 'custom';
   size?: 'sm' | 'md' | 'lg';
   rounded?: 'sm' | 'md' | 'lg' | 'full';
   iconOnly?: boolean;
@@ -23,6 +23,9 @@ export const Chip: React.FC<ChipProps> = ({
   className = '',
   onClick,
 }) => {
+  // Check if className contains color classes (bg- or text-)
+  const hasCustomColors = className.includes('bg-') || className.includes('text-');
+  const effectiveVariant = hasCustomColors ? 'custom' : variant;
   // Base styles
   const baseStyles = 'inline-flex items-center justify-center font-medium transition duration-200';
   
@@ -48,6 +51,8 @@ export const Chip: React.FC<ChipProps> = ({
     warning: 'text-warning bg-warning/10 hover:bg-warning/20',
     danger: 'text-danger bg-danger/10 hover:bg-danger/20',
     dark: 'text-light bg-dark hover:bg-dark/80',
+    info: 'text-blue-400 bg-blue-400/10 hover:bg-blue-400/20',
+    custom: '', // No styles for custom variant - uses only className
   };
   
   // Cursor style
@@ -58,7 +63,7 @@ export const Chip: React.FC<ChipProps> = ({
     baseStyles,
     sizeStyles[size],
     roundedStyles[rounded],
-    variantStyles[variant],
+    variantStyles[effectiveVariant],
     cursorStyle,
     className,
   ].join(' ');

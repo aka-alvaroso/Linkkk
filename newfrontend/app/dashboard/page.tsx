@@ -1,43 +1,17 @@
 "use client"
 import { useState, useEffect } from "react";
-import { TbFilterPlus, TbLayoutGrid, TbBaselineDensitySmall, TbLayoutList , TbSwitchVertical, TbBolt, TbLink, TbTiltShiftFilled, TbCalendarX, TbFolder, TbTags, TbQrcode, TbClick, TbAdjustments} from "react-icons/tb";
+import { TbFilterPlus, TbSwitchVertical, TbEdit, TbPlus} from "react-icons/tb";
 
 import { useLinkStore } from "@/app/stores/linkStore";
 
 import RouteGuard from '@/app/components/RouteGuard/RouteGuard';
 import Navbar from '@/app/components/Navbar/Navbar';
 import Button from "@/app/components/ui/Button/Button";
-import LinkList from "@/app/components/LinkList/LinkList";
+import LinkDetails from "@/app/components/LinkList/LinkDetails";
 
 export default function Dashboard() {
   const { links, getLinks } = useLinkStore();
-  const [view, setView] = useState('list');
-  const showingProps = [
-    {
-      key: 'shortUrl',
-      show: true,
-      label: 'Short url',
-      icon: <TbBolt size={20} className="text-dark/40" />
-    },
-    {
-      key: 'longUrl',
-      show: true,
-      label: 'Final url',
-      icon: <TbLink size={20} className="text-dark/40" />
-    },
-    {
-      key: 'status',
-      show: true,
-      label: 'Status',
-      icon: <TbTiltShiftFilled size={20} className="text-dark/40" />
-    },
-    {
-      key: 'dateExpire',
-      show: true,
-      label: 'Expiration date',
-      icon: <TbCalendarX size={20} className="text-dark/40" />
-    }
-  ];
+  const [view, setView] = useState('details');
 
   useEffect(() => {
     getLinks();
@@ -83,17 +57,28 @@ export default function Dashboard() {
             <Button variant="ghost" className="" size="sm" leftIcon={<TbSwitchVertical size={20} />}>
               <span className=''>Order by</span>
             </Button>
-            <div className='flex items-center gap-4'>
+            {/* <div className='flex items-center gap-1'>
               <Button variant={`${view === 'list' ? 'solid' : 'ghost'}`} className={`${view === 'list' ? 'bg-dark text-light' : ''}`} size="sm" iconOnly leftIcon={<TbBaselineDensitySmall size={20} onClick={() => setView('list')} />} />
               <Button variant={`${view === 'details' ? 'solid' : 'ghost'}`} className={`${view === 'details' ? 'bg-dark text-light' : ''}`} size="sm" iconOnly leftIcon={<TbLayoutList size={20} onClick={() => setView('details')} />} />
               <Button variant={`${view === 'grid' ? 'solid' : 'ghost'}`} className={`${view === 'grid' ? 'bg-dark text-light' : ''}`} size="sm" iconOnly leftIcon={<TbLayoutGrid size={20} onClick={() => setView('grid')} />} />
-            </div>
+            </div> */}
           </div>
         </div>
+         
+        <div className='flex flex-wrap items-center justify-between'>
+            <h3 className='text-2xl font-black italic'>My links</h3>
 
-        {view === 'list' && <LinkList showingProps={showingProps.filter((prop) => prop.show)} links={links} view={view} />}
-        {/* {view === 'details' && <LinkDetails />}
-        {view === 'grid' && <LinkGrid />} */}
+            <div className='flex items-center gap-2'>
+                <Button variant='ghost' size='sm' rounded='xl' leftIcon={<TbEdit size={20} />}>
+                    Edit view
+                </Button>
+                <Button variant='solid' size='sm' rounded='xl' leftIcon={<TbPlus size={20} />}>
+                    New link
+                </Button>
+            </div>
+        </div>
+
+        {view === 'details' && <LinkDetails links={links} />}
 
       </div>
     </RouteGuard>
