@@ -1,10 +1,9 @@
 import React from 'react'
 import { Link } from '@/app/stores/linkStore'
-import { TbArrowFork, TbCalendarCheck, TbCalendarExclamation, TbCalendarOff, TbCalendarX, TbClick, TbDotsVertical, TbInputCheck, TbLibrary, TbLocation, TbLocationOff, TbLockPassword, TbMapPinOff, TbSettings, TbTrash, TbEdit, TbCopy, TbQrcode, TbChartBar, TbShare } from 'react-icons/tb'
+import { TbArrowFork, TbCalendarCheck, TbCalendarExclamation, TbCalendarOff, TbCalendarX, TbClick, TbCopy, TbDotsVertical, TbInputCheck, TbLibrary, TbLocation, TbLocationOff, TbLockPassword, TbMapPinOff, TbSettings, TbShare3, TbTrash } from 'react-icons/tb'
 import { FiCornerDownRight } from "react-icons/fi";
 import Button from '@/app/components/ui/Button/Button';
 import Chip from '@/app/components/ui/Chip/Chip';
-import FloatingDropdown from '@/app/components/ui/FloatingDropdown/FloatingDropdown';
 import { getExpirationStatus, formatDate } from '@/app/utils/dateUtils';
 
 
@@ -17,58 +16,6 @@ interface LinkItemProps {
 export default function LinkItem({ view, data }: LinkItemProps) {
 
     const dateStatus = getExpirationStatus(data.dateExpire);
-
-    // Dropdown menu actions
-    const handleCopyShortUrl = () => {
-        navigator.clipboard.writeText(`linkkk.dev/${data.shortUrl}`);
-        // TODO: Add toast notification
-        console.log('Short URL copied to clipboard');
-    };
-
-    const handleCopyLongUrl = () => {
-        navigator.clipboard.writeText(data.longUrl);
-        // TODO: Add toast notification
-        console.log('Long URL copied to clipboard');
-    };
-
-    const handleModify = () => {
-        // TODO: Open edit modal
-        console.log('Edit link:', data.id);
-    };
-
-    const handleDelete = () => {
-        // TODO: Show confirmation dialog
-        console.log('Delete link:', data.id);
-    };
-
-    // Dropdown menu items
-    const dropdownItems = [
-        {
-            id: 'copyShortUrl',
-            label: 'Copy Short URL',
-            icon: <TbCopy size={16} />,
-            onClick: handleCopyShortUrl,
-        },
-        {
-            id: 'copyLongUrl',
-            label: 'Copy Long URL',
-            icon: <TbCopy size={16} />,
-            onClick: handleCopyLongUrl,
-        },
-        {
-            id: 'modify',
-            label: 'Modify link',
-            icon: <TbSettings size={16} />,
-            onClick: handleModify,
-        },
-        {
-            id: 'delete',
-            label: 'Delete link',
-            variant: 'danger',
-            icon: <TbTrash size={16} />,
-            onClick: handleDelete,
-        }
-    ];
     
     if (view === 'list') {
         return <></>;
@@ -77,45 +24,49 @@ export default function LinkItem({ view, data }: LinkItemProps) {
     if (view === 'details') {
         return (
             <div className='relative flex group'>
-                <div className='absolute h-full top-0 left-0 opacity-0 flex flex-col items-center justify-center transition transform scale-0 group-hover:opacity-100 group-hover:scale-100'>
+                <div className='absolute top-1/2 left-0 opacity-0 grid grid-cols-2 grid-rows-2 items-center transition transform -translate-x-1/2 -translate-y-1/2 scale-0 group-hover:opacity-100 group-hover:scale-100'>
+                    <Button 
+                        variant='ghost' 
+                        iconOnly 
+                        leftIcon={<TbCopy size={20} />} 
+                        rounded='xl' 
+                        size='md' 
+                        className='text-dark/40 hover:text-info hover:bg-info/10' 
+                    />
+                    <Button 
+                        variant='ghost' 
+                        iconOnly 
+                        leftIcon={<TbShare3 size={20} />} 
+                        rounded='xl' 
+                        size='md' 
+                        className='text-dark/40 hover:text-success hover:bg-success/10' 
+                    />
                     <Button 
                         variant='ghost' 
                         iconOnly 
                         leftIcon={<TbSettings size={20} />} 
                         rounded='xl' 
-                        size='sm' 
-                        className='w-10 h-8 text-dark/40 hover:text-dark flex-1' 
+                        size='md' 
+                        className='text-dark/40 hover:text-warning hover:bg-warning/10' 
                     />
                     <Button 
                         variant='ghost' 
                         iconOnly 
                         leftIcon={<TbTrash size={20} />} 
                         rounded='xl' 
-                        size='sm' 
-                        className='w-10 h-8 text-dark/40 hover:text-danger flex-1' 
+                        size='md' 
+                        className='text-dark/40 hover:text-danger hover:bg-danger/10' 
                     />
 
                 </div>
 
-                <div className='w-full flex flex-col gap-4 items-start justify-between py-2 px-4 bg-dark/5 rounded-2xl transition transform hover:bg-dark/10 group-hover:translate-x-12'>
+                <div className='w-full flex flex-col gap-4 items-start justify-between py-2 px-4 bg-dark/5 rounded-2xl transition transform hover:cursor-pointer hover:bg-dark/10 group-hover:translate-x-12'>
                     
                     <div className='flex flex-col justify-between sm:flex-row gap-2 w-full'>
                         {/* URLs */}
                         <div className='flex flex-col w-full sm:max-w-1/2'>
                             <div className='flex items-center justify-between'>
                                 <p className='text-lg italic'>linkkk.dev/<span className='font-bold'>{data.shortUrl}</span></p>
-                                <FloatingDropdown
-                                    trigger={
-                                        <Button 
-                                            variant='ghost' 
-                                            iconOnly 
-                                            leftIcon={<TbDotsVertical size={16} className='text-dark/40 hover:text-dark sm:hidden' />} 
-                                        />
-                                    }
-                                    items={dropdownItems}
-                                    direction="left"
-                                    className='sm:hidden'
-                                />
                             </div>
                             <div className='flex items-center gap-2 text-dark/50'>
                                 <FiCornerDownRight size={20} /> 
@@ -124,7 +75,7 @@ export default function LinkItem({ view, data }: LinkItemProps) {
                         </div>
 
                         {/* Status & Expiration */}
-                        <div className='flex gap-2 sm:flex-col sm:items-end '>
+                        <div className='flex gap-2 sm:flex-col sm:items-end'>
                                 {data.status ?
                                     <Chip variant="success" size='sm' leftIcon={<TbLocation size={16} />}>
                                         Active
@@ -146,7 +97,7 @@ export default function LinkItem({ view, data }: LinkItemProps) {
 
                     
                     {/* Advanced */}
-                    <div className='flex flex-wrap gap-1 items-center sm:justify-center'>
+                    <div className='flex flex-wrap gap-1 items-center'>
                         {data.password && (
                             <Chip size='sm' className='bg-blue-400/10 text-blue-400' leftIcon={<TbLockPassword size={16} />}>
                                 Protected
@@ -177,7 +128,7 @@ export default function LinkItem({ view, data }: LinkItemProps) {
                         )}
                         {(data.metadataTitle || data.metadataDescription || data.metadataImage) && (
                             <Chip size='sm' className='bg-blue-400/10 text-blue-400' leftIcon={<TbLibrary size={16} />}>
-                                Metadata
+                                Custom Metadata
                             </Chip>
                         )}
                     </div>

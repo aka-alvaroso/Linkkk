@@ -5,13 +5,17 @@ import { TbFilterPlus, TbSwitchVertical, TbEdit, TbPlus} from "react-icons/tb";
 import { useLinkStore } from "@/app/stores/linkStore";
 
 import RouteGuard from '@/app/components/RouteGuard/RouteGuard';
-import Navbar from '@/app/components/Navbar/Navbar';
 import Button from "@/app/components/ui/Button/Button";
 import LinkDetails from "@/app/components/LinkList/LinkDetails";
+import Drawer from "../components/ui/Drawer/Drawer";
+import Sidebar from "@/app/components/Sidebar/Sidebar";
+import { useSidebarStore } from "@/app/stores/sidebarStore";
 
 export default function Dashboard() {
   const { links, getLinks } = useLinkStore();
   const [view, setView] = useState('details');
+  const [createLinkDrawerOpen, setCreateLinkDrawerOpen] = useState(false);
+  const { desktopOpen, toggleDesktop } = useSidebarStore();
 
   useEffect(() => {
     getLinks();
@@ -19,67 +23,69 @@ export default function Dashboard() {
 
   return (
     <RouteGuard type="user-only" title="Dashboard - Linkkk">
-      <Navbar />
-      <div className="my-20 p-2 space-y-8 w-full md:max-w-3/4 md:mx-auto">
-        <h1 className="text-4xl font-black mb-2 italic">Dashboard</h1>
-        
-        {/* Widgets */}
-        <div className='flex items-center gap-1 overflow-x-auto scrollbar-hide lg:grid lg:gap-2 lg:grid-cols-4'>
-          <div className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
-            <h2 className='text-md'>Total links</h2>
-            <p className='text-end text-5xl font-black italic'>182</p>
-          </div>
-          <div className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
-            <h2 className='text-md'>Total clicks</h2>
-            <p className='text-end text-5xl font-black italic'>20.4M</p>
-          </div>
-          <div className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
-            <h2 className='text-md'>Active links</h2>
-            <p className='text-end text-5xl font-black italic'>140</p>
-          </div>
-          <div className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
-            <h2 className='text-md'>API usage</h2>
-            <p className='text-end text-5xl font-black italic'>85<span className='text-xl text-dark/60'>/100</span></p>
-          </div>
-        </div>
+      <div className="md:flex md:flex-row justify-center p-4 md:gap-11">
+        <Sidebar />
 
-        <div className='flex flex-wrap items-center justify-between border-2 border-dark/5 rounded-xl p-1'>
-
-          {/* Filters */}
-          <div className='flex items-center gap-2'>
-            <Button variant="ghost" className="" size="sm" leftIcon={<TbFilterPlus size={20} />}>
-              <span className=''>Add filter</span>
-            </Button>
-          </div>
-
-          {/* View */}
-          <div className='flex items-center justify-between gap-4 w-full sm:w-auto'>
-            <Button variant="ghost" className="" size="sm" leftIcon={<TbSwitchVertical size={20} />}>
-              <span className=''>Order by</span>
-            </Button>
-            {/* <div className='flex items-center gap-1'>
-              <Button variant={`${view === 'list' ? 'solid' : 'ghost'}`} className={`${view === 'list' ? 'bg-dark text-light' : ''}`} size="sm" iconOnly leftIcon={<TbBaselineDensitySmall size={20} onClick={() => setView('list')} />} />
-              <Button variant={`${view === 'details' ? 'solid' : 'ghost'}`} className={`${view === 'details' ? 'bg-dark text-light' : ''}`} size="sm" iconOnly leftIcon={<TbLayoutList size={20} onClick={() => setView('details')} />} />
-              <Button variant={`${view === 'grid' ? 'solid' : 'ghost'}`} className={`${view === 'grid' ? 'bg-dark text-light' : ''}`} size="sm" iconOnly leftIcon={<TbLayoutGrid size={20} onClick={() => setView('grid')} />} />
-            </div> */}
-          </div>
-        </div>
-         
-        <div className='flex flex-wrap items-center justify-between'>
-            <h3 className='text-2xl font-black italic'>My links</h3>
-
-            <div className='flex items-center gap-2'>
-                <Button variant='ghost' size='sm' rounded='xl' leftIcon={<TbEdit size={20} />}>
-                    Edit view
-                </Button>
-                <Button variant='solid' size='sm' rounded='xl' leftIcon={<TbPlus size={20} />}>
-                    New link
-                </Button>
+        {/* Dashboard */}
+        <div className={`mt-20 md:mt-0 transition-all flex-1 md:pr-18 space-y-8 min-w-0 ${desktopOpen ? 'md:ml-64' : 'md:ml-20'}`}>
+          <h1 className="text-4xl font-black mb-2 italic">Dashboard</h1>
+          
+          {/* Widgets */}
+          <div className='flex items-center gap-1 overflow-x-auto scrollbar-hide lg:grid lg:gap-2 lg:grid-cols-4'>
+            <div className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
+              <h2 className='text-md'>Total links</h2>
+              <p className='text-end text-5xl font-black italic'>182</p>
             </div>
+            <div className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
+              <h2 className='text-md'>Total clicks</h2>
+              <p className='text-end text-5xl font-black italic'>20.4M</p>
+            </div>
+            <div className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
+              <h2 className='text-md'>Active links</h2>
+              <p className='text-end text-5xl font-black italic'>140</p>
+            </div>
+            <div className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
+              <h2 className='text-md'>API usage</h2>
+              <p className='text-end text-5xl font-black italic'>85<span className='text-xl text-dark/60'>/100</span></p>
+            </div>
+          </div>
+
+          
+          <div className='flex flex-wrap items-center justify-between'>
+            
+            <div className='flex items-center gap-2'>
+              <h3 className='text-3xl font-black italic'>My links</h3>
+              <Button variant="ghost" className="" size="sm" rounded="xl" leftIcon={<TbFilterPlus size={20} />}>
+                <span className=''>Add filter</span>
+              </Button>
+            </div>
+
+              <div className='flex items-center gap-2'>
+                  {/* <Button variant='ghost' size='sm' rounded='xl' leftIcon={<TbEdit size={20} />}>
+                      Edit view
+                  </Button> */}
+                  <Button variant="ghost" className="" size="sm" rounded="xl" leftIcon={<TbSwitchVertical size={20} />}>
+                    <span className=''>Order by</span>
+                  </Button>
+                  <Button variant='solid' size='sm' rounded='xl' leftIcon={<TbPlus size={20} />} onClick={() => setCreateLinkDrawerOpen(true)}>
+                      New link
+                  </Button>
+                  <Drawer 
+                    open={createLinkDrawerOpen} 
+                    rounded="3xl" 
+                    onClose={() => setCreateLinkDrawerOpen(false)} 
+                    className="p-4 border-2 border-dark rounded-tr-none rounded-br-none border-r-0"
+                    modal
+                    overlayClassName="bg-black/50"
+                    >
+                    TEST
+                  </Drawer>
+              </div>
+          </div>
+
+          {view === 'details' && <LinkDetails links={links} />}
+
         </div>
-
-        {view === 'details' && <LinkDetails links={links} />}
-
       </div>
     </RouteGuard>
   );

@@ -1,4 +1,5 @@
 import React from 'react';
+import { cn } from '@/app/utils/cn';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'solid' | 'outline' | 'ghost' | 'link';
@@ -28,7 +29,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) => {
-    // Mapeo de rounded
     const roundedClasses = {
       none: 'rounded-none',
       xs: 'rounded-xs',
@@ -42,13 +42,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       full: 'rounded-full'
     };
 
-    // Clases base
     const baseClasses = [
       'inline-flex',
       'items-center',
       'justify-center',
       'font-medium',
-      roundedClasses[rounded],
       'transition-all',
       'duration-200',
       'focus:outline-none',
@@ -58,7 +56,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       'disabled:pointer-events-none'
     ];
 
-    // Variantes de estilo
     const variantClasses = {
       solid: [
         'bg-dark',
@@ -85,7 +82,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       ]
     };
 
-    // Tamaños
     const sizeClasses = {
       xs: iconOnly 
         ? ['w-6', 'h-6', 'p-1', 'text-xs'] 
@@ -104,22 +100,19 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         : ['px-8', 'py-4', 'text-xl'],
     };
 
-    // Clases adicionales
     const additionalClasses = [
-      iconOnly && 'rounded-full',
       loading && 'cursor-wait'
     ].filter(Boolean);
 
-    // Combinar todas las clases
-    const buttonClasses = [
+    const buttonClasses = cn(
       ...baseClasses,
+      roundedClasses[rounded],
       ...variantClasses[variant],
       ...sizeClasses[size],
       ...additionalClasses,
       className
-    ].join(' ');
+    );
 
-    // Contenido del botón
     const buttonContent = () => {
       if (loading) {
         return (
