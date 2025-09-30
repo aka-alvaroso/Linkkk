@@ -1,19 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSidebarStore } from '@/app/stores/sidebarStore';
 import Link from 'next/link';
 import Button from '@/app/components/ui/Button/Button';
-import { TbInfoCircle, TbLayoutSidebarLeftCollapse, TbLayoutSidebarLeftExpand, TbPlus, TbSettings } from 'react-icons/tb';
+import { TbDirection, TbInfoCircle, TbLayoutSidebarLeftCollapse, TbLayoutSidebarLeftExpand, TbPlus, TbSettings } from 'react-icons/tb';
 import { HiCode, HiHome, HiSparkles } from 'react-icons/hi';
 import Image from 'next/image';
 
 const DesktopSidebar = () => {
     const { desktopOpen, toggleDesktop } = useSidebarStore();
+    const [ selected, setSelected ] = useState('home');
     const sidebarWidth = desktopOpen ? 'w-64' : 'w-20';
 
     return (
         <div className={`m-4 h-[calc(100vh-2rem)] hidden md:flex flex-col gap-2 items-center fixed top-0 left-0 ${sidebarWidth} flex-shrink-0 transition-all duration-300 ease-in-out `}>
             
-            <div className='w-full  flex-1 flex flex-col gap-2 items-center p-2 bg-dark/5 rounded-xl'>
+            <div className='w-full flex flex-col gap-2 items-center p-2 bg-dark/5 rounded-xl'>
                 {/* Header */}
                 <div className="flex items-center justify-between w-full">
                     {/* Logo */}
@@ -39,7 +40,7 @@ const DesktopSidebar = () => {
                         size="sm" 
                         rounded="xl" 
                         iconOnly={!desktopOpen}
-                        className='w-full'
+                        className={`w-full ${desktopOpen ? 'h-12' : 'size-12 mx-auto'}`}
                         leftIcon={<TbPlus size={20} />}
                     >
                             {desktopOpen ? 
@@ -50,46 +51,49 @@ const DesktopSidebar = () => {
 
                 {/* Links */}
                 <div className='my-2 w-full flex flex-col gap-2'>
-                    <Link href="/">
+                    <Link href="/dashboard">
                         <Button
+                            onClick={() => setSelected('home')}
                             variant='link'
                             size='sm'
                             rounded='xl'
-                            className='w-full flex justify-start gap-2 hover:bg-transparent transition-all duration-200 ease-in-out transform hover:translate-x-2 '
+                            className={`p-1 w-full flex gap-2 hover:bg-transparent transition-all duration-200 ease-in-out transform hover:translate-x-2 ${selected === 'home' ? 'text-dark' : 'text-dark/50'} ${desktopOpen ? 'justify-start h-10' : 'size-10 mx-auto'}`}
                         >
                             <HiHome size={22} />
                             {desktopOpen ? 
-                                <span className='font-black italic text-xl'>Home</span> 
+                                <span className={`font-black text-xl`}>Home</span>
                             : null}
                         </Button>
                     </Link>
 
                     
-                    <Link href="/bio">
+                    <Link href="/dashboard">
                         <Button
+                            onClick={() => setSelected('bio')}
                             variant='link'
                             size='sm'
                             rounded='xl'
-                            className='w-full flex justify-start gap-2 hover:bg-transparent transition-all duration-200 ease-in-out transform hover:translate-x-2 '
+                            className={`p-1 w-full flex gap-2 hover:bg-transparent transition-all duration-200 ease-in-out transform hover:translate-x-2 ${selected === 'bio' ? 'text-dark' : 'text-dark/50'} ${desktopOpen ? 'justify-start h-10' : 'size-10 mx-auto'}`}
                         >
                             <HiSparkles size={22} />
                             {desktopOpen ? 
-                                <span className='font-black italic text-xl'>Bio Page</span> 
+                                <span className={`font-black text-xl`}>Bio Page</span> 
                             : null}
                         </Button>
                     </Link>
 
                     
-                    <Link href="/api">
+                    <Link href="/dashboard">
                         <Button
+                            onClick={() => setSelected('api')}
                             variant='link'
                             size='sm'
                             rounded='xl'
-                            className='w-full flex justify-start gap-2 hover:bg-transparent transition-all duration-200 ease-in-out transform hover:translate-x-2 '
+                            className={`p-1 w-full flex gap-2 hover:bg-transparent transition-all duration-200 ease-in-out transform hover:translate-x-2 ${selected === 'api' ? 'text-dark' : 'text-dark/50'} ${desktopOpen ? 'justify-start h-10' : 'size-10 mx-auto'}`}
                         >
                             <HiCode size={22} />
                             {desktopOpen ? 
-                                <span className='font-black italic text-xl'>API</span> 
+                                <span className={`font-black text-xl`}>API</span> 
                             : null}
                             </Button>
                     </Link>
@@ -98,42 +102,11 @@ const DesktopSidebar = () => {
                 </div>
             </div>
 
-            <div className='w-full flex flex-col items-center gap-2 p-1 bg-dark/5 rounded-xl text-light'>
-                <div className='w-full h-full flex-1 flex flex-col gap-1 p-2 bg-light rounded-lg'>
-                    
-                    <Link href="/dashboard">
-                        <Button 
-                            size='sm' 
-                            iconOnly={!desktopOpen}
-                            rounded='xl'
-                            variant='ghost'
-                            className={`w-full ${desktopOpen ? 'justify-start' : 'justify-center'}`}
-                            leftIcon={<TbSettings size={20} />}
-                        >
-                            {
-                                desktopOpen ? <span className=''>Settings</span> : null
-                            }
-                        </Button>
-                    </Link>
-                    
-                    <Link href="/dashboard">
-                        <Button 
-                            size='sm' 
-                            iconOnly={!desktopOpen}
-                            rounded='xl'
-                            variant='ghost'
-                            className={`w-full ${desktopOpen ? 'justify-start' : 'justify-center'}`} 
-                            leftIcon={<TbInfoCircle size={20} />}
-                        >
-                            {
-                                desktopOpen ? <span className=''>Help</span> : null
-                            }
-                        </Button>
-                    </Link>
+            <div className='mt-auto w-full flex flex-col items-center gap-2 p-1 bg-dark/5 rounded-xl text-light'>
 
-                    <div className='w-full flex justify-between text-dark transition-all duration-200 ease-in-out hover:cursor-pointer hover:bg-dark/5 rounded-xl p-1'>
+                    <div className='relative w-full flex justify-between text-dark transition-all duration-200 ease-in-out hover:cursor-pointer hover:bg-dark/5 rounded-lg p-1 group'>
 
-                        <div className="relative border border-dark rounded-full size-11 overflow-hidden">
+                        <div className="relative rounded-full size-11 overflow-hidden">
                             <Image 
                                 src="https://images.unsplash.com/photo-1758621518225-9248e65dbaee?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
                                 fill
@@ -141,19 +114,22 @@ const DesktopSidebar = () => {
                                 className="object-cover"
                             />
                         </div>
-                        <div className={`flex flex-col flex-1 pl-2 justify-center ${!desktopOpen ? 'hidden' : 'block'}`}>
+                        <div className={`flex flex-col flex-1 pl-2 justify-center transition-all  duration-200 ease-in-out overflow-hidden text-ellipsis ${!desktopOpen ? 'w-0 h-0 opacity-0' : 'delay-150 w-full h-full opacity-100'}`}>
                             <span className='text-sm'>John Doe</span>
                             <span className='text-sm text-dark/50'>john.doe@example.com</span>
                         </div>
 
-
+                        <Button 
+                            variant='ghost'
+                            size='sm'
+                            iconOnly
+                            leftIcon={<TbDirection size={24} />}
+                            rounded='xl'
+                            className={`
+                                absolute top-1/2 right-0 transform -translate-y-1/2 hover:bg-transparent group-hover:scale-120
+                            `}
+                        />
                     </div>
-
-                </div>
-
-                <div className={`text-dark/50 w-full flex justify-start px-2 text-xs ${!desktopOpen ? 'hidden' : 'block'}`}>
-                    © {new Date().getFullYear()} Linkkk. Version 2.1.0 Beta
-                </div>
 
             </div>
             

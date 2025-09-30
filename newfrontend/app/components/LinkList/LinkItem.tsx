@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from '@/app/stores/linkStore'
 import { TbArrowFork, TbCalendarCheck, TbCalendarExclamation, TbCalendarOff, TbCalendarX, TbClick, TbCopy, TbDotsVertical, TbInputCheck, TbLibrary, TbLocation, TbLocationOff, TbLockPassword, TbMapPinOff, TbSettings, TbShare3, TbTrash } from 'react-icons/tb'
 import { FiCornerDownRight } from "react-icons/fi";
 import Button from '@/app/components/ui/Button/Button';
 import Chip from '@/app/components/ui/Chip/Chip';
 import { getExpirationStatus, formatDate } from '@/app/utils/dateUtils';
+import Drawer from '@/app/components/ui/Drawer/Drawer';
 
 
 
@@ -14,6 +15,8 @@ interface LinkItemProps {
   }
 
 export default function LinkItem({ view, data }: LinkItemProps) {
+    
+      const [linkDetailsDrawer, setLinkDetailsDrawer] = useState(false);
 
     const dateStatus = getExpirationStatus(data.dateExpire);
     
@@ -23,7 +26,8 @@ export default function LinkItem({ view, data }: LinkItemProps) {
 
     if (view === 'details') {
         return (
-            <div className='relative flex group'>
+            <>
+            <div className='relative flex group' onClick={() => setLinkDetailsDrawer(true)}>
                 <div className='absolute top-1/2 left-0 opacity-0 grid grid-cols-2 grid-rows-2 items-center transition transform -translate-x-1/2 -translate-y-1/2 scale-0 group-hover:opacity-100 group-hover:scale-100'>
                     <Button 
                         variant='ghost' 
@@ -134,6 +138,21 @@ export default function LinkItem({ view, data }: LinkItemProps) {
                     </div>
                 </div>
             </div>
+            <Drawer 
+                open={linkDetailsDrawer} 
+                onClose={() => setLinkDetailsDrawer(false)} 
+                modal
+                placement='right'
+                size='2xl'
+                rounded='3xl'
+                className='h-full'
+            >
+                <div className='flex flex-col gap-2 items-center'>
+                    <h1 className='text-3xl font-black'>k.</h1>
+                    <p className='text-sm text-dark'>Welcome to Linkkk</p>
+                </div>
+            </Drawer>
+            </>
         )
     }
 

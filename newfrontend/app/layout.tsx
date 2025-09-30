@@ -19,7 +19,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="es">
+      <head>
+      <meta name="view-transition" content="same-origin" />
+      </head>
       <body>
         {children}
       </body>

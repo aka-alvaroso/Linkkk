@@ -1,20 +1,18 @@
 "use client"
 import { useState, useEffect } from "react";
-import { TbFilterPlus, TbSwitchVertical, TbEdit, TbPlus} from "react-icons/tb";
+import { TbFilterPlus, TbSwitchVertical, TbPlus} from "react-icons/tb";
 
 import { useLinkStore } from "@/app/stores/linkStore";
 
 import RouteGuard from '@/app/components/RouteGuard/RouteGuard';
 import Button from "@/app/components/ui/Button/Button";
 import LinkDetails from "@/app/components/LinkList/LinkDetails";
-import Drawer from "../components/ui/Drawer/Drawer";
 import Sidebar from "@/app/components/Sidebar/Sidebar";
 import { useSidebarStore } from "@/app/stores/sidebarStore";
 
 export default function Dashboard() {
   const { links, getLinks } = useLinkStore();
   const [view, setView] = useState('details');
-  const [createLinkDrawerOpen, setCreateLinkDrawerOpen] = useState(false);
   const { desktopOpen, toggleDesktop } = useSidebarStore();
 
   useEffect(() => {
@@ -23,7 +21,7 @@ export default function Dashboard() {
 
   return (
     <RouteGuard type="user-only" title="Dashboard - Linkkk">
-      <div className="md:flex md:flex-row justify-center p-4 md:gap-11">
+      <div className="relative md:flex md:flex-row justify-center p-4 md:gap-11 max-w-[128rem] mx-auto">
         <Sidebar />
 
         {/* Dashboard */}
@@ -67,19 +65,9 @@ export default function Dashboard() {
                   <Button variant="ghost" className="" size="sm" rounded="xl" leftIcon={<TbSwitchVertical size={20} />}>
                     <span className=''>Order by</span>
                   </Button>
-                  <Button variant='solid' size='sm' rounded='xl' leftIcon={<TbPlus size={20} />} onClick={() => setCreateLinkDrawerOpen(true)}>
+                  <Button variant='solid' size='sm' rounded='xl' leftIcon={<TbPlus size={20} />}>
                       New link
                   </Button>
-                  <Drawer 
-                    open={createLinkDrawerOpen} 
-                    rounded="3xl" 
-                    onClose={() => setCreateLinkDrawerOpen(false)} 
-                    className="p-4 border-2 border-dark rounded-tr-none rounded-br-none border-r-0"
-                    modal
-                    overlayClassName="bg-black/50"
-                    >
-                    TEST
-                  </Drawer>
               </div>
           </div>
 
