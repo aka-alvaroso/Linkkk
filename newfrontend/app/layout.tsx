@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import SessionProvider from "./components/SessionProvider";
 
 export const metadata: Metadata = {
   title: "Linkkk",  
@@ -21,10 +22,10 @@ export default function RootLayout({
   return (
     <html lang="es">
       <head>
-      <meta name="view-transition" content="same-origin" />
+        <meta name="view-transition" content="same-origin" />
       </head>
       <body>
-        {children}
+        <SessionProvider>{children}</SessionProvider>
       </body>
     </html>
   );

@@ -51,12 +51,20 @@ export const useLinkStore = create<LinkStore>((set) => ({
     return data;
   },
   updateLink: async (link: Link) => {
-    const response = await fetch(`${API_BASE_URL}/link/${link.id}`, {
+    const response = await fetch(`${API_BASE_URL}/link/${link.shortUrl}`, {
       method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(link),
+      credentials: "include",
     });
-    const data = await response.json();
-    return data;
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    }
+    console.log(await response.json());
+    throw new Error("Failed to update link");
   },
   deleteLink: async (id: string) => {
     const response = await fetch(`${API_BASE_URL}/link/${id}`, {

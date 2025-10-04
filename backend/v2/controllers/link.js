@@ -96,8 +96,7 @@ const createLink = async (req, res) => {
       data.sufix = sufix.toLowerCase();
     }
   }
-  if (expirationDate !== undefined)
-    data.dateExpire = expirationDate;
+  if (expirationDate !== undefined) data.dateExpire = expirationDate;
   if (blockedCountries !== undefined && limits.blockedCountries)
     data.blockedCountries = blockedCountries;
 
@@ -145,7 +144,10 @@ const getLink = async (req, res) => {
       return errorResponse(res, ERRORS.LINK_ACCESS_DENIED);
     }
 
-    return successResponse(res, link);
+    return successResponse(res, {
+      ...link,
+      password: link.password !== null ? true : false,
+    });
   } catch (error) {
     return errorResponse(res, ERRORS.INTERNAL_ERROR);
   }
@@ -168,13 +170,22 @@ const getAllLinks = async (req, res) => {
 
     const links = await prisma.link.findMany({
       where: whereClause,
+      orderBy: {
+        createdAt: "desc",
+      },
     });
 
     if (!links) {
       return errorResponse(res, ERRORS.LINK_NOT_FOUND);
     }
 
-    return successResponse(res, links);
+    return successResponse(
+      res,
+      links.map((link) => ({
+        ...link,
+        password: link.password !== null ? true : false,
+      }))
+    );
   } catch (error) {
     return errorResponse(res, ERRORS.INTERNAL_ERROR);
   }
@@ -245,22 +256,11 @@ const updateLink = async (req, res) => {
   const isGuest = !!guest;
   const limits = isGuest ? planLimits.guest : planLimits.user;
 
-  const {
-    longUrl,
-    status,
-    password,
-    accessLimit,
-    blockedCountries,
-    mobileUrl,
-    desktopUrl,
-    sufix,
-    expirationDate,
-    metadataTitle,
-    metadataDescription,
-    metadataImage,
-  } = req.body;
+  const data = req.body;
 
-  const validatedData = updateLinkSchema.safeParse(req.body);
+  // console.log(data);
+
+  const validatedData = updateLinkSchema.safeParse(data);
 
   if (!validatedData.success) {
     const issues = validatedData.error.issues.map((issue) => ({
@@ -289,41 +289,43 @@ const updateLink = async (req, res) => {
     }
 
     const updateData = {};
-    if (longUrl !== undefined) updateData.longUrl = longUrl;
-    if (status !== undefined) updateData.status = status;
-    if (metadataTitle !== undefined && limits.metadata)
-      updateData.metadataTitle = metadataTitle;
-    if (metadataDescription !== undefined && limits.metadata)
-      updateData.metadataDescription = metadataDescription;
-    if (metadataImage !== undefined && limits.metadata)
-      updateData.metadataImage = metadataImage;
-    if (password !== undefined && limits.password) {
-      updateData.password = password ? await bcryptjs.hash(password, 10) : null;
+    if (data.longUrl !== undefined) updateData.longUrl = data.longUrl;
+    if (data.status !== undefined) updateData.status = data.status;
+    if (data.metadataTitle !== undefined && limits.metadata)
+      updateData.metadataTitle = data.metadataTitle;
+    if (data.metadataDescription !== undefined && limits.metadata)
+      updateData.metadataDescription = data.metadataDescription;
+    if (data.metadataImage !== undefined && limits.metadata)
+      updateData.metadataImage = data.metadataImage;
+    if (data.password !== undefined && limits.password) {
+      updateData.password = data.password
+        ? await bcryptjs.hash(data.password, 10)
+        : null;
     }
-    if (accessLimit !== undefined && limits.accessLimit)
-      updateData.accessLimit = accessLimit;
-    if (mobileUrl !== undefined && limits.smartRedirection)
-      updateData.mobileUrl = mobileUrl;
-    if (desktopUrl !== undefined && limits.smartRedirection)
-      updateData.desktopUrl = desktopUrl;
-    if (sufix !== undefined && limits.sufix) {
-      if (sufix) {
+    if (data.accessLimit !== undefined && limits.accessLimit)
+      updateData.accessLimit = data.accessLimit;
+    if (data.mobileUrl !== undefined && limits.smartRedirection)
+      updateData.mobileUrl = data.mobileUrl;
+    if (data.desktopUrl !== undefined && limits.smartRedirection)
+      updateData.desktopUrl = data.desktopUrl;
+    if (data.sufix !== undefined && limits.sufix) {
+      if (data.sufix) {
         const existingSufix = await prisma.link.findFirst({
           where: {
-            sufix: sufix.toLowerCase(),
+            sufix: data.sufix.toLowerCase(),
           },
         });
 
         if (existingSufix) {
           return errorResponse(res, ERRORS.SHORT_URL_EXISTS);
         }
-        updateData.sufix = sufix.toLowerCase();
+        updateData.sufix = data.sufix.toLowerCase();
       }
     }
-    if (expirationDate !== undefined)
-      updateData.dateExpire = expirationDate;
-    if (blockedCountries !== undefined && limits.blockedCountries)
-      updateData.blockedCountries = blockedCountries;
+    if (data.expirationDate !== undefined)
+      updateData.dateExpire = data.expirationDate;
+    if (data.blockedCountries !== undefined && limits.blockedCountries)
+      updateData.blockedCountries = data.blockedCountries;
 
     const updatedLink = await prisma.link.update({
       where: { shortUrl },

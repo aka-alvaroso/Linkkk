@@ -13,7 +13,7 @@ import { useSidebarStore } from "@/app/stores/sidebarStore";
 export default function Dashboard() {
   const { links, getLinks } = useLinkStore();
   const [view, setView] = useState('details');
-  const { desktopOpen, toggleDesktop } = useSidebarStore();
+  const { desktopOpen } = useSidebarStore();
 
   useEffect(() => {
     getLinks();

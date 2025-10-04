@@ -14,16 +14,18 @@ const createLinkSchema = z.object({
     .refine((url) => !url.toLowerCase().startsWith("data:"), {
       message: "Data URLs are not allowed",
     }),
-  status: z.boolean().optional(),
-  password: z.string().optional(),
+  status: z.boolean(),
+  password: z.string().nullable().optional(),
   accessLimit: z
     .number()
+    .nullable()
     .optional()
     .refine((limit) => limit === undefined || limit >= 0, {
       message: "Access limit must be a positive number",
     }),
   blockedCountries: z
     .array(z.string())
+    .nullable()
     .optional()
     .refine(
       (countries) => !countries || countries.every((code) => code.length === 2),
@@ -48,6 +50,7 @@ const createLinkSchema = z.object({
     .refine((url) => !url || !url.toLowerCase().startsWith("data:"), {
       message: "Data URLs are not allowed",
     })
+    .nullable()
     .optional(),
   desktopUrl: z
     .string()
@@ -65,9 +68,11 @@ const createLinkSchema = z.object({
     .refine((url) => !url || !url.toLowerCase().startsWith("data:"), {
       message: "Data URLs are not allowed",
     })
+    .nullable()
     .optional(),
   sufix: z
     .string()
+    .nullable()
     .optional()
     .refine((sufix) => !sufix || /^[a-zA-Z0-9-_]+$/.test(sufix), {
       message:
@@ -78,6 +83,7 @@ const createLinkSchema = z.object({
     }),
   expirationDate: z
     .string()
+    .nullable()
     .optional()
     .transform((str) => (str ? new Date(str) : undefined))
     .refine((date) => date === undefined || !isNaN(date.getTime()), {
@@ -86,12 +92,17 @@ const createLinkSchema = z.object({
     .refine((date) => date === undefined || date > new Date(), {
       message: "Expiration date must be a valid future date",
     }),
-  metadataTitle: z.string().max(200, "Title too long").optional(),
-  metadataDescription: z.string().max(500, "Description too long").optional(),
+  metadataTitle: z.string().max(200, "Title too long").nullable().optional(),
+  metadataDescription: z
+    .string()
+    .max(500, "Description too long")
+    .nullable()
+    .optional(),
   metadataImage: z
     .string()
     .url()
     .max(2048, "Metadata image URL too long")
+    .nullable()
     .optional()
     .refine(
       (url) => !url || url.startsWith("http://") || url.startsWith("https://"),

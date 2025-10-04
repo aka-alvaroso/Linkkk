@@ -100,7 +100,6 @@ const optionalGuest = (req, res, next) => {
       const guestDecoded = jwt.verify(guestToken, GUEST_SECRET_KEY);
       req.guest = guestDecoded;
     } catch (error) {
-      // Si hay error, simplemente no asignamos guest
       req.guest = null;
     }
   }
@@ -108,12 +107,10 @@ const optionalGuest = (req, res, next) => {
   next();
 };
 
-// Middleware para validación que intenta obtener cualquier sesión disponible
 const optionalAuth = (req, res, next) => {
   let token = req.cookies.token;
   let guestToken = req.cookies.guestToken;
 
-  // Intentar obtener token user del header si no está en cookies
   if (!token && req.headers.authorization) {
     const authHeader = req.headers.authorization;
     if (authHeader.startsWith("Bearer ") && authHeader.length > 7) {
@@ -121,29 +118,24 @@ const optionalAuth = (req, res, next) => {
     }
   }
 
-  // Intentar verificar token de usuario
   if (token) {
     try {
       const decoded = jwt.verify(token, AUTH_SECRET_KEY);
       req.user = decoded;
     } catch (error) {
-      // Si hay error, no asignamos user
       req.user = null;
     }
   }
 
-  // Intentar verificar token de guest
   if (guestToken) {
     try {
       const guestDecoded = jwt.verify(guestToken, GUEST_SECRET_KEY);
       req.guest = guestDecoded;
     } catch (error) {
-      // Si hay error, no asignamos guest
       req.guest = null;
     }
   }
 
-  // Siempre continúa, sin importar si hay tokens o no
   next();
 };
 

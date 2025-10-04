@@ -77,13 +77,13 @@ const Drawer: React.FC<DrawerProps> = ({
     };
     
     const sizeClasses = {
-        xs: 'w-3/12 h-3/12',
-        sm: 'w-4/12 h-4/12',
-        md: 'w-5/12 h-5/12',
-        lg: 'w-6/12 h-6/12',
-        xl: 'w-7/12 h-7/12',
-        '2xl': 'w-9/12 h-9/12',
-        '3xl': 'w-11/12 h-11/12',
+        xs: 'w-full md:w-3/12 h-3/12',
+        sm: 'w-full md:w-4/12 h-4/12',
+        md: 'w-full md:w-5/12 h-5/12',
+        lg: 'w-full md:w-6/12 h-6/12',
+        xl: 'w-full md:w-7/12 h-7/12',
+        '2xl': 'w-full md:w-9/12 h-9/12',
+        '3xl': 'w-full md:w-11/12 h-11/12',
         full: 'w-full h-full',
     }
 

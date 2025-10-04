@@ -13,10 +13,17 @@ const validateSession = (req, res) => {
   const user = req.user;
   const guest = req.guest;
 
-  return successResponse(res, {
-    user,
-    guest,
-  });
+  if (user) {
+    return successResponse(res, {
+      user,
+    });
+  } else if (guest) {
+    return successResponse(res, {
+      guest,
+    });
+  } else {
+    return errorResponse(res, ERRORS.UNAUTHORIZED);
+  }
 };
 
 const createGuestSession = async (req, res) => {
