@@ -12,6 +12,9 @@ const ERRORS = require("./v2/constants/errorCodes");
 const authRouter = require("./v2/routers/auth");
 const linkRouter = require("./v2/routers/link");
 
+// Controllers
+const { redirectLink } = require("./v2/controllers/link");
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -68,8 +71,12 @@ app.get("/status", (req, res) => {
   res.send("Server running");
 });
 
+// API routes (must be before redirect catch-all)
 app.use("/auth", authRouter);
 app.use("/link", linkRouter);
+
+// Public redirect endpoint (LAST - catches everything else)
+app.get("/:shortUrl", redirectLink);
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);

@@ -401,6 +401,36 @@ const generateShortCode = async () => {
   return shortCode;
 };
 
+// 7. Redirect to long URL (public endpoint)
+const redirectLink = async (req, res) => {
+  const { shortUrl } = req.params;
+
+  try {
+    // Buscar link por shortUrl o sufix
+    const link = await prisma.link.findFirst({
+      where: {
+        OR: [{ shortUrl }, { sufix: shortUrl.toLowerCase() }],
+      },
+    });
+
+    // 1. Verificar si existe
+    if (!link) {
+      return res.redirect(`${process.env.FRONTEND_URL}/404?url=${shortUrl}`);
+    }
+
+    // 2. Verificar status (si está activo)
+    if (!link.status) {
+      return res.redirect(`${process.env.FRONTEND_URL}/disabled`);
+    }
+
+    // 3. Redirect exitoso
+    return res.redirect(302, link.longUrl);
+  } catch (error) {
+    console.error("Redirect error:", error);
+    return res.redirect(`${process.env.FRONTEND_URL}/error`);
+  }
+};
+
 module.exports = {
   createLink,
   getLink,
@@ -408,4 +438,5 @@ module.exports = {
   validateLinkPassword,
   updateLink,
   deleteLink,
+  redirectLink,
 };
