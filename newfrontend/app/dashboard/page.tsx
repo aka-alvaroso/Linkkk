@@ -8,12 +8,14 @@ import RouteGuard from '@/app/components/RouteGuard/RouteGuard';
 import Button from "@/app/components/ui/Button/Button";
 import LinkDetails from "@/app/components/LinkList/LinkDetails";
 import Sidebar from "@/app/components/Sidebar/Sidebar";
+import CreateLinkDrawer from "@/app/components/Drawer/CreateLinkDrawer";
 import { useSidebarStore } from "@/app/stores/sidebarStore";
 
 export default function Dashboard() {
   const { links, getLinks } = useLinkStore();
   const [view, setView] = useState('details');
   const { desktopOpen } = useSidebarStore();
+  const [createLinkDrawerOpen, setCreateLinkDrawerOpen] = useState(false);
 
   useEffect(() => {
     getLinks();
@@ -65,7 +67,7 @@ export default function Dashboard() {
                   <Button variant="ghost" className="" size="sm" rounded="xl" leftIcon={<TbSwitchVertical size={20} />}>
                     <span className=''>Order by</span>
                   </Button>
-                  <Button variant='solid' size='sm' rounded='xl' leftIcon={<TbPlus size={20} />}>
+                  <Button variant='solid' size='sm' rounded='xl' leftIcon={<TbPlus size={20} />} onClick={() => setCreateLinkDrawerOpen(true)}>
                       New link
                   </Button>
               </div>
@@ -73,6 +75,7 @@ export default function Dashboard() {
 
           {view === 'details' && <LinkDetails links={links} />}
 
+          <CreateLinkDrawer open={createLinkDrawerOpen} onClose={() => setCreateLinkDrawerOpen(false)} />
         </div>
       </div>
     </RouteGuard>

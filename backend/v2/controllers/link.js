@@ -66,7 +66,7 @@ const createLink = async (req, res) => {
 
   const data = {};
   if (longUrl !== undefined) data.longUrl = longUrl;
-  if (status !== undefined && limits.status) data.status = status;
+  if (status !== undefined) data.status = status;
   if (metadataTitle !== undefined && limits.metadata)
     data.metadataTitle = metadataTitle;
   if (metadataDescription !== undefined && limits.metadata)

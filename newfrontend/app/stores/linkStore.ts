@@ -46,6 +46,10 @@ export const useLinkStore = create<LinkStore>((set) => ({
     const response = await fetch(`${API_BASE_URL}/link`, {
       method: "POST",
       body: JSON.stringify(link),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
     });
     const data = await response.json();
     return data;

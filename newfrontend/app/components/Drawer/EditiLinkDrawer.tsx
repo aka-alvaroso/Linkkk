@@ -400,7 +400,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
 
 
                         {/* Status bar */}
-                        <div className={`absolute flex flex-col gap-2 p-4 mb-2 bottom-0 left-1/2 w-1/2 -translate-x-1/2 bg-dark/5 rounded-3xl
+                        <div className={`absolute flex flex-col gap-2 p-4 mb-2 bottom-0 left-1/2 w-1/2 -translate-x-1/2 bg-light border border-dark/10 rounded-3xl
                             transform transition-all duration-200 ease-in-out
                             ${hasChanges ? 'opacity-100 -translate-y-1/2' : 'opacity-0 translate-y-0'}
                             ${statusBar !== 'none' ? 'block' : 'hidden'}
