@@ -6,6 +6,7 @@ import { TbBolt, TbCircleDashed, TbCircleDashedCheck, TbHash, TbLink, TbLock, Tb
 import { useLinkStore } from '@/app/stores/linkStore';
 import Select from '../ui/Select/Select';
 import { FiCornerDownRight } from 'react-icons/fi';
+import { generateRandomPassword } from '@/app/utils/password';
 
 interface CreateLinkDrawerProps {
     open: boolean;
@@ -93,12 +94,6 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
             setLoading(false);
             setShowStatusBar("none");
         }
-    };
-
-    const generateRandomPassword = () => {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
-        const password = Array.from({ length: 12 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
-        setNewLink({ ...newLink, password });
     };
 
     return (
@@ -189,10 +184,10 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
                         <Button
                             variant='solid'
                             size='sm'
-                            leftIcon={<TbRefresh size={20} />}
+                            leftIcon={<TbRefresh size={20} className='group-hover:rotate-180 transition-all duration-300' />}
                             rounded='2xl'
-                            className='rounded-2xl bg-info/15 text-info hover:bg-info hover:text-light'
-                            onClick={generateRandomPassword}
+                            className='rounded-2xl bg-info/15 text-info hover:bg-info hover:text-light group'
+                            onClick={() => setNewLink({ ...newLink, password: generateRandomPassword() })}
                         >
                             Generate
                         </Button>

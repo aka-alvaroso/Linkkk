@@ -7,6 +7,7 @@ import Select from '../ui/Select/Select';
 import Chip from '../ui/Chip/Chip';
 import Input from '../ui/Input/Input';
 import { Link, useLinkStore } from '@/app/stores/linkStore';
+import { generateRandomPassword } from '@/app/utils/password';
 
 
 interface EditiLinkDrawerProps {
@@ -69,9 +70,9 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
     }, [newLink, link, removePassword]);
 
     useEffect(() => {
-        const passwordChanged = link.password
-            ? (newLink.password !== '' || removePassword) // Tiene contraseña: cambió si se modificó el input o se marcó eliminar
-            : newLink.password !== ''; // No tiene: cambió si se escribió algo
+        const passwordChanged = link.hasPassword
+            ? (newLink.password !== '' || removePassword)
+            : newLink.password !== '';
 
         const otherFieldsChanged =
             link.status !== newLink.status ||
@@ -101,6 +102,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
             if (d.success) {
                 setShowStatusBar("none");
                 setRemovePassword(false);
+                setNewLink({...link});
                 onClose();
                 getLinks();
             }else{
@@ -350,10 +352,10 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                     <Button
                                         variant='solid'
                                         size='sm'
-                                        leftIcon={<TbRefresh size={20} />}
+                                        leftIcon={<TbRefresh size={20} className='group-hover:-rotate-180 transition-all duration-300' />}
                                         rounded='2xl'
-                                        className='flex-1 rounded-2xl bg-info/15 text-info hover:bg-info hover:text-light'
-                                        onClick={() => setNewLink(link)}
+                                        className='flex-1 rounded-2xl bg-info/15 text-info hover:bg-info hover:text-light group'
+                                        onClick={() => setNewLink({ ...newLink, password: generateRandomPassword() })}
                                     >
                                         Generate
                                     </Button>

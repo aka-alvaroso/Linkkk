@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom';
 import { TbX } from 'react-icons/tb';
 import { cn } from '@/app/utils/cn';
 
@@ -14,19 +15,24 @@ interface DrawerProps {
   onClose: () => void;
 }
 
-const Drawer: React.FC<DrawerProps> = ({ 
-    open = false, 
-    placement = 'right', 
+const Drawer: React.FC<DrawerProps> = ({
+    open = false,
+    placement = 'right',
     modal = false,
-    size = 'md', 
+    size = 'md',
     rounded = 'md',
-    children = null, 
+    children = null,
     className,
     overlayClassName,
-    onClose = () => {} 
+    onClose = () => {}
 }) => {
     const [show, setShow] = useState(open);
     const [isAnimating, setIsAnimating] = useState(false);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     useEffect(() => {
         if (open) {
@@ -51,7 +57,7 @@ const Drawer: React.FC<DrawerProps> = ({
         }
     }, [open]);
 
-    if (!show) return null;
+    if (!show || !mounted) return null;
 
     const transitionVariants = {
         top: isAnimating ? 'translate-y-0 opacity-100' : '-translate-y-10 opacity-0',
@@ -101,28 +107,29 @@ const Drawer: React.FC<DrawerProps> = ({
     };
 
     const drawerClasses = cn(
-        'bg-light z-1002 transition-all duration-300 ease-in-out',
+        'bg-light z-[9999] transition-all duration-300 ease-in-out',
         sizeClasses[size],
         roundedClasses[rounded],
         transitionVariants[mainPlacement],
-        className 
+        className
     );
 
     const overlayClasses = cn(
-        'absolute inset-0 bg-dark/50 z-1001 transition-opacity duration-300',
+        'absolute inset-0 bg-dark/50 z-[9998] transition-opacity duration-300',
         isAnimating ? 'opacity-100' : 'opacity-0 pointer-events-none',
         overlayClassName,
     );
 
-    return (
-        <div className={`fixed inset-0 flex z-1000 p-6 m-0 transition-all duration-300 ease-in-out ${placementClasses[placement]}`}>
+    const drawerContent = (
+        <div className={`fixed inset-0 flex z-[9997] p-6 m-0 transition-all duration-300 ease-in-out ${placementClasses[placement]}`}>
             {modal && <div className={overlayClasses} onClick={open ? onClose : undefined} />}
             <div className={drawerClasses}>
                 {children}
             </div>
         </div>
     );
-  
+
+    return createPortal(drawerContent, document.body);
 }
 
 export default Drawer
