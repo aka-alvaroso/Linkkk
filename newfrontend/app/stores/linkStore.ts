@@ -70,9 +70,10 @@ export const useLinkStore = create<LinkStore>((set) => ({
     console.log(await response.json());
     throw new Error("Failed to update link");
   },
-  deleteLink: async (id: string) => {
-    const response = await fetch(`${API_BASE_URL}/link/${id}`, {
+  deleteLink: async (shortUrl: string) => {
+    const response = await fetch(`${API_BASE_URL}/link/${shortUrl}`, {
       method: "DELETE",
+      credentials: "include",
     });
     const data = await response.json();
     return data;

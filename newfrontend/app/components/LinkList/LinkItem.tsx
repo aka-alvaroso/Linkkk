@@ -6,6 +6,7 @@ import Button from '@/app/components/ui/Button/Button';
 import Chip from '@/app/components/ui/Chip/Chip';
 import { getExpirationStatus, formatDate } from '@/app/utils/dateUtils';
 import EditLinkDrawer from '@/app/components/Drawer/EditiLinkDrawer';
+import { useLinkStore } from '@/app/stores/linkStore';
 
 
 
@@ -15,8 +16,8 @@ interface LinkItemProps {
   }
 
 export default function LinkItem({ view, data }: LinkItemProps) {
-    
-      const [linkDetailsDrawer, setLinkDetailsDrawer] = useState(false);
+    const { deleteLink, getLinks } = useLinkStore();    
+    const [linkDetailsDrawer, setLinkDetailsDrawer] = useState(false);
 
     const dateStatus = getExpirationStatus(data.dateExpire);
     
@@ -36,6 +37,10 @@ export default function LinkItem({ view, data }: LinkItemProps) {
                         rounded='xl' 
                         size='md' 
                         className='text-dark/40 hover:text-info hover:bg-info/10' 
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            navigator.clipboard.writeText(`https://linkkk.dev/${data.sufix || data.shortUrl}`);
+                        }}
                     />
                     <Button 
                         variant='ghost' 
@@ -60,6 +65,11 @@ export default function LinkItem({ view, data }: LinkItemProps) {
                         rounded='xl' 
                         size='md' 
                         className='text-dark/40 hover:text-danger hover:bg-danger/10' 
+                        onClick={async (e) => {
+                            e.stopPropagation();
+                            await deleteLink(data.shortUrl);  
+                            await getLinks();
+                        }}
                     />
 
                 </div>
@@ -70,7 +80,7 @@ export default function LinkItem({ view, data }: LinkItemProps) {
                         {/* URLs */}
                         <div className='flex flex-col w-full sm:max-w-1/2'>
                             <div className='flex items-center justify-between'>
-                                <p className='text-lg italic'>linkkk.dev/<span className='font-bold'>{data.shortUrl}</span></p>
+                                <p className='text-lg italic'>linkkk.dev/<span className='font-bold'>{data.sufix || data.shortUrl}</span></p>
                             </div>
                             <div className='flex items-center gap-2 text-dark/50'>
                                 <FiCornerDownRight size={20} /> 
