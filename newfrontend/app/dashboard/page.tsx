@@ -9,17 +9,32 @@ import Button from "@/app/components/ui/Button/Button";
 import LinkDetails from "@/app/components/LinkList/LinkDetails";
 import Sidebar from "@/app/components/Sidebar/Sidebar";
 import CreateLinkDrawer from "@/app/components/Drawer/CreateLinkDrawer";
+import FilterModal from "@/app/components/Modal/FilterModal";
 import { useSidebarStore } from "@/app/stores/sidebarStore";
+import type { LinkFilters } from "@/app/stores/linkStore";
 
 export default function Dashboard() {
-  const { links, getLinks } = useLinkStore();
+  const { filteredLinks, filters, getLinks, setFilters } = useLinkStore();
   const [view, setView] = useState('details');
   const { desktopOpen } = useSidebarStore();
   const [createLinkDrawerOpen, setCreateLinkDrawerOpen] = useState(false);
+  const [filterModalOpen, setFilterModalOpen] = useState(false);
 
   useEffect(() => {
     getLinks();
   }, [getLinks]);
+
+  const handleApplyFilters = (newFilters: LinkFilters) => {
+    setFilters(newFilters);
+  };
+
+  const hasActiveFilters = () => {
+    return filters.search !== '' ||
+           filters.status !== 'all' ||
+           filters.hasPassword !== 'all' ||
+           filters.expiration !== 'all' ||
+           filters.hasAccessLimit !== 'all';
+  };
 
   return (
     <RouteGuard type="user-only" title="Dashboard - Linkkk">
@@ -55,8 +70,17 @@ export default function Dashboard() {
             
             <div className='flex items-center gap-2'>
               <h3 className='text-3xl font-black italic'>My links</h3>
-              <Button variant="ghost" className="" size="sm" rounded="xl" leftIcon={<TbFilterPlus size={20} />}>
-                <span className=''>Add filter</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                rounded="xl"
+                leftIcon={<TbFilterPlus size={20} />}
+                onClick={() => setFilterModalOpen(true)}
+                className={hasActiveFilters() ? 'bg-info/10 text-info hover:bg-info/20' : ''}
+              >
+                <span className=''>
+                  {hasActiveFilters() ? 'Filters active' : 'Add filter'}
+                </span>
               </Button>
             </div>
 
@@ -73,9 +97,15 @@ export default function Dashboard() {
               </div>
           </div>
 
-          {view === 'details' && <LinkDetails links={links} />}
+          {view === 'details' && <LinkDetails links={filteredLinks} />}
 
           <CreateLinkDrawer open={createLinkDrawerOpen} onClose={() => setCreateLinkDrawerOpen(false)} />
+          <FilterModal
+            open={filterModalOpen}
+            onClose={() => setFilterModalOpen(false)}
+            onApplyFilters={handleApplyFilters}
+            initialFilters={filters}
+          />
         </div>
       </div>
     </RouteGuard>
