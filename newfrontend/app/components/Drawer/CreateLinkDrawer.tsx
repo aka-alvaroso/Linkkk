@@ -5,6 +5,7 @@ import Button from '@/app/components/ui/Button/Button';
 import { TbBolt, TbCircleDashed, TbCircleDashedCheck, TbHash, TbLink, TbLock, TbRefresh, TbSparkles } from 'react-icons/tb';
 import { useLinkStore } from '@/app/stores/linkStore';
 import Select from '../ui/Select/Select';
+import { FiCornerDownRight } from 'react-icons/fi';
 
 interface CreateLinkDrawerProps {
     open: boolean;
@@ -36,6 +37,21 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
         }
     }, [newLink]);
 
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                if (newLink.longUrl.trim()) {
+                    setShowStatusBar("loading");
+                    handleCreateLink();
+                }
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [newLink.longUrl]);
+
     const handleCreateLink = async () => {
         if (!newLink.longUrl) {
             setError('Long URL is required');
@@ -57,9 +73,6 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
 
             const response = await createLink(linkData);
 
-            console.log(linkData)
-            console.log(response)
-
             if (response.success) {
                 setNewLink({
                     longUrl: '',
@@ -78,6 +91,7 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
             console.error(err);
         } finally {
             setLoading(false);
+            setShowStatusBar("none");
         }
     };
 
@@ -113,6 +127,7 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
                         rounded='2xl'
                         leftIcon={<TbLink size={20} className='text-info' />}
                         className='w-full'
+                        autoFocus
                     />
                 </div>
 
@@ -242,8 +257,15 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
                                                 rounded='2xl'
                                                 className='flex-1 rounded-xl border-info text-info hover:bg-info/15 hover:text-info'
                                                 onClick={() => {
+                                                    setNewLink({
+                                                        longUrl: '',
+                                                        sufix: '',
+                                                        accessLimit: undefined as number | undefined,
+                                                        password: '',
+                                                        status: true,
+                                                    });
                                                     setShowStatusBar("none");
-                                                    setNewLink({...newLink});
+                                                    onClose();
                                                 }}
                                             >
                                                 Cancel
@@ -259,6 +281,9 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
                                                 }}
                                             >
                                                 Create Link
+                                                <span className='ml-2 text-xs border border-light rounded-lg p-1'>
+                                                    <FiCornerDownRight size={14} />
+                                                </span>
                                             </Button>
                                         </div>
                                     </>

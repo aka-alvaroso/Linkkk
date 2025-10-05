@@ -41,8 +41,15 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
     };
 
     useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
+        const handleKeyDown = async (e: KeyboardEvent) => {
             const activeElement = document.activeElement;
+
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                setShowStatusBar("loading");
+                await handleUpdateLink();
+            }
+
             if (activeElement?.tagName === 'INPUT' || activeElement?.tagName === 'TEXTAREA') return;
 
             if (e.key === '1') {
@@ -59,10 +66,10 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
         };
-    }, []);
+    }, [newLink, link, removePassword]);
 
     useEffect(() => {
-        const passwordChanged = link.hasPassword
+        const passwordChanged = link.password
             ? (newLink.password !== '' || removePassword) // Tiene contraseña: cambió si se modificó el input o se marcó eliminar
             : newLink.password !== ''; // No tiene: cambió si se escribió algo
 
@@ -443,6 +450,9 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                                 }}
                                             >
                                                 Update Link
+                                                <span className='ml-2 text-xs border border-light rounded-lg p-1'>
+                                                    <FiCornerDownRight size={14} />
+                                                </span> 
                                             </Button>
                                         </div>
                                     </>

@@ -1,15 +1,31 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSidebarStore } from '@/app/stores/sidebarStore';
 import Link from 'next/link';
 import Button from '@/app/components/ui/Button/Button';
 import { TbDirection, TbInfoCircle, TbLayoutSidebarLeftCollapse, TbLayoutSidebarLeftExpand, TbPlus, TbSettings } from 'react-icons/tb';
 import { HiCode, HiHome, HiSparkles } from 'react-icons/hi';
 import Image from 'next/image';
+import CreateLinkDrawer from '@/app/components/Drawer/CreateLinkDrawer';
 
 const DesktopSidebar = () => {
     const { desktopOpen, toggleDesktop } = useSidebarStore();
+    const [createLinkDrawer, setCreateLinkDrawer] = useState(false);
     const [ selected, setSelected ] = useState('home');
     const sidebarWidth = desktopOpen ? 'w-64' : 'w-20';
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+        if (event.ctrlKey && event.key === 'k') {
+            event.preventDefault();
+            setCreateLinkDrawer(true);
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener('keydown', handleKeyDown);
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, []);
 
     return (
         <div className={`m-4 h-[calc(100vh-2rem)] hidden md:flex flex-col gap-2 items-center fixed top-0 left-0 ${sidebarWidth} flex-shrink-0 transition-all duration-300 ease-in-out `}>
@@ -36,17 +52,19 @@ const DesktopSidebar = () => {
                 {/* New Link Button */}
                 <div className="flex items-center justify-between w-full">
                     <Button 
-                        onClick={() => {}}
+                        onClick={() => {setCreateLinkDrawer(true)}}
                         size="sm" 
                         rounded="xl" 
                         iconOnly={!desktopOpen}
                         className={`w-full ${desktopOpen ? 'h-12' : 'size-12 mx-auto'}`}
                         leftIcon={<TbPlus size={20} />}
                     >
-                            {desktopOpen ? 
-                                <span className='font-black italic text-lg'>New</span> 
-                            : null}
+                            <span className='font-black italic text-lg'>New</span> 
+                            <span className='font-black italic text-xs text-info ml-2 border border-info p-1 rounded-lg bg-info/20'>
+                            Ctrl+k
+                            </span> 
                     </Button>
+                    <CreateLinkDrawer open={createLinkDrawer} onClose={() => setCreateLinkDrawer(false)} />
                 </div>
 
                 {/* Links */}
