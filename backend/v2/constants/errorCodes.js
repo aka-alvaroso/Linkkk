@@ -72,6 +72,16 @@ const ERRORS = {
     message: "This link is not password protected",
     statusCode: 400,
   },
+  LINK_DISABLED: {
+    code: "LINK_DISABLED",
+    message: "This link is disabled",
+    statusCode: 403,
+  },
+  LINK_EXPIRED: {
+    code: "LINK_EXPIRED",
+    message: "This link has expired",
+    statusCode: 410,
+  },
 
   // Rate limiting
   RATE_LIMIT_EXCEEDED: {

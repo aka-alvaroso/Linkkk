@@ -85,6 +85,19 @@ const linkValidatorLimiter = rateLimit({
   handler: rateLimitHandler,
 });
 
+const passwordVerifyLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: process.env.ENV === "development" ? 1000 : 10, // Max 10 attempts per 15 minutes to prevent brute force
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => {
+    // Rate limit by IP and shortUrl to prevent brute force on specific links
+    const shortUrl = req.params.shortUrl || "";
+    return req.ip + ":" + shortUrl;
+  },
+  handler: rateLimitHandler,
+});
+
 module.exports = {
   authLimiter,
   loginLimiter,
@@ -94,4 +107,5 @@ module.exports = {
   updateLinkLimiter,
   getLinksLimiter,
   linkValidatorLimiter,
+  passwordVerifyLimiter,
 };

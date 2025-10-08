@@ -1,10 +1,13 @@
 const prisma = require("../prisma/client");
 const { createLinkSchema, updateLinkSchema } = require("../validators/link");
-const bcryptjs = require("bcryptjs");
+const { hashPassword, comparePassword } = require("../utils/password");
+const { isbot } = require("isbot");
 
 const planLimits = require("../utils/limits");
 const { successResponse, errorResponse } = require("../utils/response");
 const ERRORS = require("../constants/errorCodes");
+
+const { defineCountry, defineIsVPN } = require("../utils/access");
 
 // 1. Create link
 const createLink = async (req, res) => {
@@ -74,7 +77,7 @@ const createLink = async (req, res) => {
   if (metadataImage !== undefined && limits.metadata)
     data.metadataImage = metadataImage;
   if (password !== undefined && limits.password) {
-    data.password = password ? await bcryptjs.hash(password, 10) : null;
+    data.password = password ? await hashPassword(password) : null;
   }
   if (accessLimit !== undefined && limits.accessLimit)
     data.accessLimit = accessLimit;
@@ -224,7 +227,7 @@ const validateLinkPassword = async (req, res) => {
     }
 
     // Validar contraseña
-    const isValidPassword = await bcryptjs.compare(password, link.password);
+    const isValidPassword = await comparePassword(password, link.password);
 
     if (!isValidPassword) {
       return errorResponse(res, ERRORS.INVALID_CREDENTIALS);
@@ -299,7 +302,7 @@ const updateLink = async (req, res) => {
       updateData.metadataImage = data.metadataImage;
     if (data.password !== undefined && limits.password) {
       updateData.password = data.password
-        ? await bcryptjs.hash(data.password, 10)
+        ? await hashPassword(data.password)
         : null;
     }
     if (data.accessLimit !== undefined && limits.accessLimit)
@@ -401,29 +404,102 @@ const generateShortCode = async () => {
   return shortCode;
 };
 
-// 7. Redirect to long URL (public endpoint)
-const redirectLink = async (req, res) => {
+// 7. Verify password and redirect
+const verifyPasswordAndRedirect = async (req, res) => {
   const { shortUrl } = req.params;
+  const { password } = req.body;
 
   try {
-    // Buscar link por shortUrl o sufix
     const link = await prisma.link.findFirst({
       where: {
         OR: [{ shortUrl }, { sufix: shortUrl.toLowerCase() }],
       },
     });
 
-    // 1. Verificar si existe
+    if (!link) {
+      return errorResponse(res, ERRORS.LINK_NOT_FOUND);
+    }
+
+    // Check status
+    if (!link.status) {
+      return errorResponse(res, ERRORS.LINK_DISABLED);
+    }
+
+    // Check expiration date
+    if (link.dateExpire && link.dateExpire < new Date()) {
+      return errorResponse(res, ERRORS.LINK_EXPIRED);
+    }
+
+    // Check if link has password
+    if (!link.password) {
+      return errorResponse(res, ERRORS.LINK_NO_PASSWORD);
+    }
+
+    // Validate password
+    const isValidPassword = await comparePassword(password, link.password);
+
+    if (!isValidPassword) {
+      return errorResponse(res, ERRORS.INVALID_CREDENTIALS);
+    }
+
+    // Return success with the long URL
+    return successResponse(res, {
+      longUrl: link.longUrl,
+    });
+  } catch (error) {
+    console.error("Password verification error:", error);
+    return errorResponse(res, ERRORS.INTERNAL_ERROR);
+  }
+};
+
+// 8. Link redirect
+const redirectLink = async (req, res) => {
+  const { shortUrl } = req.params;
+  const userAgent = req.headers["user-agent"];
+  const ip = req.ip === "::1" ? "127.0.0.1" : req.ip;
+
+  try {
+    const link = await prisma.link.findFirst({
+      where: {
+        OR: [{ shortUrl }, { sufix: shortUrl.toLowerCase() }],
+      },
+    });
+
     if (!link) {
       return res.redirect(`${process.env.FRONTEND_URL}/404?url=${shortUrl}`);
     }
 
-    // 2. Verificar status (si está activo)
+    // Check status
     if (!link.status) {
       return res.redirect(`${process.env.FRONTEND_URL}/disabled`);
     }
 
-    // 3. Redirect exitoso
+    // Check expiration date
+    if (link.dateExpire && link.dateExpire < new Date()) {
+      return res.redirect(`${process.env.FRONTEND_URL}/expired`);
+    }
+
+    // Check password
+    if (link.password) {
+      return res.redirect(
+        `${process.env.FRONTEND_URL}/password?url=${shortUrl}`
+      );
+    }
+
+    const country = await defineCountry(ip);
+    const isVpn = await defineIsVPN(ip);
+
+    await prisma.access.create({
+      data: {
+        linkId: link.id,
+        userAgent,
+        ip,
+        country: country,
+        isVPN: isVpn,
+        isBot: isbot(userAgent),
+      },
+    });
+
     return res.redirect(302, link.longUrl);
   } catch (error) {
     console.error("Redirect error:", error);
@@ -438,5 +514,6 @@ module.exports = {
   validateLinkPassword,
   updateLink,
   deleteLink,
+  verifyPasswordAndRedirect,
   redirectLink,
 };

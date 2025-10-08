@@ -53,5 +53,17 @@ model Link {
   qrBinaryBytes Bytes?
   user        User? @relation(fields: [userId], references: [id])
   guestSession GuestSession? @relation(fields: [guestSessionId], references: [id])
+  accesses Access[]
 }
 
+model Access {
+  id          Int     @id @default(autoincrement())
+  linkId      Int
+  createdAt   DateTime @default(now())
+  userAgent   String
+  ip          String
+  country     String
+  isVPN       Boolean
+  isBot       Boolean
+  link        Link @relation(fields: [linkId], references: [id])
+}
