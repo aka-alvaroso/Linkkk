@@ -14,11 +14,7 @@ const linkRouter = require("./v2/routers/link");
 const accessesRouter = require("./v2/routers/accesses");
 
 // Controllers
-const {
-  redirectLink,
-  verifyPasswordAndRedirect,
-} = require("./v2/controllers/link");
-const { passwordVerifyLimiter } = require("./v2/middlewares/security");
+const { redirectLink } = require("./v2/controllers/link");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -91,13 +87,6 @@ app.get("/status", (req, res) => {
 app.use("/auth", authRouter);
 app.use("/link", linkRouter);
 app.use("/accesses", accessesRouter);
-
-// Public password verification endpoint (must be before redirect catch-all)
-app.post(
-  "/r/:shortUrl/verify",
-  passwordVerifyLimiter,
-  verifyPasswordAndRedirect
-);
 
 // Public redirect endpoint (LAST - catches everything else)
 app.get("/r/:shortUrl", redirectLink);

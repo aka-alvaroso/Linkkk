@@ -1,6 +1,5 @@
 const prisma = require("../prisma/client");
 const { createLinkSchema, updateLinkSchema } = require("../validators/link");
-const { hashPassword, comparePassword } = require("../utils/password");
 const { isbot } = require("isbot");
 
 const planLimits = require("../utils/limits");
@@ -16,20 +15,7 @@ const createLink = async (req, res) => {
   const isGuest = !!guest;
   const limits = isGuest ? planLimits.guest : planLimits.user;
 
-  const {
-    longUrl,
-    status,
-    password,
-    accessLimit,
-    blockedCountries,
-    mobileUrl,
-    desktopUrl,
-    sufix,
-    expirationDate,
-    metadataTitle,
-    metadataDescription,
-    metadataImage,
-  } = req.body;
+  const { longUrl, status } = req.body;
 
   const validate = createLinkSchema.safeParse(req.body);
 
@@ -44,6 +30,7 @@ const createLink = async (req, res) => {
     return errorResponse(res, ERRORS.INVALID_DATA, issues);
   }
 
+  // Check link limit
   if (isGuest) {
     const count = await prisma.link.count({
       where: {
@@ -58,7 +45,6 @@ const createLink = async (req, res) => {
     const count = await prisma.link.count({
       where: {
         userId: user.id,
-        dateExpire: { lt: new Date() },
       },
     });
 
@@ -67,42 +53,6 @@ const createLink = async (req, res) => {
     }
   }
 
-  const data = {};
-  if (longUrl !== undefined) data.longUrl = longUrl;
-  if (status !== undefined) data.status = status;
-  if (metadataTitle !== undefined && limits.metadata)
-    data.metadataTitle = metadataTitle;
-  if (metadataDescription !== undefined && limits.metadata)
-    data.metadataDescription = metadataDescription;
-  if (metadataImage !== undefined && limits.metadata)
-    data.metadataImage = metadataImage;
-  if (password !== undefined && limits.password) {
-    data.password = password ? await hashPassword(password) : null;
-  }
-  if (accessLimit !== undefined && limits.accessLimit)
-    data.accessLimit = accessLimit;
-  if (mobileUrl !== undefined && limits.smartRedirection)
-    data.mobileUrl = mobileUrl;
-  if (desktopUrl !== undefined && limits.smartRedirection)
-    data.desktopUrl = desktopUrl;
-  if (sufix !== undefined && limits.sufix) {
-    if (sufix) {
-      const existingSufix = await prisma.link.findFirst({
-        where: {
-          sufix: sufix.toLowerCase(),
-        },
-      });
-
-      if (existingSufix) {
-        return errorResponse(res, ERRORS.SHORT_URL_EXISTS);
-      }
-      data.sufix = sufix.toLowerCase();
-    }
-  }
-  if (expirationDate !== undefined) data.dateExpire = expirationDate;
-  if (blockedCountries !== undefined && limits.blockedCountries)
-    data.blockedCountries = blockedCountries;
-
   const shortUrl = await generateShortCode();
 
   try {
@@ -110,7 +60,8 @@ const createLink = async (req, res) => {
       data: {
         userId: user?.id,
         guestSessionId: guest?.guestSessionId,
-        ...data,
+        longUrl,
+        status: status ?? true,
         shortUrl,
       },
     });
@@ -152,11 +103,10 @@ const getLink = async (req, res) => {
     }
 
     return successResponse(res, {
-      ...link,
-      id: undefined,
-      userId: undefined,
-      guestSessionId: undefined,
-      password: link.password !== null ? true : false,
+      shortUrl: link.shortUrl,
+      longUrl: link.longUrl,
+      status: link.status,
+      createdAt: link.createdAt,
     });
   } catch (error) {
     return errorResponse(res, ERRORS.INTERNAL_ERROR);
@@ -192,11 +142,10 @@ const getAllLinks = async (req, res) => {
     return successResponse(
       res,
       links.map((link) => ({
-        ...link,
-        id: undefined,
-        userId: undefined,
-        guestSessionId: undefined,
-        password: link.password !== null ? true : false,
+        shortUrl: link.shortUrl,
+        longUrl: link.longUrl,
+        status: link.status,
+        createdAt: link.createdAt,
       }))
     );
   } catch (error) {
@@ -204,76 +153,15 @@ const getAllLinks = async (req, res) => {
   }
 };
 
-// 4. Validate link password
-const validateLinkPassword = async (req, res) => {
-  const { shortUrl } = req.params;
-  const { password } = req.body;
-  const guest = req.guest;
-  const user = req.user;
-
-  try {
-    // Buscar el link
-    const link = await prisma.link.findUnique({
-      where: {
-        shortUrl,
-      },
-    });
-
-    if (!link) {
-      return errorResponse(res, ERRORS.LINK_NOT_FOUND);
-    }
-
-    const hasUserAccess = user && link.userId === user.id;
-    const hasGuestAccess =
-      guest && link.guestSessionId === guest.guestSessionId;
-
-    if (!hasUserAccess && !hasGuestAccess) {
-      return errorResponse(res, ERRORS.LINK_ACCESS_DENIED);
-    }
-
-    // Verificar si el link tiene contraseña
-    if (!link.password) {
-      return errorResponse(res, ERRORS.LINK_NO_PASSWORD);
-    }
-
-    // Validar contraseña
-    const isValidPassword = await comparePassword(password, link.password);
-
-    if (!isValidPassword) {
-      return errorResponse(res, ERRORS.INVALID_CREDENTIALS);
-    }
-
-    // Si la contraseña es correcta, devolver info del link
-    return successResponse(res, {
-      shortUrl: link.shortUrl,
-      longUrl: link.longUrl,
-      metadataTitle: link.metadataTitle,
-      metadataDescription: link.metadataDescription,
-      metadataImage: link.metadataImage,
-      mobileUrl: link.mobileUrl,
-      desktopUrl: link.desktopUrl,
-      createdAt: link.createdAt,
-      accessCount: link.accessCount,
-      // No devolver datos sensibles como password hash
-    });
-  } catch (error) {
-    return errorResponse(res, ERRORS.INTERNAL_ERROR);
-  }
-};
-
-// 5. Update link
+// 4. Update link
 const updateLink = async (req, res) => {
   const { shortUrl } = req.params;
   const user = req.user;
   const guest = req.guest;
-  const isGuest = !!guest;
-  const limits = isGuest ? planLimits.guest : planLimits.user;
 
-  const data = req.body;
+  const { longUrl, status } = req.body;
 
-  // console.log(data);
-
-  const validatedData = updateLinkSchema.safeParse(data);
+  const validatedData = updateLinkSchema.safeParse(req.body);
 
   if (!validatedData.success) {
     const issues = validatedData.error.issues.map((issue) => ({
@@ -302,61 +190,24 @@ const updateLink = async (req, res) => {
     }
 
     const updateData = {};
-    if (data.longUrl !== undefined) updateData.longUrl = data.longUrl;
-    if (data.status !== undefined) updateData.status = data.status;
-    if (data.metadataTitle !== undefined && limits.metadata)
-      updateData.metadataTitle = data.metadataTitle;
-    if (data.metadataDescription !== undefined && limits.metadata)
-      updateData.metadataDescription = data.metadataDescription;
-    if (data.metadataImage !== undefined && limits.metadata)
-      updateData.metadataImage = data.metadataImage;
-    if (data.password !== undefined && limits.password) {
-      updateData.password = data.password
-        ? await hashPassword(data.password)
-        : null;
-    }
-    if (data.accessLimit !== undefined && limits.accessLimit)
-      updateData.accessLimit = data.accessLimit;
-    if (data.mobileUrl !== undefined && limits.smartRedirection)
-      updateData.mobileUrl = data.mobileUrl;
-    if (data.desktopUrl !== undefined && limits.smartRedirection)
-      updateData.desktopUrl = data.desktopUrl;
-    if (data.sufix !== undefined && limits.sufix) {
-      if (data.sufix) {
-        const existingSufix = await prisma.link.findFirst({
-          where: {
-            sufix: data.sufix.toLowerCase(),
-            id: {
-              not: existingLink.id,
-            },
-          },
-        });
+    if (longUrl !== undefined) updateData.longUrl = longUrl;
+    if (status !== undefined) updateData.status = status;
 
-        if (existingSufix) {
-          return errorResponse(res, ERRORS.SHORT_URL_EXISTS);
-        }
-        updateData.sufix = data.sufix.toLowerCase();
-      }
-    }
-    if (data.expirationDate !== undefined)
-      updateData.dateExpire = data.expirationDate;
-    if (data.blockedCountries !== undefined && limits.blockedCountries)
-      updateData.blockedCountries = data.blockedCountries;
+    const updatedLink = await prisma.link.update({
+      where: { shortUrl },
+      data: updateData,
+    });
 
-    try {
-      const updatedLink = await prisma.link.update({
-        where: { shortUrl },
-        data: updateData,
-      });
-
-      return successResponse(res, updatedLink);
-    } catch (error) {
-      if (error.code === "P2002") {
-        // Prisma unique constraint error
-        return errorResponse(res, ERRORS.SHORT_URL_EXISTS);
-      }
-    }
+    return successResponse(res, {
+      shortUrl: updatedLink.shortUrl,
+      longUrl: updatedLink.longUrl,
+      status: updatedLink.status,
+      createdAt: updatedLink.createdAt,
+    });
   } catch (error) {
+    if (error.code === "P2002") {
+      return errorResponse(res, ERRORS.SHORT_URL_EXISTS);
+    }
     return errorResponse(res, ERRORS.INTERNAL_ERROR);
   }
 };
@@ -421,66 +272,15 @@ const generateShortCode = async () => {
   return shortCode;
 };
 
-// 7. Verify password and redirect
-const verifyPasswordAndRedirect = async (req, res) => {
-  const { shortUrl } = req.params;
-  const { password } = req.body;
-
-  try {
-    const link = await prisma.link.findFirst({
-      where: {
-        OR: [{ shortUrl }, { sufix: shortUrl.toLowerCase() }],
-      },
-    });
-
-    if (!link) {
-      return errorResponse(res, ERRORS.LINK_NOT_FOUND);
-    }
-
-    // Check status
-    if (!link.status) {
-      return errorResponse(res, ERRORS.LINK_DISABLED);
-    }
-
-    // Check expiration date
-    if (link.dateExpire && link.dateExpire < new Date()) {
-      return errorResponse(res, ERRORS.LINK_EXPIRED);
-    }
-
-    // Check if link has password
-    if (!link.password) {
-      return errorResponse(res, ERRORS.LINK_NO_PASSWORD);
-    }
-
-    // Validate password
-    const isValidPassword = await comparePassword(password, link.password);
-
-    if (!isValidPassword) {
-      return errorResponse(res, ERRORS.INVALID_CREDENTIALS);
-    }
-
-    // Return success with the long URL
-    return successResponse(res, {
-      longUrl: link.longUrl,
-    });
-  } catch (error) {
-    console.error("Password verification error:", error);
-    return errorResponse(res, ERRORS.INTERNAL_ERROR);
-  }
-};
-
-// 8. Link redirect
+// 5. Link redirect
 const redirectLink = async (req, res) => {
   const { shortUrl } = req.params;
   const userAgent = req.headers["user-agent"];
   const ip = req.ip === "::1" ? "127.0.0.1" : req.ip;
-  const userAgentSanitized = sanitizeUserAgent(userAgent);
 
   try {
-    const link = await prisma.link.findFirst({
-      where: {
-        OR: [{ shortUrl }, { sufix: shortUrl.toLowerCase() }],
-      },
+    const link = await prisma.link.findUnique({
+      where: { shortUrl },
     });
 
     if (!link) {
@@ -492,30 +292,14 @@ const redirectLink = async (req, res) => {
       return res.redirect(`${process.env.FRONTEND_URL}/disabled`);
     }
 
-    // Check access limit
-    if (link.accessLimit && link.accessLimit < link.accessCount) {
-      return res.redirect(`${process.env.FRONTEND_URL}/disabled`);
-    }
-
-    // Check expiration date
-    if (link.dateExpire && link.dateExpire < new Date()) {
-      return res.redirect(`${process.env.FRONTEND_URL}/expired`);
-    }
-
-    // Check password
-    if (link.password) {
-      return res.redirect(
-        `${process.env.FRONTEND_URL}/password?url=${shortUrl}`
-      );
-    }
-
+    // Track access
     const country = await defineCountry(ip);
     const isVpn = await defineIsVPN(ip);
 
     await prisma.access.create({
       data: {
         linkId: link.id,
-        userAgent: userAgentSanitized,
+        userAgent: userAgent || "Unknown",
         ip,
         country: country,
         isVPN: isVpn,
@@ -534,9 +318,7 @@ module.exports = {
   createLink,
   getLink,
   getAllLinks,
-  validateLinkPassword,
   updateLink,
   deleteLink,
-  verifyPasswordAndRedirect,
   redirectLink,
 };

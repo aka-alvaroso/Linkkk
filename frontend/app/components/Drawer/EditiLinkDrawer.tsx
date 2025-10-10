@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import Drawer from '@/app/components/ui/Drawer/Drawer';
 import { FiCornerDownRight } from 'react-icons/fi';
-import { TbBolt, TbChartBar, TbCircleDashed, TbCircleDashedCheck, TbCopy, TbDotsVertical, TbExternalLink, TbLink, TbLock, TbRefresh, TbSettings, TbSparkles, TbTextScan2 } from 'react-icons/tb';
+import { TbChartBar, TbCircleDashed, TbCircleDashedCheck, TbCopy, TbDotsVertical, TbExternalLink, TbLink, TbSettings } from 'react-icons/tb';
 import Button from '../ui/Button/Button';
 import Select from '../ui/Select/Select';
 import Chip from '../ui/Chip/Chip';
 import Input from '../ui/Input/Input';
 import { Link, useLinkStore } from '@/app/stores/linkStore';
-import { generateRandomPassword } from '@/app/utils/password';
 import { AccessesList } from '../Accesses/accessesList';
 
 interface EditiLinkDrawerProps {
@@ -22,24 +21,6 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
     const [hasChanges, setHasChanges] = useState(false);
     const [statusBar, setShowStatusBar] = useState("none");
     const [newLink, setNewLink] = useState({...link});
-    const [removePassword, setRemovePassword] = useState(false);
-
-    const deepEqual = (a: any, b: any): boolean => {
-        if (a === b) return true;
-        if (a == null || b == null) return false;
-        if (a.constructor !== b.constructor) return false;
-    
-        if (Array.isArray(a)) {
-            return a.length === b.length && a.every((val, i) => deepEqual(val, b[i]));
-        }
-    
-        if (typeof a === 'object') {
-            const keys = [...new Set([...Object.keys(a), ...Object.keys(b)])];
-            return keys.every(key => deepEqual(a[key], b[key]));
-        }
-    
-        return false;
-    };
 
     useEffect(() => {
         const handleKeyDown = async (e: KeyboardEvent) => {
@@ -68,20 +49,12 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
         };
-    }, [newLink, link, removePassword]);
+    }, [newLink, link]);
 
     useEffect(() => {
-        const passwordChanged = link.hasPassword
-            ? (newLink.password !== '' || removePassword)
-            : newLink.password !== '';
-
-        const otherFieldsChanged =
+        const hasChanges =
             link.status !== newLink.status ||
-            link.longUrl !== newLink.longUrl ||
-            link.sufix !== newLink.sufix ||
-            link.accessLimit !== newLink.accessLimit;
-
-        const hasChanges = passwordChanged || otherFieldsChanged;
+            link.longUrl !== newLink.longUrl;
 
         if (hasChanges) {
             setShowStatusBar("confirm")
@@ -90,19 +63,16 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
             setHasChanges(false);
             setTimeout(() => setShowStatusBar("none"), 200);
         }
-    }, [newLink, link, removePassword]);
+    }, [newLink, link]);
 
     const handleUpdateLink = async () => {
         try {
             const linkToUpdate = {
                 ...newLink,
-                password: removePassword ? null : (newLink.password || undefined),
-                hasPassword: undefined,
             };
             const d = await updateLink(linkToUpdate);
             if (d.success) {
                 setShowStatusBar("none");
-                setRemovePassword(false);
                 setNewLink({...link});
                 onClose();
                 getLinks();
@@ -110,7 +80,6 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                 setShowStatusBar("error");
             }
         } catch (error) {
-            console.error(error);
             setShowStatusBar("error");
         }
     };
@@ -165,7 +134,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                 <header className='w-full flex flex-col md:flex-row items-start'>
                     <div className='w-full flex-1 flex flex-col gap-2'>
                         <div className='flex items-center'>
-                            <p className='text-2xl md:text-3xl italic font-black'>linkkk.dev/{newLink.sufix || newLink.shortUrl}</p>
+                            <p className='text-2xl md:text-3xl italic font-black'>linkkk.dev/{newLink.shortUrl}</p>
                             {
                                 newLink.status ? (
                                     <Chip
@@ -272,38 +241,6 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                         {/* URLs */}
                         <div className='w-full flex justify-between items-center gap-4'>
                             <div className='w-1/2 flex flex-col gap-1'>
-                                <p className='text-lg'>Suffix</p>
-                                <div className='w-full relative group'>
-                                    <Input
-                                        value={newLink.sufix}
-                                        onChange={(e) => setNewLink({ ...newLink, sufix: e.target.value })}
-                                        placeholder='Suffix'
-                                        size='md'
-                                        rounded='2xl'
-                                        leftIcon={<TbBolt size={20} className='text-info' />}
-                                        className='w-full'
-                                    />
-                                <div className='opacity-0 bg-light pl-2 group-hover:opacity-100 absolute flex gap-2 top-1/2 -translate-y-1/2 right-2 transition-all duration-200 ease-in-out'>
-                                        <Button
-                                            iconOnly
-                                            leftIcon={<TbCopy size={20} />}
-                                            variant='ghost'
-                                            size='sm'
-                                            rounded='md'
-                                            className='bg-info/10 text-info hover:bg-info/15'
-                                        />
-                                        <Button
-                                            iconOnly
-                                            leftIcon={<TbExternalLink size={20} />}
-                                            variant='ghost'
-                                            size='sm'
-                                            rounded='md'
-                                            className='bg-info/10 text-info hover:bg-info/15'
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                            <div className='w-1/2 flex flex-col gap-1'>
                                 <p className='text-lg'>Long URL</p>
                                 <div className='w-full relative group'>
                                 <Input
@@ -338,76 +275,6 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                             </div>
                         </div>
 
-                        {/* TODO: Expiration Date */}
-
-                        <p className='w-full text-2xl font-black mt-6 flex items-center gap-2'>
-                            <TbSparkles size={26} />
-                            Advanced
-                        </p>
-
-                        {/* Password */}
-                        <div className='w-full flex flex-col gap-2'>
-                            <div className='w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-1'>
-                                <p className='text-lg'>Password</p>
-                                <div className='flex gap-2 md:w-2/5'>
-                                    <Button
-                                        variant='solid'
-                                        size='sm'
-                                        leftIcon={<TbRefresh size={20} className='group-hover:-rotate-180 transition-all duration-300' />}
-                                        rounded='2xl'
-                                        className='flex-1 rounded-2xl bg-info/15 text-info hover:bg-info hover:text-light group'
-                                        onClick={() => setNewLink({ ...newLink, password: generateRandomPassword() })}
-                                    >
-                                        Generate
-                                    </Button>
-                                    <Input
-                                        value={newLink.password}
-                                        onChange={(e) => setNewLink({ ...newLink, password: e.target.value })}
-                                        placeholder={link.hasPassword ? '••••••••' : 'Enter password'}
-                                        size='md'
-                                        rounded='2xl'
-                                        leftIcon={<TbLock size={20} className='text-info' />}
-                                        className='w-full'
-                                    />
-                                </div>
-                            </div>
-                            {link.hasPassword && (
-                                <div className='w-full flex justify-end'>
-                                    <label className='flex items-center gap-2 cursor-pointer text-sm text-dark/70 hover:text-dark'>
-                                        <input
-                                            type='checkbox'
-                                            checked={removePassword}
-                                            onChange={(e) => setRemovePassword(e.target.checked)}
-                                            className='w-4 h-4 rounded accent-danger'
-                                        />
-                                        Remove password
-                                    </label>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* TODO: Access Limit */}
-                        <div className='w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-1'>
-                            <p className='text-lg'>Access Limit</p>
-                            <div className='w-full md:w-2/5'>
-                                <Input
-                                    type='number'
-                                    min={0}
-                                    value={newLink.accessLimit?.toString()}
-                                    onChange={(e) => setNewLink({ ...newLink, accessLimit: parseInt(e.target.value) })}
-                                    placeholder='Access Limit'
-                                    size='md'
-                                    rounded='2xl'
-                                    leftIcon={<TbLock size={20} className='text-info' />}
-                                    className=''
-                                />
-                            </div>
-                        </div>
-                        {/* TODO: Blocked Countries */}
-                        {/* TODO: Smart Redirection */}
-                        {/* TODO: Metadata */}
-
-
 
                         {/* Status bar */}
                         <div className={`absolute flex flex-col gap-2 p-4 mb-2 bottom-0 left-1/2 w-1/2 -translate-x-1/2 bg-light border border-dark/10 rounded-3xl
@@ -437,7 +304,6 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                                 onClick={() => {
                                                     setShowStatusBar("none");
                                                     setNewLink({...link});
-                                                    setRemovePassword(false);
                                                 }}
                                             >
                                                 Cancel

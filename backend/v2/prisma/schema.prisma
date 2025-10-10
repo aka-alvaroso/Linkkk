@@ -40,17 +40,6 @@ model Link {
   longUrl     String
   status      Boolean @default(true)
   createdAt   DateTime @default(now())
-  accessLimit Int?
-  password    String?
-  blockedCountries String[]
-  dateExpire    DateTime?
-  mobileUrl   String?
-  desktopUrl  String?
-  sufix       String?  @unique
-  metadataTitle     String?
-  metadataDescription String?
-  metadataImage     String?
-  qrBinaryBytes Bytes?
   user        User? @relation(fields: [userId], references: [id])
   guestSession GuestSession? @relation(fields: [guestSessionId], references: [id])
   accesses Access[]
