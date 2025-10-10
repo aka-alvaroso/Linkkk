@@ -8,7 +8,7 @@ import Chip from '../ui/Chip/Chip';
 import Input from '../ui/Input/Input';
 import { Link, useLinkStore } from '@/app/stores/linkStore';
 import { generateRandomPassword } from '@/app/utils/password';
-
+import { AccessesList } from '../Accesses/accessesList';
 
 interface EditiLinkDrawerProps {
     open: boolean;
@@ -18,7 +18,7 @@ interface EditiLinkDrawerProps {
 
 export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawerProps) {
     const { updateLink, getLinks } = useLinkStore();
-    const [tab, setTab] = useState('resume');
+    const [tab, setTab] = useState('settings');
     const [hasChanges, setHasChanges] = useState(false);
     const [statusBar, setShowStatusBar] = useState("none");
     const [newLink, setNewLink] = useState({...link});
@@ -54,12 +54,13 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
             if (activeElement?.tagName === 'INPUT' || activeElement?.tagName === 'TEXTAREA') return;
 
             if (e.key === '1') {
-                setTab('resume');
+                setTab('settings'); //TODO: Change to resume on implementation
             } else if (e.key === '2') {
-                setTab('settings');
-            } else if (e.key === '3') {
-                setTab('analytics');
-            }
+                setTab('analytics'); //TODO: Change to analytics on implementation
+            } 
+            // else if (e.key === '3') {
+            //     setTab('analytics');
+            // }
         };
     
         document.addEventListener('keydown', handleKeyDown);
@@ -128,7 +129,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
 
                 {/* Tabs */}
                 <div className='w-full flex flex-wrap gap-2 mb-6'>
-                    <Button
+                    {/* <Button
                         variant='ghost'
                         size='sm'
                         rounded='2xl'
@@ -137,7 +138,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                         onClick={() => setTab('resume')}
                     >
                         Resume
-                    </Button>
+                    </Button> */}
                     <Button
                         variant='ghost'
                         size='sm'
@@ -467,7 +468,9 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                 {/* Analytics */}
                 {tab === 'analytics' && (
                 <div className='w-full flex flex-col gap-2 items-center p-4'>
-                    
+                    {
+                        <AccessesList shortUrl={link.shortUrl} />
+                    }
                 </div>
                 )}
 

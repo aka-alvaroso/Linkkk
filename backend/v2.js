@@ -11,9 +11,13 @@ const ERRORS = require("./v2/constants/errorCodes");
 // Routers
 const authRouter = require("./v2/routers/auth");
 const linkRouter = require("./v2/routers/link");
+const accessesRouter = require("./v2/routers/accesses");
 
 // Controllers
-const { redirectLink, verifyPasswordAndRedirect } = require("./v2/controllers/link");
+const {
+  redirectLink,
+  verifyPasswordAndRedirect,
+} = require("./v2/controllers/link");
 const { passwordVerifyLimiter } = require("./v2/middlewares/security");
 
 const app = express();
@@ -40,8 +44,19 @@ app.use(
       includeSubDomains: true,
       preload: true,
     },
+    referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+    noSniff: true,
+    xssFilter: true,
   })
 );
+
+app.use((req, res, next) => {
+  res.setHeader(
+    "Permissions-Policy",
+    "geolocation=(), microphone=(), camera=()"
+  );
+  next();
+});
 
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -65,8 +80,8 @@ app.use(
   })
 );
 app.use(cookieParser());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 
 app.get("/status", (req, res) => {
   res.send("Server running");
@@ -75,9 +90,14 @@ app.get("/status", (req, res) => {
 // API routes (must be before redirect catch-all)
 app.use("/auth", authRouter);
 app.use("/link", linkRouter);
+app.use("/accesses", accessesRouter);
 
 // Public password verification endpoint (must be before redirect catch-all)
-app.post("/r/:shortUrl/verify", passwordVerifyLimiter, verifyPasswordAndRedirect);
+app.post(
+  "/r/:shortUrl/verify",
+  passwordVerifyLimiter,
+  verifyPasswordAndRedirect
+);
 
 // Public redirect endpoint (LAST - catches everything else)
 app.get("/r/:shortUrl", redirectLink);
