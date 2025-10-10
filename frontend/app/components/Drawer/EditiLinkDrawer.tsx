@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Drawer from '@/app/components/ui/Drawer/Drawer';
 import { FiCornerDownRight } from 'react-icons/fi';
-import { TbChartBar, TbCircleDashed, TbCircleDashedCheck, TbCopy, TbDotsVertical, TbExternalLink, TbLink, TbSettings } from 'react-icons/tb';
+import { TbChartBar, TbCircleDashed, TbCircleDashedCheck, TbCopy, TbDotsVertical, TbExternalLink, TbLink, TbSettings, TbTrash } from 'react-icons/tb';
 import Button from '../ui/Button/Button';
 import Select from '../ui/Select/Select';
 import Chip from '../ui/Chip/Chip';
@@ -17,7 +17,7 @@ interface EditiLinkDrawerProps {
 }
 
 export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawerProps) {
-    const { updateLink, fetchLinks } = useLinks();
+    const { updateLink, fetchLinks, deleteLink } = useLinks();
     const [tab, setTab] = useState('settings');
     const [hasChanges, setHasChanges] = useState(false);
     const [statusBar, setShowStatusBar] = useState("none");
@@ -131,13 +131,13 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
 
                 <header className='w-full flex flex-col md:flex-row items-start'>
                     <div className='w-full flex-1 flex flex-col gap-2'>
-                        <div className='flex items-center'>
+                        <div className='flex flex-col-reverse items-start md:flex-row md:items-center'>
                             <p className='text-2xl md:text-3xl italic font-black'>linkkk.dev/{newLink.shortUrl}</p>
                             {
                                 newLink.status ? (
                                     <Chip
                                         variant='success'
-                                        className='ml-4'
+                                        className='md:ml-4'
                                         size='md'
                                         leftIcon={<TbCircleDashedCheck size={20} />}
                                     >
@@ -146,7 +146,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                 ) : (
                                     <Chip
                                         variant='danger'
-                                        className='ml-4'
+                                        className='md:ml-4'
                                         size='md'
                                         leftIcon={<TbCircleDashed size={20} />}
                                     >
@@ -169,6 +169,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                         size='sm' 
                         rounded='2xl'
                         className='flex-1 flex-col items-center justify-center border border-info text-info bg-info/5'
+                        onClick={() => navigator.clipboard.writeText(`https://linkkk.dev/${newLink.shortUrl}`)}
                     >
                         <TbCopy size={20} />
                         Copy
@@ -178,6 +179,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                         size='sm' 
                         rounded='2xl'
                         className='flex-1 flex-col items-center justify-center border border-success text-success bg-success/5'
+                        onClick={() => window.open(`https://linkkk.dev/${newLink.shortUrl}`, '_blank')}
                     >
                         <TbExternalLink size={20} />
                         Visit
@@ -186,10 +188,11 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                         variant='ghost' 
                         size='sm' 
                         rounded='2xl'
-                        className='flex-1 flex-col items-center justify-center border border-dark/50 text-dark/50 bg-dark/5'
+                        className='flex-1 flex-col items-center justify-center border border-danger text-danger bg-danger/5'
+                        onClick={() => deleteLink(link.shortUrl)}
                     >
-                        <TbDotsVertical size={20} />
-                        More
+                        <TbTrash size={20} />
+                        Delete
                     </Button>
                 </div>
 

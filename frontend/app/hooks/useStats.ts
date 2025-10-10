@@ -5,12 +5,10 @@
 
 import { useMemo } from "react";
 import { useLinkStore } from "@/app/stores/linkStore";
-import { useStatsStore } from "@/app/stores/statsStore";
 import type { LinkStats } from "@/app/types";
 
 export function useStats() {
-  const { links } = useLinkStore();
-  const { stats: storedStats, setStats } = useStatsStore();
+  const { links, totalClicks } = useLinkStore();
 
   /**
    * Calculate stats from current links
@@ -21,22 +19,13 @@ export function useStats() {
     const activeLinks = links.filter((link) => link.status).length;
     const inactiveLinks = totalLinks - activeLinks;
 
-    // For beta, we don't have click data yet
-    // This will be populated from API in future
-    const totalClicks = 0;
-
-    const stats: LinkStats = {
+    return {
       totalLinks,
       activeLinks,
       inactiveLinks,
-      totalClicks,
+      totalClicks, // Now coming from backend
     };
-
-    // Update store with calculated stats
-    setStats(stats);
-
-    return stats;
-  }, [links, setStats]);
+  }, [links, totalClicks]);
 
   return {
     stats: calculatedStats,

@@ -48,3 +48,11 @@ export interface ApiError {
   code: string;
   details?: any;
 }
+
+// GetAllLinks response type
+export interface GetAllLinksResponse {
+  links: Link[];
+  stats: {
+    totalClicks: number;
+  };
+}

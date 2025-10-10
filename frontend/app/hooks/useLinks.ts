@@ -16,6 +16,7 @@ export function useLinks() {
     isLoading,
     error,
     setLinks,
+    setTotalClicks,
     addLink,
     updateLinkInStore,
     removeLinkFromStore,
@@ -34,7 +35,8 @@ export function useLinks() {
 
     try {
       const data = await linkService.getAll();
-      setLinks(data);
+      setLinks(data.links);
+      setTotalClicks(data.stats.totalClicks);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to fetch links";
       setError(message);
@@ -42,7 +44,7 @@ export function useLinks() {
     } finally {
       setLoading(false);
     }
-  }, [setLinks, setLoading, setError]);
+  }, [setLinks, setTotalClicks, setLoading, setError]);
 
   /**
    * Create a new link

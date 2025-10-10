@@ -128,6 +128,7 @@ const getAllLinks = async (req, res) => {
       return errorResponse(res, ERRORS.UNAUTHORIZED);
     }
 
+    // Get all links
     const links = await prisma.link.findMany({
       where: whereClause,
       orderBy: {
@@ -139,15 +140,24 @@ const getAllLinks = async (req, res) => {
       return errorResponse(res, ERRORS.LINK_NOT_FOUND);
     }
 
-    return successResponse(
-      res,
-      links.map((link) => ({
+    // Get total access count for all user/guest links
+    const totalAccessCount = await prisma.access.count({
+      where: {
+        link: whereClause,
+      },
+    });
+
+    return successResponse(res, {
+      links: links.map((link) => ({
         shortUrl: link.shortUrl,
         longUrl: link.longUrl,
         status: link.status,
         createdAt: link.createdAt,
-      }))
-    );
+      })),
+      stats: {
+        totalClicks: totalAccessCount,
+      },
+    });
   } catch (error) {
     return errorResponse(res, ERRORS.INTERNAL_ERROR);
   }

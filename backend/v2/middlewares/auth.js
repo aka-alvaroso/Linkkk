@@ -5,7 +5,8 @@ const GUEST_SECRET_KEY = process.env.V2_GUEST_SECRET_KEY;
 const { errorResponse } = require("../utils/response");
 const ERRORS = require("../constants/errorCodes");
 
-const auth = (req, res, next) => {
+// Must be authenticated as user or guest
+const auth = async (req, res, next) => {
   let token = req.cookies.token;
   let guestToken = req.cookies.guestToken;
 
@@ -26,7 +27,19 @@ const auth = (req, res, next) => {
   if (token) {
     try {
       const userDecoded = jwt.verify(token, AUTH_SECRET_KEY);
-      req.user = userDecoded;
+
+      // Fetch full user data from database
+      const user = await prisma.user.findUnique({
+        where: { id: userDecoded.id },
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          createdAt: true,
+        },
+      });
+
+      req.user = user;
     } catch (error) {}
   }
 
@@ -44,6 +57,7 @@ const auth = (req, res, next) => {
   next();
 };
 
+// Must be authenticated as user
 const authUser = async (req, res, next) => {
   const user = req.user;
 
@@ -68,6 +82,7 @@ const authUser = async (req, res, next) => {
   next();
 };
 
+// Must be authenticated as guest
 const authGuest = async (req, res, next) => {
   const guest = req.guest;
 
@@ -92,7 +107,8 @@ const authGuest = async (req, res, next) => {
   next();
 };
 
-const optionalGuest = (req, res, next) => {
+// Can be authenticated as guest
+const optionalGuest = async (req, res, next) => {
   let guestToken = req.cookies.guestToken;
 
   if (guestToken) {
@@ -107,7 +123,8 @@ const optionalGuest = (req, res, next) => {
   next();
 };
 
-const optionalAuth = (req, res, next) => {
+// Can be authenticated as user or guest
+const optionalAuth = async (req, res, next) => {
   let token = req.cookies.token;
   let guestToken = req.cookies.guestToken;
 
@@ -121,7 +138,19 @@ const optionalAuth = (req, res, next) => {
   if (token) {
     try {
       const decoded = jwt.verify(token, AUTH_SECRET_KEY);
-      req.user = decoded;
+
+      // Fetch full user data from database
+      const user = await prisma.user.findUnique({
+        where: { id: decoded.id },
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          createdAt: true,
+        },
+      });
+
+      req.user = user;
     } catch (error) {
       req.user = null;
     }
