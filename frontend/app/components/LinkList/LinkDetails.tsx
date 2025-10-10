@@ -37,7 +37,7 @@ const LinkDetails: React.FC<LinkDetailsProps> = ({ links }) => {
           ) : (
             links.map((link) => {
               return (
-                <LinkItem key={link.id} view={'details'} data={link} />
+                <LinkItem key={link.shortUrl} view={'details'} data={link} />
               )
             })
           )}

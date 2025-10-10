@@ -54,5 +54,5 @@ model Access {
   country     String
   isVPN       Boolean
   isBot       Boolean
-  link        Link @relation(fields: [linkId], references: [id])
+  link        Link @relation(fields: [linkId], references: [id], onDelete: Cascade)
 }
