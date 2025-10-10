@@ -116,6 +116,10 @@ const createLink = async (req, res) => {
     });
     return successResponse(res, link, 201);
   } catch (error) {
+    if (error.code === "P2002") {
+      // Prisma unique constraint error
+      return errorResponse(res, ERRORS.SHORT_URL_EXISTS);
+    }
     console.error("Link creation error:", error);
     return errorResponse(res, ERRORS.INTERNAL_ERROR);
   }
@@ -149,6 +153,9 @@ const getLink = async (req, res) => {
 
     return successResponse(res, {
       ...link,
+      id: undefined,
+      userId: undefined,
+      guestSessionId: undefined,
       password: link.password !== null ? true : false,
     });
   } catch (error) {
@@ -186,6 +193,9 @@ const getAllLinks = async (req, res) => {
       res,
       links.map((link) => ({
         ...link,
+        id: undefined,
+        userId: undefined,
+        guestSessionId: undefined,
         password: link.password !== null ? true : false,
       }))
     );
@@ -333,12 +343,19 @@ const updateLink = async (req, res) => {
     if (data.blockedCountries !== undefined && limits.blockedCountries)
       updateData.blockedCountries = data.blockedCountries;
 
-    const updatedLink = await prisma.link.update({
-      where: { shortUrl },
-      data: updateData,
-    });
+    try {
+      const updatedLink = await prisma.link.update({
+        where: { shortUrl },
+        data: updateData,
+      });
 
-    return successResponse(res, updatedLink);
+      return successResponse(res, updatedLink);
+    } catch (error) {
+      if (error.code === "P2002") {
+        // Prisma unique constraint error
+        return errorResponse(res, ERRORS.SHORT_URL_EXISTS);
+      }
+    }
   } catch (error) {
     return errorResponse(res, ERRORS.INTERNAL_ERROR);
   }
@@ -457,6 +474,7 @@ const redirectLink = async (req, res) => {
   const { shortUrl } = req.params;
   const userAgent = req.headers["user-agent"];
   const ip = req.ip === "::1" ? "127.0.0.1" : req.ip;
+  const userAgentSanitized = sanitizeUserAgent(userAgent);
 
   try {
     const link = await prisma.link.findFirst({
@@ -471,6 +489,11 @@ const redirectLink = async (req, res) => {
 
     // Check status
     if (!link.status) {
+      return res.redirect(`${process.env.FRONTEND_URL}/disabled`);
+    }
+
+    // Check access limit
+    if (link.accessLimit && link.accessLimit < link.accessCount) {
       return res.redirect(`${process.env.FRONTEND_URL}/disabled`);
     }
 
@@ -492,7 +515,7 @@ const redirectLink = async (req, res) => {
     await prisma.access.create({
       data: {
         linkId: link.id,
-        userAgent,
+        userAgent: userAgentSanitized,
         ip,
         country: country,
         isVPN: isVpn,
