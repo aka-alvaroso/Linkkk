@@ -3,7 +3,7 @@ import Drawer from '@/app/components/ui/Drawer/Drawer';
 import Input from '@/app/components/ui/Input/Input';
 import Button from '@/app/components/ui/Button/Button';
 import { TbCircleDashed, TbCircleDashedCheck, TbLink } from 'react-icons/tb';
-import { useLinkStore } from '@/app/stores/linkStore';
+import { useLinks } from '@/app/hooks';
 import Select from '../ui/Select/Select';
 import { FiCornerDownRight } from 'react-icons/fi';
 
@@ -13,7 +13,7 @@ interface CreateLinkDrawerProps {
 }
 
 export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProps) {
-    const { createLink, getLinks } = useLinkStore();
+    const { createLink, fetchLinks } = useLinks();
     const [statusBar, setShowStatusBar] = useState("none");
     const [hasChanges, setHasChanges] = useState(false);
     const [newLink, setNewLink] = useState({
@@ -58,29 +58,24 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
         setLoading(true);
         setError('');
 
-        try {
-            const response = await createLink({
-                longUrl: newLink.longUrl,
-                status: newLink.status,
-            });
+        const response = await createLink({
+            longUrl: newLink.longUrl,
+            status: newLink.status,
+        });
 
-            if (response.success) {
-                setNewLink({
-                    longUrl: '',
-                    status: true,
-                });
-                await getLinks();
-                onClose();
-            } else {
-                setError(response.message || 'Failed to create link');
-            }
-        } catch (err) {
-            setError('An error occurred while creating the link');
-            console.error(err);
-        } finally {
-            setLoading(false);
-            setShowStatusBar("none");
+        if (response.success) {
+            setNewLink({
+                longUrl: '',
+                status: true,
+            });
+            await fetchLinks();
+            onClose();
+        } else {
+            setError(response.error || 'Failed to create link');
         }
+
+        setLoading(false);
+        setShowStatusBar("none");
     };
 
     return (

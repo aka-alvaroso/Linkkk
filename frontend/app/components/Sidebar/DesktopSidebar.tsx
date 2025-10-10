@@ -84,38 +84,6 @@ const DesktopSidebar = () => {
                         </Button>
                     </Link>
 
-                    
-                    <Link href="/dashboard">
-                        <Button
-                            onClick={() => setSelected('bio')}
-                            variant='link'
-                            size='sm'
-                            rounded='xl'
-                            className={`p-1 w-full flex gap-2 hover:bg-transparent transition-all duration-200 ease-in-out transform hover:translate-x-2 ${selected === 'bio' ? 'text-dark' : 'text-dark/50'} ${desktopOpen ? 'justify-start h-10' : 'size-10 mx-auto'}`}
-                        >
-                            <HiSparkles size={22} />
-                            {desktopOpen ? 
-                                <span className={`font-black text-xl`}>Bio Page</span> 
-                            : null}
-                        </Button>
-                    </Link>
-
-                    
-                    <Link href="/dashboard">
-                        <Button
-                            onClick={() => setSelected('api')}
-                            variant='link'
-                            size='sm'
-                            rounded='xl'
-                            className={`p-1 w-full flex gap-2 hover:bg-transparent transition-all duration-200 ease-in-out transform hover:translate-x-2 ${selected === 'api' ? 'text-dark' : 'text-dark/50'} ${desktopOpen ? 'justify-start h-10' : 'size-10 mx-auto'}`}
-                        >
-                            <HiCode size={22} />
-                            {desktopOpen ? 
-                                <span className={`font-black text-xl`}>API</span> 
-                            : null}
-                            </Button>
-                    </Link>
-
 
                 </div>
             </div>

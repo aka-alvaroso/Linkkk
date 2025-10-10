@@ -6,7 +6,8 @@ import Button from '../ui/Button/Button';
 import Select from '../ui/Select/Select';
 import Chip from '../ui/Chip/Chip';
 import Input from '../ui/Input/Input';
-import { Link, useLinkStore } from '@/app/stores/linkStore';
+import { useLinks } from '@/app/hooks';
+import type { Link } from '@/app/types';
 import { AccessesList } from '../Accesses/accessesList';
 
 interface EditiLinkDrawerProps {
@@ -16,7 +17,7 @@ interface EditiLinkDrawerProps {
 }
 
 export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawerProps) {
-    const { updateLink, getLinks } = useLinkStore();
+    const { updateLink, fetchLinks } = useLinks();
     const [tab, setTab] = useState('settings');
     const [hasChanges, setHasChanges] = useState(false);
     const [statusBar, setShowStatusBar] = useState("none");
@@ -66,20 +67,17 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
     }, [newLink, link]);
 
     const handleUpdateLink = async () => {
-        try {
-            const linkToUpdate = {
-                ...newLink,
-            };
-            const d = await updateLink(linkToUpdate);
-            if (d.success) {
-                setShowStatusBar("none");
-                setNewLink({...link});
-                onClose();
-                getLinks();
-            }else{
-                setShowStatusBar("error");
-            }
-        } catch (error) {
+        const response = await updateLink(link.shortUrl, {
+            longUrl: newLink.longUrl,
+            status: newLink.status,
+        });
+
+        if (response.success) {
+            setShowStatusBar("none");
+            setNewLink({...link});
+            onClose();
+            await fetchLinks();
+        } else {
             setShowStatusBar("error");
         }
     };

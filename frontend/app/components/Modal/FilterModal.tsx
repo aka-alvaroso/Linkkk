@@ -8,9 +8,6 @@ import { TbSearch, TbCircleDashedCheck, TbCircleDashed, TbLockPassword, TbLockOp
 export interface LinkFilters {
   search: string;
   status: 'all' | 'active' | 'inactive';
-  hasPassword: 'all' | 'yes' | 'no';
-  expiration: 'all' | 'expires-soon' | 'no-expiration' | 'has-expiration';
-  hasAccessLimit: 'all' | 'yes' | 'no';
 }
 
 interface FilterModalProps {
@@ -23,9 +20,6 @@ interface FilterModalProps {
 const defaultFilters: LinkFilters = {
   search: '',
   status: 'all',
-  hasPassword: 'all',
-  expiration: 'all',
-  hasAccessLimit: 'all',
 };
 
 export default function FilterModal({
@@ -64,10 +58,7 @@ export default function FilterModal({
 
   const hasActiveFilters = () => {
     return filters.search !== '' ||
-           filters.status !== 'all' ||
-           filters.hasPassword !== 'all' ||
-           filters.expiration !== 'all' ||
-           filters.hasAccessLimit !== 'all';
+           filters.status !== 'all'
   };
 
   return (
@@ -141,115 +132,7 @@ export default function FilterModal({
             ]}
             value={filters.status}
             onChange={(v) => setFilters({ ...filters, status: v as LinkFilters['status'] })}
-            listClassName="rounded-2xl p-1 shadow-none"
-            buttonClassName="rounded-2xl border-dark/10 w-full"
-            optionClassName="rounded-xl"
-          />
-        </div>
-
-        {/* Password Filter */}
-        <div className="flex flex-col gap-2">
-          <label className="text-lg font-semibold">Password Protection</label>
-          <Select
-            options={[
-              {
-                label: 'All',
-                value: 'all',
-                customClassName: 'hover:bg-dark/5',
-                selectedClassName: 'bg-dark/10'
-              },
-              {
-                label: 'Protected',
-                value: 'yes',
-                leftIcon: <TbLockPassword size={16} />,
-                customClassName: 'text-info hover:bg-info/10',
-                selectedClassName: 'bg-info/15'
-              },
-              {
-                label: 'Not protected',
-                value: 'no',
-                leftIcon: <TbLockOpen size={16} />,
-                customClassName: 'text-dark/50 hover:bg-dark/10',
-                selectedClassName: 'bg-dark/15'
-              },
-            ]}
-            value={filters.hasPassword}
-            onChange={(v) => setFilters({ ...filters, hasPassword: v as LinkFilters['hasPassword'] })}
-            listClassName="rounded-2xl p-1 shadow-none"
-            buttonClassName="rounded-2xl border-dark/10 w-full"
-            optionClassName="rounded-xl"
-          />
-        </div>
-
-        {/* Expiration Filter */}
-        <div className="flex flex-col gap-2">
-          <label className="text-lg font-semibold">Expiration</label>
-          <Select
-            options={[
-              {
-                label: 'All',
-                value: 'all',
-                customClassName: 'hover:bg-dark/5',
-                selectedClassName: 'bg-dark/10'
-              },
-              {
-                label: 'Expires in 24h',
-                value: 'expires-soon',
-                leftIcon: <TbCalendarCheck size={16} />,
-                customClassName: 'text-warning hover:bg-warning/10',
-                selectedClassName: 'bg-warning/15'
-              },
-              {
-                label: 'Has expiration',
-                value: 'has-expiration',
-                leftIcon: <TbCalendarCheck size={16} />,
-                customClassName: 'text-info hover:bg-info/10',
-                selectedClassName: 'bg-info/15'
-              },
-              {
-                label: 'No expiration',
-                value: 'no-expiration',
-                leftIcon: <TbCalendarOff size={16} />,
-                customClassName: 'text-dark/50 hover:bg-dark/10',
-                selectedClassName: 'bg-dark/15'
-              },
-            ]}
-            value={filters.expiration}
-            onChange={(v) => setFilters({ ...filters, expiration: v as LinkFilters['expiration'] })}
-            listClassName="rounded-2xl p-1 shadow-none"
-            buttonClassName="rounded-2xl border-dark/10 w-full"
-            optionClassName="rounded-xl"
-          />
-        </div>
-
-        {/* Access Limit Filter */}
-        <div className="flex flex-col gap-2">
-          <label className="text-lg font-semibold">Access Limit</label>
-          <Select
-            options={[
-              {
-                label: 'All',
-                value: 'all',
-                customClassName: 'hover:bg-dark/5',
-                selectedClassName: 'bg-dark/10'
-              },
-              {
-                label: 'Has limit',
-                value: 'yes',
-                leftIcon: <TbHash size={16} />,
-                customClassName: 'text-info hover:bg-info/10',
-                selectedClassName: 'bg-info/15'
-              },
-              {
-                label: 'No limit',
-                value: 'no',
-                customClassName: 'text-dark/50 hover:bg-dark/10',
-                selectedClassName: 'bg-dark/15'
-              },
-            ]}
-            value={filters.hasAccessLimit}
-            onChange={(v) => setFilters({ ...filters, hasAccessLimit: v as LinkFilters['hasAccessLimit'] })}
-            listClassName="rounded-2xl p-1 shadow-none"
+            listClassName="rounded-2xl p-1 shadow-none transform origin-bottom bottom-12"
             buttonClassName="rounded-2xl border-dark/10 w-full"
             optionClassName="rounded-xl"
           />

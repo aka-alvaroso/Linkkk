@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { TbFilterPlus, TbSwitchVertical, TbPlus} from "react-icons/tb";
 
-import { useLinkStore } from "@/app/stores/linkStore";
+import { useLinks, useStats } from "@/app/hooks";
 
 import RouteGuard from '@/app/components/RouteGuard/RouteGuard';
 import Button from "@/app/components/ui/Button/Button";
@@ -11,29 +11,27 @@ import Sidebar from "@/app/components/Sidebar/Sidebar";
 import CreateLinkDrawer from "@/app/components/Drawer/CreateLinkDrawer";
 import FilterModal from "@/app/components/Modal/FilterModal";
 import { useSidebarStore } from "@/app/stores/sidebarStore";
-import type { LinkFilters } from "@/app/stores/linkStore";
+import type { LinkFilters } from "@/app/types";
 
 export default function Dashboard() {
-  const { filteredLinks, filters, getLinks, setFilters } = useLinkStore();
+  const { filteredLinks, filters, fetchLinks, updateFilters } = useLinks();
+  const { totalLinks, activeLinks, totalClicks } = useStats();
   const [view, setView] = useState('details');
   const { desktopOpen } = useSidebarStore();
   const [createLinkDrawerOpen, setCreateLinkDrawerOpen] = useState(false);
   const [filterModalOpen, setFilterModalOpen] = useState(false);
 
   useEffect(() => {
-    getLinks();
-  }, [getLinks]);
+    fetchLinks();
+  }, [fetchLinks]);
 
   const handleApplyFilters = (newFilters: LinkFilters) => {
-    setFilters(newFilters);
+    updateFilters(newFilters);
   };
 
   const hasActiveFilters = () => {
     return filters.search !== '' ||
-           filters.status !== 'all' ||
-           filters.hasPassword !== 'all' ||
-           filters.expiration !== 'all' ||
-           filters.hasAccessLimit !== 'all';
+           filters.status !== 'all';
   };
 
   return (
@@ -49,20 +47,28 @@ export default function Dashboard() {
           <div className='flex items-center gap-1 overflow-x-auto scrollbar-hide lg:grid lg:gap-2 lg:grid-cols-4'>
             <div className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
               <h2 className='text-md'>Total links</h2>
-              <p className='text-end text-5xl font-black italic'>182</p>
+              <p className='text-end text-5xl font-black italic'>
+                {totalLinks}
+              </p>
             </div>
             <div className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
               <h2 className='text-md'>Total clicks</h2>
-              <p className='text-end text-5xl font-black italic'>20.4M</p>
+              <p className='text-end text-5xl font-black italic'>
+                {totalClicks}
+              </p>
             </div>
             <div className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
               <h2 className='text-md'>Active links</h2>
-              <p className='text-end text-5xl font-black italic'>140</p>
+              <p className='text-end text-5xl font-black italic'>
+                {activeLinks}
+              </p>
             </div>
-            <div className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
+            {/* <div className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
               <h2 className='text-md'>API usage</h2>
-              <p className='text-end text-5xl font-black italic'>85<span className='text-xl text-dark/60'>/100</span></p>
-            </div>
+              <p className='text-end text-5xl font-black italic'>
+                {filteredLinks.reduce((total, link) => total + link.apiUsage, 0)}
+              </p>
+            </div> */}
           </div>
 
           
