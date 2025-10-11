@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import SessionProvider from "./components/SessionProvider";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
-  title: "Linkkk",  
+  title: "Linkkk",
   description: "Create and manage your short links easily",
   icons: {
     icon: [
@@ -26,6 +27,12 @@ export default function RootLayout({
       </head>
       <body>
         <SessionProvider>{children}</SessionProvider>
+        <Toaster
+          position="top-center"
+          richColors
+          closeButton
+          duration={4000}
+        />
       </body>
     </html>
   );

@@ -6,6 +6,7 @@
 import { useCallback } from "react";
 import { useLinkStore } from "@/app/stores/linkStore";
 import { linkService } from "@/app/services";
+import { HttpError, NetworkError, TimeoutError } from "@/app/utils/errors";
 import type { CreateLinkDTO, UpdateLinkDTO } from "@/app/types";
 
 export function useLinks() {
@@ -27,6 +28,22 @@ export function useLinks() {
   } = useLinkStore();
 
   /**
+   * Get user-friendly error message from error object
+   */
+  const getErrorMessage = (err: unknown): string => {
+    if (err instanceof HttpError) {
+      return err.message;
+    }
+    if (err instanceof NetworkError || err instanceof TimeoutError) {
+      return err.message;
+    }
+    if (err instanceof Error) {
+      return err.message;
+    }
+    return "An unexpected error occurred";
+  };
+
+  /**
    * Fetch all links from API
    */
   const fetchLinks = useCallback(async () => {
@@ -38,7 +55,7 @@ export function useLinks() {
       setLinks(data.links);
       setTotalClicks(data.stats.totalClicks);
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to fetch links";
+      const message = getErrorMessage(err);
       setError(message);
       console.error("Error fetching links:", err);
     } finally {
@@ -57,12 +74,13 @@ export function useLinks() {
       try {
         const newLink = await linkService.create(linkData);
         addLink(newLink);
-        return { success: true, data: newLink };
+        return { success: true as const, data: newLink, error: null, errorCode: null };
       } catch (err) {
-        const message = err instanceof Error ? err.message : "Failed to create link";
+        const message = getErrorMessage(err);
+        const errorCode = err instanceof HttpError ? err.code : null;
         setError(message);
         console.error("Error creating link:", err);
-        return { success: false, error: message };
+        return { success: false as const, data: null, error: message, errorCode };
       } finally {
         setLoading(false);
       }
@@ -81,12 +99,13 @@ export function useLinks() {
       try {
         const updatedLink = await linkService.update(shortUrl, linkData);
         updateLinkInStore(shortUrl, updatedLink);
-        return { success: true, data: updatedLink };
+        return { success: true as const, data: updatedLink, error: null, errorCode: null };
       } catch (err) {
-        const message = err instanceof Error ? err.message : "Failed to update link";
+        const message = getErrorMessage(err);
+        const errorCode = err instanceof HttpError ? err.code : null;
         setError(message);
         console.error("Error updating link:", err);
-        return { success: false, error: message };
+        return { success: false as const, data: null, error: message, errorCode };
       } finally {
         setLoading(false);
       }
@@ -105,12 +124,13 @@ export function useLinks() {
       try {
         await linkService.delete(shortUrl);
         removeLinkFromStore(shortUrl);
-        return { success: true };
+        return { success: true as const, error: null, errorCode: null };
       } catch (err) {
-        const message = err instanceof Error ? err.message : "Failed to delete link";
+        const message = getErrorMessage(err);
+        const errorCode = err instanceof HttpError ? err.code : null;
         setError(message);
         console.error("Error deleting link:", err);
-        return { success: false, error: message };
+        return { success: false as const, error: message, errorCode };
       } finally {
         setLoading(false);
       }

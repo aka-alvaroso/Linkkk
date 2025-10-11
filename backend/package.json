@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start": "node --watch v1.js",
-    "dev": "node --watch v2.js"
+    "dev": "node --watch v2.js",
+    "test": "cross-env NODE_ENV=test jest --runInBand",
+    "test:watch": "cross-env NODE_ENV=test jest --watch",
+    "test:coverage": "cross-env NODE_ENV=test jest --coverage"
   },
   "keywords": [],
   "author": "",
@@ -28,20 +31,11 @@
     "zod": "^3.24.3"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/supertest": "^6.0.3",
+    "cross-env": "^10.1.0",
     "jest": "^29.7.0",
     "prisma": "^6.8.2",
-    "supertest": "^7.0.0"
-  },
-  "jest": {
-    "testEnvironment": "node",
-    "testMatch": [
-      "**/__tests__/**/*.js",
-      "**/?(*.)+(spec|test).js"
-    ],
-    "collectCoverageFrom": [
-      "v2/**/*.js",
-      "!v2/prisma/**",
-      "!v2/node_modules/**"
-    ]
+    "supertest": "^7.1.4"
   }
 }

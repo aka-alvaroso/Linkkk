@@ -1,15 +1,35 @@
 import { API_CONFIG, defaultFetchOptions } from "@/app/config/api";
 import { HttpError, NetworkError, TimeoutError } from "@/app/utils/errors";
-import type {
-  Link,
-  CreateLinkDTO,
-  UpdateLinkDTO,
-  ApiResponse,
-  GetAllLinksResponse,
-} from "@/app/types";
+import type { ApiResponse } from "@/app/types";
 
-class LinkService {
-  private baseUrl = `${API_CONFIG.BASE_URL}/link`;
+interface LoginDTO {
+  usernameOrEmail: string;
+  password: string;
+}
+
+interface RegisterDTO {
+  username: string;
+  email: string;
+  password: string;
+}
+
+interface User {
+  id: string;
+  username: string;
+  email: string;
+  planId?: string;
+  createdAt: string;
+}
+
+interface SessionResponse {
+  user?: User;
+  guest?: {
+    guestSessionId: string;
+  };
+}
+
+class AuthService {
+  private baseUrl = `${API_CONFIG.BASE_URL}/auth`;
 
   /**
    * Handle API response and extract data or throw appropriate error
@@ -20,7 +40,6 @@ class LinkService {
     try {
       data = await response.json();
     } catch (error) {
-      // Failed to parse JSON
       throw new HttpError(
         response.status,
         'INVALID_RESPONSE',
@@ -29,18 +48,16 @@ class LinkService {
       );
     }
 
-    // Handle error responses
     if (!response.ok) {
       throw new HttpError(
         response.status,
         data.code || 'UNKNOWN_ERROR',
         data.message || response.statusText,
-        response.status >= 500, // Server errors are retryable
-        (data as any).validation // Include validation errors if present
+        response.status >= 500,
+        (data as any).validation
       );
     }
 
-    // Handle successful but malformed responses
     if (!data.success || !data.data) {
       throw new HttpError(
         response.status,
@@ -74,57 +91,69 @@ class LinkService {
 
       return this.handleResponse<T>(response);
     } catch (error) {
-      // Re-throw HttpError as-is
       if (error instanceof HttpError) {
         throw error;
       }
 
-      // Handle abort/timeout errors
       if (error instanceof Error && error.name === 'AbortError') {
         throw new TimeoutError();
       }
 
-      // Handle network errors (fetch failed, no internet, etc.)
       if (error instanceof TypeError) {
         throw new NetworkError();
       }
 
-      // Unknown error
       throw new NetworkError('An unexpected error occurred');
     }
   }
 
-  async getAll(): Promise<GetAllLinksResponse> {
-    return this.request<GetAllLinksResponse>(this.baseUrl, {
+  /**
+   * Validate current session
+   */
+  async validateSession(): Promise<SessionResponse> {
+    return this.request<SessionResponse>(`${this.baseUrl}/validate`, {
       method: "GET",
     });
   }
 
-  async getOne(shortUrl: string): Promise<Link> {
-    return this.request<Link>(`${this.baseUrl}/${shortUrl}`, {
-      method: "GET",
-    });
-  }
-
-  async create(linkData: CreateLinkDTO): Promise<Link> {
-    return this.request<Link>(this.baseUrl, {
+  /**
+   * Create guest session
+   */
+  async createGuestSession(): Promise<{ guestSession: { id: string; createdAt: string } }> {
+    return this.request<{ guestSession: { id: string; createdAt: string } }>(`${this.baseUrl}/guest`, {
       method: "POST",
-      body: JSON.stringify(linkData),
     });
   }
 
-  async update(shortUrl: string, linkData: UpdateLinkDTO): Promise<Link> {
-    return this.request<Link>(`${this.baseUrl}/${shortUrl}`, {
-      method: "PUT",
-      body: JSON.stringify(linkData),
+  /**
+   * Login user
+   */
+  async login(credentials: LoginDTO): Promise<{ user: User }> {
+    return this.request<{ user: User }>(`${this.baseUrl}/login`, {
+      method: "POST",
+      body: JSON.stringify(credentials),
     });
   }
 
-  async delete(shortUrl: string): Promise<void> {
-    await this.request<Link>(`${this.baseUrl}/${shortUrl}`, {
-      method: "DELETE",
+  /**
+   * Register new user
+   */
+  async register(userData: RegisterDTO): Promise<{ user: User }> {
+    return this.request<{ user: User }>(`${this.baseUrl}/register`, {
+      method: "POST",
+      body: JSON.stringify(userData),
+    });
+  }
+
+  /**
+   * Logout current user
+   */
+  async logout(): Promise<{ message: string }> {
+    return this.request<{ message: string }>(`${this.baseUrl}/logout`, {
+      method: "POST",
     });
   }
 }
 
-export const linkService = new LinkService();
+export const authService = new AuthService();
+export type { LoginDTO, RegisterDTO, User, SessionResponse };

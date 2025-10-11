@@ -6,6 +6,7 @@ import { TbCircleDashed, TbCircleDashedCheck, TbLink } from 'react-icons/tb';
 import { useLinks } from '@/app/hooks';
 import Select from '../ui/Select/Select';
 import { FiCornerDownRight } from 'react-icons/fi';
+import { toast } from 'sonner';
 
 interface CreateLinkDrawerProps {
     open: boolean;
@@ -51,7 +52,7 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
 
     const handleCreateLink = async () => {
         if (!newLink.longUrl) {
-            setError('Long URL is required');
+            toast.error('Long URL is required');
             return;
         }
 
@@ -64,6 +65,12 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
         });
 
         if (response.success) {
+            // Success toast
+            toast.success('Link created successfully!', {
+                description: `Short URL: ${response.data.shortUrl}`,
+            });
+
+            // Reset form and close drawer
             setNewLink({
                 longUrl: '',
                 status: true,
@@ -71,6 +78,26 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
             await fetchLinks();
             onClose();
         } else {
+            // Error handling with specific messages
+            if (response.errorCode === 'LINK_LIMIT_EXCEEDED') {
+                toast.error('Link limit exceeded', {
+                    description: 'You\'ve reached your link limit. Upgrade your plan to create more links.',
+                    duration: 6000,
+                });
+            } else if (response.errorCode === 'UNAUTHORIZED') {
+                toast.error('Session expired', {
+                    description: 'Please login again to continue.',
+                });
+            } else if (response.errorCode === 'INVALID_DATA') {
+                toast.error('Invalid data', {
+                    description: response.error || 'Please check your input and try again.',
+                });
+            } else {
+                toast.error('Failed to create link', {
+                    description: response.error || 'An unexpected error occurred.',
+                });
+            }
+
             setError(response.error || 'Failed to create link');
         }
 

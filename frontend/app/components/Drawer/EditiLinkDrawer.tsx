@@ -9,6 +9,7 @@ import Input from '../ui/Input/Input';
 import { useLinks } from '@/app/hooks';
 import type { Link } from '@/app/types';
 import { AccessesList } from '../Accesses/accessesList';
+import { toast } from 'sonner';
 
 interface EditiLinkDrawerProps {
     open: boolean;
@@ -22,6 +23,11 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
     const [hasChanges, setHasChanges] = useState(false);
     const [statusBar, setShowStatusBar] = useState("none");
     const [newLink, setNewLink] = useState({...link});
+
+    // Sincronizar estado local cuando el prop link cambia
+    useEffect(() => {
+        setNewLink({...link});
+    }, [link]);
 
     useEffect(() => {
         const handleKeyDown = async (e: KeyboardEvent) => {
@@ -73,12 +79,31 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
         });
 
         if (response.success) {
+            toast.success('Link updated successfully!');
             setShowStatusBar("none");
-            setNewLink({...link});
+            // No need to update newLink here, fetchLinks() will update the parent
             onClose();
             await fetchLinks();
         } else {
-            setShowStatusBar("error");
+            // Error handling with specific messages
+            if (response.errorCode === 'LINK_NOT_FOUND') {
+                toast.error('Link not found', {
+                    description: 'This link no longer exists.',
+                });
+            } else if (response.errorCode === 'LINK_ACCESS_DENIED') {
+                toast.error('Access denied', {
+                    description: 'You don\'t have permission to edit this link.',
+                });
+            } else if (response.errorCode === 'UNAUTHORIZED') {
+                toast.error('Session expired', {
+                    description: 'Please login again to continue.',
+                });
+            } else {
+                toast.error('Failed to update link', {
+                    description: response.error || 'An unexpected error occurred.',
+                });
+            }
+            setShowStatusBar("none");
         }
     };
 
@@ -184,12 +209,23 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                         <TbExternalLink size={20} />
                         Visit
                     </Button>
-                    <Button 
-                        variant='ghost' 
-                        size='sm' 
+                    <Button
+                        variant='ghost'
+                        size='sm'
                         rounded='2xl'
                         className='flex-1 flex-col items-center justify-center border border-danger text-danger bg-danger/5'
-                        onClick={() => deleteLink(link.shortUrl)}
+                        onClick={async () => {
+                            const result = await deleteLink(link.shortUrl);
+                            if (result.success) {
+                                toast.success('Link deleted successfully');
+                                onClose();
+                                await fetchLinks();
+                            } else {
+                                toast.error('Failed to delete link', {
+                                    description: result.error || 'An unexpected error occurred.',
+                                });
+                            }
+                        }}
                     >
                         <TbTrash size={20} />
                         Delete
@@ -262,6 +298,10 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                             size='sm'
                                             rounded='md'
                                             className='bg-info/10 text-info hover:bg-info/15'
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                navigator.clipboard.writeText(newLink.longUrl);
+                                            }}
                                         />
                                         <Button
                                             iconOnly
@@ -270,6 +310,10 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                             size='sm'
                                             rounded='md'
                                             className='bg-info/10 text-info hover:bg-info/15'
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                window.open(newLink.longUrl, '_blank');
+                                            }}
                                         />
                                     </div>
                                 </div>

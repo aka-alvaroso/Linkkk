@@ -4,3 +4,4 @@
  */
 
 export { linkService } from "./api/linkService";
+export { authService } from "./api/authService";

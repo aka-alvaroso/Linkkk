@@ -40,14 +40,31 @@ const auth = async (req, res, next) => {
       });
 
       req.user = user;
-    } catch (error) {}
+    } catch (error) {
+      // Token invalid or expired - log but don't throw
+      // We check req.user later, so just leave it undefined
+      if (
+        process.env.ENV === "development" &&
+        process.env.NODE_ENV !== "test"
+      ) {
+        console.warn("User token validation failed:", error.message);
+      }
+    }
   }
 
   if (guestToken) {
     try {
       const guestDecoded = jwt.verify(guestToken, GUEST_SECRET_KEY);
       req.guest = guestDecoded;
-    } catch (error) {}
+    } catch (error) {
+      // Guest token invalid or expired - log but don't throw
+      if (
+        process.env.ENV === "development" &&
+        process.env.NODE_ENV !== "test"
+      ) {
+        console.warn("Guest token validation failed:", error.message);
+      }
+    }
   }
 
   if (!req.user && !req.guest) {
@@ -116,7 +133,14 @@ const optionalGuest = async (req, res, next) => {
       const guestDecoded = jwt.verify(guestToken, GUEST_SECRET_KEY);
       req.guest = guestDecoded;
     } catch (error) {
+      // Optional guest auth - token validation failed but that's ok
       req.guest = null;
+      if (process.env.ENV === "development" && process.env.NODE_ENV !== "test") {
+        console.warn(
+          "Optional guest (optionalGuest) token validation failed:",
+          error.message
+        );
+      }
     }
   }
 
@@ -152,7 +176,11 @@ const optionalAuth = async (req, res, next) => {
 
       req.user = user;
     } catch (error) {
+      // Optional auth - token validation failed but that's ok
       req.user = null;
+      if (process.env.ENV === "development" && process.env.NODE_ENV !== "test") {
+        console.warn("Optional user token validation failed:", error.message);
+      }
     }
   }
 
@@ -161,7 +189,11 @@ const optionalAuth = async (req, res, next) => {
       const guestDecoded = jwt.verify(guestToken, GUEST_SECRET_KEY);
       req.guest = guestDecoded;
     } catch (error) {
+      // Optional auth - guest token validation failed but that's ok
       req.guest = null;
+      if (process.env.ENV === "development" && process.env.NODE_ENV !== "test") {
+        console.warn("Optional guest token validation failed:", error.message);
+      }
     }
   }
 
