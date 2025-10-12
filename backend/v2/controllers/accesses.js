@@ -33,7 +33,8 @@ const getLinkAccesses = async (req, res) => {
 
     return successResponse(res, accesses);
   } catch (error) {
-    return errorResponse(res, ERRORS.INTERNAL_SERVER_ERROR);
+    console.error("Error fetching accesses:", error);
+    return errorResponse(res, ERRORS.INTERNAL_ERROR);
   }
 };
 

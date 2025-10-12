@@ -5,7 +5,8 @@ const GUEST_SECRET_KEY = process.env.V2_GUEST_SECRET_KEY;
 const { errorResponse } = require("../utils/response");
 const ERRORS = require("../constants/errorCodes");
 
-const auth = (req, res, next) => {
+// Must be authenticated as user or guest
+const auth = async (req, res, next) => {
   let token = req.cookies.token;
   let guestToken = req.cookies.guestToken;
 
@@ -26,15 +27,44 @@ const auth = (req, res, next) => {
   if (token) {
     try {
       const userDecoded = jwt.verify(token, AUTH_SECRET_KEY);
-      req.user = userDecoded;
-    } catch (error) {}
+
+      // Fetch full user data from database
+      const user = await prisma.user.findUnique({
+        where: { id: userDecoded.id },
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          createdAt: true,
+        },
+      });
+
+      req.user = user;
+    } catch (error) {
+      // Token invalid or expired - log but don't throw
+      // We check req.user later, so just leave it undefined
+      if (
+        process.env.ENV === "development" &&
+        process.env.NODE_ENV !== "test"
+      ) {
+        console.warn("User token validation failed:", error.message);
+      }
+    }
   }
 
   if (guestToken) {
     try {
       const guestDecoded = jwt.verify(guestToken, GUEST_SECRET_KEY);
       req.guest = guestDecoded;
-    } catch (error) {}
+    } catch (error) {
+      // Guest token invalid or expired - log but don't throw
+      if (
+        process.env.ENV === "development" &&
+        process.env.NODE_ENV !== "test"
+      ) {
+        console.warn("Guest token validation failed:", error.message);
+      }
+    }
   }
 
   if (!req.user && !req.guest) {
@@ -44,6 +74,7 @@ const auth = (req, res, next) => {
   next();
 };
 
+// Must be authenticated as user
 const authUser = async (req, res, next) => {
   const user = req.user;
 
@@ -68,6 +99,7 @@ const authUser = async (req, res, next) => {
   next();
 };
 
+// Must be authenticated as guest
 const authGuest = async (req, res, next) => {
   const guest = req.guest;
 
@@ -92,7 +124,8 @@ const authGuest = async (req, res, next) => {
   next();
 };
 
-const optionalGuest = (req, res, next) => {
+// Can be authenticated as guest
+const optionalGuest = async (req, res, next) => {
   let guestToken = req.cookies.guestToken;
 
   if (guestToken) {
@@ -100,14 +133,22 @@ const optionalGuest = (req, res, next) => {
       const guestDecoded = jwt.verify(guestToken, GUEST_SECRET_KEY);
       req.guest = guestDecoded;
     } catch (error) {
+      // Optional guest auth - token validation failed but that's ok
       req.guest = null;
+      if (process.env.ENV === "development" && process.env.NODE_ENV !== "test") {
+        console.warn(
+          "Optional guest (optionalGuest) token validation failed:",
+          error.message
+        );
+      }
     }
   }
 
   next();
 };
 
-const optionalAuth = (req, res, next) => {
+// Can be authenticated as user or guest
+const optionalAuth = async (req, res, next) => {
   let token = req.cookies.token;
   let guestToken = req.cookies.guestToken;
 
@@ -121,9 +162,25 @@ const optionalAuth = (req, res, next) => {
   if (token) {
     try {
       const decoded = jwt.verify(token, AUTH_SECRET_KEY);
-      req.user = decoded;
+
+      // Fetch full user data from database
+      const user = await prisma.user.findUnique({
+        where: { id: decoded.id },
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          createdAt: true,
+        },
+      });
+
+      req.user = user;
     } catch (error) {
+      // Optional auth - token validation failed but that's ok
       req.user = null;
+      if (process.env.ENV === "development" && process.env.NODE_ENV !== "test") {
+        console.warn("Optional user token validation failed:", error.message);
+      }
     }
   }
 
@@ -132,7 +189,11 @@ const optionalAuth = (req, res, next) => {
       const guestDecoded = jwt.verify(guestToken, GUEST_SECRET_KEY);
       req.guest = guestDecoded;
     } catch (error) {
+      // Optional auth - guest token validation failed but that's ok
       req.guest = null;
+      if (process.env.ENV === "development" && process.env.NODE_ENV !== "test") {
+        console.warn("Optional guest token validation failed:", error.message);
+      }
     }
   }
 

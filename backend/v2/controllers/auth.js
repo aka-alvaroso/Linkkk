@@ -54,10 +54,6 @@ const createGuestSession = async (req, res) => {
       secure: process.env.ENV === "production",
       sameSite: "strict",
     });
-
-    if (ENV === "development") {
-      console.log("Guest token: ", token);
-    }
     return successResponse(
       res,
       {
@@ -140,6 +136,7 @@ const register = async (req, res) => {
       201
     );
   } catch (error) {
+    console.error("Error during registration:", error);
     return errorResponse(res, ERRORS.INTERNAL_ERROR);
   }
 };
@@ -202,6 +199,7 @@ const login = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error("Error during login:", error);
     return errorResponse(res, ERRORS.INTERNAL_ERROR);
   }
 };
