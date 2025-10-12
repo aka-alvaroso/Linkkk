@@ -6,6 +6,7 @@ import { LuArrowUpRight } from "react-icons/lu";
 import { useState } from "react";
 import { useAuth } from "../../stores/authStore";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function Login() {
     const { login } = useAuth();
@@ -15,11 +16,22 @@ export default function Login() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!email || !password) {
+            toast.error('Campos requeridos', {
+                description: 'Por favor completa todos los campos'
+            });
+            return;
+        }
+
         const result = await login({ usernameOrEmail: email, password });
         if (result.success) {
+            toast.success('¡Bienvenido de nuevo!');
             router.push('/dashboard');
         } else {
-            console.error('Login error:', result.error);
+            toast.error('Error al iniciar sesión', {
+                description: result.error || 'Credenciales incorrectas'
+            });
         }
     };
 

@@ -204,6 +204,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
         guestSession: null,
         isLoading: false,
       });
+      window.location.href = "/landing";
     }
   },
 
@@ -228,16 +229,18 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
           return {
             success: true,
             requiresVerification: true,
-            user: result.user,
+            user: result.data.user,
           };
         } else {
           set({
-            user: result.user,
+            user: result.data.user,
             isAuthenticated: true,
+            isGuest: false,
+            guestSession: null,
             isLoading: false,
           });
 
-          return { success: true, user: result.user };
+          return { success: true, user: result.data.user };
         }
       } else {
         set({ isLoading: false });

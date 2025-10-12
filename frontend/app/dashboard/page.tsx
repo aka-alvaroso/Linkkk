@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { TbFilterPlus, TbSwitchVertical, TbPlus} from "react-icons/tb";
 
 import { useLinks, useStats } from "@/app/hooks";
+import { useAuth } from "@/app/stores/authStore";
 
 import RouteGuard from '@/app/components/RouteGuard/RouteGuard';
 import Button from "@/app/components/ui/Button/Button";
@@ -16,14 +17,17 @@ import type { LinkFilters } from "@/app/types";
 export default function Dashboard() {
   const { filteredLinks, filters, fetchLinks, updateFilters } = useLinks();
   const { totalLinks, activeLinks, totalClicks } = useStats();
+  const { isAuthenticated, isGuest } = useAuth();
   const [view, setView] = useState('details');
   const { desktopOpen } = useSidebarStore();
   const [createLinkDrawerOpen, setCreateLinkDrawerOpen] = useState(false);
   const [filterModalOpen, setFilterModalOpen] = useState(false);
 
   useEffect(() => {
-    fetchLinks();
-  }, [fetchLinks]);
+    if (isAuthenticated || isGuest) {
+      fetchLinks();
+    }
+  }, [fetchLinks, isAuthenticated, isGuest]);
 
   const handleApplyFilters = (newFilters: LinkFilters) => {
     updateFilters(newFilters);
@@ -35,7 +39,7 @@ export default function Dashboard() {
   };
 
   return (
-    <RouteGuard type="user-only" title="Dashboard - Linkkk">
+    <RouteGuard type="guest-or-user" title="Dashboard - Linkkk">
       <div className="relative md:flex md:flex-row justify-center p-4 md:gap-11 max-w-[128rem] mx-auto">
         <Sidebar />
 

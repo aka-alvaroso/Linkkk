@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
-import { Link } from '@/app/stores/linkStore'
 import { TbCopy, TbLocation, TbLocationOff, TbSettings, TbShare3, TbTrash } from 'react-icons/tb'
 import { FiCornerDownRight } from "react-icons/fi";
 import Button from '@/app/components/ui/Button/Button';
 import Chip from '@/app/components/ui/Chip/Chip';
 import EditLinkDrawer from '@/app/components/Drawer/EditiLinkDrawer';
-import { useLinkStore } from '@/app/stores/linkStore';
+import { useLinks } from '@/app/hooks';
+import { Link } from '@/app/types';
 
 
 
@@ -15,7 +15,7 @@ interface LinkItemProps {
   }
 
 export default function LinkItem({ view, data }: LinkItemProps) {
-    const { deleteLink, getLinks } = useLinkStore();    
+    const { deleteLink } = useLinks();    
     const [linkDetailsDrawer, setLinkDetailsDrawer] = useState(false);
 
     
@@ -27,7 +27,7 @@ export default function LinkItem({ view, data }: LinkItemProps) {
         return (
             <>
             <div className='relative flex group' onClick={() => setLinkDetailsDrawer(true)}>
-                <div className='absolute top-1/2 left-0 opacity-0 grid grid-cols-2 grid-rows-2 items-center transition transform -translate-x-1/2 -translate-y-1/2 scale-0 group-hover:opacity-100 group-hover:scale-100'>
+                <div className='absolute top-1/2 left-0 opacity-0 grid grid-cols-2 grid-rows-2 items-center transition transform -translate-x-1/2 -translate-y-1/2 scale-0 group-hover:opacity-100 group-hover:scale-90'>
                     <Button 
                         variant='ghost' 
                         iconOnly 
@@ -65,8 +65,7 @@ export default function LinkItem({ view, data }: LinkItemProps) {
                         className='text-dark/40 hover:text-danger hover:bg-danger/10' 
                         onClick={async (e) => {
                             e.stopPropagation();
-                            await deleteLink(data.shortUrl);  
-                            await getLinks();
+                            await deleteLink(data.shortUrl);
                         }}
                     />
 

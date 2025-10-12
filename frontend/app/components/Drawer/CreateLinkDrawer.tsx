@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import Drawer from '@/app/components/ui/Drawer/Drawer';
 import Input from '@/app/components/ui/Input/Input';
 import Button from '@/app/components/ui/Button/Button';
@@ -14,7 +14,7 @@ interface CreateLinkDrawerProps {
 }
 
 export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProps) {
-    const { createLink, fetchLinks } = useLinks();
+    const { createLink } = useLinks();
     const [statusBar, setShowStatusBar] = useState("none");
     const [hasChanges, setHasChanges] = useState(false);
     const [newLink, setNewLink] = useState({
@@ -35,22 +35,7 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
         }
     }, [newLink]);
 
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                if (newLink.longUrl.trim()) {
-                    setShowStatusBar("loading");
-                    handleCreateLink();
-                }
-            }
-        };
-
-        document.addEventListener('keydown', handleKeyDown);
-        return () => document.removeEventListener('keydown', handleKeyDown);
-    }, [newLink.longUrl]);
-
-    const handleCreateLink = async () => {
+    const handleCreateLink = useCallback(async () => {
         if (!newLink.longUrl) {
             toast.error('Long URL is required');
             return;
@@ -65,20 +50,16 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
         });
 
         if (response.success) {
-            // Success toast
             toast.success('Link created successfully!', {
                 description: `Short URL: ${response.data.shortUrl}`,
             });
 
-            // Reset form and close drawer
             setNewLink({
                 longUrl: '',
                 status: true,
             });
-            await fetchLinks();
             onClose();
         } else {
-            // Error handling with specific messages
             if (response.errorCode === 'LINK_LIMIT_EXCEEDED') {
                 toast.error('Link limit exceeded', {
                     description: 'You\'ve reached your link limit. Upgrade your plan to create more links.',
@@ -103,7 +84,24 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
 
         setLoading(false);
         setShowStatusBar("none");
-    };
+    }, [createLink, newLink.longUrl, newLink.status, onClose]);
+
+    useEffect(() => {
+        if (!open) return;
+
+        const handleKeyDown = async (e: KeyboardEvent) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                if (newLink.longUrl.trim()) {
+                    setShowStatusBar("loading");
+                    await handleCreateLink();
+                }
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [open, newLink.longUrl, handleCreateLink]);
 
     return (
         <Drawer

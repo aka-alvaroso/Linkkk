@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Drawer from '@/app/components/ui/Drawer/Drawer';
 import { FiCornerDownRight } from 'react-icons/fi';
-import { TbChartBar, TbCircleDashed, TbCircleDashedCheck, TbCopy, TbDotsVertical, TbExternalLink, TbLink, TbSettings, TbTrash } from 'react-icons/tb';
+import { TbChartBar, TbCircleDashed, TbCircleDashedCheck, TbCopy, TbExternalLink, TbLink, TbSettings, TbTrash } from 'react-icons/tb';
 import Button from '../ui/Button/Button';
 import Select from '../ui/Select/Select';
 import Chip from '../ui/Chip/Chip';
@@ -29,7 +29,44 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
         setNewLink({...link});
     }, [link]);
 
+    const handleUpdateLink = useCallback(async () => {
+            const response = await updateLink(link.shortUrl, {
+                longUrl: newLink.longUrl,
+                status: newLink.status,
+            });
+
+            if (response.success) {
+                toast.success('Link updated successfully!');
+                setShowStatusBar("none");
+                // No need to update newLink here, fetchLinks() will update the parent
+                onClose();
+                await fetchLinks();
+            } else {
+                // Error handling with specific messages
+                if (response.errorCode === 'LINK_NOT_FOUND') {
+                    toast.error('Link not found', {
+                        description: 'This link no longer exists.',
+                    });
+                } else if (response.errorCode === 'LINK_ACCESS_DENIED') {
+                    toast.error('Access denied', {
+                        description: 'You don\'t have permission to edit this link.',
+                    });
+                } else if (response.errorCode === 'UNAUTHORIZED') {
+                    toast.error('Session expired', {
+                        description: 'Please login again to continue.',
+                    });
+                } else {
+                    toast.error('Failed to update link', {
+                        description: response.error || 'An unexpected error occurred.',
+                    });
+                }
+                setShowStatusBar("none");
+            }
+    }, [link, newLink, updateLink, fetchLinks, onClose]);
+    
     useEffect(() => {
+        if (!open) return;
+
         const handleKeyDown = async (e: KeyboardEvent) => {
             const activeElement = document.activeElement;
 
@@ -52,11 +89,8 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
         };
     
         document.addEventListener('keydown', handleKeyDown);
-    
-        return () => {
-            document.removeEventListener('keydown', handleKeyDown);
-        };
-    }, [newLink, link]);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [open, newLink, link, handleUpdateLink]);
 
     useEffect(() => {
         const hasChanges =
@@ -71,41 +105,6 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
             setTimeout(() => setShowStatusBar("none"), 200);
         }
     }, [newLink, link]);
-
-    const handleUpdateLink = async () => {
-        const response = await updateLink(link.shortUrl, {
-            longUrl: newLink.longUrl,
-            status: newLink.status,
-        });
-
-        if (response.success) {
-            toast.success('Link updated successfully!');
-            setShowStatusBar("none");
-            // No need to update newLink here, fetchLinks() will update the parent
-            onClose();
-            await fetchLinks();
-        } else {
-            // Error handling with specific messages
-            if (response.errorCode === 'LINK_NOT_FOUND') {
-                toast.error('Link not found', {
-                    description: 'This link no longer exists.',
-                });
-            } else if (response.errorCode === 'LINK_ACCESS_DENIED') {
-                toast.error('Access denied', {
-                    description: 'You don\'t have permission to edit this link.',
-                });
-            } else if (response.errorCode === 'UNAUTHORIZED') {
-                toast.error('Session expired', {
-                    description: 'Please login again to continue.',
-                });
-            } else {
-                toast.error('Failed to update link', {
-                    description: response.error || 'An unexpected error occurred.',
-                });
-            }
-            setShowStatusBar("none");
-        }
-    };
 
     return (
         <Drawer

@@ -6,6 +6,7 @@ import { LuArrowUpRight } from "react-icons/lu";
 import { useState } from "react";
 import { useAuth } from "../../stores/authStore";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function Register() {
     const { register } = useAuth();
@@ -16,11 +17,31 @@ export default function Register() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!email || !username || !password) {
+            toast.error('Campos requeridos', {
+                description: 'Por favor completa todos los campos'
+            });
+            return;
+        }
+
+        if (password.length < 6) {
+            toast.error('Contraseña muy corta', {
+                description: 'La contraseña debe tener al menos 6 caracteres'
+            });
+            return;
+        }
+
         const result = await register({ email, username, password });
         if (result.success) {
+            toast.success('¡Cuenta creada exitosamente!', {
+                description: 'Bienvenido a Linkkk'
+            });
             router.push('/dashboard');
         } else {
-            console.error('Register error:', result.error);
+            toast.error('Error al registrarse', {
+                description: result.error || 'No se pudo crear la cuenta'
+            });
         }
     };
 

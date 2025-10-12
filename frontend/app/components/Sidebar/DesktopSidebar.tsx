@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { useSidebarStore } from '@/app/stores/sidebarStore';
-import { useAuthStore } from '@/app/stores/authStore';
 import Link from 'next/link';
 import Button from '@/app/components/ui/Button/Button';
 import Dropdown from '@/app/components/ui/Dropdown/Dropdown';
 import type { DropdownItem } from '@/app/components/ui/Dropdown/Dropdown';
-import { TbDirection, TbLayoutSidebarLeftCollapse, TbLayoutSidebarLeftExpand, TbPlus, TbSettings, TbLogout, TbUser } from 'react-icons/tb';
+import { TbDirection, TbLayoutSidebarLeftCollapse, TbLayoutSidebarLeftExpand, TbPlus, TbSettings, TbLogout, TbUser, TbLogin } from 'react-icons/tb';
 import { HiHome } from 'react-icons/hi';
 import Image from 'next/image';
 import CreateLinkDrawer from '@/app/components/Drawer/CreateLinkDrawer';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/app/stores/authStore';
 
 const DesktopSidebar = () => {
+    const router = useRouter();
     const { desktopOpen, toggleDesktop } = useSidebarStore();
-    const { user, logout } = useAuthStore();
+    const { user, logout, isAuthenticated } = useAuth();
     const [createLinkDrawer, setCreateLinkDrawer] = useState(false);
     const [ selected, setSelected ] = useState('home');
     const sidebarWidth = desktopOpen ? 'w-64' : 'w-20';
@@ -57,7 +59,6 @@ const DesktopSidebar = () => {
             separator: true,
             onClick: async () => {
                 await logout();
-                window.location.href = '/auth/login';
             },
             customClassName: 'text-danger hover:bg-danger/5'
         },
@@ -124,10 +125,12 @@ const DesktopSidebar = () => {
                 </div>
             </div>
 
-            <div className='mt-auto w-full flex flex-col items-center gap-2 bg-dark/5 rounded-xl text-light'>
-                    <Dropdown
-                        trigger={
-                            <div className='relative w-full flex justify-between text-dark transition-all duration-200 ease-in-out hover:cursor-pointer rounded-xl p-2 group'>
+                    
+                    {
+                        isAuthenticated ? (
+                            <Dropdown
+                            trigger={
+                            <div className='relative w-full flex justify-between text-dark bg-dark/5 transition-all duration-200 ease-in-out hover:cursor-pointer rounded-xl p-2 group'>
                                 <div className="relative rounded-full size-11 overflow-hidden flex-shrink-0">
                                     <Image
                                         src="https://images.unsplash.com/photo-1758621518225-9248e65dbaee?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
@@ -142,16 +145,32 @@ const DesktopSidebar = () => {
                                 </div>
 
                                 <div className={`flex items-center justify-center transition-all duration-200 ease-in-out ${!desktopOpen ? 'w-0 opacity-0' : 'w-6 opacity-100'}`}>
-                                    <TbDirection size={20} className='text-dark/50 group-hover:text-dark group-hover:scale-110 transition-all' />
+                                    <TbDirection size={20} className='text-dark/50' />
                                 </div>
                             </div>
                         }
                         items={userMenuItems}
                         placement="top-right"
+                        className='mt-auto w-full'
                         menuClassName='p-2 shadow-none w-full'
                         itemClassName='text-dark hover:cursor-pointer rounded-xl'
-                    />
-            </div>
+                            />
+                        ) : (
+                            <Button
+                                variant='solid'
+                                size='sm'
+                                rounded='xl'
+                                iconOnly={!desktopOpen}
+                                className={`w-full border-2 border-info bg-info text-light hover:text-info hover:bg-light hover:shadow-[4px_4px_0_0_rgb(39,154,241)] transition-all duration-200 ease-in-out ${desktopOpen ? 'h-12' : 'size-12 mx-auto'}`}
+                                leftIcon={<TbLogin size={22} />}
+                                onClick={() => {
+                                    router.push('/auth/login');
+                                }}
+                            >
+                                    <span className='font-black italic text-lg'>Login</span> 
+                            </Button>
+                        )
+                    }
             
         </div>
     );

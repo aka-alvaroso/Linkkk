@@ -1,13 +1,29 @@
 "use client"
-import RouteGuard from "./components/RouteGuard/RouteGuard";
-import Navbar from "./components/Navbar/Navbar";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "./stores/authStore";
 
 export default function Home() {
+  const router = useRouter();
+  const { isAuthenticated, isGuest, isLoading, sessionChecked } = useAuth();
+
+  useEffect(() => {
+    // Wait for session check to complete before redirecting
+    if (!isLoading && sessionChecked) {
+      if (isAuthenticated || isGuest) {
+        router.push("/dashboard");
+      } else {
+        router.push("/landing");
+      }
+    }
+  }, [isAuthenticated, isGuest, isLoading, sessionChecked, router]);
+
+  // Show nothing while checking/redirecting
   return (
-    <RouteGuard type="public" title="Linkkk - Home">
-      <Navbar />
-      <div className="mt-20 p-2 space-y-8 w-full md:max-w-3/4 md:mx-auto">
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="animate-pulse text-lg font-medium text-dark/50">
+        Loading...
       </div>
-    </RouteGuard>
+    </div>
   );
 }
