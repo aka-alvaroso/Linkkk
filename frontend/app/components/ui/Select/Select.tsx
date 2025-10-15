@@ -129,6 +129,7 @@ export default function Select({
         >
           {options.map((opt) => {
             const isSelected = value === opt.value || opt.selected;
+            const hasCustomHover = opt.customClassName?.includes('hover:');
             return (
               <li
                 key={opt.value}
@@ -137,11 +138,12 @@ export default function Select({
                 aria-disabled={opt.disabled}
                 onClick={() => handleSelect(opt.value, opt.disabled)}
                 className={cn(
-                  "flex items-center px-4 py-2 cursor-pointer select-none transition",
-                  opt.disabled ? "cursor-not-allowed opacity-50" : "hover:bg-blue-50",
-                  isSelected ? (opt.selectedClassName || optionSelectedClassName) : '',
+                  "flex items-center px-4 py-2 select-none transition",
+                  opt.disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer",
+                  !hasCustomHover && !opt.disabled && "hover:bg-blue-50",
                   optionClassName,
-                  opt.customClassName
+                  opt.customClassName,
+                  isSelected && (opt.selectedClassName || optionSelectedClassName)
                 )}
               >
                 {opt.leftIcon && (

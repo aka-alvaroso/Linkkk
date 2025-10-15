@@ -9,7 +9,9 @@ import Input from '../ui/Input/Input';
 import { useLinks } from '@/app/hooks';
 import type { Link } from '@/app/types';
 import { AccessesList } from '../Accesses/accessesList';
-import { toast } from 'sonner';
+import { useToast } from '@/app/hooks/useToast';
+import * as motion from 'motion/react-client';
+import { AnimatePresence } from 'motion/react';
 
 interface EditiLinkDrawerProps {
     open: boolean;
@@ -19,8 +21,8 @@ interface EditiLinkDrawerProps {
 
 export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawerProps) {
     const { updateLink, fetchLinks, deleteLink } = useLinks();
+    const toast = useToast();
     const [tab, setTab] = useState('settings');
-    const [hasChanges, setHasChanges] = useState(false);
     const [statusBar, setShowStatusBar] = useState("none");
     const [newLink, setNewLink] = useState({...link});
 
@@ -70,27 +72,29 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
         const handleKeyDown = async (e: KeyboardEvent) => {
             const activeElement = document.activeElement;
 
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                setShowStatusBar("loading");
-                await handleUpdateLink();
+            // Manejar Enter para actualizar
+            if (e.key === 'Enter' && !e.shiftKey) {
+                const hasChanges = link.status !== newLink.status || link.longUrl !== newLink.longUrl;
+                if (hasChanges) {
+                    e.preventDefault();
+                    setShowStatusBar("loading");
+                    await handleUpdateLink();
+                }
             }
 
+            // Solo manejar shortcuts de teclado cuando no estamos en un input
             if (activeElement?.tagName === 'INPUT' || activeElement?.tagName === 'TEXTAREA') return;
 
             if (e.key === '1') {
                 setTab('settings'); //TODO: Change to resume on implementation
             } else if (e.key === '2') {
                 setTab('analytics'); //TODO: Change to analytics on implementation
-            } 
-            // else if (e.key === '3') {
-            //     setTab('analytics');
-            // }
+            }
         };
-    
+
         document.addEventListener('keydown', handleKeyDown);
         return () => document.removeEventListener('keydown', handleKeyDown);
-    }, [open, newLink, link, handleUpdateLink]);
+    }, [open, link, newLink, handleUpdateLink]);
 
     useEffect(() => {
         const hasChanges =
@@ -98,11 +102,9 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
             link.longUrl !== newLink.longUrl;
 
         if (hasChanges) {
-            setShowStatusBar("confirm")
-            setTimeout(() => setHasChanges(true), 200);
-        }else{
-            setHasChanges(false);
-            setTimeout(() => setShowStatusBar("none"), 200);
+            setShowStatusBar("confirm");
+        } else {
+            setShowStatusBar("none");
         }
     }, [newLink, link]);
 
@@ -130,64 +132,106 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                     >
                         Resume
                     </Button> */}
-                    <Button
-                        variant='ghost'
-                        size='sm'
-                        rounded='2xl'
-                        leftIcon={<TbSettings size={20} />}
-                        className={`rounded-2xl ${tab === 'settings' ? 'bg-dark text-light hover:bg-dark/90' : 'bg-dark/5 text-dark/50'}`}
-                        onClick={() => setTab('settings')}
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, ease: "backInOut" }}
+                        
                     >
-                        Settings
-                    </Button>
-                    <Button
-                        variant='ghost'
-                        size='sm'
-                        rounded='2xl'
-                        leftIcon={<TbChartBar size={20} />}
-                        className={`rounded-2xl ${tab === 'analytics' ? 'bg-dark text-light hover:bg-dark/90' : 'bg-dark/5 text-dark/50'}`}
-                        onClick={() => setTab('analytics')}
+                        <Button
+                            variant='ghost'
+                            size='sm'
+                            rounded='2xl'
+                            leftIcon={<TbSettings size={20} />}
+                            className={`rounded-2xl ${tab === 'settings' ? 'bg-dark text-light hover:bg-dark/90' : 'bg-dark/5 text-dark/50'}`}
+                            onClick={() => setTab('settings')}
+                            >
+                            Settings
+                        </Button>
+                    </motion.div>
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.05,  duration: 0.4, ease: "backInOut" }}
+                        
                     >
-                        Analytics
-                    </Button>
+                        <Button
+                            variant='ghost'
+                            size='sm'
+                            rounded='2xl'
+                            leftIcon={<TbChartBar size={20} />}
+                            className={`rounded-2xl ${tab === 'analytics' ? 'bg-dark text-light hover:bg-dark/90' : 'bg-dark/5 text-dark/50'}`}
+                            onClick={() => setTab('analytics')}
+                        >
+                            Analytics
+                        </Button>
+                    </motion.div>
                 </div>
  
 
                 <header className='w-full flex flex-col md:flex-row items-start'>
                     <div className='w-full flex-1 flex flex-col gap-2'>
                         <div className='flex flex-col-reverse items-start md:flex-row md:items-center'>
-                            <p className='text-2xl md:text-3xl italic font-black'>linkkk.dev/{newLink.shortUrl}</p>
+                            <motion.h1
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: 0.1,  duration: 0.4, ease: "backInOut" }} 
+                                className='text-2xl md:text-3xl italic font-black'>
+                                linkkk.dev/{newLink.shortUrl}
+                            </motion.h1>
                             {
                                 newLink.status ? (
-                                    <Chip
+                                    <motion.div
+                                        initial={{ opacity: 0, x: 20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: 0.15, duration: 0.3, ease: "backOut" }}
+                                    >
+                                        <Chip
                                         variant='success'
                                         className='md:ml-4'
                                         size='md'
                                         leftIcon={<TbCircleDashedCheck size={20} />}
-                                    >
-                                        Active
-                                    </Chip>
+                                        >
+                                            Active
+                                        </Chip>
+                                    </motion.div>
                                 ) : (
-                                    <Chip
+                                    <motion.div
+                                        initial={{ opacity: 0, x: 20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: 0.15, duration: 0.3, ease: "backOut" }}
+                                    >
+                                        <Chip
                                         variant='danger'
                                         className='md:ml-4'
                                         size='md'
                                         leftIcon={<TbCircleDashed size={20} />}
-                                    >
-                                        Inactive
-                                    </Chip>
+                                        >
+                                            Inactive
+                                        </Chip>
+                                    </motion.div>
                                 )
                             }
                         </div>
-                        <div className='w-full flex items-center gap-2 text-dark/50'>
+                        <motion.div 
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.175, duration: 0.3, ease: "backOut" }}
+                            className='w-full flex items-center gap-2 text-dark/50'
+                        >
                             <FiCornerDownRight size={20} /> 
                             <p className='text-sm md:text-lg flex-1 truncate'>{newLink.longUrl}</p>
-                        </div>
+                        </motion.div>
                     </div>
                 </header>
 
                 {/* Mobile buttons */}
-                <div className='w-full flex gap-2 my-4 md:hidden'>
+                <motion.div 
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.175, duration: 0.3, ease: "backOut" }}
+                    className='w-full flex gap-2 my-4 md:hidden'
+                >
                     <Button 
                         variant='ghost' 
                         size='sm' 
@@ -229,7 +273,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                         <TbTrash size={20} />
                         Delete
                     </Button>
-                </div>
+                </motion.div >
 
                 {/* Main Content */}
                 {/* Resume */}
@@ -242,54 +286,91 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                 {tab === 'settings' && (
                     <div className='w-full h-full flex flex-col gap-2 items-center p-4'>
                         
-                        <p className='w-full text-2xl font-black flex items-center gap-2'>
+                        <motion.p 
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.2, duration: 0.3, ease: "backOut" }}
+                            className='w-full text-2xl font-black flex items-center gap-2'>
                             <TbSettings size={26} />
                             Settings
-                        </p>
+                        </motion.p>
 
                         {/* Link status */}
                         <div className='w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-1'>
-                            <p className='text-lg'>Link status</p>
-                            <Select
-                                options={[
-                                    { 
-                                        label: 'Active', 
-                                        value: 'active', 
-                                        leftIcon: <TbCircleDashedCheck size={16} />,
-                                        customClassName: 'text-success hover:bg-success/10', 
-                                        selectedClassName: 'bg-success/15'
-                                    },
-                                    { 
-                                        label: 'Inactive', 
-                                        value: 'inactive', 
-                                        leftIcon: <TbCircleDashed size={16} />,
-                                        customClassName: 'mt-1 text-danger hover:bg-danger/10', 
-                                        selectedClassName: 'bg-danger/15'
-                                    },
-                                ]}
-                                value={newLink.status ? 'active' : 'inactive'}
-                                onChange={(v) => setNewLink({ ...newLink, status: v === 'active' })}
-                                listClassName='rounded-2xl p-1 shadow-none'
-                                buttonClassName="rounded-2xl border-dark/10"
-                                optionClassName='rounded-xl '
-                            />
+                            <motion.p
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.25, duration: 0.3, ease: "backOut" }} 
+                            className='text-lg'>
+                                Link status
+                            </motion.p>
+                            <motion.div 
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: 0.275, duration: 0.3, ease: "backOut" }}
+                                className='w-xs'
+                            >
+                                <Select
+                                    options={[
+                                        { 
+                                            label: 'Active', 
+                                            value: 'active', 
+                                            leftIcon: <TbCircleDashedCheck size={16} />,
+                                            customClassName: 'text-dark bg-success/50 hover:bg-success',
+                                            selectedClassName: 'bg-success'
+                                        },
+                                        { 
+                                            label: 'Inactive', 
+                                            value: 'inactive', 
+                                            leftIcon: <TbCircleDashed size={16} />,
+                                            customClassName: 'mt-1 text-light bg-danger/50 hover:bg-danger',
+                                            selectedClassName: 'bg-danger'
+                                        },
+                                    ]}
+                                    value={newLink.status ? 'active' : 'inactive'}
+                                    onChange={(v) => setNewLink({ ...newLink, status: v === 'active' })}
+                                    listClassName='rounded-2xl p-1 shadow-none'
+                                    buttonClassName="rounded-2xl border-dark/10"
+                                    optionClassName='rounded-xl '
+                                />
+                            </motion.div>
                         </div>
                         {/* URLs */}
                         <div className='w-full flex justify-between items-center gap-4'>
                             <div className='w-1/2 flex flex-col gap-1'>
-                                <p className='text-lg'>Long URL</p>
-                                <div className='w-full relative group'>
-                                <Input
-                                    value={newLink.longUrl}
-                                    onChange={(e) => setNewLink({ ...newLink, longUrl: e.target.value })}
-                                    placeholder='https://example.com'
-                                    size='md'
-                                    rounded='2xl'
-                                    leftIcon={<TbLink size={20} className='text-info' />}
-                                    className='w-full transition-all duration-100 ease-in-out text-ellipsis overflow-hidden'
-                                />
+                                <motion.p 
+                                    initial={{ opacity: 0, x: 20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: 0.3, duration: 0.3, ease: "backOut" }}
+                                    className='text-lg'>
+                                        Long URL
+                                </motion.p>
+                                <motion.div 
+                                    initial={{ opacity: 0, x: 20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: 0.35, duration: 0.3, ease: "backOut" }}
+                                    className='w-full relative group'>
+                                    <Input
+                                        value={newLink.longUrl}
+                                        onChange={(e) => setNewLink({ ...newLink, longUrl: e.target.value })}
+                                        onKeyDown={async (e) => {
+                                            if (e.key === 'Enter' && !e.shiftKey) {
+                                                const hasChanges = link.status !== newLink.status || link.longUrl !== newLink.longUrl;
+                                                if (hasChanges) {
+                                                    e.preventDefault();
+                                                    setShowStatusBar("loading");
+                                                    await handleUpdateLink();
+                                                }
+                                            }
+                                        }}
+                                        placeholder='https://example.com'
+                                        size='md'
+                                        rounded='2xl'
+                                        leftIcon={<TbLink size={20} className='text-info' />}
+                                        className='w-full transition-all duration-100 ease-in-out text-ellipsis overflow-hidden'
+                                    />
                                 
-                                <div className='opacity-0 bg-light pl-2 group-hover:opacity-100 absolute flex gap-2 top-1/2 -translate-y-1/2 right-2 transition-all duration-200 ease-in-out'>
+                                    <div className='opacity-0 bg-light pl-2 group-hover:opacity-100 absolute flex gap-2 top-1/2 -translate-y-1/2 right-2 transition-all duration-200 ease-in-out'>
                                         <Button
                                             iconOnly
                                             leftIcon={<TbCopy size={20} />}
@@ -315,63 +396,90 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                             }}
                                         />
                                     </div>
-                                </div>
+                                </motion.div>
                             </div>
                         </div>
 
 
                         {/* Status bar */}
-                        <div className={`absolute flex flex-col gap-2 p-4 mb-2 bottom-0 left-1/2 w-1/2 -translate-x-1/2 bg-light border border-dark/10 rounded-3xl
-                            transform transition-all duration-200 ease-in-out
-                            ${hasChanges ? 'opacity-100 -translate-y-1/2' : 'opacity-0 translate-y-0'}
-                            ${statusBar !== 'none' ? 'block' : 'hidden'}
-                            `}>
-                                
-                                {statusBar === "loading" && (
-                                    <p className='text-dark/50'>
-                                        Updating link...
-                                    </p>
-                                )}
+                        <AnimatePresence>
+                            {statusBar !== 'none' && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                                    animate={{ opacity: 1, y: -8, scale: 1 }}
+                                    exit={{ opacity: 0, y: 50, scale: 0.9 }}
+                                    transition={{ duration: 0.3, ease: "backOut" }}
+                                    className='absolute flex flex-col gap-2 p-4 mb-2 bottom-0 left-1/2 w-1/2 -translate-x-1/2 bg-light border border-dark/10 rounded-3xl'
+                                >
+                                    {statusBar === "loading" && (
+                                        <motion.p
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: 0.1, duration: 0.2 }}
+                                            className='text-dark/50'
+                                        >
+                                            Updating link...
+                                        </motion.p>
+                                    )}
 
-                                
-                                {statusBar === "confirm" && (
-                                    <>
-                                        <p className='text-dark/50'>
-                                            We detected some changes, do you want to apply them?
-                                        </p>
-                                        <div className='flex gap-2'>
-                                            <Button
-                                                variant='outline'
-                                                size='sm'
-                                                rounded='2xl'
-                                                className='flex-1 rounded-xl border-info text-info hover:bg-info/15 hover:text-info'
-                                                onClick={() => {
-                                                    setShowStatusBar("none");
-                                                    setNewLink({...link});
-                                                }}
+                                    {statusBar === "confirm" && (
+                                        <>
+                                            <motion.p
+                                                initial={{ opacity: 0, y: 20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ delay: 0.05, duration: 0.2 }}
+                                                className='text-dark/50'
                                             >
-                                                Cancel
-                                            </Button>
-                                            <Button
-                                                variant='solid'
-                                                size='sm'
-                                                rounded='2xl'
-                                                className='flex-1 rounded-xl bg-info hover:bg-info/80'
-                                                onClick={async () => {
-                                                    setShowStatusBar("loading");
-                                                    await handleUpdateLink();
-                                                }}
-                                            >
-                                                Update Link
-                                                <span className='ml-2 text-xs border border-light rounded-lg p-1'>
-                                                    <FiCornerDownRight size={14} />
-                                                </span> 
-                                            </Button>
-                                        </div>
-                                    </>
-                                )}
-                            
-                        </div>
+                                                We detected some changes, do you want to apply them?
+                                            </motion.p>
+                                            <div className='flex gap-2'>
+                                                <motion.div
+                                                    initial={{ opacity: 0, y: 20 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    transition={{ delay: 0.1, duration: 0.2, ease: "backOut" }}
+                                                    className='flex-1'
+                                                >
+                                                    <Button
+                                                        variant='outline'
+                                                        size='sm'
+                                                        rounded='2xl'
+                                                        className='w-full rounded-xl border-danger text-danger hover:bg-danger/15 hover:text-danger'
+                                                        onClick={() => {
+                                                            setShowStatusBar("none");
+                                                            setNewLink({...link});
+                                                        }}
+                                                    >
+                                                        Cancel
+                                                    </Button>
+                                                </motion.div>
+                                                <motion.div
+                                                    initial={{ opacity: 0, y: 20 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    transition={{ delay: 0.15, duration: 0.2, ease: "backOut" }}
+                                                    className='flex-1'
+                                                >
+                                                    <Button
+                                                        variant='solid'
+                                                        size='sm'
+                                                        rounded='2xl'
+                                                        className='w-full rounded-xl hover:bg-primary hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)]'
+                                                        onClick={async () => {
+                                                            setShowStatusBar("loading");
+                                                            await handleUpdateLink();
+                                                        }}
+                                                    >
+                                                        Update Link
+                                                        <span className='ml-2 text-xs'>
+                                                            <FiCornerDownRight size={14} />
+                                                        </span>
+                                                    </Button>
+                                                </motion.div>
+                                            </div>
+                                        </>
+                                    )}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
                 )}
 

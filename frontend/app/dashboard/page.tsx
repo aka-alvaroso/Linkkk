@@ -13,6 +13,25 @@ import CreateLinkDrawer from "@/app/components/Drawer/CreateLinkDrawer";
 import FilterModal from "@/app/components/Modal/FilterModal";
 import { useSidebarStore } from "@/app/stores/sidebarStore";
 import type { LinkFilters } from "@/app/types";
+import * as motion from 'motion/react-client';
+import { useMotionValue, useTransform, animate } from 'motion/react';
+
+function AnimatedCounter({ value, delay = 0 }: { value: number; delay?: number }) {
+  const count = useMotionValue(0);
+  const rounded = useTransform(count, (latest) => Math.round(latest));
+
+  useEffect(() => {
+    const controls = animate(count, value, {
+      duration: 1,
+      delay,
+      ease: "easeOut"
+    });
+
+    return controls.stop;
+  }, [count, value, delay]);
+
+  return <motion.span>{rounded}</motion.span>;
+}
 
 export default function Dashboard() {
   const { filteredLinks, filters, fetchLinks, updateFilters } = useLinks();
@@ -45,28 +64,46 @@ export default function Dashboard() {
 
         {/* Dashboard */}
         <div className={`mt-20 md:mt-0 transition-all flex-1 md:pr-18 space-y-8 min-w-0 ${desktopOpen ? 'md:ml-64' : 'md:ml-20'}`}>
-          <h1 className="text-4xl font-black mb-2 italic">Dashboard</h1>
+          <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0, duration: 0.4, ease: "backInOut" }}
+              className="text-4xl font-black mb-2 italic">
+            Dashboard
+          </motion.h1>
           
           {/* Widgets */}
           <div className='flex items-center gap-1 overflow-x-auto scrollbar-hide lg:grid lg:gap-2 lg:grid-cols-4'>
-            <div className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05, duration: 0.4, ease: "backInOut" }}
+            className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
               <h2 className='text-md'>Total links</h2>
               <p className='text-end text-5xl font-black italic'>
-                {totalLinks}
+                <AnimatedCounter value={totalLinks} delay={0.1} />
               </p>
-            </div>
-            <div className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1, duration: 0.4, ease: "backInOut" }}
+            className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
               <h2 className='text-md'>Total clicks</h2>
               <p className='text-end text-5xl font-black italic'>
-                {totalClicks}
+                <AnimatedCounter value={totalClicks} delay={0.15} />
               </p>
-            </div>
-            <div className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15, duration: 0.4, ease: "backInOut" }}
+            className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
               <h2 className='text-md'>Active links</h2>
               <p className='text-end text-5xl font-black italic'>
-                {activeLinks}
+                <AnimatedCounter value={activeLinks} delay={0.2} />
               </p>
-            </div>
+            </motion.div>
             {/* <div className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
               <h2 className='text-md'>API usage</h2>
               <p className='text-end text-5xl font-black italic'>
@@ -79,31 +116,59 @@ export default function Dashboard() {
           <div className='flex flex-wrap items-center justify-between'>
             
             <div className='flex items-center gap-2'>
-              <h3 className='text-3xl font-black italic'>My links</h3>
-              <Button
-                variant="ghost"
-                size="sm"
-                rounded="xl"
-                leftIcon={<TbFilterPlus size={20} />}
-                onClick={() => setFilterModalOpen(true)}
-                className={hasActiveFilters() ? 'bg-info/10 text-info hover:bg-info/20' : ''}
+              <motion.h3 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.4, ease: "backInOut" }}
+                className='text-3xl font-black italic'>
+                My links
+              </motion.h3>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.25, duration: 0.4, ease: "backInOut" }}
               >
-                <span className=''>
-                  {hasActiveFilters() ? 'Filters active' : 'Add filter'}
-                </span>
-              </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  rounded="xl"
+                  leftIcon={<TbFilterPlus size={20} />}
+                  onClick={() => setFilterModalOpen(true)}
+                  className={hasActiveFilters() ? 'bg-info/10 text-info hover:bg-info/20' : ''}
+                >
+                  <span className=''>
+                    {hasActiveFilters() ? 'Filters active' : 'Add filter'}
+                  </span>
+                </Button>
+              </motion.div>
             </div>
 
               <div className='flex items-center gap-2'>
                   {/* <Button variant='ghost' size='sm' rounded='xl' leftIcon={<TbEdit size={20} />}>
                       Edit view
                   </Button> */}
+                  
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3, duration: 0.4, ease: "backInOut" }}
+                >
                   <Button variant="ghost" className="" size="sm" rounded="xl" leftIcon={<TbSwitchVertical size={20} />}>
                     <span className=''>Order by</span>
                   </Button>
-                  <Button variant='solid' size='sm' rounded='xl' leftIcon={<TbPlus size={20} />} onClick={() => setCreateLinkDrawerOpen(true)}>
+                </motion.div>
+                
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.35, duration: 0.4, ease: "backInOut" }}
+                >
+                  <Button variant='solid' size='sm' rounded='xl' leftIcon={<TbPlus size={20} />} onClick={() => setCreateLinkDrawerOpen(true)}
+                    className="hover:bg-primary hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)]"
+                    >
                       New link
                   </Button>
+                  </motion.div>
               </div>
           </div>
 
