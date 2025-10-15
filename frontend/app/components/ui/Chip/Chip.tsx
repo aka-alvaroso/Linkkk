@@ -49,11 +49,11 @@ export const Chip: React.FC<ChipProps> = ({
   // Variant styles
   const variantStyles = {
     default: 'text-dark bg-dark/10 hover:bg-dark/20',
-    success: 'text-success bg-success/10 hover:bg-success/20',
-    warning: 'text-warning bg-warning/10 hover:bg-warning/20',
-    danger: 'text-danger bg-danger/10 hover:bg-danger/20',
-    dark: 'text-light bg-dark hover:bg-dark/80',
-    info: 'text-blue-400 bg-blue-400/10 hover:bg-blue-400/20',
+    success: 'text-dark bg-success hover:bg-success',
+    warning: 'text-dark bg-warning hover:bg-warning',
+    danger: 'text-light bg-danger hover:bg-danger',
+    dark: 'text-light bg-dark hover:bg-dark',
+    info: 'text-dark bg-info hover:bg-info',
     custom: '', // No styles for custom variant - uses only className
   };
 

@@ -18,7 +18,7 @@ export default function DesktopNavbar() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0, duration: 0.4 }}
+          transition={{ delay: 0, duration: 0.4, ease: "backInOut" }}
         >
           <Link href="/" className="ml-2 text-5xl font-black italic">
               <span
@@ -61,11 +61,22 @@ export default function DesktopNavbar() {
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2, duration: 0.4 }}
+                  transition={{ delay: 0.2, duration: 0.4, ease: "backInOut"}}
                 >
                   <Link href="/" className="relative group">
                       <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
                       <p className="font-black italic z-20 relative">Home</p>
+                  </Link>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.22, duration: 0.4, ease: "backInOut" }}
+                >
+                  <Link href="/dashboard" className="relative group">
+                      <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
+                      <p className="font-black italic z-20 relative">Dashboard</p>
                   </Link>
                 </motion.div>
                 
@@ -91,7 +102,7 @@ export default function DesktopNavbar() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.4 }}
+          transition={{ delay: 0.3, duration: 0.4, ease: "backInOut" }}
           className="flex items-center gap-2"
         >
             {
@@ -117,7 +128,7 @@ export default function DesktopNavbar() {
                         rounded="xl"
                         className="hover:bg-primary hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)]"
                         onClick={() => {
-                            window.location.href = `/login`;
+                            window.location.href = `/auth/login`;
                         }}
                     >
                         <p className="font-black italic">Get full access</p>

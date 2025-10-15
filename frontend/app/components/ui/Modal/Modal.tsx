@@ -145,7 +145,7 @@ const Modal: React.FC<ModalProps> = ({
         {showCloseButton && (
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-lg hover:bg-dark/5 transition-colors z-10"
+            className="absolute top-4 right-4 p-2 rounded-lg hover:bg-dark/5 transition-colors z-10 hover:cursor-pointer"
             aria-label="Close modal"
           >
             <TbX size={24} className="text-dark/70" />

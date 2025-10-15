@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import SessionProvider from "./components/SessionProvider";
-import { Toaster } from "sonner";
+import { ToastProvider } from "./contexts/ToastContext";
 
 export const metadata: Metadata = {
   title: "Linkkk",
@@ -26,13 +26,9 @@ export default function RootLayout({
         <meta name="view-transition" content="same-origin" />
       </head>
       <body>
-        <SessionProvider>{children}</SessionProvider>
-        <Toaster
-          position="top-center"
-          richColors
-          closeButton
-          duration={4000}
-        />
+        <ToastProvider>
+          <SessionProvider>{children}</SessionProvider>
+        </ToastProvider>
       </body>
     </html>
   );
