@@ -6,12 +6,15 @@ import { LuArrowUpRight } from "react-icons/lu";
 import { useState } from "react";
 import { useAuth } from "../../stores/authStore";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { useToast } from "@/app/hooks/useToast";
 import Button from "@/app/components/ui/Button/Button";
+import * as motion from "motion/react-client";
+import { TbArrowUpRight } from "react-icons/tb";
 
 export default function Login() {
     const { login } = useAuth();
     const router = useRouter();
+    const toast = useToast();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -86,6 +89,29 @@ export default function Login() {
                                 </p>
                             </Button>
                         </form>
+                        
+
+                        
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2, ease: "backInOut" }}
+                            className="text-center mt-8"
+                        >
+                            <Link
+                            href="/auth/register"
+                            className="relative group inlin"
+                            >
+                            <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
+                            <p className="font-black italic z-20 relative inline-flex items-center">
+                                Dont have an account?
+                                <span className="underline ml-2">
+                                Create one
+                                </span>
+                                <TbArrowUpRight size={18} className="ml-2" />
+                            </p>
+                            </Link>
+                        </motion.div>
                 </div>
             </main>
         </RouteGuard>

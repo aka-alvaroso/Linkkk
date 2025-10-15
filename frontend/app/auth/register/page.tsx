@@ -6,11 +6,12 @@ import { LuArrowUpRight } from "react-icons/lu";
 import { useState } from "react";
 import { useAuth } from "../../stores/authStore";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { useToast } from "@/app/hooks/useToast";
 
 export default function Register() {
     const { register } = useAuth();
     const router = useRouter();
+    const toast = useToast();
     const [email, setEmail] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
