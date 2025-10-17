@@ -13,6 +13,7 @@ const AppError = require("./v2/utils/AppError");
 const authRouter = require("./v2/routers/auth");
 const linkRouter = require("./v2/routers/link");
 const accessesRouter = require("./v2/routers/accesses");
+const userRouter = require("./v2/routers/user");
 
 // Controllers
 const { redirectLink } = require("./v2/controllers/link");
@@ -88,6 +89,7 @@ app.get("/status", (req, res) => {
 app.use("/auth", authRouter);
 app.use("/link", linkRouter);
 app.use("/accesses", accessesRouter);
+app.use("/user", userRouter);
 
 // Public redirect endpoint (LAST - catches everything else)
 app.get("/r/:shortUrl", redirectLink);
@@ -190,7 +192,7 @@ process.on("uncaughtException", (error) => {
 // ============================================================================
 
 // Only start server if not in test mode
-if (process.env.NODE_ENV !== 'test') {
+if (process.env.NODE_ENV !== "test") {
   app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
     console.log(`📝 Environment: ${process.env.ENV || "development"}`);
