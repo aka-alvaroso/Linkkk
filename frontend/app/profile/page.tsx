@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import RouteGuard from "@/app/components/RouteGuard/RouteGuard";
 import Navbar from "@/app/components/Navbar/Navbar";
 import { useAuthStore } from "@/app/stores/authStore";
@@ -20,12 +20,16 @@ import {
   TbRefresh,
 } from "react-icons/tb";
 import Input from "../components/ui/Input/Input";
+import { getUserAvatarUrl } from "@/app/utils/gravatar";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 export default function ProfilePage() {
   const { user, logout } = useAuthStore();
   const toast = useToast();
+
+  // Avatar
+  const [avatarUrl, setAvatarUrl] = useState<string>("");
 
   // Edit states
   const [isEditingUsername, setIsEditingUsername] = useState(false);
@@ -49,6 +53,14 @@ export default function ProfilePage() {
 
   // Loading
   const [isUpdating, setIsUpdating] = useState(false);
+
+  // Load avatar URL
+  useEffect(() => {
+    if (user?.email) {
+      const url = getUserAvatarUrl(user.avatarUrl, user.email, 200);
+      setAvatarUrl(url);
+    }
+  }, [user?.email, user?.avatarUrl]);
 
   const handleUpdateUsername = async () => {
     if (!username.trim()) return toast.error("Username requerido");
@@ -245,16 +257,16 @@ export default function ProfilePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ ease: "backInOut" }}
-            className="relative size-18 rounded-full overflow-hidden"
+            className="relative size-18 rounded-full overflow-hidden border-2 border-dark shadow-[4px_4px_0_var(--color-dark)]"
           >
-            <Image
-              src={
-                "https://images.unsplash.com/photo-1760160741769-c5212246e4c8?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=687"
-              }
-              fill
-              className="object-cover"
-              alt="avatar"
-            />
+            {avatarUrl && (
+              <Image
+                src={avatarUrl}
+                fill
+                className="object-cover"
+                alt={`${user?.username}'s avatar`}
+              />
+            )}
           </motion.div>
           <div>
             <motion.h1

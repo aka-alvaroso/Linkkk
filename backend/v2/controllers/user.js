@@ -7,7 +7,7 @@ const ERRORS = require("../constants/errorCodes");
 
 const updateUser = async (req, res) => {
   const user = req.user;
-  const { email, username, password } = req.body;
+  const { email, username, password, avatarUrl } = req.body;
 
   const validate = updateUserSchema.safeParse(req.body);
 
@@ -36,6 +36,7 @@ const updateUser = async (req, res) => {
         email,
         username,
         password: hashedPassword,
+        avatarUrl,
       },
     });
 

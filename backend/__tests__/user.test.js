@@ -597,3 +597,24 @@ describe("User Operations", () => {
     });
   });
 });
+
+// Cleanup: Delete all test users after all tests complete
+afterAll(async () => {
+  try {
+    const result = await prisma.user.deleteMany({
+      where: {
+        OR: [
+          { username: { contains: 'test_' } },
+          { username: { contains: 'dup_' } },
+          { username: { contains: 'usr_' } },
+          { username: { contains: 'new_user_' } },
+          { username: { contains: 'multi_user_' } },
+          { email: { contains: '@example.com' } }
+        ]
+      }
+    });
+    console.log(`\n✅ Cleanup: ${result.count} test users deleted`);
+  } catch (error) {
+    console.error('⚠️  Cleanup error:', error.message);
+  }
+});

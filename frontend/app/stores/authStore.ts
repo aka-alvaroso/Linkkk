@@ -5,6 +5,7 @@ interface User {
   id: string;
   email: string;
   username?: string;
+  avatarUrl?: string | null;
   role: "user" | "guest";
   isEmailVerified: boolean;
   createdAt: string;

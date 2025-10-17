@@ -11,6 +11,7 @@ const updateUserSchema = z.object({
       "Password must contain at least one letter, one number, and one special character"
     )
     .optional(),
+  avatarUrl: z.string().url().optional().nullable(),
 });
 
 module.exports = {

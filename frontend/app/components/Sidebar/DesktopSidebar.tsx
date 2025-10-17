@@ -12,6 +12,7 @@ import CreateLinkDrawer from '@/app/components/Drawer/CreateLinkDrawer';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/stores/authStore';
 import * as motion from 'motion/react-client';
+import { getUserAvatarUrl } from '@/app/utils/gravatar';
 
 const DesktopSidebar = () => {
     const router = useRouter();
@@ -19,6 +20,7 @@ const DesktopSidebar = () => {
     const { user, logout, isAuthenticated } = useAuth();
     const [createLinkDrawer, setCreateLinkDrawer] = useState(false);
     const [ selected, setSelected ] = useState('dashboard');
+    const [avatarUrl, setAvatarUrl] = useState<string>("");
 
     const handleKeyDown = (event: KeyboardEvent) => {
         if (event.ctrlKey && event.key === 'k') {
@@ -33,6 +35,14 @@ const DesktopSidebar = () => {
             document.removeEventListener('keydown', handleKeyDown);
         };
     }, []);
+
+    // Load avatar URL
+    useEffect(() => {
+        if (user?.email) {
+            const url = getUserAvatarUrl(user.avatarUrl, user.email, 80);
+            setAvatarUrl(url);
+        }
+    }, [user?.email, user?.avatarUrl]);
 
     const userMenuItems: DropdownItem[] = [
         {
@@ -195,13 +205,15 @@ const DesktopSidebar = () => {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.4, duration: 0.4, ease: "backInOut" }} 
                             className='relative w-full flex justify-between text-dark bg-dark/5 hover:cursor-pointer rounded-xl p-2 group'>
-                            <div className="relative rounded-full size-11 overflow-hidden flex-shrink-0">
-                                <Image
-                                    src="https://images.unsplash.com/photo-1758621518225-9248e65dbaee?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                                    fill
-                                    alt="User avatar"
-                                    className="object-cover"
-                                />
+                            <div className="relative rounded-full size-11 overflow-hidden flex-shrink-0 border-2 border-dark shadow-[2px_2px_0_var(--color-dark)]">
+                                {avatarUrl && (
+                                    <Image
+                                        src={avatarUrl}
+                                        fill
+                                        alt={`${user?.username}'s avatar`}
+                                        className="object-cover"
+                                    />
+                                )}
                             </div>
                             <motion.div
                                 initial={{ opacity: 0, width: 0 }}
