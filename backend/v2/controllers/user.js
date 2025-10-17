@@ -1,0 +1,151 @@
+const prisma = require("../prisma/client");
+const { updateUserSchema } = require("../validators/user");
+const bcryptjs = require("bcryptjs");
+
+const { successResponse, errorResponse } = require("../utils/response");
+const ERRORS = require("../constants/errorCodes");
+
+const updateUser = async (req, res) => {
+  const user = req.user;
+  const { email, username, password } = req.body;
+
+  const validate = updateUserSchema.safeParse(req.body);
+
+  if (!validate.success) {
+    const issues = validate.error.issues.map((issue) => {
+      return {
+        field: issue.path[0],
+        message: issue.message,
+      };
+    });
+
+    return errorResponse(res, ERRORS.INVALID_DATA, issues);
+  }
+
+  let hashedPassword;
+  if (password) {
+    hashedPassword = await bcryptjs.hash(password, 10);
+  }
+
+  try {
+    const updatedUser = await prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        email,
+        username,
+        password: hashedPassword,
+      },
+    });
+
+    return successResponse(res, updatedUser);
+  } catch {
+    return errorResponse(res, ERRORS.INTERNAL_ERROR);
+  }
+};
+
+const deleteUserData = async (req, res) => {
+  const user = req.user;
+
+  try {
+    // Delete all links associated with the user
+    await prisma.link.deleteMany({
+      where: {
+        userId: user.id,
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "All user data deleted successfully",
+    });
+  } catch (error) {
+    return errorResponse(res, ERRORS.INTERNAL_ERROR);
+  }
+};
+
+const deleteUser = async (req, res) => {
+  const user = req.user;
+
+  try {
+    // Delete all links first (if not using cascade delete)
+    await prisma.link.deleteMany({
+      where: {
+        userId: user.id,
+      },
+    });
+
+    // Delete the user
+    await prisma.user.delete({
+      where: {
+        id: user.id,
+      },
+    });
+
+    // Clear the authentication cookie
+    res.clearCookie("token");
+
+    return res.status(200).json({
+      success: true,
+      message: "User account deleted successfully",
+    });
+  } catch (error) {
+    return errorResponse(res, ERRORS.INTERNAL_ERROR);
+  }
+};
+
+const generateApiKey = async (req, res) => {
+  const user = req.user;
+
+  try {
+    // Generate a random API key
+    const crypto = require("crypto");
+    const apiKey = crypto.randomBytes(32).toString("hex");
+
+    // Update user with new API key
+    const updatedUser = await prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        apiKey: apiKey,
+      },
+    });
+
+    return successResponse(res, { apiKey: updatedUser.apiKey });
+  } catch (error) {
+    return errorResponse(res, ERRORS.INTERNAL_ERROR);
+  }
+};
+
+const resetApiKey = async (req, res) => {
+  const user = req.user;
+
+  try {
+    // Reset API key to null
+    await prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        apiKey: null,
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "API key reset successfully",
+    });
+  } catch (error) {
+    return errorResponse(res, ERRORS.INTERNAL_ERROR);
+  }
+};
+
+module.exports = {
+  updateUser,
+  deleteUserData,
+  deleteUser,
+  generateApiKey,
+  resetApiKey,
+};
