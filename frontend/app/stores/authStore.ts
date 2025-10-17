@@ -204,7 +204,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
         guestSession: null,
         isLoading: false,
       });
-      window.location.href = "/landing";
+      window.location.href = "/";
     }
   },
 

@@ -44,17 +44,33 @@ export default function Login() {
             <Navbar />
             <main className="w-full h-[calc(100dvh-10rem)] flex items-center justify-center">
                 <div className="text-dark bg-light p-8 w-11/12 md:w-3/4 max-w-xl mx-auto rounded-3xl">
-                        <h1 className="text-3xl font-black mb-6 italic text-center
+                        <motion.h1 
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ ease: "backInOut" }}
+                            className="text-3xl font-black mb-6 italic text-center
                             transition-all duration-300 ease-in-out
                         hover:text-primary
                             hover:text-shadow-[_4px_4px_0_var(--color-dark)]
                         ">
                             Linkkk.
-                        </h1>
+                        </motion.h1>
 
                         <form onSubmit={handleSubmit} className="flex flex-col gap-2">
                             <div className="flex flex-col">
-                                <label htmlFor="email">Email or username</label>
+                                <motion.label 
+                                    initial={{ opacity: 0, y: -20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.1, ease: "backInOut" }}
+                                    htmlFor="email">
+                                    Email or username
+                                </motion.label>
+                                <motion.div
+                                    initial={{ opacity: 0, y: -20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.15, ease: "backInOut" }}
+                                    className="w-full"
+                                >
                                 <input 
                                     type="text" 
                                     name="email" 
@@ -62,11 +78,24 @@ export default function Login() {
                                     placeholder="Email or username"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="transition border-2 border-dark/25 text-dark rounded-xl p-1 px-2 hover:outline-none focus:outline-none focus:border-2 focus:border-dark"
+                                    className="w-full transition border-2 border-dark/25 text-dark rounded-xl p-1 px-2 hover:outline-none focus:outline-none focus:border-2 focus:border-dark"
                                 />
+                                </motion.div>
                             </div>
                             <div className="flex flex-col">
-                                <label htmlFor="password">Password</label>
+                                <motion.label 
+                                    initial={{ opacity: 0, y: -20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.2, ease: "backInOut" }}
+                                    htmlFor="password">
+                                    Password
+                                </motion.label>
+                                <motion.div
+                                    initial={{ opacity: 0, y: -20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.15, ease: "backInOut" }}
+                                    className="w-full"
+                                >
                                 <input 
                                     type="password" 
                                     name="password" 
@@ -74,9 +103,16 @@ export default function Login() {
                                     placeholder="Password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="transition border-2 border-dark/25 text-dark rounded-xl p-1 px-2 hover:outline-none focus:outline-none focus:border-2 focus:border-dark"
+                                    className="w-full transition border-2 border-dark/25 text-dark rounded-xl p-1 px-2 hover:outline-none focus:outline-none focus:border-2 focus:border-dark"
                                 />
+                                </motion.div>
                             </div>
+                            <motion.div
+                                initial={{ opacity: 0, y: -20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.25, ease: "backInOut" }}
+                                className="w-full"
+                            >
                             <Button 
                                 variant="solid"
                                 size="lg"
@@ -88,6 +124,7 @@ export default function Login() {
                                     Log In
                                 </p>
                             </Button>
+                            </motion.div>
                         </form>
                         
 
@@ -104,7 +141,7 @@ export default function Login() {
                             >
                             <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
                             <p className="font-black italic z-20 relative inline-flex items-center">
-                                Dont have an account?
+                                Don&apos;t have an account?
                                 <span className="underline ml-2">
                                 Create one
                                 </span>

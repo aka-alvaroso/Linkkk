@@ -57,22 +57,10 @@ export default function DesktopNavbar() {
                 Home | Features | Blog | Docs
             */}
             <div className="flex gap-4">
-                {/* Link Home - Animación tercera (delay 0.2) */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2, duration: 0.4, ease: "backInOut"}}
-                >
-                  <Link href="/" className="relative group">
-                      <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
-                      <p className="font-black italic z-20 relative">Home</p>
-                  </Link>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.22, duration: 0.4, ease: "backInOut" }}
+                  transition={{ delay: 0.15, duration: 0.4, ease: "backInOut" }}
                 >
                   <Link href="/dashboard" className="relative group">
                       <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
@@ -80,20 +68,17 @@ export default function DesktopNavbar() {
                   </Link>
                 </motion.div>
                 
-                {/* <Link href="/features" className="relative group">
-                    <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
-                    <p className="font-black italic z-20 relative">Features</p>
-                </Link>
                 
-                <Link href="/blog" className="relative group">
-                    <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
-                    <p className="font-black italic z-20 relative">Blog</p>
-                </Link>
-
-                <Link href="/docs" className="relative group">
-                    <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
-                    <p className="font-black italic z-20 relative">Docs</p>
-                </Link> */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2, duration: 0.4, ease: "backInOut" }}
+                >
+                  <Link href="/features" className="relative group">
+                      <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
+                      <p className="font-black italic z-20 relative">Features</p>
+                  </Link>
+                </motion.div>
             </div>
 
         </div>

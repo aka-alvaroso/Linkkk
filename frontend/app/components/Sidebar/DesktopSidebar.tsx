@@ -232,7 +232,7 @@ const DesktopSidebar = () => {
                     items={userMenuItems}
                     placement="top-right"
                     className='mt-auto w-full'
-                    menuClassName='p-2 shadow-none w-full'
+                    menuClassName='p-2 shadow-none w-full bg-transparent border-transparent'
                     itemClassName='text-dark hover:cursor-pointer rounded-xl'
                 />
                 ) : (

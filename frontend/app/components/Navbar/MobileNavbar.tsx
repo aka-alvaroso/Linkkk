@@ -19,7 +19,7 @@ export default function MobileNavbar() {
       <div className="md:hidden bg-light fixed top-0 left-0 right-0 max-w-screen z-40 flex items-center justify-between p-4">
           
           {/* Logo */}
-          <Link href={isAuthenticated ? "/dashboard" : "/"} className="text-5xl font-black italic leading-10">
+          <Link href="/" className="text-5xl font-black italic leading-10">
               k.
           </Link>
 
