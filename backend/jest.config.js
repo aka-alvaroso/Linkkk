@@ -8,7 +8,10 @@ module.exports = {
   ],
   testMatch: [
     '**/__tests__/**/*.test.js',
-    '**/?(*.)+(spec|test).js'
+  ],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/v2/', // Unit tests in v2/ should use jest.unit.config.js
   ],
   verbose: true,
   forceExit: true,
