@@ -125,6 +125,17 @@ const ERRORS = {
   },
 
   // ============================================================================
+  // LINK RULES ERRORS
+  // ============================================================================
+  RULE_NOT_FOUND: {
+    code: "RULE_NOT_FOUND",
+    message: "Rule not found",
+    userMessage: "The rule you're looking for doesn't exist",
+    statusCode: 404,
+    retryable: false,
+  },
+
+  // ============================================================================
   // RATE LIMITING ERRORS
   // ============================================================================
   RATE_LIMIT_EXCEEDED: {
