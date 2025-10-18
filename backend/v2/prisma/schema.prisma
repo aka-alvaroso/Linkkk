@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -20,18 +14,16 @@ model User {
   email      String  @unique
   password   String
   avatarUrl  String?
+  apiKey     String? @unique
   createdAt  DateTime @default(now())
   links      Link[]
-  apiKey     String? @unique
 }
-
 
 model GuestSession {
   id         Int     @id @default(autoincrement())
   createdAt  DateTime @default(now())
   links      Link[]
 }
-
 
 model Link {
   id          Int     @id @default(autoincrement())
@@ -40,10 +32,15 @@ model Link {
   shortUrl    String  @unique
   longUrl     String
   status      Boolean @default(true)
+  accessCount Int     @default(0)
   createdAt   DateTime @default(now())
+
   user        User? @relation(fields: [userId], references: [id])
   guestSession GuestSession? @relation(fields: [guestSessionId], references: [id])
   accesses Access[]
+  rules       LinkRule[]
+
+  @@index([shortUrl])
 }
 
 model Access {
@@ -55,5 +52,75 @@ model Access {
   country     String
   isVPN       Boolean
   isBot       Boolean
+
   link        Link @relation(fields: [linkId], references: [id], onDelete: Cascade)
+}
+
+model LinkRule {
+  id          Int             @id @default(autoincrement())
+  linkId      Int
+  link        Link            @relation(fields: [linkId], references: [id], onDelete: Cascade)
+  priority    Int             @default(0)
+  enabled     Boolean         @default(true)
+  match       MatchType       @default(AND)
+  conditions  RuleCondition[]
+
+  actionType      ActionType
+  actionSettings  Json?
+
+  elseActionType      ActionType?
+  elseActionSettings  Json?
+
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([linkId, priority])
+  @@index([linkId, enabled])
+}
+
+model RuleCondition {
+  id         Int           @id @default(autoincrement())
+  ruleId     Int
+  rule       LinkRule      @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  field      FieldType
+  operator   OperatorType
+  value      Json
+
+  @@index([ruleId])
+}
+
+// Enums
+enum MatchType {
+  AND
+  OR
+}
+
+enum FieldType {
+  country
+  device
+  ip
+  is_bot
+  is_vpn
+  date
+  access_count
+}
+
+enum OperatorType {
+  equals
+  not_equals
+  in
+  not_in
+  greater_than
+  less_than
+  before
+  after
+  contains
+  not_contains
+}
+
+enum ActionType {
+  redirect
+  block_access
+  notify
+  password_gate
 }
