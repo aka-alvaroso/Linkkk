@@ -7,6 +7,8 @@ const { successResponse, errorResponse } = require("../utils/response");
 const ERRORS = require("../constants/errorCodes");
 
 const { defineCountry, defineIsVPN } = require("../utils/access");
+const { evaluateLinkRules, detectDevice } = require("../utils/linkRulesEngine");
+const { comparePassword } = require("../utils/password");
 
 // 1. Create link
 const createLink = async (req, res) => {
@@ -289,8 +291,18 @@ const redirectLink = async (req, res) => {
   const ip = req.ip === "::1" ? "127.0.0.1" : req.ip;
 
   try {
+    // Fetch link with rules
     const link = await prisma.link.findUnique({
       where: { shortUrl },
+      include: {
+        rules: {
+          where: { enabled: true },
+          include: {
+            conditions: true,
+          },
+          orderBy: { priority: "asc" },
+        },
+      },
     });
 
     if (!link) {
@@ -302,25 +314,257 @@ const redirectLink = async (req, res) => {
       return res.redirect(`${process.env.FRONTEND_URL}/disabled`);
     }
 
-    // Track access
+    // Build evaluation context
     const country = await defineCountry(ip);
     const isVpn = await defineIsVPN(ip);
+    const device = detectDevice(userAgent);
+    const isBot = isbot(userAgent);
 
+    const context = {
+      country,
+      device,
+      ip,
+      isVPN: isVpn,
+      isBot,
+      currentDate: new Date(),
+      accessCount: link.accessCount,
+    };
+
+    // Evaluate link rules
+    let allowed = true;
+    let action = null;
+
+    try {
+      const evaluationResult = await evaluateLinkRules(link, context);
+      allowed = evaluationResult.allowed;
+      action = evaluationResult.action;
+    } catch (ruleError) {
+      console.error(
+        `[CRITICAL] Rule evaluation failed for link ${shortUrl}:`,
+        ruleError
+      );
+
+      // TODO: Implement email notification to link owner when rule evaluation fails
+      // This will help owners know when their rules are broken and links are falling back to default behavior
+
+      // Fallback to default redirect (fail-open approach)
+      action = {
+        type: "redirect",
+        url: link.longUrl,
+      };
+    }
+
+    // Apply action based on type
+    switch (action.type) {
+      case "redirect":
+        // Track access
+        await prisma.access.create({
+          data: {
+            linkId: link.id,
+            userAgent: userAgent || "Unknown",
+            ip,
+            country,
+            isVPN: isVpn,
+            isBot,
+          },
+        });
+
+        // Increment access count
+        await prisma.link.update({
+          where: { shortUrl },
+          data: { accessCount: { increment: 1 } },
+        });
+
+        return res.redirect(302, action.url);
+
+      case "block":
+        // Only increment counter (don't track full access for blocked requests)
+        await prisma.link.update({
+          where: { shortUrl },
+          data: { accessCount: { increment: 1 } },
+        });
+
+        return res.redirect(
+          `${process.env.FRONTEND_URL}/blocked?reason=${
+            action.reason
+          }&message=${encodeURIComponent(action.message)}`
+        );
+
+      case "password_gate":
+        // Increment counter (access will be tracked after password verification)
+        await prisma.link.update({
+          where: { shortUrl },
+          data: { accessCount: { increment: 1 } },
+        });
+
+        return res.redirect(
+          `${process.env.FRONTEND_URL}/password?shortUrl=${shortUrl}${
+            action.hint ? `&hint=${encodeURIComponent(action.hint)}` : ""
+          }`
+        );
+
+      case "notify":
+        // TODO: Implement notification system (email or webhook)
+        // For now, just log the notification request
+        console.log(
+          `[NOTIFY] Link ${link.shortUrl} accessed. Notification pending:`,
+          {
+            webhookUrl: action.webhookUrl,
+            message: action.message,
+            context,
+          }
+        );
+
+        // Continue with normal redirect (notify is non-blocking)
+        await prisma.access.create({
+          data: {
+            linkId: link.id,
+            userAgent: userAgent || "Unknown",
+            ip,
+            country,
+            isVPN: isVpn,
+            isBot,
+          },
+        });
+
+        await prisma.link.update({
+          where: { shortUrl },
+          data: { accessCount: { increment: 1 } },
+        });
+
+        return res.redirect(302, link.longUrl);
+
+      default:
+        // Unknown action type - fallback to redirect
+        console.warn(`Unknown action type: ${action.type}`);
+
+        await prisma.access.create({
+          data: {
+            linkId: link.id,
+            userAgent: userAgent || "Unknown",
+            ip,
+            country,
+            isVPN: isVpn,
+            isBot,
+          },
+        });
+
+        await prisma.link.update({
+          where: { shortUrl },
+          data: { accessCount: { increment: 1 } },
+        });
+
+        return res.redirect(302, link.longUrl);
+    }
+  } catch (error) {
+    console.error("Redirect error:", error);
+    return res.redirect(`${process.env.FRONTEND_URL}/error`);
+  }
+};
+
+// 7. Verify password for password_gate action
+const verifyPasswordGate = async (req, res) => {
+  const { shortUrl } = req.params;
+  const { password } = req.body;
+  const userAgent = req.headers["user-agent"];
+  const ip = req.ip === "::1" ? "127.0.0.1" : req.ip;
+
+  try {
+    // Validate input
+    if (!password || typeof password !== "string") {
+      return errorResponse(res, ERRORS.INVALID_DATA, [
+        { field: "password", message: "Password is required" },
+      ]);
+    }
+
+    // Fetch link with rules
+    const link = await prisma.link.findUnique({
+      where: { shortUrl },
+      include: {
+        rules: {
+          where: {
+            enabled: true,
+            actionType: "password_gate",
+          },
+          include: {
+            conditions: true,
+          },
+          orderBy: { priority: "asc" },
+        },
+      },
+    });
+
+    if (!link) {
+      return errorResponse(res, ERRORS.LINK_NOT_FOUND);
+    }
+
+    if (!link.status) {
+      return errorResponse(res, ERRORS.LINK_DISABLED);
+    }
+
+    // Build evaluation context to find which rule should apply
+    const country = await defineCountry(ip);
+    const isVpn = await defineIsVPN(ip);
+    const device = detectDevice(userAgent);
+    const isBot = isbot(userAgent);
+
+    const context = {
+      country,
+      device,
+      ip,
+      isVPN: isVpn,
+      isBot,
+      currentDate: new Date(),
+      accessCount: link.accessCount,
+    };
+
+    // Evaluate rules to get the correct password_gate action
+    let passwordHash = null;
+    let redirectUrl = link.longUrl;
+
+    try {
+      const { action } = await evaluateLinkRules(link, context);
+
+      if (action.type !== "password_gate") {
+        // No password gate rule applies to this request
+        return errorResponse(res, ERRORS.LINK_NO_PASSWORD);
+      }
+
+      passwordHash = action.passwordHash;
+    } catch (error) {
+      console.error("Error evaluating rules for password verification:", error);
+      return errorResponse(res, ERRORS.INTERNAL_ERROR);
+    }
+
+    // Verify password
+    const isValid = await comparePassword(password, passwordHash);
+
+    if (!isValid) {
+      return errorResponse(res, ERRORS.INVALID_CREDENTIALS);
+    }
+
+    // Password is correct - track access and return redirect URL
     await prisma.access.create({
       data: {
         linkId: link.id,
         userAgent: userAgent || "Unknown",
         ip,
-        country: country,
+        country,
         isVPN: isVpn,
-        isBot: isbot(userAgent),
+        isBot,
       },
     });
 
-    return res.redirect(302, link.longUrl);
+    // Note: accessCount was already incremented when user first accessed the link
+    // No need to increment again here
+
+    return successResponse(res, {
+      success: true,
+      redirectUrl,
+    });
   } catch (error) {
-    console.error("Redirect error:", error);
-    return res.redirect(`${process.env.FRONTEND_URL}/error`);
+    console.error("Password verification error:", error);
+    return errorResponse(res, ERRORS.INTERNAL_ERROR);
   }
 };
 
@@ -331,4 +575,5 @@ module.exports = {
   updateLink,
   deleteLink,
   redirectLink,
+  verifyPasswordGate,
 };

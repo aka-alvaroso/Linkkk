@@ -13,6 +13,7 @@ const {
   getAllLinks,
   updateLink,
   deleteLink,
+  verifyPasswordGate,
 } = require("../controllers/link");
 
 const {
@@ -30,6 +31,9 @@ router.get("/:shortUrl", auth, getLink);
 router.get("/", auth, getLinksLimiter, getAllLinks);
 router.put("/:shortUrl", auth, updateLinkLimiter, updateLink);
 router.delete("/:shortUrl", auth, deleteLink);
+
+// Password verification (public endpoint - no auth required)
+router.post("/:shortUrl/verify-password", verifyPasswordGate);
 
 // Link Rules routes (nested under /link/:shortUrl/rules)
 router.post("/:shortUrl/rules", auth, createLinkRule);
