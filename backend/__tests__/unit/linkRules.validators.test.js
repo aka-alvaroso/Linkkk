@@ -2,9 +2,6 @@
  * @jest-environment node
  */
 
-// Skip Prisma setup for these unit tests
-jest.mock("@prisma/client");
-
 const {
   // Condition schemas
   countryConditionSchema,
@@ -26,7 +23,7 @@ const {
   // Link Rule schemas
   createLinkRuleSchema,
   updateLinkRuleSchema,
-} = require("./linkRules");
+} = require("../../v2/validators/linkRules");
 
 describe("Link Rules Validators", () => {
   // ============================================

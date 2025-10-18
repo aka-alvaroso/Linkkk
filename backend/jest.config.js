@@ -11,7 +11,6 @@ module.exports = {
   ],
   testPathIgnorePatterns: [
     '/node_modules/',
-    '/v2/', // Unit tests in v2/ should use jest.unit.config.js
   ],
   verbose: true,
   forceExit: true,
@@ -19,7 +18,7 @@ module.exports = {
   resetMocks: true,
   restoreMocks: true,
   testTimeout: 10000,
-  setupFilesAfterEnv: ['./__tests__/setup.js'],
+  setupFilesAfterEnv: ['<rootDir>/__tests__/conditionalSetup.js'],
   testEnvironmentOptions: {
     NODE_ENV: 'test'
   },

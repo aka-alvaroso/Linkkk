@@ -2,15 +2,12 @@
  * @jest-environment node
  */
 
-// Skip Prisma setup for these unit tests
-jest.mock("@prisma/client");
-
 const {
   evaluateLinkRules,
   evaluateCondition,
   evaluateAction,
   detectDevice,
-} = require("./linkRulesEngine");
+} = require("../../v2/utils/linkRulesEngine");
 
 describe("Link Rules Engine", () => {
   // ============================================
