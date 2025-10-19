@@ -247,9 +247,9 @@ describe('Link Rules Integration (E2E)', () => {
       const response = await request(app)
         .post(`/link/${link.shortUrl}/verify-password`)
         .send({ password: 'wrongpassword' })
-        .expect(401);
+        .expect(403); // Changed from 401 to 403 (generic error to prevent enumeration)
 
-      expect(response.body.code).toBe('INVALID_CREDENTIALS');
+      expect(response.body.code).toBe('ACCESS_DENIED'); // Changed from INVALID_CREDENTIALS
 
       // Verify access was NOT tracked
       const accessCount = await prisma.access.count({
