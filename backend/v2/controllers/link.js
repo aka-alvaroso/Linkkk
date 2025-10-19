@@ -330,18 +330,25 @@ const redirectLink = async (req, res) => {
       accessCount: link.accessCount,
     };
 
-    // Evaluate link rules
+    // Evaluate link rules with timeout protection
     let allowed = true;
     let action = null;
 
     try {
-      const evaluationResult = await evaluateLinkRules(link, context);
+      const RULE_EVALUATION_TIMEOUT = 5000; // 5 seconds max
+
+      const evaluationPromise = evaluateLinkRules(link, context);
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Rule evaluation timeout')), RULE_EVALUATION_TIMEOUT)
+      );
+
+      const evaluationResult = await Promise.race([evaluationPromise, timeoutPromise]);
       allowed = evaluationResult.allowed;
       action = evaluationResult.action;
     } catch (ruleError) {
       console.error(
         `[CRITICAL] Rule evaluation failed for link ${shortUrl}:`,
-        ruleError
+        ruleError.message || ruleError
       );
 
       // TODO: Implement email notification to link owner when rule evaluation fails

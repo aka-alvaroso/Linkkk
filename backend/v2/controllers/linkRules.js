@@ -7,6 +7,7 @@ const {
 } = require("../validators/linkRules");
 const { successResponse, errorResponse } = require("../utils/response");
 const ERRORS = require("../constants/errorCodes");
+const planLimits = require("../utils/limits");
 
 // Helper: Check link access
 const checkLinkAccess = async (shortUrl, user, guest) => {
@@ -55,6 +56,24 @@ const createLinkRule = async (req, res) => {
   }
 
   const { priority, enabled, match, conditions, action, elseAction } = validate.data;
+
+  // Check rule limit per link
+  const isGuest = !!guest;
+  const limits = isGuest ? planLimits.guest : planLimits.user;
+
+  const existingRuleCount = await prisma.linkRule.count({
+    where: { linkId: link.id }
+  });
+
+  if (existingRuleCount >= limits.rulesPerLink) {
+    return errorResponse(res, {
+      code: "RULE_LIMIT_EXCEEDED",
+      message: "Rule limit exceeded",
+      userMessage: `You can only create ${limits.rulesPerLink} rules per link`,
+      statusCode: 400,
+      retryable: false,
+    });
+  }
 
   try {
     // Create rule with conditions
@@ -354,6 +373,24 @@ const createMultipleLinkRules = async (req, res) => {
   }
 
   const { rules } = validate.data;
+
+  // Check rule limit per link
+  const isGuest = !!guest;
+  const limits = isGuest ? planLimits.guest : planLimits.user;
+
+  const existingRuleCount = await prisma.linkRule.count({
+    where: { linkId: link.id }
+  });
+
+  if (existingRuleCount + rules.length > limits.rulesPerLink) {
+    return errorResponse(res, {
+      code: "RULE_LIMIT_EXCEEDED",
+      message: "Rule limit exceeded",
+      userMessage: `This would exceed the limit of ${limits.rulesPerLink} rules per link (current: ${existingRuleCount}, adding: ${rules.length})`,
+      statusCode: 400,
+      retryable: false,
+    });
+  }
 
   try {
     // Wrap all rule creation in a single transaction for atomicity

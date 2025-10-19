@@ -54,6 +54,9 @@ model Access {
   isBot       Boolean
 
   link        Link @relation(fields: [linkId], references: [id], onDelete: Cascade)
+
+  @@index([linkId])
+  @@index([linkId, createdAt])
 }
 
 model LinkRule {
