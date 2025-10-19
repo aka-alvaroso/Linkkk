@@ -3,6 +3,7 @@ const {
   createLinkRuleSchema,
   updateLinkRuleSchema,
   createMultipleLinkRulesSchema,
+  ruleIdParamSchema,
 } = require("../validators/linkRules");
 const { successResponse, errorResponse } = require("../utils/response");
 const ERRORS = require("../constants/errorCodes");
@@ -133,6 +134,18 @@ const getLinkRule = async (req, res) => {
   const user = req.user;
   const guest = req.guest;
 
+  // Validate ruleId parameter
+  const paramValidation = ruleIdParamSchema.safeParse({ ruleId });
+  if (!paramValidation.success) {
+    const issues = paramValidation.error.issues.map((issue) => ({
+      field: issue.path.join("."),
+      message: issue.message,
+    }));
+    return errorResponse(res, ERRORS.INVALID_DATA, issues);
+  }
+
+  const validatedRuleId = paramValidation.data.ruleId;
+
   // Check link access
   const { link, hasAccess, error } = await checkLinkAccess(shortUrl, user, guest);
   if (!hasAccess) {
@@ -142,7 +155,7 @@ const getLinkRule = async (req, res) => {
   try {
     const rule = await prisma.linkRule.findFirst({
       where: {
-        id: parseInt(ruleId),
+        id: validatedRuleId,
         linkId: link.id,
       },
       include: {
@@ -167,6 +180,18 @@ const updateLinkRule = async (req, res) => {
   const user = req.user;
   const guest = req.guest;
 
+  // Validate ruleId parameter
+  const paramValidation = ruleIdParamSchema.safeParse({ ruleId });
+  if (!paramValidation.success) {
+    const issues = paramValidation.error.issues.map((issue) => ({
+      field: issue.path.join("."),
+      message: issue.message,
+    }));
+    return errorResponse(res, ERRORS.INVALID_DATA, issues);
+  }
+
+  const validatedRuleId = paramValidation.data.ruleId;
+
   // Check link access
   const { link, hasAccess, error } = await checkLinkAccess(shortUrl, user, guest);
   if (!hasAccess) {
@@ -187,7 +212,7 @@ const updateLinkRule = async (req, res) => {
     // Check rule exists and belongs to link
     const existingRule = await prisma.linkRule.findFirst({
       where: {
-        id: parseInt(ruleId),
+        id: validatedRuleId,
         linkId: link.id,
       },
     });
@@ -214,7 +239,7 @@ const updateLinkRule = async (req, res) => {
 
     // Update rule
     const updatedRule = await prisma.linkRule.update({
-      where: { id: parseInt(ruleId) },
+      where: { id: validatedRuleId },
       data: updateData,
     });
 
@@ -259,6 +284,18 @@ const deleteLinkRule = async (req, res) => {
   const user = req.user;
   const guest = req.guest;
 
+  // Validate ruleId parameter
+  const paramValidation = ruleIdParamSchema.safeParse({ ruleId });
+  if (!paramValidation.success) {
+    const issues = paramValidation.error.issues.map((issue) => ({
+      field: issue.path.join("."),
+      message: issue.message,
+    }));
+    return errorResponse(res, ERRORS.INVALID_DATA, issues);
+  }
+
+  const validatedRuleId = paramValidation.data.ruleId;
+
   // Check link access
   const { link, hasAccess, error } = await checkLinkAccess(shortUrl, user, guest);
   if (!hasAccess) {
@@ -269,7 +306,7 @@ const deleteLinkRule = async (req, res) => {
     // Check rule exists and belongs to link
     const existingRule = await prisma.linkRule.findFirst({
       where: {
-        id: parseInt(ruleId),
+        id: validatedRuleId,
         linkId: link.id,
       },
     });
@@ -280,7 +317,7 @@ const deleteLinkRule = async (req, res) => {
 
     // Delete rule (conditions will be deleted automatically via cascade)
     await prisma.linkRule.delete({
-      where: { id: parseInt(ruleId) },
+      where: { id: validatedRuleId },
     });
 
     return successResponse(res, { message: "Rule deleted successfully" });
@@ -319,45 +356,50 @@ const createMultipleLinkRules = async (req, res) => {
   const { rules } = validate.data;
 
   try {
-    const createdRules = [];
+    // Wrap all rule creation in a single transaction for atomicity
+    // If any rule fails, all changes are rolled back
+    const createdRules = await prisma.$transaction(async (tx) => {
+      const results = [];
 
-    // Create each rule in a transaction
-    for (const ruleData of rules) {
-      const rule = await prisma.linkRule.create({
-        data: {
-          linkId: link.id,
-          priority: ruleData.priority ?? 0,
-          enabled: ruleData.enabled ?? true,
-          match: ruleData.match ?? "AND",
-          actionType: ruleData.action.type,
-          actionSettings: ruleData.action.settings || {},
-          elseActionType: ruleData.elseAction?.type,
-          elseActionSettings: ruleData.elseAction?.settings || null,
-        },
-      });
-
-      // Create conditions
-      if (ruleData.conditions && ruleData.conditions.length > 0) {
-        await prisma.ruleCondition.createMany({
-          data: ruleData.conditions.map((cond) => ({
-            ruleId: rule.id,
-            field: cond.field,
-            operator: cond.operator,
-            value: cond.value,
-          })),
+      for (const ruleData of rules) {
+        const rule = await tx.linkRule.create({
+          data: {
+            linkId: link.id,
+            priority: ruleData.priority ?? 0,
+            enabled: ruleData.enabled ?? true,
+            match: ruleData.match ?? "AND",
+            actionType: ruleData.action.type,
+            actionSettings: ruleData.action.settings || {},
+            elseActionType: ruleData.elseAction?.type,
+            elseActionSettings: ruleData.elseAction?.settings || null,
+          },
         });
+
+        // Create conditions
+        if (ruleData.conditions && ruleData.conditions.length > 0) {
+          await tx.ruleCondition.createMany({
+            data: ruleData.conditions.map((cond) => ({
+              ruleId: rule.id,
+              field: cond.field,
+              operator: cond.operator,
+              value: cond.value,
+            })),
+          });
+        }
+
+        // Fetch complete rule with conditions
+        const completeRule = await tx.linkRule.findUnique({
+          where: { id: rule.id },
+          include: {
+            conditions: true,
+          },
+        });
+
+        results.push(completeRule);
       }
 
-      // Fetch complete rule
-      const completeRule = await prisma.linkRule.findUnique({
-        where: { id: rule.id },
-        include: {
-          conditions: true,
-        },
-      });
-
-      createdRules.push(completeRule);
-    }
+      return results;
+    });
 
     return successResponse(res, createdRules, 201);
   } catch (error) {

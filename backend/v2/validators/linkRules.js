@@ -120,6 +120,46 @@ const ruleConditionSchema = z.discriminatedUnion("field", [
 // ACTION SETTINGS SCHEMAS
 // ============================================
 
+// Helper function to check for private/internal IPs (SSRF protection)
+const isPrivateOrLocalhost = (url) => {
+  try {
+    const parsed = new URL(url);
+    const hostname = parsed.hostname.toLowerCase();
+
+    // Block localhost variants
+    if (hostname === 'localhost' ||
+        hostname === '0.0.0.0' ||
+        hostname === '::1' ||
+        hostname.endsWith('.local') ||
+        hostname.endsWith('.localhost')) {
+      return true;
+    }
+
+    // Block loopback (127.x.x.x)
+    if (hostname === '127.0.0.1' ||
+        hostname.startsWith('127.')) {
+      return true;
+    }
+
+    // Block private IPv4 ranges
+    if (hostname.startsWith('10.') ||
+        hostname.startsWith('192.168.') ||
+        hostname.match(/^172\.(1[6-9]|2[0-9]|3[01])\./)) {
+      return true;
+    }
+
+    // Block link-local and AWS metadata
+    if (hostname.startsWith('169.254.') ||
+        hostname === '169.254.169.254') {
+      return true;
+    }
+
+    return false;
+  } catch {
+    return false;
+  }
+};
+
 // Redirect action settings
 const redirectSettingsSchema = z.object({
   url: z
@@ -142,34 +182,65 @@ const redirectSettingsSchema = z.object({
       if (url.startsWith("{{")) {
         return true;
       }
-      // Must start with http or https
-      return url.startsWith("http://") || url.startsWith("https://");
-    }, { message: "URL must start with http:// or https://" })
-    .refine((url) => !url.toLowerCase().startsWith("javascript:"), {
-      message: "JavaScript URLs are not allowed",
-    })
-    .refine((url) => !url.toLowerCase().startsWith("data:"), {
-      message: "Data URLs are not allowed",
-    }),
-});
+
+      const lower = url.toLowerCase();
+
+      // Block dangerous protocols (case-insensitive)
+      const dangerousProtocols = [
+        'javascript:',
+        'data:',
+        'vbscript:',
+        'file:',
+        'about:',
+      ];
+
+      for (const protocol of dangerousProtocols) {
+        if (lower.startsWith(protocol)) {
+          return false;
+        }
+      }
+
+      // Must start with http or https (case-insensitive)
+      return lower.startsWith("http://") || lower.startsWith("https://");
+    }, { message: "URL must use HTTP/HTTPS protocol only" })
+    .refine((url) => {
+      // Allow template variables
+      if (url.startsWith("{{")) {
+        return true;
+      }
+
+      // Block private/internal network URLs (SSRF protection)
+      return !isPrivateOrLocalhost(url);
+    }, { message: "Internal/private network URLs are not allowed" }),
+}).strict();
 
 // Block access action settings
 const blockAccessSettingsSchema = z.object({
   reason: z.string().min(1).max(100).optional(),
   message: z.string().min(1).max(500).optional(),
-});
+}).strict();
 
 // Notify action settings
 const notifySettingsSchema = z.object({
-  webhookUrl: z.string().url().optional(),
+  webhookUrl: z.string()
+    .url()
+    .refine((url) => {
+      // Must use HTTPS for webhooks (security requirement)
+      return url.startsWith('https://');
+    }, { message: "Webhook URL must use HTTPS" })
+    .refine((url) => {
+      // Block private/internal network URLs (SSRF protection)
+      return !isPrivateOrLocalhost(url);
+    }, { message: "Internal/private network URLs are not allowed for webhooks" })
+    .optional(),
   message: z.string().min(1).max(1000).optional(),
-});
+}).strict();
 
 // Password gate action settings
 const passwordGateSettingsSchema = z.object({
   passwordHash: z.string().min(1),
   hint: z.string().max(200).optional(),
-});
+}).strict();
 
 // ============================================
 // ACTION SCHEMAS
@@ -178,22 +249,22 @@ const passwordGateSettingsSchema = z.object({
 const redirectActionSchema = z.object({
   type: z.literal("redirect"),
   settings: redirectSettingsSchema,
-});
+}).strict();
 
 const blockAccessActionSchema = z.object({
   type: z.literal("block_access"),
   settings: blockAccessSettingsSchema.optional(),
-});
+}).strict();
 
 const notifyActionSchema = z.object({
   type: z.literal("notify"),
   settings: notifySettingsSchema.optional(),
-});
+}).strict();
 
 const passwordGateActionSchema = z.object({
   type: z.literal("password_gate"),
   settings: passwordGateSettingsSchema,
-});
+}).strict();
 
 // Union of all action types
 const actionSchema = z.discriminatedUnion("type", [
@@ -240,6 +311,20 @@ const createMultipleLinkRulesSchema = z.object({
 });
 
 // ============================================
+// PATH PARAMETER VALIDATION
+// ============================================
+
+const ruleIdParamSchema = z.object({
+  ruleId: z
+    .string()
+    .regex(/^\d+$/, "Rule ID must be a positive integer")
+    .transform((val) => parseInt(val, 10))
+    .refine((val) => val > 0 && val <= 2147483647, {
+      message: "Rule ID must be between 1 and 2147483647",
+    }),
+});
+
+// ============================================
 // EXPORTS
 // ============================================
 
@@ -277,4 +362,7 @@ module.exports = {
   createLinkRuleSchema,
   updateLinkRuleSchema,
   createMultipleLinkRulesSchema,
+
+  // Path parameter validation
+  ruleIdParamSchema,
 };

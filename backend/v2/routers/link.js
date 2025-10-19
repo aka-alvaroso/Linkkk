@@ -5,6 +5,7 @@ const {
   createLinkLimiter,
   getLinksLimiter,
   updateLinkLimiter,
+  passwordVerifyLimiter,
 } = require("../middlewares/security");
 
 const {
@@ -33,7 +34,11 @@ router.put("/:shortUrl", auth, updateLinkLimiter, updateLink);
 router.delete("/:shortUrl", auth, deleteLink);
 
 // Password verification (public endpoint - no auth required)
-router.post("/:shortUrl/verify-password", verifyPasswordGate);
+router.post(
+  "/:shortUrl/verify-password",
+  passwordVerifyLimiter,
+  verifyPasswordGate
+);
 
 // Link Rules routes (nested under /link/:shortUrl/rules)
 router.post("/:shortUrl/rules", auth, createLinkRule);

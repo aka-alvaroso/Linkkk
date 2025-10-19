@@ -38,12 +38,74 @@ const detectDevice = (userAgent) => {
 // ============================================
 
 /**
+ * Validates condition structure at runtime
+ * @param {Object} condition - The condition to validate
+ * @returns {boolean} - True if condition is valid
+ */
+const validateConditionStructure = (condition) => {
+  // Basic structure validation
+  if (!condition || typeof condition !== 'object') {
+    return false;
+  }
+
+  const { field, operator, value } = condition;
+
+  // All conditions must have these fields
+  if (!field || !operator || value === undefined) {
+    return false;
+  }
+
+  // Validate field types
+  const validFields = ['country', 'device', 'ip', 'is_vpn', 'is_bot', 'date', 'access_count'];
+  if (!validFields.includes(field)) {
+    return false;
+  }
+
+  // Validate operators per field type
+  const validOperators = {
+    country: ['in', 'not_in'],
+    device: ['equals', 'not_equals'],
+    ip: ['equals', 'not_equals'],
+    is_vpn: ['equals'],
+    is_bot: ['equals'],
+    date: ['before', 'after', 'equals'],
+    access_count: ['equals', 'greater_than', 'less_than'],
+  };
+
+  if (!validOperators[field] || !validOperators[field].includes(operator)) {
+    return false;
+  }
+
+  // Validate value types per field
+  if (field === 'country' && !Array.isArray(value)) {
+    return false;
+  }
+
+  if ((field === 'is_vpn' || field === 'is_bot') && typeof value !== 'boolean') {
+    return false;
+  }
+
+  if (field === 'access_count' && typeof value !== 'number') {
+    return false;
+  }
+
+  return true;
+};
+
+/**
  * Evaluates a single condition against context
  * @param {Object} condition - The condition to evaluate
  * @param {Object} context - The context with user data
  * @returns {Promise<boolean>} - True if condition matches
  */
 const evaluateCondition = async (condition, context) => {
+  // Runtime validation to protect against malformed data from database
+  if (!validateConditionStructure(condition)) {
+    console.error("Invalid condition structure detected:", JSON.stringify(condition));
+    // Fail closed - treat invalid conditions as not matching
+    return false;
+  }
+
   const { field, operator, value } = condition;
 
   switch (field) {
@@ -248,15 +310,60 @@ const evaluateAction = async (action, link) => {
 };
 
 /**
+ * Validates if a URL is safe for redirection
+ * @param {string} url - URL to validate
+ * @returns {boolean} - True if URL is safe
+ */
+const isValidRedirectUrl = (url) => {
+  try {
+    const parsed = new URL(url);
+    const protocol = parsed.protocol.toLowerCase();
+    const hostname = parsed.hostname.toLowerCase();
+
+    // Only allow http and https protocols
+    if (protocol !== 'http:' && protocol !== 'https:') {
+      return false;
+    }
+
+    // Block localhost and private IPs (SSRF protection)
+    if (hostname === 'localhost' ||
+        hostname === '127.0.0.1' ||
+        hostname === '0.0.0.0' ||
+        hostname === '::1' ||
+        hostname.endsWith('.local') ||
+        hostname.endsWith('.localhost') ||
+        hostname.startsWith('127.') ||
+        hostname.startsWith('192.168.') ||
+        hostname.startsWith('10.') ||
+        hostname.startsWith('169.254.') ||
+        hostname === '169.254.169.254' || // AWS metadata
+        hostname.match(/^172\.(1[6-9]|2[0-9]|3[01])\./)) {
+      return false;
+    }
+
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+/**
  * Replaces template variables in URLs
  * @param {string} url - URL with potential variables
  * @param {Object} link - Link object
  * @returns {string} - URL with variables replaced
  */
 const replaceVariables = (url, link) => {
-  return url
+  const replaced = url
     .replace(/\{\{longUrl\}\}/g, link.longUrl)
     .replace(/\{\{shortUrl\}\}/g, link.shortUrl);
+
+  // Validate the final URL after replacement (prevents open redirect)
+  if (!isValidRedirectUrl(replaced)) {
+    throw new Error("Invalid redirect URL after variable replacement");
+  }
+
+  return replaced;
 };
 
 // ============================================
