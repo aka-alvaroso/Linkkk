@@ -1,66 +1,47 @@
 /**
- * useLinkRules Hook - Business Logic for Link Rules
- * Combines link rules store state with link rules service API calls
+ * useLinkRules Hook
+ * Connects Link Rules store with API service
  */
 
-import { useCallback } from "react";
-import { useLinkRulesStore } from "@/app/stores/linkRulesStore";
-import { linkRulesService } from "@/app/services";
-import { HttpError, NetworkError, TimeoutError } from "@/app/utils/errors";
-import type { CreateRuleDTO, UpdateRuleDTO, BatchCreateRulesDTO } from "@/app/types";
+import { useCallback } from 'react';
+import { useLinkRulesStore } from '@/app/stores/linkRulesStore';
+import { linkRulesService } from '@/app/services';
+import { CreateRuleDTO, UpdateRuleDTO } from '@/app/types/linkRules';
 
 export function useLinkRules() {
   const {
     rules,
-    currentShortUrl,
     isLoading,
     error,
     setRules,
     addRule,
-    updateRuleInStore,
-    removeRuleFromStore,
-    reorderRules,
+    updateRule: updateRuleInStore,
+    removeRule,
+    reorderRules: reorderRulesInStore,
     setLoading,
     setError,
     reset,
   } = useLinkRulesStore();
 
   /**
-   * Get user-friendly error message from error object
-   */
-  const getErrorMessage = (err: unknown): string => {
-    if (err instanceof HttpError) {
-      return err.message;
-    }
-    if (err instanceof NetworkError || err instanceof TimeoutError) {
-      return err.message;
-    }
-    if (err instanceof Error) {
-      return err.message;
-    }
-    return "An unexpected error occurred";
-  };
-
-  /**
-   * Fetch all rules for a specific link
+   * Fetch all rules for a link
    */
   const fetchRules = useCallback(
     async (shortUrl: string) => {
       setLoading(true);
       setError(null);
-
       try {
-        const data = await linkRulesService.getAll(shortUrl);
-        setRules(data, shortUrl);
+        const fetchedRules = await linkRulesService.getRules(shortUrl);
+        setRules(fetchedRules);
       } catch (err) {
-        const message = getErrorMessage(err);
+        const message = err instanceof Error ? err.message : 'Failed to fetch rules';
         setError(message);
-        console.error("Error fetching rules:", err);
+        console.error('Error fetching rules:', err);
       } finally {
         setLoading(false);
       }
     },
-    [setRules, setLoading, setError]
+    [setLoading, setError, setRules]
   );
 
   /**
@@ -70,47 +51,43 @@ export function useLinkRules() {
     async (shortUrl: string, ruleData: CreateRuleDTO) => {
       setLoading(true);
       setError(null);
-
       try {
-        const newRule = await linkRulesService.create(shortUrl, ruleData);
+        const newRule = await linkRulesService.createRule(shortUrl, ruleData);
         addRule(newRule);
-        return { success: true as const, data: newRule, error: null, errorCode: null };
+        return newRule;
       } catch (err) {
-        const message = getErrorMessage(err);
-        const errorCode = err instanceof HttpError ? err.code : null;
+        const message = err instanceof Error ? err.message : 'Failed to create rule';
         setError(message);
-        console.error("Error creating rule:", err);
-        return { success: false as const, data: null, error: message, errorCode };
+        console.error('Error creating rule:', err);
+        throw err;
       } finally {
         setLoading(false);
       }
     },
-    [addRule, setLoading, setError]
+    [setLoading, setError, addRule]
   );
 
   /**
    * Update an existing rule
    */
   const updateRule = useCallback(
-    async (shortUrl: string, ruleId: number, ruleData: UpdateRuleDTO) => {
+    async (shortUrl: string, ruleId: number, updates: UpdateRuleDTO) => {
       setLoading(true);
       setError(null);
-
       try {
-        const updatedRule = await linkRulesService.update(shortUrl, ruleId, ruleData);
+        const updatedRule = await linkRulesService.updateRule(shortUrl, ruleId, updates);
         updateRuleInStore(ruleId, updatedRule);
-        return { success: true as const, data: updatedRule, error: null, errorCode: null };
+        return updatedRule;
       } catch (err) {
-        const message = getErrorMessage(err);
-        const errorCode = err instanceof HttpError ? err.code : null;
+        const message = err instanceof Error ? err.message : 'Failed to update rule';
         setError(message);
-        console.error("Error updating rule:", err);
-        return { success: false as const, data: null, error: message, errorCode };
+        console.error('Error updating rule:', err);
+        throw err;
       } finally {
         setLoading(false);
       }
     },
-    [updateRuleInStore, setLoading, setError]
+    [setLoading, setError, updateRuleInStore]
   );
 
   /**
@@ -120,88 +97,47 @@ export function useLinkRules() {
     async (shortUrl: string, ruleId: number) => {
       setLoading(true);
       setError(null);
-
       try {
-        await linkRulesService.delete(shortUrl, ruleId);
-        removeRuleFromStore(ruleId);
-        return { success: true as const, error: null, errorCode: null };
+        await linkRulesService.deleteRule(shortUrl, ruleId);
+        removeRule(ruleId);
       } catch (err) {
-        const message = getErrorMessage(err);
-        const errorCode = err instanceof HttpError ? err.code : null;
+        const message = err instanceof Error ? err.message : 'Failed to delete rule';
         setError(message);
-        console.error("Error deleting rule:", err);
-        return { success: false as const, error: message, errorCode };
+        console.error('Error deleting rule:', err);
+        throw err;
       } finally {
         setLoading(false);
       }
     },
-    [removeRuleFromStore, setLoading, setError]
+    [setLoading, setError, removeRule]
   );
 
   /**
-   * Batch create multiple rules
+   * Reorder rules (update priorities)
    */
-  const batchCreateRules = useCallback(
-    async (shortUrl: string, batchData: BatchCreateRulesDTO) => {
+  const reorderRules = useCallback(
+    async (shortUrl: string, ruleIds: number[]) => {
       setLoading(true);
       setError(null);
-
       try {
-        const newRules = await linkRulesService.batchCreate(shortUrl, batchData);
-        // Refresh all rules to ensure correct state
-        await fetchRules(shortUrl);
-        return { success: true as const, data: newRules, error: null, errorCode: null };
+        const reorderedRules = await linkRulesService.reorderRules(shortUrl, ruleIds);
+        reorderRulesInStore(reorderedRules);
+        return reorderedRules;
       } catch (err) {
-        const message = getErrorMessage(err);
-        const errorCode = err instanceof HttpError ? err.code : null;
+        const message = err instanceof Error ? err.message : 'Failed to reorder rules';
         setError(message);
-        console.error("Error batch creating rules:", err);
-        return { success: false as const, data: null, error: message, errorCode };
+        console.error('Error reordering rules:', err);
+        throw err;
       } finally {
         setLoading(false);
       }
     },
-    [fetchRules, setLoading, setError]
-  );
-
-  /**
-   * Update rule priorities (for drag & drop)
-   * This will update multiple rules with new priorities
-   */
-  const updateRulePriorities = useCallback(
-    async (shortUrl: string, rulesWithNewPriorities: { id: number; priority: number }[]) => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        // Update each rule's priority
-        const updatePromises = rulesWithNewPriorities.map(({ id, priority }) =>
-          linkRulesService.update(shortUrl, id, { priority })
-        );
-
-        await Promise.all(updatePromises);
-
-        // Refresh rules to get updated state
-        await fetchRules(shortUrl);
-
-        return { success: true as const, error: null, errorCode: null };
-      } catch (err) {
-        const message = getErrorMessage(err);
-        const errorCode = err instanceof HttpError ? err.code : null;
-        setError(message);
-        console.error("Error updating rule priorities:", err);
-        return { success: false as const, error: message, errorCode };
-      } finally {
-        setLoading(false);
-      }
-    },
-    [fetchRules, setLoading, setError]
+    [setLoading, setError, reorderRulesInStore]
   );
 
   return {
     // State
     rules,
-    currentShortUrl,
     isLoading,
     error,
 
@@ -210,9 +146,7 @@ export function useLinkRules() {
     createRule,
     updateRule,
     deleteRule,
-    batchCreateRules,
-    updateRulePriorities,
-    reorderRules, // For optimistic UI updates before API call
+    reorderRules,
     reset,
   };
 }

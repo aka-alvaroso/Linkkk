@@ -17,14 +17,14 @@ export default function BlockedPage() {
         initial={{ opacity: 0, y: 20, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.5, ease: "backOut" }}
-        className="max-w-md w-full bg-light rounded-3xl border-2 border-dark shadow-[8px_8px_0_var(--color-dark)] p-8 text-center"
+        className="max-w-4xl w-full bg-light rounded-3xl  p-8 text-center"
       >
         {/* Icon */}
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ delay: 0.2, duration: 0.5, type: "spring", bounce: 0.5 }}
-          className="w-24 h-24 mx-auto mb-6 rounded-2xl bg-danger/10 border-2 border-danger/20 shadow-[4px_4px_0_var(--color-danger)] flex items-center justify-center"
+          className="w-24 h-24 mx-auto mb-6 flex items-center justify-center"
         >
           <TbShieldX size={56} className="text-danger" />
         </motion.div>
@@ -75,36 +75,6 @@ export default function BlockedPage() {
           )}
         </motion.div>
 
-        {/* Info Box */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.3 }}
-          className="bg-dark/5 rounded-2xl p-4 mb-6"
-        >
-          <p className="text-sm text-dark/60">
-            Possible reasons for blocking:
-          </p>
-          <ul className="text-sm text-dark/70 mt-2 space-y-1 text-left">
-            <li className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-dark/40"></span>
-              Geographic restrictions
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-dark/40"></span>
-              VPN/Proxy detection
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-dark/40"></span>
-              Access limit reached
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-dark/40"></span>
-              Device or network restrictions
-            </li>
-          </ul>
-        </motion.div>
-
         {/* Actions */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -137,7 +107,7 @@ export default function BlockedPage() {
           className="mt-8 pt-6 border-t border-dark/10"
         >
           <p className="text-sm text-dark/50">
-            Protected by <span className="font-black italic">Linkkk</span>
+            Powered by <span className="font-black italic">Linkkk</span>
           </p>
         </motion.div>
       </motion.div>

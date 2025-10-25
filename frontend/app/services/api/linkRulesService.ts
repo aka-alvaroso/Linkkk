@@ -1,175 +1,201 @@
-import { API_CONFIG, defaultFetchOptions } from "@/app/config/api";
-import { HttpError, NetworkError, TimeoutError } from "@/app/utils/errors";
-import type {
+/**
+ * Link Rules Service
+ * Handles all API communication for link rules
+ */
+
+import {
   LinkRule,
   CreateRuleDTO,
   UpdateRuleDTO,
-  BatchCreateRulesDTO,
-  ApiResponse,
-} from "@/app/types";
+  GetRulesResponse,
+  CreateRuleResponse,
+  UpdateRuleResponse,
+  DeleteRuleResponse,
+} from '@/app/types/linkRules';
+
+import { API_CONFIG } from '@/app/config/api';
+
+const API_BASE_URL = API_CONFIG.BASE_URL;
 
 class LinkRulesService {
   /**
-   * Build the base URL for a specific link's rules
+   * Get all rules for a specific link
    */
-  private getRulesBaseUrl(shortUrl: string): string {
-    return `${API_CONFIG.BASE_URL}/link/${shortUrl}/rules`;
-  }
-
-  /**
-   * Handle API response and extract data or throw appropriate error
-   */
-  private async handleResponse<T>(response: Response): Promise<T> {
-    let data: ApiResponse<T>;
-
+  async getRules(shortUrl: string): Promise<LinkRule[]> {
     try {
-      data = await response.json();
-    } catch (error) {
-      // Failed to parse JSON
-      throw new HttpError(
-        response.status,
-        'INVALID_RESPONSE',
-        'Invalid response from server',
-        false
-      );
-    }
-
-    // Handle error responses
-    if (!response.ok) {
-      throw new HttpError(
-        response.status,
-        data.code || 'UNKNOWN_ERROR',
-        data.message || response.statusText,
-        response.status >= 500, // Server errors are retryable
-        (data as any).validation // Include validation errors if present
-      );
-    }
-
-    // Handle successful but malformed responses
-    if (!data.success || data.data === undefined) {
-      throw new HttpError(
-        response.status,
-        data.code || 'UNKNOWN_ERROR',
-        data.message || 'Unknown error occurred',
-        false
-      );
-    }
-
-    return data.data;
-  }
-
-  /**
-   * Make an HTTP request with timeout and error handling
-   */
-  private async request<T>(
-    url: string,
-    options: RequestInit
-  ): Promise<T> {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT);
-
-      const response = await fetch(url, {
-        ...defaultFetchOptions,
-        ...options,
-        signal: controller.signal,
+      const response = await fetch(`${API_BASE_URL}/link/${shortUrl}/rules`, {
+        credentials: 'include',
       });
 
-      clearTimeout(timeoutId);
-
-      return this.handleResponse<T>(response);
-    } catch (error) {
-      // Re-throw HttpError as-is
-      if (error instanceof HttpError) {
-        throw error;
+      // If endpoint doesn't exist or link has no rules, return empty array
+      if (response.status === 404) {
+        return [];
       }
 
-      // Handle abort/timeout errors
-      if (error instanceof Error && error.name === 'AbortError') {
-        throw new TimeoutError();
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Failed to fetch rules:', response.status, errorText);
+        throw new Error(`Failed to fetch rules: ${response.statusText}`);
       }
 
-      // Handle network errors (fetch failed, no internet, etc.)
-      if (error instanceof TypeError) {
-        throw new NetworkError();
+      const data: GetRulesResponse = await response.json();
+      return data.data || [];
+    } catch (err) {
+      // If it's a network error or endpoint doesn't exist, return empty array
+      if (err instanceof TypeError || (err as any).code === 'ECONNREFUSED') {
+        console.warn('Network error, returning empty rules array');
+        return [];
       }
-
-      // Unknown error
-      throw new NetworkError('An unexpected error occurred');
+      throw err;
     }
-  }
-
-  /**
-   * Get all rules for a specific link
-   * GET /link/:shortUrl/rules
-   */
-  async getAll(shortUrl: string): Promise<LinkRule[]> {
-    return this.request<LinkRule[]>(this.getRulesBaseUrl(shortUrl), {
-      method: "GET",
-    });
-  }
-
-  /**
-   * Get a specific rule by ID
-   * GET /link/:shortUrl/rules/:ruleId
-   */
-  async getOne(shortUrl: string, ruleId: number): Promise<LinkRule> {
-    return this.request<LinkRule>(`${this.getRulesBaseUrl(shortUrl)}/${ruleId}`, {
-      method: "GET",
-    });
   }
 
   /**
    * Create a new rule for a link
-   * POST /link/:shortUrl/rules
    */
-  async create(shortUrl: string, ruleData: CreateRuleDTO): Promise<LinkRule> {
-    return this.request<LinkRule>(this.getRulesBaseUrl(shortUrl), {
-      method: "POST",
-      body: JSON.stringify(ruleData),
+  async createRule(shortUrl: string, ruleData: CreateRuleDTO): Promise<LinkRule> {
+    // Clean up action settings - remove empty optional fields
+    const cleanedData = {
+      ...ruleData,
+      action: {
+        type: ruleData.action.type,
+        settings: Object.fromEntries(
+          Object.entries(ruleData.action.settings).filter(([_, value]) =>
+            value !== '' && value !== null && value !== undefined
+          )
+        )
+      },
+      ...(ruleData.elseAction && {
+        elseAction: {
+          type: ruleData.elseAction.type,
+          settings: Object.fromEntries(
+            Object.entries(ruleData.elseAction.settings).filter(([_, value]) =>
+              value !== '' && value !== null && value !== undefined
+            )
+          )
+        }
+      })
+    };
+
+    const response = await fetch(`${API_BASE_URL}/link/${shortUrl}/rules`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(cleanedData),
     });
+
+    if (!response.ok) {
+      const error = await response.json();
+      console.error('Backend validation error:', error);
+      console.error('Validation details:', JSON.stringify(error.validation, null, 2));
+      throw new Error(error.message || 'Failed to create rule');
+    }
+
+    const data: CreateRuleResponse = await response.json();
+    return data.data;
   }
 
   /**
    * Update an existing rule
-   * PUT /link/:shortUrl/rules/:ruleId
    */
-  async update(
+  async updateRule(
     shortUrl: string,
     ruleId: number,
-    ruleData: UpdateRuleDTO
+    updates: UpdateRuleDTO
   ): Promise<LinkRule> {
-    return this.request<LinkRule>(`${this.getRulesBaseUrl(shortUrl)}/${ruleId}`, {
-      method: "PUT",
-      body: JSON.stringify(ruleData),
+    // Clean up action settings if present - remove empty optional fields
+    let cleanedUpdates: any = { ...updates };
+
+    if (updates.action) {
+      cleanedUpdates.action = {
+        type: updates.action.type,
+        settings: Object.fromEntries(
+          Object.entries(updates.action.settings).filter(([_, value]) =>
+            value !== '' && value !== null && value !== undefined
+          )
+        )
+      };
+    }
+
+    if (updates.elseAction !== undefined) {
+      if (updates.elseAction === null) {
+        // Send null to backend to remove elseAction
+        cleanedUpdates.elseAction = null;
+      } else {
+        cleanedUpdates.elseAction = {
+          type: updates.elseAction.type,
+          settings: Object.fromEntries(
+            Object.entries(updates.elseAction.settings).filter(([_, value]) =>
+              value !== '' && value !== null && value !== undefined
+            )
+          )
+        };
+      }
+    }
+
+    const response = await fetch(`${API_BASE_URL}/link/${shortUrl}/rules/${ruleId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(cleanedUpdates),
     });
+
+    if (!response.ok) {
+      const error = await response.json();
+      console.error('Backend validation error (update):', error);
+      console.error('Validation details:', JSON.stringify(error.validation, null, 2));
+      throw new Error(error.message || 'Failed to update rule');
+    }
+
+    const data: UpdateRuleResponse = await response.json();
+    return data.data;
   }
 
   /**
    * Delete a rule
-   * DELETE /link/:shortUrl/rules/:ruleId
    */
-  async delete(shortUrl: string, ruleId: number): Promise<void> {
-    await this.request<{ message: string }>(
-      `${this.getRulesBaseUrl(shortUrl)}/${ruleId}`,
-      {
-        method: "DELETE",
-      }
-    );
+  async deleteRule(shortUrl: string, ruleId: number): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/link/${shortUrl}/rules/${ruleId}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to delete rule');
+    }
   }
 
   /**
-   * Batch create multiple rules
-   * POST /link/:shortUrl/rules/batch
+   * Reorder rules (update priorities in batch)
    */
-  async batchCreate(
-    shortUrl: string,
-    batchData: BatchCreateRulesDTO
-  ): Promise<LinkRule[]> {
-    return this.request<LinkRule[]>(`${this.getRulesBaseUrl(shortUrl)}/batch`, {
-      method: "POST",
-      body: JSON.stringify(batchData),
+  async reorderRules(shortUrl: string, ruleIds: number[]): Promise<LinkRule[]> {
+    // Update priority for each rule based on its position in the array
+    const updates = ruleIds.map((id, index) => ({
+      id,
+      priority: index,
+    }));
+
+    const response = await fetch(`${API_BASE_URL}/link/${shortUrl}/rules/reorder`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({ updates }),
     });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to reorder rules');
+    }
+
+    const data: GetRulesResponse = await response.json();
+    return data.data;
   }
 }
 

@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect, Dispatch, SetStateAction } from "react";
 import { cn } from "@/app/utils/cn";
+import { TbChevronDown } from "react-icons/tb";
+import Button from "../Button/Button";
 
 interface Option {
   label: string;
@@ -26,6 +28,7 @@ interface SelectProps {
   listClassName?: string;
   optionClassName?: string;
   optionSelectedClassName?: string;
+  useFixedPosition?: boolean;
 }
 
 export default function Select({
@@ -36,6 +39,7 @@ export default function Select({
   placeholder = "Selecciona una opción",
   required = false,
   error = "",
+  useFixedPosition = false,
   disabled = false,
   className,
   buttonClassName,
@@ -46,8 +50,21 @@ export default function Select({
   const [open, setOpen] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
   const [animateOpen, setAnimateOpen] = useState(false);
+  const [menuPosition, setMenuPosition] = useState<{ top: number; left: number; width: number } | null>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLUListElement>(null);
+
+  // Calculate position for fixed positioning
+  useEffect(() => {
+    if (useFixedPosition && open && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setMenuPosition({
+        top: rect.bottom,
+        left: rect.left,
+        width: rect.width,
+      });
+    }
+  }, [open, useFixedPosition]);
 
   useEffect(() => {
     let openTimeout: NodeJS.Timeout;
@@ -96,7 +113,7 @@ export default function Select({
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
-      <button
+      <Button
         ref={buttonRef}
         disabled={disabled}
         aria-haspopup="listbox"
@@ -104,7 +121,7 @@ export default function Select({
         type="button"
         onClick={() => !disabled && setOpen((o) => !o)}
         className={cn(
-          "w-full py-2 px-4 border rounded-md text-left text-sm transition",
+          "bg-light text-dark hover:bg-dark/5 w-full py-2 px-4 border rounded-md text-left text-sm transition",
           disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer",
           error ? "border-red-500" : "border-gray-300 focus:ring focus:ring-blue-100",
           buttonClassName
@@ -113,8 +130,10 @@ export default function Select({
         {value !== null && value !== undefined
           ? options.find((opt) => opt.value === value)?.label
           : <span className="text-gray-400">{placeholder}</span>}
-        <span className="float-right ml-2 text-gray-500">&#9662;</span>
-      </button>
+        <span className="float-right ml-2 text-gray-500">
+          <TbChevronDown size={16} />
+        </span>
+      </Button>
 
       {menuVisible && (
         <ul
@@ -122,10 +141,16 @@ export default function Select({
           role="listbox"
           tabIndex={-1}
           className={cn(
-            "absolute z-10 w-full mt-1 bg-white shadow-md border border-gray-200 rounded-md transition-all duration-200 ease-in-out transform origin-top",
+            useFixedPosition ? "fixed z-50" : "absolute z-10 w-full",
+            "mt-1 bg-white shadow-md border border-gray-200 rounded-md transition-all duration-200 ease-in-out transform origin-top",
             animateOpen ? "opacity-100 scale-100" : "opacity-0 scale-95",
             listClassName
           )}
+          style={useFixedPosition && menuPosition ? {
+            top: `${menuPosition.top}px`,
+            left: `${menuPosition.left}px`,
+            width: `${menuPosition.width}px`,
+          } : undefined}
         >
           {options.map((opt) => {
             const isSelected = value === opt.value || opt.selected;

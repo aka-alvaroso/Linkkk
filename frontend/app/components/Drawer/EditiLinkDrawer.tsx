@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Drawer from '@/app/components/ui/Drawer/Drawer';
 import { FiCornerDownRight } from 'react-icons/fi';
 import { TbChartBar, TbCircleDashed, TbCircleDashedCheck, TbCopy, TbExternalLink, TbLink, TbSettings, TbTrash } from 'react-icons/tb';
@@ -12,6 +12,7 @@ import { AccessesList } from '../Accesses/accessesList';
 import { useToast } from '@/app/hooks/useToast';
 import * as motion from 'motion/react-client';
 import { AnimatePresence } from 'motion/react';
+import { RulesManager } from '../LinkRules/RulesManager';
 
 interface EditiLinkDrawerProps {
     open: boolean;
@@ -26,45 +27,76 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
     const [statusBar, setShowStatusBar] = useState("none");
     const [newLink, setNewLink] = useState({...link});
 
+    // Rules state
+    const [hasRulesChanges, setHasRulesChanges] = useState(false);
+    const saveRulesRef = useRef<(() => Promise<void>) | null>(null);
+    const cancelRulesRef = useRef<(() => void) | null>(null);
+
     // Sincronizar estado local cuando el prop link cambia
     useEffect(() => {
         setNewLink({...link});
     }, [link]);
 
-    const handleUpdateLink = useCallback(async () => {
-            const response = await updateLink(link.shortUrl, {
-                longUrl: newLink.longUrl,
-                status: newLink.status,
-            });
+    // Handle rules changes callback from RulesManager
+    const handleRulesChange = useCallback((
+        hasChanges: boolean,
+        saveRules: () => Promise<void>,
+        cancelRules: () => void
+    ) => {
+        setHasRulesChanges(hasChanges);
+        saveRulesRef.current = saveRules;
+        cancelRulesRef.current = cancelRules;
+    }, []);
 
-            if (response.success) {
-                toast.success('Link updated successfully!');
+    const handleUpdateLink = useCallback(async () => {
+            try {
+                // Save link
+                const response = await updateLink(link.shortUrl, {
+                    longUrl: newLink.longUrl,
+                    status: newLink.status,
+                });
+
+                if (!response.success) {
+                    // Error handling with specific messages
+                    if (response.errorCode === 'LINK_NOT_FOUND') {
+                        toast.error('Link not found', {
+                            description: 'This link no longer exists.',
+                        });
+                    } else if (response.errorCode === 'LINK_ACCESS_DENIED') {
+                        toast.error('Access denied', {
+                            description: 'You don\'t have permission to edit this link.',
+                        });
+                    } else if (response.errorCode === 'UNAUTHORIZED') {
+                        toast.error('Session expired', {
+                            description: 'Please login again to continue.',
+                        });
+                    } else {
+                        toast.error('Failed to update link', {
+                            description: response.error || 'An unexpected error occurred.',
+                        });
+                    }
+                    setShowStatusBar("none");
+                    return;
+                }
+
+                // Save rules if there are changes
+                if (hasRulesChanges && saveRulesRef.current) {
+                    await saveRulesRef.current();
+                }
+
+                toast.success('Link and rules updated successfully!');
                 setShowStatusBar("none");
-                // No need to update newLink here, fetchLinks() will update the parent
                 onClose();
                 await fetchLinks();
-            } else {
-                // Error handling with specific messages
-                if (response.errorCode === 'LINK_NOT_FOUND') {
-                    toast.error('Link not found', {
-                        description: 'This link no longer exists.',
-                    });
-                } else if (response.errorCode === 'LINK_ACCESS_DENIED') {
-                    toast.error('Access denied', {
-                        description: 'You don\'t have permission to edit this link.',
-                    });
-                } else if (response.errorCode === 'UNAUTHORIZED') {
-                    toast.error('Session expired', {
-                        description: 'Please login again to continue.',
-                    });
-                } else {
-                    toast.error('Failed to update link', {
-                        description: response.error || 'An unexpected error occurred.',
-                    });
-                }
+            } catch (err) {
+                console.error('Failed to save:', err);
+                const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred.';
+                toast.error('Failed to save changes', {
+                    description: errorMessage,
+                });
                 setShowStatusBar("none");
             }
-    }, [link, newLink, updateLink, fetchLinks, onClose]);
+    }, [link, newLink, updateLink, fetchLinks, onClose, hasRulesChanges, toast]);
     
     useEffect(() => {
         if (!open) return;
@@ -97,16 +129,18 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
     }, [open, link, newLink, handleUpdateLink]);
 
     useEffect(() => {
-        const hasChanges =
+        const hasLinkChanges =
             link.status !== newLink.status ||
             link.longUrl !== newLink.longUrl;
+
+        const hasChanges = hasLinkChanges || hasRulesChanges;
 
         if (hasChanges) {
             setShowStatusBar("confirm");
         } else {
             setShowStatusBar("none");
         }
-    }, [newLink, link]);
+    }, [newLink, link, hasRulesChanges]);
 
     return (
         <Drawer
@@ -308,7 +342,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                 initial={{ opacity: 0, x: 20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: 0.275, duration: 0.3, ease: "backOut" }}
-                                className='w-xs'
+                                className='w-full max-w-xs'
                             >
                                 <Select
                                     options={[
@@ -400,82 +434,80 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                             </div>
                         </div>
 
+                        {/* Divider */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.4, duration: 0.3 }}
+                            className='w-full h-px bg-dark/10 my-8'
+                        />
+
+                        {/* Link Rules Section */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.45, duration: 0.3, ease: "backOut" }}
+                            className='w-full'
+                        >
+                            <RulesManager
+                                shortUrl={newLink.shortUrl}
+                                onRulesChange={handleRulesChange}
+                            />
+                        </motion.div>
 
                         {/* Status bar */}
                         <AnimatePresence>
                             {statusBar !== 'none' && (
                                 <motion.div
-                                    initial={{ opacity: 0, y: 50, scale: 0.9 }}
-                                    animate={{ opacity: 1, y: -8, scale: 1 }}
-                                    exit={{ opacity: 0, y: 50, scale: 0.9 }}
-                                    transition={{ duration: 0.3, ease: "backOut" }}
-                                    className='absolute flex flex-col gap-2 p-4 mb-2 bottom-0 left-1/2 w-1/2 -translate-x-1/2 bg-light border border-dark/10 rounded-3xl'
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: 20 }}
+                                    transition={{ duration: 0.2 }}
+                                    className='sticky bottom-4 bg-light border border-dark/10 rounded-2xl p-4'
                                 >
                                     {statusBar === "loading" && (
-                                        <motion.p
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: 0.1, duration: 0.2 }}
-                                            className='text-dark/50'
-                                        >
+                                        <p className='text-sm text-dark/70'>
                                             Updating link...
-                                        </motion.p>
+                                        </p>
                                     )}
 
                                     {statusBar === "confirm" && (
-                                        <>
-                                            <motion.p
-                                                initial={{ opacity: 0, y: 20 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                transition={{ delay: 0.05, duration: 0.2 }}
-                                                className='text-dark/50'
-                                            >
-                                                We detected some changes, do you want to apply them?
-                                            </motion.p>
+                                        <div className='flex flex-col md:flex-row items-center justify-between'>
+                                            <p className='text-sm text-dark/70'>
+                                                You have unsaved changes
+                                            </p>
                                             <div className='flex gap-2'>
-                                                <motion.div
-                                                    initial={{ opacity: 0, y: 20 }}
-                                                    animate={{ opacity: 1, y: 0 }}
-                                                    transition={{ delay: 0.1, duration: 0.2, ease: "backOut" }}
-                                                    className='flex-1'
+                                                <Button
+                                                    variant='outline'
+                                                    size='sm'
+                                                    rounded='xl'
+                                                    onClick={() => {
+                                                        setShowStatusBar("none");
+                                                        setNewLink({...link});
+                                                        // Cancel rules changes if any
+                                                        if (cancelRulesRef.current) {
+                                                            cancelRulesRef.current();
+                                                        }
+                                                        // Close the drawer
+                                                        onClose();
+                                                    }}
                                                 >
-                                                    <Button
-                                                        variant='outline'
-                                                        size='sm'
-                                                        rounded='2xl'
-                                                        className='w-full rounded-xl border-danger text-danger hover:bg-danger/15 hover:text-danger'
-                                                        onClick={() => {
-                                                            setShowStatusBar("none");
-                                                            setNewLink({...link});
-                                                        }}
-                                                    >
-                                                        Cancel
-                                                    </Button>
-                                                </motion.div>
-                                                <motion.div
-                                                    initial={{ opacity: 0, y: 20 }}
-                                                    animate={{ opacity: 1, y: 0 }}
-                                                    transition={{ delay: 0.15, duration: 0.2, ease: "backOut" }}
-                                                    className='flex-1'
+                                                    Cancel
+                                                </Button>
+                                                <Button
+                                                    variant='solid'
+                                                    size='sm'
+                                                    rounded='xl'
+                                                    className='bg-primary text-dark hover:shadow-[4px_4px_0_var(--color-dark)]'
+                                                    onClick={async () => {
+                                                        setShowStatusBar("loading");
+                                                        await handleUpdateLink();
+                                                    }}
                                                 >
-                                                    <Button
-                                                        variant='solid'
-                                                        size='sm'
-                                                        rounded='2xl'
-                                                        className='w-full rounded-xl hover:bg-primary hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)]'
-                                                        onClick={async () => {
-                                                            setShowStatusBar("loading");
-                                                            await handleUpdateLink();
-                                                        }}
-                                                    >
-                                                        Update Link
-                                                        <span className='ml-2 text-xs'>
-                                                            <FiCornerDownRight size={14} />
-                                                        </span>
-                                                    </Button>
-                                                </motion.div>
+                                                    Update Link
+                                                </Button>
                                             </div>
-                                        </>
+                                        </div>
                                     )}
                                 </motion.div>
                             )}

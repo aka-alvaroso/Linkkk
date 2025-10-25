@@ -255,7 +255,7 @@ export default function FeaturesPage() {
               <p className="text-xl mb-6 font-medium">
                 Share your ideas and vote on features in our{" "}
                 <a
-                  href="https://github.com/yourusername/linkkk/discussions"
+                  href="https://github.com/aka-alvaroso/linkkk/discussions"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="underline font-black hover:opacity-80 transition-opacity"
@@ -273,7 +273,7 @@ export default function FeaturesPage() {
                     <p className="font-black italic">Get Started Free</p>
                   </Button>
                 </Link>
-                <a href="https://github.com/anthropics/linkkk" target="_blank" rel="noopener noreferrer">
+                <a href="https://github.com/aka-alvaroso/linkkk" target="_blank" rel="noopener noreferrer">
                   <Button
                     variant="outline"
                     size="lg"

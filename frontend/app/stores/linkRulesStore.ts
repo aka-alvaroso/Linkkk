@@ -1,87 +1,61 @@
 /**
- * Link Rules Store - Pure State Management
- * Only handles state mutations, no API calls
+ * Link Rules Store
+ * Zustand store for managing link rules state
  */
 
-import { create } from "zustand";
-import type { LinkRule } from "@/app/types";
+import { create } from 'zustand';
+import { LinkRule } from '@/app/types/linkRules';
 
-interface LinkRulesStore {
+interface LinkRulesState {
   // State
   rules: LinkRule[];
-  currentShortUrl: string | null; // Track which link's rules we're viewing
   isLoading: boolean;
   error: string | null;
 
-  // State mutations only (no API calls)
-  setRules: (rules: LinkRule[], shortUrl: string) => void;
+  // Actions
+  setRules: (rules: LinkRule[]) => void;
   addRule: (rule: LinkRule) => void;
-  updateRuleInStore: (ruleId: number, data: Partial<LinkRule>) => void;
-  removeRuleFromStore: (ruleId: number) => void;
-  reorderRules: (rules: LinkRule[]) => void; // For drag & drop priority changes
-  setLoading: (loading: boolean) => void;
+  updateRule: (ruleId: number, updates: Partial<LinkRule>) => void;
+  removeRule: (ruleId: number) => void;
+  reorderRules: (newOrder: LinkRule[]) => void;
+  setLoading: (isLoading: boolean) => void;
   setError: (error: string | null) => void;
   reset: () => void;
 }
 
-export const useLinkRulesStore = create<LinkRulesStore>((set, get) => ({
-  // Initial state
+const initialState = {
   rules: [],
-  currentShortUrl: null,
   isLoading: false,
   error: null,
+};
 
-  // State mutations
-  setRules: (rules, shortUrl) => {
-    // Sort by priority (lower = higher priority)
-    const sortedRules = [...rules].sort((a, b) => a.priority - b.priority);
-    set({ rules: sortedRules, currentShortUrl: shortUrl });
-  },
+export const useLinkRulesStore = create<LinkRulesState>((set) => ({
+  ...initialState,
 
-  addRule: (rule) => {
-    set((state) => {
-      const newRules = [...state.rules, rule];
-      // Sort by priority
-      return {
-        rules: newRules.sort((a, b) => a.priority - b.priority),
-      };
-    });
-  },
+  setRules: (rules) => set({ rules, error: null }),
 
-  updateRuleInStore: (ruleId, data) => {
-    set((state) => {
-      const updatedRules = state.rules.map((rule) =>
-        rule.id === ruleId ? { ...rule, ...data } : rule
-      );
-      // Re-sort if priority changed
-      return {
-        rules: updatedRules.sort((a, b) => a.priority - b.priority),
-      };
-    });
-  },
+  addRule: (rule) =>
+    set((state) => ({
+      rules: [...state.rules, rule],
+    })),
 
-  removeRuleFromStore: (ruleId) => {
+  updateRule: (ruleId, updates) =>
+    set((state) => ({
+      rules: state.rules.map((rule) =>
+        rule.id === ruleId ? { ...rule, ...updates } : rule
+      ),
+    })),
+
+  removeRule: (ruleId) =>
     set((state) => ({
       rules: state.rules.filter((rule) => rule.id !== ruleId),
-    }));
-  },
+    })),
 
-  reorderRules: (rules) => {
-    // Used for drag & drop or manual priority changes
-    const sortedRules = [...rules].sort((a, b) => a.priority - b.priority);
-    set({ rules: sortedRules });
-  },
+  reorderRules: (newOrder) => set({ rules: newOrder }),
 
   setLoading: (isLoading) => set({ isLoading }),
 
-  setError: (error) => set({ error }),
+  setError: (error) => set({ error, isLoading: false }),
 
-  reset: () => {
-    set({
-      rules: [],
-      currentShortUrl: null,
-      isLoading: false,
-      error: null,
-    });
-  },
+  reset: () => set(initialState),
 }));

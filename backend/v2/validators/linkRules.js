@@ -228,7 +228,7 @@ const updateLinkRuleSchema = z.object({
   match: MatchTypeEnum.optional(),
   conditions: z.array(ruleConditionSchema).min(0).max(5).optional(),
   action: actionSchema.optional(),
-  elseAction: actionSchema.optional(),
+  elseAction: actionSchema.nullable().optional(), // Allow null to remove elseAction
 });
 
 // ============================================
