@@ -347,16 +347,14 @@ describe("Link Rules Engine", () => {
       const action = {
         type: "block_access",
         settings: {
-          reason: "GEO_BLOCKED",
-          message: "Access denied",
+          reason: "Access denied from GEO_BLOCKED",
         },
       };
 
       const result = await evaluateAction(action, mockLink);
       expect(result).toEqual({
         type: "block",
-        reason: "GEO_BLOCKED",
-        message: "Access denied",
+        reason: "Access denied from GEO_BLOCKED",
       });
     });
 

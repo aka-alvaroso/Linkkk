@@ -41,7 +41,6 @@ const OPERATOR_OPTIONS: Record<FieldType, { label: string; value: OperatorType }
   ip: [
     { label: 'equals', value: 'equals' },
     { label: 'not equals', value: 'not_equals' },
-    { label: 'contains', value: 'contains' },
   ],
   is_bot: [{ label: 'equals', value: 'equals' }],
   is_vpn: [{ label: 'equals', value: 'equals' }],

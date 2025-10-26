@@ -110,7 +110,7 @@ export function LinkRule({ rule, priority, onChange, onDelete, dragHandleProps, 
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
-      className="relative bg-dark/5 rounded-lg p-2.5 transition-colors"
+      className="relative rounded-2xl border border-dark/10 p-4 transition-colors"
     >
       {/* Drag Handle and Delete Button */}
       <div className="flex items-start justify-between mb-2">

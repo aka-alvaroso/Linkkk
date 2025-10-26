@@ -155,8 +155,7 @@ const redirectSettingsSchema = z.object({
 
 // Block access action settings
 const blockAccessSettingsSchema = z.object({
-  reason: z.string().min(1).max(100).optional(),
-  message: z.string().min(1).max(500).optional(),
+  reason: z.string().min(1).max(500).optional(),
 });
 
 // Notify action settings

@@ -1,32 +1,26 @@
 "use client";
-import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Button from '@/app/components/ui/Button/Button';
-import { TbHandStop, TbHome, TbLock, TbShieldX } from 'react-icons/tb';
+import { TbHome, TbLinkOff } from 'react-icons/tb';
 import * as motion from 'motion/react-client';
 
-export default function BlockedPage() {
-  const searchParams = useSearchParams();
-  const shortUrl = searchParams.get('url');
-  const reason = searchParams.get('reason');
-  const message = searchParams.get('message');
-
+export default function DisabledPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-warning/5 via-light to-secondary/5">
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.5, ease: "backOut" }}
-        className="max-w-xl w-full bg-light rounded-3xl  p-8 text-center"
+        className="max-w-xl w-full bg-light rounded-3xl p-8 text-center"
       >
         {/* Icon */}
         <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
+          initial={{ scale: 0, rotate: -180 }}
+          animate={{ scale: 1, rotate: 0 }}
           transition={{ delay: 0.2, duration: 0.5, type: "spring", bounce: 0.5 }}
           className="w-24 h-24 mx-auto flex items-center justify-center"
         >
-          <TbHandStop size={56} className="text-danger" />
+          <TbLinkOff size={56} className="text-warning" />
         </motion.div>
 
         {/* Title */}
@@ -36,33 +30,29 @@ export default function BlockedPage() {
           transition={{ delay: 0.3, duration: 0.3 }}
           className="text-4xl md:text-5xl font-black italic mb-4 text-dark"
         >
-          Access Blocked
+          Link Disabled
         </motion.h1>
 
         {/* Description */}
-        <motion.div
+        <motion.p
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.3 }}
-          className="space-y-3 mb-6"
+          className="text-dark/70 mb-6"
         >
-          {shortUrl && (
-            <p className="text-dark/70">
-              Access to <span className="font-bold text-dark px-2 py-1 bg-dark/5 rounded-lg">linkkk.dev/{shortUrl}</span> has been restricted.
-            </p>
-          )}
+          This link has been temporarily disabled by its owner.
+        </motion.p>
 
-          {reason && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.3 }}
-              className="bg-info/5 border border-info/20 rounded-2xl p-4 flex flex-col items-start"
-            >
-                <h6 className='font-bold text-info'>Reason:</h6>
-                <p className="text-dark/70">{reason}</p>
-            </motion.div>
-          )}
+        {/* Info Box */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.3 }}
+          className="bg-warning/10 border border-warning/20 rounded-2xl p-4 mb-6"
+        >
+          <p className="text-sm text-dark/80">
+            The link owner has paused this short link. It may be re-enabled in the future.
+          </p>
         </motion.div>
 
         {/* Actions */}
@@ -87,7 +77,7 @@ export default function BlockedPage() {
           </Link>
 
           <p className="text-xs text-dark/50 mt-2">
-            If you believe this is an error, please contact the link owner.
+            If you're the link owner, you can re-enable it from your dashboard.
           </p>
         </motion.div>
 
@@ -99,7 +89,7 @@ export default function BlockedPage() {
           className="mt-8 pt-6 border-t border-dark/10"
         >
           <p className="text-sm text-dark/50">
-            Powered by <span className="font-black italic">Linkkk.</span>
+            Powered by <span className="font-black italic">Linkkk</span>
           </p>
         </motion.div>
       </motion.div>

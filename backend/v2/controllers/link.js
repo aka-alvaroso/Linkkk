@@ -385,9 +385,9 @@ const redirectLink = async (req, res) => {
         });
 
         return res.redirect(
-          `${process.env.FRONTEND_URL}/blocked?reason=${
+          `${process.env.FRONTEND_URL}/blocked?url=${shortUrl}&reason=${encodeURIComponent(
             action.reason
-          }&message=${encodeURIComponent(action.message)}`
+          )}`
         );
 
       case "password_gate":
@@ -560,7 +560,7 @@ const verifyPasswordGate = async (req, res) => {
 
     return successResponse(res, {
       success: true,
-      redirectUrl,
+      url: redirectUrl,
     });
   } catch (error) {
     console.error("Password verification error:", error);

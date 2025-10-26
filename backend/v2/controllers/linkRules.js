@@ -7,6 +7,7 @@ const {
 const { successResponse, errorResponse } = require("../utils/response");
 const ERRORS = require("../constants/errorCodes");
 const planLimits = require("../utils/limits");
+const { hashPassword } = require("../utils/password");
 
 // Helper: Check link access
 const checkLinkAccess = async (shortUrl, user, guest) => {
@@ -74,6 +75,24 @@ const createLinkRule = async (req, res) => {
   }
 
   try {
+    // Hash password if action is password_gate
+    let actionSettings = action.settings || {};
+    if (action.type === 'password_gate' && actionSettings.passwordHash) {
+      actionSettings = {
+        ...actionSettings,
+        passwordHash: await hashPassword(actionSettings.passwordHash)
+      };
+    }
+
+    // Hash password in elseAction if needed
+    let elseActionSettings = elseAction?.settings || null;
+    if (elseAction?.type === 'password_gate' && elseActionSettings?.passwordHash) {
+      elseActionSettings = {
+        ...elseActionSettings,
+        passwordHash: await hashPassword(elseActionSettings.passwordHash)
+      };
+    }
+
     // Create rule with conditions
     const rule = await prisma.linkRule.create({
       data: {
@@ -82,9 +101,9 @@ const createLinkRule = async (req, res) => {
         enabled: enabled ?? true,
         match: match ?? "AND",
         actionType: action.type,
-        actionSettings: action.settings || {},
+        actionSettings,
         elseActionType: elseAction?.type,
-        elseActionSettings: elseAction?.settings || null,
+        elseActionSettings,
       },
     });
 
@@ -233,11 +252,31 @@ const updateLinkRule = async (req, res) => {
     if (match !== undefined) updateData.match = match;
     if (action) {
       updateData.actionType = action.type;
-      updateData.actionSettings = action.settings || {};
+      let actionSettings = action.settings || {};
+      // Hash password if action is password_gate and password is not already hashed
+      if (action.type === 'password_gate' && actionSettings.passwordHash) {
+        // Only hash if it's not already a bcrypt hash (bcrypt hashes start with $2)
+        const isAlreadyHashed = actionSettings.passwordHash.startsWith('$2');
+        actionSettings = {
+          ...actionSettings,
+          passwordHash: isAlreadyHashed ? actionSettings.passwordHash : await hashPassword(actionSettings.passwordHash)
+        };
+      }
+      updateData.actionSettings = actionSettings;
     }
     if (elseAction !== undefined) {
       updateData.elseActionType = elseAction?.type || null;
-      updateData.elseActionSettings = elseAction?.settings || null;
+      let elseActionSettings = elseAction?.settings || null;
+      // Hash password in elseAction if needed
+      if (elseAction?.type === 'password_gate' && elseActionSettings?.passwordHash) {
+        // Only hash if it's not already a bcrypt hash (bcrypt hashes start with $2)
+        const isAlreadyHashed = elseActionSettings.passwordHash.startsWith('$2');
+        elseActionSettings = {
+          ...elseActionSettings,
+          passwordHash: isAlreadyHashed ? elseActionSettings.passwordHash : await hashPassword(elseActionSettings.passwordHash)
+        };
+      }
+      updateData.elseActionSettings = elseActionSettings;
     }
 
     // Update rule

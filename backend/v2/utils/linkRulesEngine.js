@@ -25,7 +25,11 @@ const detectDevice = (userAgent) => {
   }
 
   // Mobile detection
-  if (/Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(userAgent)) {
+  if (
+    /Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(
+      userAgent
+    )
+  ) {
     return "mobile";
   }
 
@@ -219,8 +223,7 @@ const evaluateAction = async (action, link) => {
     case "block_access":
       return {
         type: "block",
-        reason: settings?.reason || "ACCESS_BLOCKED",
-        message: settings?.message || "Access denied",
+        reason: settings?.reason || "Access denied",
       };
 
     case "password_gate":

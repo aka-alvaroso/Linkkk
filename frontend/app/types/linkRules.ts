@@ -53,7 +53,7 @@ export interface RedirectSettings {
 }
 
 export interface BlockAccessSettings {
-  message?: string;
+  reason?: string;
 }
 
 export interface PasswordGateSettings {

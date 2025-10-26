@@ -49,7 +49,7 @@ export function RuleAction({
         defaultSettings = { url: '' } as RedirectSettings;
         break;
       case 'block_access':
-        defaultSettings = { message: '' } as BlockAccessSettings;
+        defaultSettings = { reason: '' } as BlockAccessSettings;
         break;
       case 'password_gate':
         defaultSettings = { passwordHash: '', hint: '' } as PasswordGateSettings;
@@ -90,9 +90,9 @@ export function RuleAction({
         return (
           <div className="flex items-center gap-2">
             <Input
-              placeholder="Block message (optional)"
-              value={blockSettings.message || ''}
-              onChange={(e) => handleSettingChange('message', e.target.value)}
+              placeholder="Block reason (optional)"
+              value={blockSettings.reason || ''}
+              onChange={(e) => handleSettingChange('reason', e.target.value)}
               size="sm"
               rounded="lg"
               className='bg-light border border-dark/10 px-2 py-1 rounded-lg hover:border-dark/20'

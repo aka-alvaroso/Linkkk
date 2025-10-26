@@ -125,6 +125,13 @@ class LinkService {
       method: "DELETE",
     });
   }
+
+  async verifyPassword(shortUrl: string, password: string): Promise<{ success: boolean; url: string }> {
+    return this.request<{ success: boolean; url: string }>(`${this.baseUrl}/${shortUrl}/verify-password`, {
+      method: "POST",
+      body: JSON.stringify({ password }),
+    });
+  }
 }
 
 export const linkService = new LinkService();
