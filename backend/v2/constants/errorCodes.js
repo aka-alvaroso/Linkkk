@@ -134,6 +134,20 @@ const ERRORS = {
     statusCode: 404,
     retryable: false,
   },
+  RULE_LIMIT_EXCEEDED: {
+    code: "RULE_LIMIT_EXCEEDED",
+    message: "Rule limit exceeded",
+    userMessage: "You've reached the maximum number of rules for this link",
+    statusCode: 400,
+    retryable: false,
+  },
+  CONDITION_LIMIT_EXCEEDED: {
+    code: "CONDITION_LIMIT_EXCEEDED",
+    message: "Condition limit exceeded",
+    userMessage: "You've reached the maximum number of conditions for this rule",
+    statusCode: 400,
+    retryable: false,
+  },
 
   // ============================================================================
   // RATE LIMITING ERRORS

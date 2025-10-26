@@ -8,6 +8,7 @@
 export type MatchType = 'AND' | 'OR';
 
 export type FieldType =
+  | 'always'       // Always execute (no condition)
   | 'country'      // Country code (ES, US, FR, etc)
   | 'device'       // Device type
   | 'ip'           // IP address

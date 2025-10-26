@@ -72,37 +72,30 @@ export function RuleAction({
       case 'redirect':
         const redirectSettings = actionSettings as RedirectSettings;
         return (
-          <div>
-            <label className="block text-sm font-medium text-dark/70 mb-2">
-              Redirect URL
-            </label>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-dark/50">to</span>
             <Input
               placeholder="https://example.com or {{longUrl}}"
               value={redirectSettings.url || ''}
               onChange={(e) => handleSettingChange('url', e.target.value)}
-              size="md"
-              rounded="2xl"
-              className='bg-light border-none outline-none'
+              size="sm"
+              rounded="lg"
+              className='bg-light border border-dark/10 px-2 py-1 rounded-lg hover:border-dark/20'
             />
-            <p className="mt-1 text-xs text-dark/50">
-              Use placeholders: {'{'}{'{'} longUrl {'}'}{'}'}, {'{'}{'{'} shortUrl {'}'}{'}'}</p>
           </div>
         );
 
       case 'block_access':
         const blockSettings = actionSettings as BlockAccessSettings;
         return (
-          <div>
-            <label className="block text-sm font-medium text-dark/70 mb-2">
-              Block Message (optional)
-            </label>
+          <div className="flex items-center gap-2">
             <Input
-              placeholder="Access to this link is not allowed"
+              placeholder="Block message (optional)"
               value={blockSettings.message || ''}
               onChange={(e) => handleSettingChange('message', e.target.value)}
-              size="md"
-              rounded="2xl"
-              className='bg-light border-none outline-none'
+              size="sm"
+              rounded="lg"
+              className='bg-light border border-dark/10 px-2 py-1 rounded-lg hover:border-dark/20'
             />
           </div>
         );
@@ -110,68 +103,47 @@ export function RuleAction({
       case 'password_gate':
         const passwordSettings = actionSettings as PasswordGateSettings;
         return (
-          <div className="space-y-3">
-            <div>
-              <label className="block text-sm font-medium text-dark/70 mb-2">
-                Password
-              </label>
-              <Input
-                type="password"
-                placeholder="Enter password"
-                value={passwordSettings.passwordHash || ''}
-                onChange={(e) => handleSettingChange('passwordHash', e.target.value)}
-                size="md"
-                rounded="2xl"
-                className='bg-light border-none outline-none'
-              />
-              <p className="mt-1 text-xs text-dark/50">Will be hashed before saving</p>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-dark/70 mb-2">
-                Hint (optional)
-              </label>
-              <Input
-                placeholder="Hint for users"
-                value={passwordSettings.hint || ''}
-                onChange={(e) => handleSettingChange('hint', e.target.value)}
-                size="md"
-                rounded="2xl"
-                className='bg-light border-none outline-none'
-              />
-            </div>
+          <div className="flex items-center gap-2">
+            <Input
+              type="password"
+              placeholder="Password"
+              value={passwordSettings.passwordHash || ''}
+              onChange={(e) => handleSettingChange('passwordHash', e.target.value)}
+              size="sm"
+              rounded="lg"
+              className='bg-light border border-dark/10 px-2 py-1 rounded-lg hover:border-dark/20'
+            />
+            <Input
+              placeholder="Hint (optional)"
+              value={passwordSettings.hint || ''}
+              onChange={(e) => handleSettingChange('hint', e.target.value)}
+              size="sm"
+              rounded="lg"
+              className='bg-light border border-dark/10 px-2 py-1 rounded-lg hover:border-dark/20'
+            />
           </div>
         );
 
       case 'notify':
         const notifySettings = actionSettings as NotifySettings;
         return (
-          <div className="space-y-3">
-            <div>
-              <label className="block text-sm font-medium text-dark/70 mb-2">
-                Webhook URL (optional)
-              </label>
-              <Input
-                placeholder="https://hooks.example.com/webhook"
-                value={notifySettings.webhookUrl || ''}
-                onChange={(e) => handleSettingChange('webhookUrl', e.target.value)}
-                size="md"
-                rounded="2xl"
-                className='bg-light border-none outline-none'
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-dark/70 mb-2">
-                Message (optional)
-              </label>
-              <Input
-                placeholder="Custom notification message"
-                value={notifySettings.message || ''}
-                onChange={(e) => handleSettingChange('message', e.target.value)}
-                size="md"
-                rounded="2xl"
-                className='bg-light border-none outline-none'
-              />
-            </div>
+          <div className="flex items-center gap-2">
+            <Input
+              placeholder="Webhook URL (optional)"
+              value={notifySettings.webhookUrl || ''}
+              onChange={(e) => handleSettingChange('webhookUrl', e.target.value)}
+              size="sm"
+              rounded="lg"
+              className='bg-light border border-dark/10 px-2 py-1 rounded-lg hover:border-dark/20'
+            />
+            <Input
+              placeholder="Message (optional)"
+              value={notifySettings.message || ''}
+              onChange={(e) => handleSettingChange('message', e.target.value)}
+              size="sm"
+              rounded="lg"
+              className='bg-light border border-dark/10 px-2 py-1 rounded-lg hover:border-dark/20'
+            />
           </div>
         );
 
@@ -181,29 +153,24 @@ export function RuleAction({
   };
 
   return (
-    <div className="space-y-3 rounded-2xl">
-      {/* Label */}
-      <div className="text-sm font-black text-dark uppercase tracking-wide">
-        {label}
-      </div>
-
-      {/* Action Type Select */}
-      <div>
-        <label className="block text-sm font-medium text-dark/70 mb-1">
-          Action Type
-        </label>
+    <div className="space-y-2">
+      {/* Label and Action Type inline */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-xs font-bold text-dark/70 uppercase tracking-wide sm:w-16 sm:text-right">
+          {label}
+        </span>
         <Select
           options={ACTION_TYPE_OPTIONS}
           value={actionType}
           onChange={handleTypeChange}
-          buttonClassName="w-auto rounded-2xl text-sm border-none bg-light p-2"
-          listClassName="rounded-2xl w-auto shadow-none"
-          optionClassName='rounded-2xl p-2'
+          className='w-auto text-sm'
+          buttonClassName="w-auto rounded-lg text-sm border border-dark/10 bg-light px-2 py-1 hover:border-dark/20 whitespace-nowrap"
+          listClassName="rounded-lg w-auto shadow-lg"
+          optionClassName='rounded-md p-1.5 text-sm'
         />
+        {/* Dynamic Settings inline */}
+        {renderSettings()}
       </div>
-
-      {/* Dynamic Settings */}
-      {renderSettings()}
     </div>
   );
 }

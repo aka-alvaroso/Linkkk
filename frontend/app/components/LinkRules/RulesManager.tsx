@@ -4,6 +4,7 @@
  */
 
 import React, { useEffect, useState, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { LinkRule } from './LinkRule';
 import Button from '../ui/Button/Button';
 import { TbPlus, TbRocket } from 'react-icons/tb';
@@ -26,6 +27,8 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { LinkRule as LinkRuleType } from '@/app/types/linkRules';
+import { useAuth } from '@/app/stores/authStore';
+import { PLAN_LIMITS } from '@/app/constants/limits';
 
 interface RulesManagerProps {
   shortUrl: string;
@@ -42,6 +45,7 @@ function SortableLinkRule(props: {
   priority: number;
   onChange: (rule: LinkRuleType) => void;
   onDelete: () => void;
+  maxConditions: number;
 }) {
   const {
     attributes,
@@ -70,9 +74,13 @@ function SortableLinkRule(props: {
 
 export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
   const { rules: fetchedRules, isLoading, error, fetchRules, createRule, updateRule, deleteRule, reorderRules } = useLinkRules();
+  const { isAuthenticated } = useAuth();
 
   const [originalRules, setOriginalRules] = useState<LinkRuleType[]>([]);
   const [localRules, setLocalRules] = useState<LinkRuleType[]>([]);
+
+  // Get limits based on user type
+  const limits = isAuthenticated ? PLAN_LIMITS.user : PLAN_LIMITS.guest;
 
   // Drag & drop sensors
   const sensors = useSensors(
@@ -89,10 +97,29 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
     }
   }, [shortUrl, fetchRules]);
 
+  // Convert conditions from backend format (array) to UI format (string for countries)
+  const normalizeConditionsForUI = (conditions: any[]) => {
+    // If no conditions, add "always" condition for UI
+    if (conditions.length === 0) {
+      return [{ field: 'always', operator: 'equals', value: true }];
+    }
+
+    return conditions.map(condition => {
+      if (condition.field === 'country' && Array.isArray(condition.value)) {
+        return { ...condition, value: condition.value.join(', ') };
+      }
+      return condition;
+    });
+  };
+
   // Update local state when fetched rules change
   useEffect(() => {
-    setOriginalRules(fetchedRules);
-    setLocalRules(fetchedRules);
+    const normalizedRules = fetchedRules.map(rule => ({
+      ...rule,
+      conditions: normalizeConditionsForUI(rule.conditions)
+    }));
+    setOriginalRules(normalizedRules);
+    setLocalRules(normalizedRules);
   }, [fetchedRules]);
 
   // Detect changes
@@ -124,7 +151,12 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
     // Validate conditions
     for (const condition of rule.conditions) {
       if (condition.field === 'country') {
-        if (!Array.isArray(condition.value) || condition.value.length === 0) {
+        const value = typeof condition.value === 'string'
+          ? condition.value
+          : Array.isArray(condition.value)
+            ? condition.value.join(',')
+            : '';
+        if (!value || value.trim() === '') {
           return 'At least one country code is required';
         }
       } else if (condition.field === 'ip') {
@@ -137,12 +169,40 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
     return null;
   };
 
+  // Process conditions to convert country string to array and filter "always"
+  const processConditions = (conditions: any[]) => {
+    return conditions
+      .filter(condition => condition.field !== 'always') // Remove "always" conditions (frontend-only)
+      .map(condition => {
+        if (condition.field === 'country' && typeof condition.value === 'string') {
+          // Convert comma-separated string to array
+          const countries = condition.value
+            .split(',')
+            .map((c: string) => c.trim())
+            .filter((c: string) => c.length > 0);
+          return { ...condition, value: countries };
+        }
+        return condition;
+      });
+  };
+
   // Save callback
   const saveRules = useCallback(async () => {
     try {
+      // Validate limits
+      if (localRules.length > limits.rulesPerLink) {
+        throw new Error(`Maximum ${limits.rulesPerLink} ${limits.rulesPerLink === 1 ? 'rule' : 'rules'} allowed per link`);
+      }
+
       // Validate all rules before saving
       for (let i = 0; i < localRules.length; i++) {
         const rule = localRules[i];
+
+        // Validate conditions limit
+        if (rule.conditions.length > limits.conditionsPerRule) {
+          throw new Error(`Rule ${i + 1}: Maximum ${limits.conditionsPerRule} ${limits.conditionsPerRule === 1 ? 'condition' : 'conditions'} allowed per rule`);
+        }
+
         const error = validateRule(rule);
         if (error) {
           throw new Error(`Rule ${i + 1}: ${error}`);
@@ -158,7 +218,7 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
             priority: localRule.priority,
             enabled: localRule.enabled,
             match: localRule.match,
-            conditions: localRule.conditions,
+            conditions: processConditions(localRule.conditions),
             action: {
               type: localRule.actionType,
               settings: localRule.actionSettings
@@ -176,7 +236,7 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
             priority: localRule.priority,
             enabled: localRule.enabled,
             match: localRule.match,
-            conditions: localRule.conditions,
+            conditions: processConditions(localRule.conditions),
             action: {
               type: localRule.actionType,
               settings: localRule.actionSettings
@@ -209,7 +269,7 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
       console.error('Failed to save rules:', err);
       throw err;
     }
-  }, [localRules, originalRules, shortUrl, createRule, updateRule, deleteRule]);
+  }, [localRules, originalRules, shortUrl, createRule, updateRule, deleteRule, limits]);
 
   // Cancel callback
   const cancelRules = useCallback(() => {
@@ -249,7 +309,7 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
       priority: localRules.length,
       enabled: true,
       match: 'AND',
-      conditions: [{ field: 'device', operator: 'equals', value: 'mobile' }],
+      conditions: [{ field: 'always', operator: 'equals', value: true }], // Start with "Always" condition
       actionType: 'redirect',
       actionSettings: { url: '{{longUrl}}' },
       createdAt: new Date().toISOString(),
@@ -288,26 +348,27 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
-          <h3 className="text-xl font-black text-dark flex items-center gap-2">
-            <TbRocket size={24} />
-            Link Rules
+          <h3 className="text-2xl font-black text-dark flex items-center gap-2">
+            <TbRocket size={26} />
+            Link Rules ({localRules.length} / {limits.rulesPerLink})
           </h3>
-          <p className="text-sm text-dark/50 mt-1">
-            Define conditions and actions for this link
-          </p>
         </div>
-        <Button
-          variant="solid"
-          size="md"
-          rounded="2xl"
-          leftIcon={<TbPlus size={20} />}
-          onClick={handleAddRule}
-          className="bg-primary text-dark hover:bg-primary hover:shadow-[4px_4px_0_var(--color-dark)]"
-        >
-          Add Rule
-        </Button>
+        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+          <Button
+            variant="solid"
+            size="md"
+            rounded="2xl"
+            leftIcon={<TbPlus size={20} />}
+            onClick={handleAddRule}
+            disabled={localRules.length >= limits.rulesPerLink}
+            className="bg-primary text-dark hover:bg-primary hover:shadow-[4px_4px_0_var(--color-dark)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none transition-all"
+            title={localRules.length >= limits.rulesPerLink ? `Maximum ${limits.rulesPerLink} ${limits.rulesPerLink === 1 ? 'rule' : 'rules'} allowed` : ''}
+          >
+            Add Rule
+          </Button>
+        </motion.div>
       </div>
 
       {/* Error Message */}
@@ -339,18 +400,36 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
               strategy={verticalListSortingStrategy}
             >
               <div className="space-y-4">
-                {localRules.map((rule, index) => (
-                  <SortableLinkRule
-                    key={rule.id}
-                    rule={rule}
-                    priority={index + 1}
-                    onChange={(updatedRule) => handleRuleChange(rule.id, updatedRule)}
-                    onDelete={() => handleDeleteRule(rule.id)}
-                  />
-                ))}
+                <AnimatePresence mode="popLayout">
+                  {localRules.map((rule, index) => (
+                    <SortableLinkRule
+                      key={rule.id}
+                      rule={rule}
+                      priority={index + 1}
+                      onChange={(updatedRule) => handleRuleChange(rule.id, updatedRule)}
+                      onDelete={() => handleDeleteRule(rule.id)}
+                      maxConditions={limits.conditionsPerRule}
+                    />
+                  ))}
+                </AnimatePresence>
               </div>
             </SortableContext>
           </DndContext>
+
+          {/* Add rule button */}
+          <Button
+            variant="solid"
+            size="md"
+            rounded="2xl"
+            leftIcon={<TbPlus size={20} />}
+            onClick={handleAddRule}
+            disabled={localRules.length >= limits.rulesPerLink}
+            className="bg-primary text-dark hover:bg-primary hover:shadow-[4px_4px_0_var(--color-dark)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
+            title={localRules.length >= limits.rulesPerLink ? `Maximum ${limits.rulesPerLink} ${limits.rulesPerLink === 1 ? 'rule' : 'rules'} allowed` : ''}
+          >
+            Add Rule
+          </Button>
+
 
           {/* Info Message */}
           <div className="flex items-start gap-2 p-4 bg-info/5 rounded-2xl border border-info/20 text-sm text-info">

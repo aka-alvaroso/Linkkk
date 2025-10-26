@@ -11,6 +11,10 @@ const planLimits = {
     metadata: false,
     defaultExpirationDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
 
+    // Link Rules
+    rulesPerLink: 1,
+    conditionsPerRule: 1,
+
     // Groups & Tags
     groups: 0,
     tags: 0,
@@ -29,6 +33,10 @@ const planLimits = {
     sufix: true,
     metadata: true,
     defaultExpirationDate: null,
+
+    // Link Rules
+    rulesPerLink: 5,
+    conditionsPerRule: 3,
 
     // Groups & Tags
     groups: 10,

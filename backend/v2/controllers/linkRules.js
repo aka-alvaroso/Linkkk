@@ -6,6 +6,7 @@ const {
 } = require("../validators/linkRules");
 const { successResponse, errorResponse } = require("../utils/response");
 const ERRORS = require("../constants/errorCodes");
+const planLimits = require("../utils/limits");
 
 // Helper: Check link access
 const checkLinkAccess = async (shortUrl, user, guest) => {
@@ -54,6 +55,23 @@ const createLinkRule = async (req, res) => {
   }
 
   const { priority, enabled, match, conditions, action, elseAction } = validate.data;
+
+  // Check limits based on user type
+  const limits = user ? planLimits.user : planLimits.guest;
+
+  // Check rule count limit
+  const existingRulesCount = await prisma.linkRule.count({
+    where: { linkId: link.id }
+  });
+
+  if (existingRulesCount >= limits.rulesPerLink) {
+    return errorResponse(res, ERRORS.RULE_LIMIT_EXCEEDED);
+  }
+
+  // Check conditions count limit
+  if (conditions && conditions.length > limits.conditionsPerRule) {
+    return errorResponse(res, ERRORS.CONDITION_LIMIT_EXCEEDED);
+  }
 
   try {
     // Create rule with conditions
@@ -181,6 +199,16 @@ const updateLinkRule = async (req, res) => {
       message: issue.message,
     }));
     return errorResponse(res, ERRORS.INVALID_DATA, issues);
+  }
+
+  const { conditions } = validate.data;
+
+  // Check limits based on user type
+  const limits = user ? planLimits.user : planLimits.guest;
+
+  // Check conditions count limit if conditions are being updated
+  if (conditions && conditions.length > limits.conditionsPerRule) {
+    return errorResponse(res, ERRORS.CONDITION_LIMIT_EXCEEDED);
   }
 
   try {

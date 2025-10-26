@@ -17,6 +17,7 @@ interface RuleConditionProps {
 
 // Field options
 const FIELD_OPTIONS = [
+  { label: 'Always', value: 'always' },
   { label: 'Country', value: 'country' },
   { label: 'Device', value: 'device' },
   { label: 'IP Address', value: 'ip' },
@@ -28,6 +29,7 @@ const FIELD_OPTIONS = [
 
 // Operator options per field type
 const OPERATOR_OPTIONS: Record<FieldType, { label: string; value: OperatorType }[]> = {
+  always: [{ label: '', value: 'equals' }], // No operator for "always"
   country: [
     { label: 'is one of', value: 'in' },
     { label: 'is not one of', value: 'not_in' },
@@ -74,7 +76,8 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
 
     // Set default value based on field type
     let defaultValue: any = '';
-    if (fieldType === 'country') defaultValue = [];
+    if (fieldType === 'always') defaultValue = true;
+    else if (fieldType === 'country') defaultValue = '';
     else if (fieldType === 'device') defaultValue = 'mobile';
     else if (fieldType === 'is_bot' || fieldType === 'is_vpn') defaultValue = false;
     else if (fieldType === 'access_count') defaultValue = 0;
@@ -103,21 +106,24 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
   // Render value input based on field type
   const renderValueInput = () => {
     switch (condition.field) {
+      case 'always':
+        return (
+          <p className="w-auto text-sm text-dark/50 italic whitespace-nowrap">
+            (no conditions required)
+          </p>
+        );
+
       case 'country':
         return (
           <Input
-            placeholder="ES, US, FR (comma separated)"
-            value={Array.isArray(condition.value) ? condition.value.join(', ') : ''}
+            placeholder="ES, US, FR"
+            value={condition.value as string || ''}
             onChange={(e) => {
-              const countries = e.target.value
-                .split(',')
-                .map(c => c.trim().toUpperCase())
-                .filter(c => c.length > 0);
-              handleValueChange(countries);
+              handleValueChange(e.target.value.toUpperCase());
             }}
-            className='bg-light border-none outline-none'
-            size="md"
-            rounded="2xl"
+            className='bg-light border border-dark/10 text-sm px-2 py-1 rounded-lg w-32 hover:border-dark/20'
+            size="sm"
+            rounded="lg"
           />
         );
 
@@ -127,10 +133,9 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
             options={DEVICE_OPTIONS}
             value={condition.value as DeviceType}
             onChange={handleValueChange}
-            className='max-w-30'
-            buttonClassName="rounded-2xl border-dark/10 border-none"
-            listClassName="rounded-2xl w-auto shadow-none"
-            optionClassName='rounded-2xl p-2'
+            buttonClassName="rounded-lg text-sm border border-dark/10 bg-light px-2 py-1 hover:border-dark/20"
+            listClassName="rounded-lg w-auto shadow-lg"
+            optionClassName='rounded-md p-1.5 text-sm'
           />
         );
 
@@ -141,10 +146,9 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
             options={BOOLEAN_OPTIONS}
             value={condition.value ? 'true' : 'false'}
             onChange={(v) => handleValueChange(v === 'true')}
-            className='max-w-24'
-            buttonClassName="rounded-2xl border-dark/10 border-none"
-            listClassName="rounded-2xl w-auto shadow-none"
-            optionClassName='rounded-2xl p-2'
+            buttonClassName="w-auto rounded-lg text-sm border border-dark/10 bg-light px-2 py-1 hover:border-dark/20"
+            listClassName="rounded-lg w-auto shadow-lg"
+            optionClassName='rounded-md p-1.5 text-sm'
           />
         );
 
@@ -154,9 +158,9 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
             type="datetime-local"
             value={condition.value as string}
             onChange={(e) => handleValueChange(e.target.value)}
-            size="md"
-            rounded="2xl"
-            className='bg-light border-none outline-none'
+            size="sm"
+            rounded="lg"
+            className='bg-light border border-dark/10 text-sm px-2 py-1 rounded-lg hover:border-dark/20'
           />
         );
 
@@ -167,9 +171,9 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
             min="0"
             value={condition.value as number}
             onChange={(e) => handleValueChange(parseInt(e.target.value) || 0)}
-            size="md"
-            rounded="2xl"
-            className='bg-light border-none outline-none'
+            size="sm"
+            rounded="lg"
+            className='bg-light border border-dark/10 text-sm px-2 py-1 rounded-lg w-20 hover:border-dark/20'
           />
         );
 
@@ -179,9 +183,9 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
             placeholder="192.168.1.1"
             value={condition.value as string}
             onChange={(e) => handleValueChange(e.target.value)}
-            size="md"
-            rounded="2xl"
-            className='bg-light border-none outline-none'
+            size="sm"
+            rounded="lg"
+            className='bg-light border border-dark/10 text-sm px-2 py-1 rounded-lg w-32 hover:border-dark/20'
           />
         );
 
@@ -191,44 +195,40 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-1 rounded-2xl hover:bg-dark/5 transition p-1">
+    <div className="inline-flex flex-col sm:flex-row items-start sm:items-center gap-1.5 text-sm">
       {/* Field Select */}
-      <div className="flex-shrink-0">
-        <Select
-          options={FIELD_OPTIONS}
-          value={condition.field}
-          onChange={handleFieldChange}
-          buttonClassName="rounded-2xl text-sm border-none bg-light p-2"
-          listClassName="rounded-2xl w-auto shadow-none"
-          optionClassName='rounded-2xl p-2'
-        />
-      </div>
+      <Select
+        options={FIELD_OPTIONS}
+        value={condition.field}
+        onChange={handleFieldChange}
+        buttonClassName="w-auto rounded-lg text-sm border border-dark/10 bg-light px-2 py-1 hover:border-dark/20 whitespace-nowrap"
+        listClassName="rounded-lg w-auto shadow-lg"
+        optionClassName='rounded-md p-1.5 text-sm'
+      />
 
-      {/* Operator Select */}
-      <div className="flex-shrink-0">
+      {/* Operator Select - Hide for "always" */}
+      {condition.field !== 'always' && (
         <Select
           options={OPERATOR_OPTIONS[condition.field]}
           value={condition.operator}
           onChange={handleOperatorChange}
-          buttonClassName="rounded-2xl text-sm border-none bg-light p-2"
-          listClassName="rounded-2xl w-auto shadow-none"
-          optionClassName='rounded-2xl p-2'
+          buttonClassName="w-auto rounded-lg text-sm border border-dark/10 bg-light px-2 py-1 hover:border-dark/20 whitespace-nowrap"
+          listClassName="rounded-lg w-auto shadow-lg"
+          optionClassName='rounded-md p-1.5 text-sm'
         />
-      </div>
+      )}
 
       {/* Value Input */}
-      <div className="flex-shrink-0">
-        {renderValueInput()}
-      </div>
+      {renderValueInput()}
 
       {/* Delete Button */}
       {onDelete && (
         <button
           onClick={onDelete}
-          className="flex-shrink-0 p-2 text-danger transition-colors rounded-xl hover:cursor-pointer hover:bg-danger/10"
+          className="p-1 text-dark/30 hover:text-danger transition-colors rounded-md hover:bg-danger/10"
           title="Delete condition"
         >
-          <TbTrash size={18} />
+          <TbTrash size={14} />
         </button>
       )}
     </div>
