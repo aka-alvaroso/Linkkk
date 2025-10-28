@@ -6,7 +6,9 @@ const bcryptjs = require("bcryptjs");
  * @returns {Promise<string>} Hashed password
  */
 const hashPassword = async (password) => {
-  const saltRounds = 10;
+  // Using 12 rounds as recommended by OWASP (increased from 10)
+  // This provides stronger protection against brute force attacks
+  const saltRounds = 12;
   return await bcryptjs.hash(password, saltRounds);
 };
 

@@ -105,6 +105,34 @@ const getLinkAccessesLimiter = rateLimit({
   handler: rateLimitHandler,
 });
 
+// Rule CRUD operation limiters
+const createRuleLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: process.env.ENV === "development" ? 1000 : 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => req.ip + ":" + (req.user?.id || req.guest?.guestSessionId),
+  handler: rateLimitHandler,
+});
+
+const updateRuleLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: process.env.ENV === "development" ? 1000 : 200,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => req.ip + ":" + (req.user?.id || req.guest?.guestSessionId),
+  handler: rateLimitHandler,
+});
+
+const deleteRuleLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: process.env.ENV === "development" ? 1000 : 200,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => req.ip + ":" + (req.user?.id || req.guest?.guestSessionId),
+  handler: rateLimitHandler,
+});
+
 module.exports = {
   authLimiter,
   loginLimiter,
@@ -116,4 +144,7 @@ module.exports = {
   linkValidatorLimiter,
   passwordVerifyLimiter,
   getLinkAccessesLimiter,
+  createRuleLimiter,
+  updateRuleLimiter,
+  deleteRuleLimiter,
 };

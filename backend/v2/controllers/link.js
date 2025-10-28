@@ -330,18 +330,25 @@ const redirectLink = async (req, res) => {
       accessCount: link.accessCount,
     };
 
-    // Evaluate link rules
+    // Evaluate link rules with timeout protection
     let allowed = true;
     let action = null;
 
     try {
-      const evaluationResult = await evaluateLinkRules(link, context);
+      const RULE_EVALUATION_TIMEOUT = 5000; // 5 seconds max
+
+      const evaluationPromise = evaluateLinkRules(link, context);
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Rule evaluation timeout')), RULE_EVALUATION_TIMEOUT)
+      );
+
+      const evaluationResult = await Promise.race([evaluationPromise, timeoutPromise]);
       allowed = evaluationResult.allowed;
       action = evaluationResult.action;
     } catch (ruleError) {
       console.error(
         `[CRITICAL] Rule evaluation failed for link ${shortUrl}:`,
-        ruleError
+        ruleError.message || ruleError
       );
 
       // TODO: Implement email notification to link owner when rule evaluation fails
@@ -357,22 +364,23 @@ const redirectLink = async (req, res) => {
     // Apply action based on type
     switch (action.type) {
       case "redirect":
-        // Track access
-        await prisma.access.create({
-          data: {
-            linkId: link.id,
-            userAgent: userAgent || "Unknown",
-            ip,
-            country,
-            isVPN: isVpn,
-            isBot,
-          },
-        });
+        // Track access and increment counter atomically (prevents race condition)
+        await prisma.$transaction(async (tx) => {
+          await tx.access.create({
+            data: {
+              linkId: link.id,
+              userAgent: userAgent || "Unknown",
+              ip,
+              country,
+              isVPN: isVpn,
+              isBot,
+            },
+          });
 
-        // Increment access count
-        await prisma.link.update({
-          where: { shortUrl },
-          data: { accessCount: { increment: 1 } },
+          await tx.link.update({
+            where: { id: link.id },
+            data: { accessCount: { increment: 1 } },
+          });
         });
 
         return res.redirect(302, action.url);
@@ -380,7 +388,7 @@ const redirectLink = async (req, res) => {
       case "block":
         // Only increment counter (don't track full access for blocked requests)
         await prisma.link.update({
-          where: { shortUrl },
+          where: { id: link.id },
           data: { accessCount: { increment: 1 } },
         });
 
@@ -391,12 +399,8 @@ const redirectLink = async (req, res) => {
         );
 
       case "password_gate":
-        // Increment counter (access will be tracked after password verification)
-        await prisma.link.update({
-          where: { shortUrl },
-          data: { accessCount: { increment: 1 } },
-        });
-
+        // DO NOT increment counter here - it will be incremented after successful password verification
+        // This prevents counting failed password attempts as actual access
         return res.redirect(
           `${process.env.FRONTEND_URL}/password?shortUrl=${shortUrl}${
             action.hint ? `&hint=${encodeURIComponent(action.hint)}` : ""
@@ -443,20 +447,23 @@ const redirectLink = async (req, res) => {
         }
 
         // Continue with normal redirect (notify is non-blocking)
-        await prisma.access.create({
-          data: {
-            linkId: link.id,
-            userAgent: userAgent || "Unknown",
-            ip,
-            country,
-            isVPN: isVpn,
-            isBot,
-          },
-        });
+        // Track access and increment counter atomically (prevents race condition)
+        await prisma.$transaction(async (tx) => {
+          await tx.access.create({
+            data: {
+              linkId: link.id,
+              userAgent: userAgent || "Unknown",
+              ip,
+              country,
+              isVPN: isVpn,
+              isBot,
+            },
+          });
 
-        await prisma.link.update({
-          where: { shortUrl },
-          data: { accessCount: { increment: 1 } },
+          await tx.link.update({
+            where: { id: link.id },
+            data: { accessCount: { increment: 1 } },
+          });
         });
 
         return res.redirect(302, link.longUrl);
@@ -465,20 +472,23 @@ const redirectLink = async (req, res) => {
         // Unknown action type - fallback to redirect
         console.warn(`Unknown action type: ${action.type}`);
 
-        await prisma.access.create({
-          data: {
-            linkId: link.id,
-            userAgent: userAgent || "Unknown",
-            ip,
-            country,
-            isVPN: isVpn,
-            isBot,
-          },
-        });
+        // Track access and increment counter atomically (prevents race condition)
+        await prisma.$transaction(async (tx) => {
+          await tx.access.create({
+            data: {
+              linkId: link.id,
+              userAgent: userAgent || "Unknown",
+              ip,
+              country,
+              isVPN: isVpn,
+              isBot,
+            },
+          });
 
-        await prisma.link.update({
-          where: { shortUrl },
-          data: { accessCount: { increment: 1 } },
+          await tx.link.update({
+            where: { id: link.id },
+            data: { accessCount: { increment: 1 } },
+          });
         });
 
         return res.redirect(302, link.longUrl);
@@ -521,12 +531,18 @@ const verifyPasswordGate = async (req, res) => {
       },
     });
 
-    if (!link) {
-      return errorResponse(res, ERRORS.LINK_NOT_FOUND);
-    }
+    // Use generic error for all failure cases to prevent enumeration attacks
+    const GENERIC_ACCESS_DENIED = {
+      code: "ACCESS_DENIED",
+      message: "Access denied",
+      userMessage: "Invalid link or password",
+      statusCode: 403,
+      retryable: false,
+    };
 
-    if (!link.status) {
-      return errorResponse(res, ERRORS.LINK_DISABLED);
+    if (!link || !link.status) {
+      // Don't reveal if link exists or is disabled - use generic error
+      return errorResponse(res, GENERIC_ACCESS_DENIED);
     }
 
     // Build evaluation context to find which rule should apply
@@ -553,8 +569,8 @@ const verifyPasswordGate = async (req, res) => {
       const { action } = await evaluateLinkRules(link, context);
 
       if (action.type !== "password_gate") {
-        // No password gate rule applies to this request
-        return errorResponse(res, ERRORS.LINK_NO_PASSWORD);
+        // Don't reveal that link exists but has no password - use generic error
+        return errorResponse(res, GENERIC_ACCESS_DENIED);
       }
 
       passwordHash = action.passwordHash;
@@ -567,23 +583,29 @@ const verifyPasswordGate = async (req, res) => {
     const isValid = await comparePassword(password, passwordHash);
 
     if (!isValid) {
-      return errorResponse(res, ERRORS.INVALID_CREDENTIALS);
+      // Use same generic error for invalid password
+      return errorResponse(res, GENERIC_ACCESS_DENIED);
     }
 
-    // Password is correct - track access and return redirect URL
-    await prisma.access.create({
-      data: {
-        linkId: link.id,
-        userAgent: userAgent || "Unknown",
-        ip,
-        country,
-        isVPN: isVpn,
-        isBot,
-      },
-    });
+    // Password is correct - track access AND increment counter atomically
+    // Counter is only incremented on successful authentication to prevent inflated analytics
+    await prisma.$transaction(async (tx) => {
+      await tx.access.create({
+        data: {
+          linkId: link.id,
+          userAgent: userAgent || "Unknown",
+          ip,
+          country,
+          isVPN: isVpn,
+          isBot,
+        },
+      });
 
-    // Note: accessCount was already incremented when user first accessed the link
-    // No need to increment again here
+      await tx.link.update({
+        where: { id: link.id },
+        data: { accessCount: { increment: 1 } },
+      });
+    });
 
     return successResponse(res, {
       success: true,

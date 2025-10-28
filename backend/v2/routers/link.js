@@ -5,6 +5,10 @@ const {
   createLinkLimiter,
   getLinksLimiter,
   updateLinkLimiter,
+  passwordVerifyLimiter,
+  createRuleLimiter,
+  updateRuleLimiter,
+  deleteRuleLimiter,
 } = require("../middlewares/security");
 
 const {
@@ -33,14 +37,18 @@ router.put("/:shortUrl", auth, updateLinkLimiter, updateLink);
 router.delete("/:shortUrl", auth, deleteLink);
 
 // Password verification (public endpoint - no auth required)
-router.post("/:shortUrl/verify-password", verifyPasswordGate);
+router.post(
+  "/:shortUrl/verify-password",
+  passwordVerifyLimiter,
+  verifyPasswordGate
+);
 
 // Link Rules routes (nested under /link/:shortUrl/rules)
-router.post("/:shortUrl/rules", auth, createLinkRule);
+router.post("/:shortUrl/rules", auth, createRuleLimiter, createLinkRule);
 router.get("/:shortUrl/rules", auth, getLinkRules);
 router.get("/:shortUrl/rules/:ruleId", auth, getLinkRule);
-router.put("/:shortUrl/rules/:ruleId", auth, updateLinkRule);
-router.delete("/:shortUrl/rules/:ruleId", auth, deleteLinkRule);
-router.post("/:shortUrl/rules/batch", auth, createMultipleLinkRules);
+router.put("/:shortUrl/rules/:ruleId", auth, updateRuleLimiter, updateLinkRule);
+router.delete("/:shortUrl/rules/:ruleId", auth, deleteRuleLimiter, deleteLinkRule);
+router.post("/:shortUrl/rules/batch", auth, createRuleLimiter, createMultipleLinkRules);
 
 module.exports = router;
