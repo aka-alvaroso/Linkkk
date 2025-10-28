@@ -393,9 +393,9 @@ const redirectLink = async (req, res) => {
         });
 
         return res.redirect(
-          `${process.env.FRONTEND_URL}/blocked?reason=${
+          `${process.env.FRONTEND_URL}/blocked?url=${shortUrl}&reason=${encodeURIComponent(
             action.reason
-          }&message=${encodeURIComponent(action.message)}`
+          )}`
         );
 
       case "password_gate":
@@ -408,16 +408,43 @@ const redirectLink = async (req, res) => {
         );
 
       case "notify":
-        // TODO: Implement notification system (email or webhook)
-        // For now, just log the notification request
-        console.log(
-          `[NOTIFY] Link ${link.shortUrl} accessed. Notification pending:`,
-          {
-            webhookUrl: action.webhookUrl,
-            message: action.message,
-            context,
-          }
-        );
+        // Send webhook notification (non-blocking)
+        if (action.webhookUrl) {
+          const webhookPayload = {
+            event: "link_accessed",
+            link: {
+              shortUrl: link.shortUrl,
+              longUrl: link.longUrl,
+            },
+            timestamp: new Date().toISOString(),
+            context: {
+              country,
+              device,
+              ip,
+              isBot,
+              isVPN: isVpn,
+              accessCount: link.accessCount,
+            },
+            customMessage: action.message || null,
+          };
+
+          // Send webhook asynchronously (don't await, don't block redirect)
+          fetch(action.webhookUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "User-Agent": "Linkkk-Webhook/1.0",
+            },
+            body: JSON.stringify(webhookPayload),
+            signal: AbortSignal.timeout(5000), // 5 second timeout
+          }).catch((error) => {
+            // Log error but don't fail the request
+            console.error(
+              `[NOTIFY] Webhook failed for ${link.shortUrl}:`,
+              error.message
+            );
+          });
+        }
 
         // Continue with normal redirect (notify is non-blocking)
         // Track access and increment counter atomically (prevents race condition)
@@ -582,7 +609,7 @@ const verifyPasswordGate = async (req, res) => {
 
     return successResponse(res, {
       success: true,
-      redirectUrl,
+      url: redirectUrl,
     });
   } catch (error) {
     console.error("Password verification error:", error);

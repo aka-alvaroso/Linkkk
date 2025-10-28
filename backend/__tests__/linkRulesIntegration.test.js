@@ -188,9 +188,7 @@ describe('Link Rules Integration (E2E)', () => {
       const { user, token } = await createTestUser('test_password_verify', 'password_verify@test.com');
       const link = await createTestLink(user.id, null, 'https://secret.com');
 
-      const passwordHash = await hashPassword('secret123');
-
-      // Create password gate rule
+      // Create password gate rule (send plain text password, backend will hash it)
       await request(app)
         .post(`/link/${link.shortUrl}/rules`)
         .set('Cookie', `token=${token}`)
@@ -200,7 +198,7 @@ describe('Link Rules Integration (E2E)', () => {
           action: {
             type: 'password_gate',
             settings: {
-              passwordHash,
+              passwordHash: 'secret123', // Plain text, will be hashed by backend
             },
           },
         })
@@ -213,7 +211,7 @@ describe('Link Rules Integration (E2E)', () => {
         .expect(200);
 
       expect(response.body.data.success).toBe(true);
-      expect(response.body.data.redirectUrl).toBe('https://secret.com');
+      expect(response.body.data.url).toBe('https://secret.com');
 
       // Verify access was tracked
       const accessCount = await prisma.access.count({

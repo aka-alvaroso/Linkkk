@@ -357,11 +357,11 @@ describe("Link Rules Validators", () => {
       expect(result.success).toBe(true);
     });
 
-    it("should reject message longer than 500 chars", () => {
+    it("should reject reason longer than 500 chars", () => {
       const invalid = {
         type: "block_access",
         settings: {
-          message: "a".repeat(501),
+          reason: "a".repeat(501),
         },
       };
 

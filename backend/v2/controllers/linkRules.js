@@ -3,11 +3,11 @@ const {
   createLinkRuleSchema,
   updateLinkRuleSchema,
   createMultipleLinkRulesSchema,
-  ruleIdParamSchema,
 } = require("../validators/linkRules");
 const { successResponse, errorResponse } = require("../utils/response");
 const ERRORS = require("../constants/errorCodes");
 const planLimits = require("../utils/limits");
+const { hashPassword } = require("../utils/password");
 
 // Helper: Check link access
 const checkLinkAccess = async (shortUrl, user, guest) => {
@@ -57,25 +57,42 @@ const createLinkRule = async (req, res) => {
 
   const { priority, enabled, match, conditions, action, elseAction } = validate.data;
 
-  // Check rule limit per link
-  const isGuest = !!guest;
-  const limits = isGuest ? planLimits.guest : planLimits.user;
+  // Check limits based on user type
+  const limits = user ? planLimits.user : planLimits.guest;
 
-  const existingRuleCount = await prisma.linkRule.count({
+  // Check rule count limit
+  const existingRulesCount = await prisma.linkRule.count({
     where: { linkId: link.id }
   });
 
-  if (existingRuleCount >= limits.rulesPerLink) {
-    return errorResponse(res, {
-      code: "RULE_LIMIT_EXCEEDED",
-      message: "Rule limit exceeded",
-      userMessage: `You can only create ${limits.rulesPerLink} rules per link`,
-      statusCode: 400,
-      retryable: false,
-    });
+  if (existingRulesCount >= limits.rulesPerLink) {
+    return errorResponse(res, ERRORS.RULE_LIMIT_EXCEEDED);
+  }
+
+  // Check conditions count limit
+  if (conditions && conditions.length > limits.conditionsPerRule) {
+    return errorResponse(res, ERRORS.CONDITION_LIMIT_EXCEEDED);
   }
 
   try {
+    // Hash password if action is password_gate
+    let actionSettings = action.settings || {};
+    if (action.type === 'password_gate' && actionSettings.passwordHash) {
+      actionSettings = {
+        ...actionSettings,
+        passwordHash: await hashPassword(actionSettings.passwordHash)
+      };
+    }
+
+    // Hash password in elseAction if needed
+    let elseActionSettings = elseAction?.settings || null;
+    if (elseAction?.type === 'password_gate' && elseActionSettings?.passwordHash) {
+      elseActionSettings = {
+        ...elseActionSettings,
+        passwordHash: await hashPassword(elseActionSettings.passwordHash)
+      };
+    }
+
     // Create rule with conditions
     const rule = await prisma.linkRule.create({
       data: {
@@ -84,9 +101,9 @@ const createLinkRule = async (req, res) => {
         enabled: enabled ?? true,
         match: match ?? "AND",
         actionType: action.type,
-        actionSettings: action.settings || {},
+        actionSettings,
         elseActionType: elseAction?.type,
-        elseActionSettings: elseAction?.settings || null,
+        elseActionSettings,
       },
     });
 
@@ -153,18 +170,6 @@ const getLinkRule = async (req, res) => {
   const user = req.user;
   const guest = req.guest;
 
-  // Validate ruleId parameter
-  const paramValidation = ruleIdParamSchema.safeParse({ ruleId });
-  if (!paramValidation.success) {
-    const issues = paramValidation.error.issues.map((issue) => ({
-      field: issue.path.join("."),
-      message: issue.message,
-    }));
-    return errorResponse(res, ERRORS.INVALID_DATA, issues);
-  }
-
-  const validatedRuleId = paramValidation.data.ruleId;
-
   // Check link access
   const { link, hasAccess, error } = await checkLinkAccess(shortUrl, user, guest);
   if (!hasAccess) {
@@ -174,7 +179,7 @@ const getLinkRule = async (req, res) => {
   try {
     const rule = await prisma.linkRule.findFirst({
       where: {
-        id: validatedRuleId,
+        id: parseInt(ruleId),
         linkId: link.id,
       },
       include: {
@@ -199,18 +204,6 @@ const updateLinkRule = async (req, res) => {
   const user = req.user;
   const guest = req.guest;
 
-  // Validate ruleId parameter
-  const paramValidation = ruleIdParamSchema.safeParse({ ruleId });
-  if (!paramValidation.success) {
-    const issues = paramValidation.error.issues.map((issue) => ({
-      field: issue.path.join("."),
-      message: issue.message,
-    }));
-    return errorResponse(res, ERRORS.INVALID_DATA, issues);
-  }
-
-  const validatedRuleId = paramValidation.data.ruleId;
-
   // Check link access
   const { link, hasAccess, error } = await checkLinkAccess(shortUrl, user, guest);
   if (!hasAccess) {
@@ -227,11 +220,21 @@ const updateLinkRule = async (req, res) => {
     return errorResponse(res, ERRORS.INVALID_DATA, issues);
   }
 
+  const { conditions } = validate.data;
+
+  // Check limits based on user type
+  const limits = user ? planLimits.user : planLimits.guest;
+
+  // Check conditions count limit if conditions are being updated
+  if (conditions && conditions.length > limits.conditionsPerRule) {
+    return errorResponse(res, ERRORS.CONDITION_LIMIT_EXCEEDED);
+  }
+
   try {
     // Check rule exists and belongs to link
     const existingRule = await prisma.linkRule.findFirst({
       where: {
-        id: validatedRuleId,
+        id: parseInt(ruleId),
         linkId: link.id,
       },
     });
@@ -249,16 +252,36 @@ const updateLinkRule = async (req, res) => {
     if (match !== undefined) updateData.match = match;
     if (action) {
       updateData.actionType = action.type;
-      updateData.actionSettings = action.settings || {};
+      let actionSettings = action.settings || {};
+      // Hash password if action is password_gate and password is not already hashed
+      if (action.type === 'password_gate' && actionSettings.passwordHash) {
+        // Only hash if it's not already a bcrypt hash (bcrypt hashes start with $2)
+        const isAlreadyHashed = actionSettings.passwordHash.startsWith('$2');
+        actionSettings = {
+          ...actionSettings,
+          passwordHash: isAlreadyHashed ? actionSettings.passwordHash : await hashPassword(actionSettings.passwordHash)
+        };
+      }
+      updateData.actionSettings = actionSettings;
     }
     if (elseAction !== undefined) {
       updateData.elseActionType = elseAction?.type || null;
-      updateData.elseActionSettings = elseAction?.settings || null;
+      let elseActionSettings = elseAction?.settings || null;
+      // Hash password in elseAction if needed
+      if (elseAction?.type === 'password_gate' && elseActionSettings?.passwordHash) {
+        // Only hash if it's not already a bcrypt hash (bcrypt hashes start with $2)
+        const isAlreadyHashed = elseActionSettings.passwordHash.startsWith('$2');
+        elseActionSettings = {
+          ...elseActionSettings,
+          passwordHash: isAlreadyHashed ? elseActionSettings.passwordHash : await hashPassword(elseActionSettings.passwordHash)
+        };
+      }
+      updateData.elseActionSettings = elseActionSettings;
     }
 
     // Update rule
     const updatedRule = await prisma.linkRule.update({
-      where: { id: validatedRuleId },
+      where: { id: parseInt(ruleId) },
       data: updateData,
     });
 
@@ -303,18 +326,6 @@ const deleteLinkRule = async (req, res) => {
   const user = req.user;
   const guest = req.guest;
 
-  // Validate ruleId parameter
-  const paramValidation = ruleIdParamSchema.safeParse({ ruleId });
-  if (!paramValidation.success) {
-    const issues = paramValidation.error.issues.map((issue) => ({
-      field: issue.path.join("."),
-      message: issue.message,
-    }));
-    return errorResponse(res, ERRORS.INVALID_DATA, issues);
-  }
-
-  const validatedRuleId = paramValidation.data.ruleId;
-
   // Check link access
   const { link, hasAccess, error } = await checkLinkAccess(shortUrl, user, guest);
   if (!hasAccess) {
@@ -325,7 +336,7 @@ const deleteLinkRule = async (req, res) => {
     // Check rule exists and belongs to link
     const existingRule = await prisma.linkRule.findFirst({
       where: {
-        id: validatedRuleId,
+        id: parseInt(ruleId),
         linkId: link.id,
       },
     });
@@ -336,7 +347,7 @@ const deleteLinkRule = async (req, res) => {
 
     // Delete rule (conditions will be deleted automatically via cascade)
     await prisma.linkRule.delete({
-      where: { id: validatedRuleId },
+      where: { id: parseInt(ruleId) },
     });
 
     return successResponse(res, { message: "Rule deleted successfully" });
@@ -374,69 +385,46 @@ const createMultipleLinkRules = async (req, res) => {
 
   const { rules } = validate.data;
 
-  // Check rule limit per link
-  const isGuest = !!guest;
-  const limits = isGuest ? planLimits.guest : planLimits.user;
-
-  const existingRuleCount = await prisma.linkRule.count({
-    where: { linkId: link.id }
-  });
-
-  if (existingRuleCount + rules.length > limits.rulesPerLink) {
-    return errorResponse(res, {
-      code: "RULE_LIMIT_EXCEEDED",
-      message: "Rule limit exceeded",
-      userMessage: `This would exceed the limit of ${limits.rulesPerLink} rules per link (current: ${existingRuleCount}, adding: ${rules.length})`,
-      statusCode: 400,
-      retryable: false,
-    });
-  }
-
   try {
-    // Wrap all rule creation in a single transaction for atomicity
-    // If any rule fails, all changes are rolled back
-    const createdRules = await prisma.$transaction(async (tx) => {
-      const results = [];
+    const createdRules = [];
 
-      for (const ruleData of rules) {
-        const rule = await tx.linkRule.create({
-          data: {
-            linkId: link.id,
-            priority: ruleData.priority ?? 0,
-            enabled: ruleData.enabled ?? true,
-            match: ruleData.match ?? "AND",
-            actionType: ruleData.action.type,
-            actionSettings: ruleData.action.settings || {},
-            elseActionType: ruleData.elseAction?.type,
-            elseActionSettings: ruleData.elseAction?.settings || null,
-          },
+    // Create each rule in a transaction
+    for (const ruleData of rules) {
+      const rule = await prisma.linkRule.create({
+        data: {
+          linkId: link.id,
+          priority: ruleData.priority ?? 0,
+          enabled: ruleData.enabled ?? true,
+          match: ruleData.match ?? "AND",
+          actionType: ruleData.action.type,
+          actionSettings: ruleData.action.settings || {},
+          elseActionType: ruleData.elseAction?.type,
+          elseActionSettings: ruleData.elseAction?.settings || null,
+        },
+      });
+
+      // Create conditions
+      if (ruleData.conditions && ruleData.conditions.length > 0) {
+        await prisma.ruleCondition.createMany({
+          data: ruleData.conditions.map((cond) => ({
+            ruleId: rule.id,
+            field: cond.field,
+            operator: cond.operator,
+            value: cond.value,
+          })),
         });
-
-        // Create conditions
-        if (ruleData.conditions && ruleData.conditions.length > 0) {
-          await tx.ruleCondition.createMany({
-            data: ruleData.conditions.map((cond) => ({
-              ruleId: rule.id,
-              field: cond.field,
-              operator: cond.operator,
-              value: cond.value,
-            })),
-          });
-        }
-
-        // Fetch complete rule with conditions
-        const completeRule = await tx.linkRule.findUnique({
-          where: { id: rule.id },
-          include: {
-            conditions: true,
-          },
-        });
-
-        results.push(completeRule);
       }
 
-      return results;
-    });
+      // Fetch complete rule
+      const completeRule = await prisma.linkRule.findUnique({
+        where: { id: rule.id },
+        include: {
+          conditions: true,
+        },
+      });
+
+      createdRules.push(completeRule);
+    }
 
     return successResponse(res, createdRules, 201);
   } catch (error) {
