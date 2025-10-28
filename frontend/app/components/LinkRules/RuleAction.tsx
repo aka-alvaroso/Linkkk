@@ -19,7 +19,6 @@ interface RuleActionProps {
   actionType: ActionType;
   actionSettings: ActionSettings;
   onChange: (actionType: ActionType, actionSettings: ActionSettings) => void;
-  label?: string;
 }
 
 // Action type options
@@ -33,8 +32,7 @@ const ACTION_TYPE_OPTIONS = [
 export function RuleAction({
   actionType,
   actionSettings,
-  onChange,
-  label = 'Then'
+  onChange
 }: RuleActionProps) {
   const handleTypeChange = (newType: string | number | null) => {
     const type = newType as ActionType;
@@ -153,24 +151,18 @@ export function RuleAction({
   };
 
   return (
-    <div className="space-y-2">
-      {/* Label and Action Type inline */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-xs font-bold text-dark/70 uppercase tracking-wide sm:w-16 sm:text-right">
-          {label}
-        </span>
-        <Select
-          options={ACTION_TYPE_OPTIONS}
-          value={actionType}
-          onChange={handleTypeChange}
-          className='w-auto text-sm'
-          buttonClassName="w-auto rounded-lg text-sm border border-dark/10 bg-light px-2 py-1 hover:border-dark/20 whitespace-nowrap"
-          listClassName="rounded-lg w-auto shadow-lg"
-          optionClassName='rounded-md p-1.5 text-sm'
-        />
-        {/* Dynamic Settings inline */}
-        {renderSettings()}
-      </div>
+    <div className="flex items-center gap-2 flex-wrap">
+      <Select
+        options={ACTION_TYPE_OPTIONS}
+        value={actionType}
+        onChange={handleTypeChange}
+        className='w-auto text-sm'
+        buttonClassName="w-auto rounded-lg text-sm border border-dark/10 bg-light px-2 py-1 hover:border-dark/20 whitespace-nowrap"
+        listClassName="rounded-lg w-auto shadow-lg"
+        optionClassName='rounded-md p-1.5 text-sm'
+      />
+      {/* Dynamic Settings inline */}
+      {renderSettings()}
     </div>
   );
 }

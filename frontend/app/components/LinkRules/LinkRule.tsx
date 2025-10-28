@@ -215,12 +215,16 @@ export function LinkRule({ rule, priority, onChange, onDelete, dragHandleProps, 
         </div>
 
         {/* Main Action */}
-        <RuleAction
-          actionType={rule.actionType}
-          actionSettings={rule.actionSettings}
-          onChange={handleActionChange}
-          label="Then"
-        />
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className={`text-xs font-bold text-dark/70 uppercase tracking-wide text-right ${rule.conditions.length > 1 ? 'w-16' : ''}`}>
+            Then
+          </span>
+          <RuleAction
+            actionType={rule.actionType}
+            actionSettings={rule.actionSettings}
+            onChange={handleActionChange}
+          />
+        </div>
 
         {/* Else Action (Optional) */}
         <AnimatePresence mode="wait">
@@ -231,13 +235,15 @@ export function LinkRule({ rule, priority, onChange, onDelete, dragHandleProps, 
               animate={{ opacity: 1, height: 'auto', y: 0 }}
               exit={{ opacity: 0, height: 0, y: -10 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 flex-wrap"
             >
+              <span className={`text-xs font-bold text-dark/70 uppercase tracking-wide text-right ${rule.conditions.length > 1 ? 'w-16' : ''}`}>
+                Else
+              </span>
               <RuleAction
                 actionType={rule.elseActionType || 'redirect'}
                 actionSettings={rule.elseActionSettings || { url: '' }}
                 onChange={handleElseActionChange}
-                label="Else"
               />
               <button
                 onClick={handleRemoveElseAction}

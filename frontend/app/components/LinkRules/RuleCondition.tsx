@@ -107,7 +107,7 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
     switch (condition.field) {
       case 'always':
         return (
-          <p className="w-auto text-sm text-dark/50 italic whitespace-nowrap">
+          <p className="w-auto text-xs text-dark/50 italic whitespace-nowrap">
             (no conditions required)
           </p>
         );
