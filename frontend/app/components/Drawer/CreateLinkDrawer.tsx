@@ -4,7 +4,7 @@ import Input from '@/app/components/ui/Input/Input';
 import Button from '@/app/components/ui/Button/Button';
 import { TbCircleDashed, TbCircleDashedCheck, TbLink } from 'react-icons/tb';
 import { useLinks } from '@/app/hooks';
-import Select from '../ui/Select/Select';
+import InlineSelect from '../ui/InlineSelect/InlineSelect';
 import { FiCornerDownRight } from 'react-icons/fi';
 import { useToast } from '@/app/hooks/useToast';
 import * as motion from 'motion/react-client';
@@ -51,7 +51,7 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
 
         if (response.success) {
             toast.success('Link created successfully!', {
-                description: `Short URL: ${response.data.shortUrl}`,
+                showIcon: false,
             });
 
             setNewLink({
@@ -61,25 +61,29 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
             onClose();
         } else {
             if (response.errorCode === 'LINK_LIMIT_EXCEEDED') {
-                toast.error('Link limit exceeded', {
+                toast.error('Error creating link', {
+                    showIcon: false,
                     description: 'You\'ve reached your link limit. Upgrade your plan to create more links.',
                     duration: 6000,
                 });
             } else if (response.errorCode === 'UNAUTHORIZED') {
-                toast.error('Session expired', {
+                toast.error('Error creating link', {
+                    showIcon: false,
                     description: 'Please login again to continue.',
                 });
             } else if (response.errorCode === 'INVALID_DATA') {
-                toast.error('Invalid data', {
-                    description: response.error || 'Please check your input and try again.',
+                toast.error('Error creating link', {
+                    showIcon: false,
+                    description: 'Please check your input and try again.',
                 });
             } else {
-                toast.error('Failed to create link', {
-                    description: response.error || 'An unexpected error occurred.',
+                toast.error('Error creating link', {
+                    showIcon: false,
+                    description: 'An unexpected error occurred.',
                 });
             }
 
-            setError(response.error || 'Failed to create link');
+            setError('Error creating link');
         }
 
         setLoading(false);
@@ -157,7 +161,7 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
                 </div>
 
                 {/* Status */}
-                <div className='w-full flex justify-between items-center gap-1'>
+                <div className='w-full flex items-center gap-1'>
                     <motion.p 
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -171,30 +175,23 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.1, duration: 0.4, ease: "backInOut" }}
-                        className='w-xs'
                     >
-                        <Select
+                        <InlineSelect
                             options={[
                                 {
                                     label: 'Active',
                                     value: 'active',
                                     leftIcon: <TbCircleDashedCheck size={16} />,
-                                    customClassName: 'text-dark bg-success/50 hover:bg-success',
-                                    selectedClassName: 'bg-success'
                                 },
                                 {
                                     label: 'Inactive',
                                     value: 'inactive',
                                     leftIcon: <TbCircleDashed size={16} />,
-                                    customClassName: 'mt-1 text-light bg-danger/50 hover:bg-danger',
-                                    selectedClassName: 'bg-danger'
                                 },
                             ]}
                             value={newLink.status ? 'active' : 'inactive'}
                             onChange={(v) => setNewLink({ ...newLink, status: v === 'active' })}
-                            listClassName='rounded-2xl p-1 shadow-none'
-                            buttonClassName="rounded-2xl border-dark/10"
-                            optionClassName='rounded-xl '
+                            buttonClassName='m-1 border-1 border-dark/30'
                         />
                     </motion.div>
                 </div>

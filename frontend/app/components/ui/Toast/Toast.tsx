@@ -38,25 +38,21 @@ const Toast: React.FC<ToastProps> = ({ toast, onRemove }) => {
       case 'success':
         return {
           bg: 'bg-success',
-          border: 'border-dark',
           text: 'text-dark'
         };
       case 'error':
         return {
           bg: 'bg-danger',
-          border: 'border-dark',
           text: 'text-light',
         };
       case 'warning':
         return {
           bg: 'bg-warning',
-          border: 'border-dark',
           text: 'text-dark'
         };
       case 'info':
         return {
           bg: 'bg-info',
-          border: 'border-dark',
           text: 'text-light'
 
         };
@@ -88,8 +84,9 @@ const Toast: React.FC<ToastProps> = ({ toast, onRemove }) => {
       transition={{ duration: 0.3, ease: "backInOut" }}
       className={`
         relative w-full max-w-md
-        ${styles.bg} ${styles.border}
+        ${styles.bg}
         border border-dark
+        shadow-[4px_4px_0_var(--color-dark)]
         rounded-xl
         overflow-hidden
         cursor-pointer
@@ -98,9 +95,11 @@ const Toast: React.FC<ToastProps> = ({ toast, onRemove }) => {
     >
       <div className="p-4 flex items-start gap-3">
         {/* Icon */}
-        <div className={`flex-shrink-0 ${styles.text}`}>
-          {getIcon(toast.type)}
-        </div>
+        {toast.showIcon !== false && (
+          <div className={`flex-shrink-0 ${styles.text}`}>
+            {getIcon(toast.type)}
+          </div>
+        )}
 
         {/* Content */}
         <div className={`flex-1 min-w-0 ${styles.text}`}>

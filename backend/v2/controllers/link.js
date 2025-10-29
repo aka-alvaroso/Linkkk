@@ -339,10 +339,16 @@ const redirectLink = async (req, res) => {
 
       const evaluationPromise = evaluateLinkRules(link, context);
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Rule evaluation timeout')), RULE_EVALUATION_TIMEOUT)
+        setTimeout(
+          () => reject(new Error("Rule evaluation timeout")),
+          RULE_EVALUATION_TIMEOUT
+        )
       );
 
-      const evaluationResult = await Promise.race([evaluationPromise, timeoutPromise]);
+      const evaluationResult = await Promise.race([
+        evaluationPromise,
+        timeoutPromise,
+      ]);
       allowed = evaluationResult.allowed;
       action = evaluationResult.action;
     } catch (ruleError) {
@@ -393,9 +399,9 @@ const redirectLink = async (req, res) => {
         });
 
         return res.redirect(
-          `${process.env.FRONTEND_URL}/blocked?url=${shortUrl}&reason=${encodeURIComponent(
-            action.reason
-          )}`
+          `${
+            process.env.FRONTEND_URL
+          }/blocked?url=${shortUrl}&reason=${encodeURIComponent(action.reason)}`
         );
 
       case "password_gate":

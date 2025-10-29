@@ -78,9 +78,10 @@ export function useLinks() {
       } catch (err) {
         const message = getErrorMessage(err);
         const errorCode = err instanceof HttpError ? err.code : null;
+        const validation = err instanceof HttpError ? err.validation : undefined;
         setError(message);
         console.error("Error creating link:", err);
-        return { success: false as const, data: null, error: message, errorCode };
+        return { success: false as const, data: null, error: message, errorCode, validation };
       } finally {
         setLoading(false);
       }
@@ -103,9 +104,10 @@ export function useLinks() {
       } catch (err) {
         const message = getErrorMessage(err);
         const errorCode = err instanceof HttpError ? err.code : null;
+        const validation = err instanceof HttpError ? err.validation : undefined;
         setError(message);
         console.error("Error updating link:", err);
-        return { success: false as const, data: null, error: message, errorCode };
+        return { success: false as const, data: null, error: message, errorCode, validation };
       } finally {
         setLoading(false);
       }
