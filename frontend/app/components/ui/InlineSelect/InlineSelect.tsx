@@ -89,7 +89,7 @@ export default function InlineSelect({
       <motion.div
         layout
         className={cn(
-          "inline-flex items-center rounded-2xl",
+          "inline-flex items-center rounded-full",
           isExpanded ? "gap-1 bg-dark/5 p-1" : ""
         )}
         transition={{ duration: 0.25, ease: [0.34, 1.56, 0.64, 1] }}
@@ -108,7 +108,7 @@ export default function InlineSelect({
               "transition-all duration-200",
               "hover:shadow-[2px_2px_0_var(--color-dark)]",
               "active:shadow-none active:translate-x-[2px] active:translate-y-[2px]",
-              "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none",
+              "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none hover:cursor-pointer",
               selectedClassName,
               buttonClassName
             )}
@@ -145,12 +145,12 @@ export default function InlineSelect({
                 title={option.title}
                 className={cn(
                   "inline-flex items-center gap-2 px-3 py-1.5 whitespace-nowrap",
-                  "border rounded-xl",
+                  "border rounded-2xl",
                   "text-dark font-medium text-sm",
                   "transition-all duration-200",
                   "hover:shadow-[2px_2px_0_var(--color-dark)]",
                   "active:shadow-none active:translate-x-[2px] active:translate-y-[2px]",
-                  "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none",
+                  "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none hover:cursor-pointer",
                   option.value === value
                     ? "bg-primary border-dark"
                     : "bg-light border-dark/30",
@@ -181,14 +181,13 @@ export default function InlineSelect({
                 onClick={handleClose}
                 className={cn(
                   "inline-flex items-center justify-center",
-                  "w-8 h-8 rounded-lg",
-                  "border-2 border-dark/30 bg-light",
-                  "text-dark/50 hover:text-danger hover:border-danger",
+                  "w-8 h-8 rounded-2xl",
+                  "bg-dark/10",
+                  "text-dark ",
                   "transition-all duration-200",
-                  "hover:shadow-[2px_2px_0_var(--color-danger)]",
+                  "hover:shadow-[2px_2px_0_var(--color-dark)]",
                   "active:shadow-none active:translate-x-[2px] active:translate-y-[2px]"
                 )}
-                title="Close"
               >
                 <TbX size={16} />
               </motion.button>

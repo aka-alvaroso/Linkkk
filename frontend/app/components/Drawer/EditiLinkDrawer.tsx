@@ -13,6 +13,8 @@ import { useToast } from '@/app/hooks/useToast';
 import * as motion from 'motion/react-client';
 import { AnimatePresence } from 'motion/react';
 import { RulesManager } from '../LinkRules/RulesManager';
+import InlineSelect from '../ui/InlineSelect';
+import AnimatedText, { AnimatedTextRef } from '../ui/AnimatedText';
 
 interface EditiLinkDrawerProps {
     open: boolean;
@@ -26,6 +28,15 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
     const [tab, setTab] = useState('settings');
     const [statusBar, setShowStatusBar] = useState("none");
     const [newLink, setNewLink] = useState({...link});
+    const [showCopyShortUrlButton, setShowCopyShortUrlButton] = useState(false);
+    const [showCopyLongUrlButton, setShowCopyLongUrlButton] = useState(false);
+
+    // Ref for animated text
+    const shortUrlTextRef = useRef<AnimatedTextRef>(null);
+    const longUrlTextRef = useRef<AnimatedTextRef>(null);
+    const statusButtonTextRef = useRef<AnimatedTextRef>(null);
+
+    // Status bar
 
     // Rules state
     const [hasRulesChanges, setHasRulesChanges] = useState(false);
@@ -150,9 +161,9 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
             placement='right'
             size='xl'
             rounded='3xl'
-            className='h-full overflow-auto'
+            className='h-full overflow-hidden flex flex-col'
         >
-            <div className='flex flex-col gap-2 items-center p-4'>
+            <div className='flex-1 overflow-auto flex flex-col gap-2 items-center p-4'>
 
                 {/* Tabs */}
                 <div className='w-full flex flex-wrap gap-2 mb-6'>
@@ -204,110 +215,123 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
  
 
                 <header className='w-full flex flex-col md:flex-row items-start'>
-                    <div className='w-full flex-1 flex flex-col gap-2'>
-                        <div className='flex flex-col-reverse items-start md:flex-row md:items-center'>
+                    <div className='w-full flex-1 flex flex-col gap-1'>
+                        <div
+                            className='max-w-sm flex flex-col-reverse items-start md:flex-row md:items-center gap-2'
+                            onMouseEnter={() => setShowCopyShortUrlButton(true)}
+                            onMouseLeave={() => setShowCopyShortUrlButton(false)}
+                        >
                             <motion.h1
                                 initial={{ opacity: 0, x: 20 }}
                                 animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: 0.1,  duration: 0.4, ease: "backInOut" }} 
-                                className='text-2xl md:text-3xl italic font-black'>
-                                linkkk.dev/{newLink.shortUrl}
+                                transition={{ delay: 0.1,  duration: 0.4, ease: "backInOut" }}
+                                className='text-2xl md:text-3xl italic font-black'
+                                onMouseDown={(e) => {
+                                    e.preventDefault();
+                                    navigator.clipboard.writeText(`https://linkkk.dev/${newLink.shortUrl}`);
+                                    shortUrlTextRef.current?.setText('Copied!');
+                                    setTimeout(() => {
+                                        shortUrlTextRef.current?.reset();
+                                    }, 2000);
+                                }}    
+                            >
+                                <AnimatedText
+                                    ref={shortUrlTextRef}
+                                    initialText={`linkkk.dev/${newLink.shortUrl}`}
+                                    animationType="slide"
+                                    triggerMode="none"
+                                />
                             </motion.h1>
-                            {
-                                newLink.status ? (
+
+                            <AnimatePresence>
+                                {showCopyShortUrlButton && (
                                     <motion.div
-                                        initial={{ opacity: 0, x: 20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: 0.15, duration: 0.3, ease: "backOut" }}
+                                        initial={{ opacity: 0, scale: 0.8, x: -10 }}
+                                        animate={{ opacity: 1, scale: 1, x: 0 }}
+                                        exit={{ opacity: 0, scale: 0.8, x: -10 }}
+                                        transition={{ duration: 0.2, ease: "backOut" }}
                                     >
-                                        <Chip
-                                        variant='success'
-                                        className='md:ml-4'
-                                        size='md'
-                                        leftIcon={<TbCircleDashedCheck size={20} />}
-                                        >
-                                            Active
-                                        </Chip>
+                                        <Button
+                                            iconOnly
+                                            leftIcon={<TbCopy size={20} />}
+                                            variant='solid'
+                                            size='sm'
+                                            rounded='xl'
+                                            className='bg-primary text-dark'
+                                            onMouseDown={(e) => {
+                                                e.preventDefault();
+                                                navigator.clipboard.writeText(`https://linkkk.dev/${newLink.shortUrl}`);
+                                                shortUrlTextRef.current?.setText('Copied!');
+                                                setTimeout(() => {
+                                                    shortUrlTextRef.current?.reset();
+                                                }, 2000);
+                                            }}
+                                        />
                                     </motion.div>
-                                ) : (
-                                    <motion.div
-                                        initial={{ opacity: 0, x: 20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: 0.15, duration: 0.3, ease: "backOut" }}
-                                    >
-                                        <Chip
-                                        variant='danger'
-                                        className='md:ml-4'
-                                        size='md'
-                                        leftIcon={<TbCircleDashed size={20} />}
-                                        >
-                                            Inactive
-                                        </Chip>
-                                    </motion.div>
-                                )
-                            }
+                                )}
+                            </AnimatePresence>
                         </div>
-                        <motion.div 
+                        <motion.div
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.175, duration: 0.3, ease: "backOut" }}
-                            className='w-full flex items-center gap-2 text-dark/50'
+                            className='w-full max-w-sm flex items-center gap-1 text-dark/50'
+                            onMouseEnter={() => setShowCopyLongUrlButton(true)}
+                            onMouseLeave={() => setShowCopyLongUrlButton(false)}
                         >
-                            <FiCornerDownRight size={20} /> 
-                            <p className='text-sm md:text-lg flex-1 truncate'>{newLink.longUrl}</p>
+                            <FiCornerDownRight size={20} className="flex-shrink-0" />
+                            <div
+                                className='text-sm md:text-lg overflow-hidden text-ellipsis whitespace-nowrap p-1 flex-1 min-w-0 cursor-pointer text-dark/50'
+                                onMouseDown={() => {
+                                    navigator.clipboard.writeText(newLink.longUrl);
+                                    longUrlTextRef.current?.setText('Copied!');
+                                    setTimeout(() => {
+                                        longUrlTextRef.current?.reset();
+                                    }, 2000);
+                                }}
+                            >
+                                <AnimatedText
+                                    ref={longUrlTextRef}
+                                    initialText={newLink.longUrl}
+                                    animationType="slide"
+                                    triggerMode="none"
+                                    className="truncate block"
+                                />
+                            </div>
+
+
+                            <AnimatePresence>
+                                    {showCopyLongUrlButton && (
+                                        <motion.div
+                                            initial={{ opacity: 0, scale: 0.8, x: -10 }}
+                                            animate={{ opacity: 1, scale: 1, x: 0 }}
+                                            exit={{ opacity: 0, scale: 0.8, x: -10 }}
+                                            transition={{ duration: 0.2, ease: "backOut" }}
+                                        >
+                                            <Button
+                                                iconOnly
+                                                leftIcon={<TbCopy size={20} />}
+                                                variant='solid'
+                                                size='sm'
+                                                rounded='xl'
+                                                className="bg-primary text-dark flex-shrink-0 inline-flex items-center justify-center rounded-lg"
+                                                onMouseDown={(e) => {
+                                                    e.preventDefault();
+                                                    navigator.clipboard.writeText(newLink.longUrl);
+                                                    longUrlTextRef.current?.setText('Copied!');
+                                                    setTimeout(() => {
+                                                        longUrlTextRef.current?.reset();
+                                                    }, 2000);
+                                                }}
+                                            >
+                                                <TbCopy size={12} />
+                                            </Button>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </motion.div>
                     </div>
                 </header>
-
-                {/* Mobile buttons */}
-                <motion.div 
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.175, duration: 0.3, ease: "backOut" }}
-                    className='w-full flex gap-2 my-4 md:hidden'
-                >
-                    <Button 
-                        variant='ghost' 
-                        size='sm' 
-                        rounded='2xl'
-                        className='flex-1 flex-col items-center justify-center border border-info text-info bg-info/5'
-                        onClick={() => navigator.clipboard.writeText(`https://linkkk.dev/${newLink.shortUrl}`)}
-                    >
-                        <TbCopy size={20} />
-                        Copy
-                    </Button>
-                    <Button 
-                        variant='ghost' 
-                        size='sm' 
-                        rounded='2xl'
-                        className='flex-1 flex-col items-center justify-center border border-success text-success bg-success/5'
-                        onClick={() => window.open(`https://linkkk.dev/${newLink.shortUrl}`, '_blank')}
-                    >
-                        <TbExternalLink size={20} />
-                        Visit
-                    </Button>
-                    <Button
-                        variant='ghost'
-                        size='sm'
-                        rounded='2xl'
-                        className='flex-1 flex-col items-center justify-center border border-danger text-danger bg-danger/5'
-                        onClick={async () => {
-                            const result = await deleteLink(link.shortUrl);
-                            if (result.success) {
-                                toast.success('Link deleted successfully');
-                                onClose();
-                                await fetchLinks();
-                            } else {
-                                toast.error('Failed to delete link', {
-                                    description: result.error || 'An unexpected error occurred.',
-                                });
-                            }
-                        }}
-                    >
-                        <TbTrash size={20} />
-                        Delete
-                    </Button>
-                </motion.div >
 
                 {/* Main Content */}
                 {/* Resume */}
@@ -318,129 +342,89 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
 
                 {/* Settings */}
                 {tab === 'settings' && (
-                    <div className='w-full h-full flex flex-col gap-2 items-center p-4'>
+                    <div className='w-full h-full flex flex-col items-center gap-1'>
                         
-                        <motion.p 
+                        {/* <motion.p 
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.2, duration: 0.3, ease: "backOut" }}
                             className='w-full text-2xl font-black flex items-center gap-2'>
                             <TbSettings size={26} />
                             Settings
-                        </motion.p>
+                        </motion.p> */}
 
                         {/* Link status */}
-                        <div className='w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-1'>
+                        <div className='w-full flex flex-col md:flex-row items-start md:items-center gap-1'>
                             <motion.p
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.25, duration: 0.3, ease: "backOut" }} 
-                            className='text-lg'>
-                                Link status
+                            className='text-lg font-black italic'>
+                                Status
                             </motion.p>
-                            <motion.div 
+                            <motion.div
                                 initial={{ opacity: 0, x: 20 }}
                                 animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: 0.275, duration: 0.3, ease: "backOut" }}
-                                className='w-full max-w-xs'
+                                transition={{ delay: 0.1, duration: 0.4, ease: "backInOut" }}
                             >
-                                <Select
-                                    options={[
-                                        { 
-                                            label: 'Active', 
-                                            value: 'active', 
-                                            leftIcon: <TbCircleDashedCheck size={16} />,
-                                            customClassName: 'text-dark bg-success/50 hover:bg-success',
-                                            selectedClassName: 'bg-success'
-                                        },
-                                        { 
-                                            label: 'Inactive', 
-                                            value: 'inactive', 
-                                            leftIcon: <TbCircleDashed size={16} />,
-                                            customClassName: 'mt-1 text-light bg-danger/50 hover:bg-danger',
-                                            selectedClassName: 'bg-danger'
-                                        },
-                                    ]}
-                                    value={newLink.status ? 'active' : 'inactive'}
-                                    onChange={(v) => setNewLink({ ...newLink, status: v === 'active' })}
-                                    listClassName='rounded-2xl p-1 shadow-none'
-                                    buttonClassName="rounded-2xl border-dark/10"
-                                    optionClassName='rounded-xl '
-                                />
+                                <Button
+                                    variant='solid'
+                                    size='sm'
+                                    rounded='xl'
+                                    leftIcon={newLink.status ? <TbCircleDashedCheck size={20} /> : <TbCircleDashed size={20} />}
+                                    className={`${newLink.status ? 'bg-success text-dark' : 'bg-danger text-light'}`}
+                                    onClick={() => {
+                                        statusButtonTextRef.current?.setText(newLink.status ? 'Inactive' : 'Active');
+                                        setNewLink({ ...newLink, status: !newLink.status })
+
+                                    }}
+                                >
+                                    <AnimatedText
+                                        ref={statusButtonTextRef}
+                                        initialText={newLink.status ? 'Active' : 'Inactive'}
+                                        animationType="slide"
+                                        triggerMode='none'
+                                    />
+                                </Button>
                             </motion.div>
                         </div>
                         {/* URLs */}
-                        <div className='w-full flex justify-between items-center gap-4'>
-                            <div className='w-1/2 flex flex-col gap-1'>
-                                <motion.p 
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: 0.3, duration: 0.3, ease: "backOut" }}
-                                    className='text-lg'>
-                                        Long URL
-                                </motion.p>
-                                <motion.div 
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: 0.35, duration: 0.3, ease: "backOut" }}
-                                    className='w-full relative group'>
-                                    <Input
-                                        value={newLink.longUrl}
-                                        onChange={(e) => setNewLink({ ...newLink, longUrl: e.target.value })}
-                                        onKeyDown={async (e) => {
-                                            if (e.key === 'Enter' && !e.shiftKey) {
-                                                const hasChanges = link.status !== newLink.status || link.longUrl !== newLink.longUrl;
-                                                if (hasChanges) {
-                                                    e.preventDefault();
-                                                    setShowStatusBar("loading");
-                                                    await handleUpdateLink();
-                                                }
+                        <div className='w-full flex flex-col md:flex-row items-start md:items-center gap-4'>
+                            <motion.p 
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: 0.3, duration: 0.3, ease: "backOut" }}
+                                className='text-lg font-black italic'>
+                                    Long URL
+                            </motion.p>
+                            <motion.div
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: 0.35, duration: 0.3, ease: "backOut" }}
+                                className='relative flex items-center gap-1'
+                            >
+                                <Input
+                                    id='longUrl'
+                                    value={newLink.longUrl}
+                                    onChange={(e) => setNewLink({ ...newLink, longUrl: e.target.value })}
+                                    onKeyDown={async (e) => {
+                                        if (e.key === 'Enter' && !e.shiftKey) {
+                                            const hasChanges = link.status !== newLink.status || link.longUrl !== newLink.longUrl;
+                                            if (hasChanges) {
+                                                e.preventDefault();
+                                                setShowStatusBar("loading");
+                                                await handleUpdateLink();
                                             }
-                                        }}
-                                        placeholder='https://example.com'
-                                        size='md'
-                                        rounded='2xl'
-                                        leftIcon={<TbLink size={20} className='text-info' />}
-                                        className='w-full transition-all duration-100 ease-in-out text-ellipsis overflow-hidden'
-                                    />
-                                
-                                    <div className='opacity-0 bg-light pl-2 group-hover:opacity-100 absolute flex gap-2 top-1/2 -translate-y-1/2 right-2 transition-all duration-200 ease-in-out'>
-                                        <Button
-                                            iconOnly
-                                            leftIcon={<TbCopy size={20} />}
-                                            variant='ghost'
-                                            size='sm'
-                                            rounded='md'
-                                            className='bg-info/10 text-info hover:bg-info/15'
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                navigator.clipboard.writeText(newLink.longUrl);
-                                            }}
-                                        />
-                                        <Button
-                                            iconOnly
-                                            leftIcon={<TbExternalLink size={20} />}
-                                            variant='ghost'
-                                            size='sm'
-                                            rounded='md'
-                                            className='bg-info/10 text-info hover:bg-info/15'
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                window.open(newLink.longUrl, '_blank');
-                                            }}
-                                        />
-                                    </div>
-                                </motion.div>
-                            </div>
+                                        }
+                                    }}
+                                    placeholder='https://example.com'
+                                    size='md'
+                                    rounded='2xl'
+                                    className='w-full max-w-md'
+                                />
+                            </motion.div>
                         </div>
 
-                        {/* Divider */}
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.4, duration: 0.3 }}
-                            className='w-full h-px bg-dark/10 my-8'
-                        />
 
                         {/* Link Rules Section */}
                         <motion.div
@@ -454,65 +438,8 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                 onRulesChange={handleRulesChange}
                             />
                         </motion.div>
-
-                        {/* Status bar */}
-                        <AnimatePresence>
-                            {statusBar !== 'none' && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: 20 }}
-                                    transition={{ duration: 0.2 }}
-                                    className='sticky bottom-4 bg-light border border-dark/10 rounded-2xl p-4'
-                                >
-                                    {statusBar === "loading" && (
-                                        <p className='text-sm text-dark/70'>
-                                            Updating link...
-                                        </p>
-                                    )}
-
-                                    {statusBar === "confirm" && (
-                                        <div className='flex flex-col md:flex-row items-center justify-between'>
-                                            <p className='text-sm text-dark/70'>
-                                                You have unsaved changes
-                                            </p>
-                                            <div className='flex gap-2'>
-                                                <Button
-                                                    variant='outline'
-                                                    size='sm'
-                                                    rounded='xl'
-                                                    onClick={() => {
-                                                        setShowStatusBar("none");
-                                                        setNewLink({...link});
-                                                        // Cancel rules changes if any
-                                                        if (cancelRulesRef.current) {
-                                                            cancelRulesRef.current();
-                                                        }
-                                                        // Close the drawer
-                                                        onClose();
-                                                    }}
-                                                >
-                                                    Cancel
-                                                </Button>
-                                                <Button
-                                                    variant='solid'
-                                                    size='sm'
-                                                    rounded='xl'
-                                                    className='bg-primary text-dark hover:shadow-[4px_4px_0_var(--color-dark)]'
-                                                    onClick={async () => {
-                                                        setShowStatusBar("loading");
-                                                        await handleUpdateLink();
-                                                    }}
-                                                >
-                                                    Update Link
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    )}
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
                     </div>
+
                 )}
 
                 {/* Analytics */}
@@ -525,6 +452,67 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                 )}
 
             </div>
+
+            {/* Status bar - Fixed at bottom */}
+            <AnimatePresence>
+                {statusBar !== 'none' && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 100 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 100 }}
+                        transition={{ duration: 0.3, ease: "backOut" }}
+                        className='w-full bg-dark/5 border-t p-4'
+                    >
+                        <div className='flex flex-col gap-3 max-w-4xl mx-auto'>
+                            <div className='flex items-start gap-2'>
+                                <div className='w-6 h-6 rounded-full bg-primary border flex items-center justify-center flex-shrink-0 mt-0.5'>
+                                    <span className='text-dark text-sm font-bold'>!</span>
+                                </div>
+                                <div className='flex-1'>
+                                    <p className='text-lg font-black italic text-dark mb-1'>
+                                        Unsaved Changes
+                                    </p>
+                                    <p className='text-sm text-dark/70'>
+                                        You have changes that haven't been saved yet
+                                    </p>
+                                </div>
+                            </div>
+                            <div className='flex gap-2 justify-end'>
+                                <Button
+                                    variant='outline'
+                                    size='md'
+                                    rounded='2xl'
+                                    className='border-dark/30'
+                                    disabled={statusBar === "loading"}
+                                    onClick={() => {
+                                        setShowStatusBar("none");
+                                        setNewLink({...link});
+                                        // Cancel rules changes if any
+                                        if (cancelRulesRef.current) {
+                                            cancelRulesRef.current();
+                                        }
+                                    }}
+                                >
+                                    Discard
+                                </Button>
+                                <Button
+                                    variant='solid'
+                                    size='md'
+                                    rounded='2xl'
+                                    className='bg-primary text-dark hover:shadow-[4px_4px_0_var(--color-dark)]'
+                                    loading={statusBar === "loading"}
+                                    onClick={async () => {
+                                        setShowStatusBar("loading");
+                                        await handleUpdateLink();
+                                    }}
+                                >
+                                    Save Changes
+                                </Button>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </Drawer>
     );
 }

@@ -53,22 +53,30 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       'cursor-pointer',
       'disabled:opacity-50',
       'disabled:cursor-not-allowed',
-      'disabled:pointer-events-none'
+      'disabled:pointer-events-none',
+      'disabled:hover:shadow-none'
     ];
 
     const variantClasses = {
       solid: [
         'bg-dark',
         'text-light',
-        'hover:bg-dark/90'
+        'border',
+        'border-dark',
+        'hover:shadow-[2px_2px_0_var(--color-dark)]',
+        'active:shadow-none',
+        'active:translate-x-[2px]',
+        'active:translate-y-[2px]'
       ],
       outline: [
-        'border-2',
-        'border-dark/90',
-        'bg-transparent',
+        'border',
+        'border-dark',
+        'bg-light',
         'text-dark',
-        'hover:bg-dark/90',
-        'hover:text-light'
+        'hover:shadow-[2px_2px_0_var(--color-dark)]',
+        'active:shadow-none',
+        'active:translate-x-[2px]',
+        'active:translate-y-[2px]'
       ],
       ghost: [
         'bg-transparent',
