@@ -123,7 +123,7 @@ export default function Select({
         className={cn(
           "bg-light text-dark hover:bg-dark/5 w-full py-2 px-4 border rounded-md text-left text-sm transition",
           disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer",
-          error ? "border-red-500" : "border-gray-300 focus:ring focus:ring-blue-100",
+          error ? "border-red-500" : "border-gray-300",
           buttonClassName
         )}
       >

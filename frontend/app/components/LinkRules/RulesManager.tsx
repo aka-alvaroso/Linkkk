@@ -29,6 +29,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { LinkRule as LinkRuleType } from '@/app/types/linkRules';
 import { useAuth } from '@/app/stores/authStore';
 import { PLAN_LIMITS } from '@/app/constants/limits';
+import Link from 'next/link';
 
 interface RulesManagerProps {
   shortUrl: string;
@@ -346,29 +347,16 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-2 mt-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <div>
           <h3 className="text-2xl font-black text-dark flex items-center gap-2">
             <TbRocket size={26} />
-            Link Rules ({localRules.length} / {limits.rulesPerLink})
+            Link Rules
+            <span className='text-sm'>
+               {localRules.length} / {limits.rulesPerLink}
+            </span>
           </h3>
-        </div>
-        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-          <Button
-            variant="solid"
-            size="md"
-            rounded="2xl"
-            leftIcon={<TbPlus size={20} />}
-            onClick={handleAddRule}
-            disabled={localRules.length >= limits.rulesPerLink}
-            className="bg-primary text-dark hover:bg-primary hover:shadow-[4px_4px_0_var(--color-dark)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none transition-all"
-            title={localRules.length >= limits.rulesPerLink ? `Maximum ${limits.rulesPerLink} ${limits.rulesPerLink === 1 ? 'rule' : 'rules'} allowed` : ''}
-          >
-            Add Rule
-          </Button>
-        </motion.div>
       </div>
 
       {/* Error Message */}
@@ -386,10 +374,6 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
       {/* Rules List with Drag & Drop */}
       {localRules.length > 0 ? (
         <div className="space-y-4">
-          <div className="text-sm font-medium text-dark/50">
-            {localRules.length} {localRules.length === 1 ? 'rule' : 'rules'} configured
-          </div>
-
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
@@ -437,27 +421,36 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <p>
-              Rules are evaluated in order from top to bottom. Drag to reorder. The first matching rule will be applied.
+              Rules are evaluated in order from top to bottom. Drag to reorder. 
+              <br/>
+              <Link
+                href="/featues#rules" 
+                className='underline hover:cursor-pointer'
+              
+              >
+                Learn more
+              </Link>
             </p>
           </div>
         </div>
       ) : (
         /* Empty State */
-        <div className="text-center py-12 rounded-4xl border-2 border-dashed border-dark/20">
-          <TbRocket className="w-12 h-12 mx-auto text-dark/30 mb-3" />
-          <p className="text-dark/50 mb-4">
-            No rules configured yet
-          </p>
+        <div className="">
           <Button
-            variant="solid"
-            size="md"
+            variant="ghost"
+            size="lg"
             rounded="2xl"
             leftIcon={<TbPlus size={20} />}
             onClick={handleAddRule}
-            className="bg-primary text-dark hover:bg-primary hover:shadow-[4px_4px_0_var(--color-dark)]"
+            className="w-full bg-dark/5 hover:bg-dark/10"
           >
             Create Your First Rule
           </Button>
+          <Link 
+            href="/featues#rules" 
+            className='block text-center mt-4 text-sm text-dark/50 hover:cursor-pointer'>
+            Don&apos;t know about link rules?
+          </Link>
         </div>
       )}
     </div>

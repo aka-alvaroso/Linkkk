@@ -231,8 +231,8 @@ const DesktopSidebar = () => {
                             <motion.div
                                 initial={{ opacity: 0, width: 0 }}
                                 animate={{
-                                    opacity: desktopOpen ? 1 : 0,
-                                    width: desktopOpen ? 24 : 0
+                                    opacity: 1,
+                                    width: 24
                                 }}
                                 transition={{ duration: 0.2 }}
                                 className="flex items-center justify-center overflow-hidden"

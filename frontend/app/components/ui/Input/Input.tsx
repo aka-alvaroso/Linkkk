@@ -56,12 +56,9 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
     const hasError = Boolean(error);
 
     const commonClasses = cn(
-      'block w-full border disabled:opacity-50 disabled:cursor-not-allowed',
+      'block w-full bg-dark/5 border border-transparent disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none',
       sizeStyles[size],
       roundedStyles[rounded],
-      hasError
-        ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-        : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500',
       leftIcon ? 'pl-10' : '',
       rightIcon ? 'pr-10' : '',
       className
@@ -70,7 +67,7 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
     return (
       <div className="w-full">
         {label && (
-          <label htmlFor={inputId} className="block mb-1 font-semibold text-gray-700">
+          <label htmlFor={inputId} className="block mb-1 text-gray-700">
             {label}
           </label>
         )}

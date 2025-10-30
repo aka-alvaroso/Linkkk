@@ -10,7 +10,7 @@ import { RuleAction } from './RuleAction';
 import Button from '../ui/Button/Button';
 import Switch from '../ui/Switch/Switch';
 import Select from '../ui/Select/Select';
-import { TbPlus, TbTrash, TbGripVertical } from 'react-icons/tb';
+import { TbPlus, TbTrash, TbGripVertical, TbX } from 'react-icons/tb';
 import {
   LinkRule as LinkRuleType,
   RuleCondition as RuleConditionType,
@@ -110,24 +110,24 @@ export function LinkRule({ rule, priority, onChange, onDelete, dragHandleProps, 
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
-      className="relative rounded-2xl border border-dark/10 p-4 transition-colors"
+      className="relative rounded-2xl bg-dark/5 p-4 transition-colors"
     >
       {/* Drag Handle and Delete Button */}
       <div className="flex items-start justify-between mb-2">
         <div className="flex items-center gap-2">
           <button {...dragHandleProps} className="cursor-grab active:cursor-grabbing text-dark/30 hover:text-dark/50 transition-colors">
-            <TbGripVertical size={16} />
+            <TbGripVertical size={20} />
           </button>
-          <span className="text-sm font-bold text-dark/50">Rule {priority}</span>
+          <span className="font-black italic">Rule {priority}</span>
         </div>
         <motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
           onClick={onDelete}
-          className="p-1 text-dark/30 hover:text-danger transition-colors rounded-md hover:bg-danger/10"
+          className="p-1 text-dark/30 hover:text-danger transition-colors rounded-md hover:bg-danger/10 hover:cursor-pointer"
           title="Delete rule"
         >
-          <TbTrash size={18} />
+          <TbX size={20} />
         </motion.button>
       </div>
 
@@ -137,7 +137,7 @@ export function LinkRule({ rule, priority, onChange, onDelete, dragHandleProps, 
 
         {/* Mobile IF and AND/OR selector */}
         <div className="flex sm:hidden items-start gap-2">
-          <span className="text-sm font-bold text-dark/70 uppercase tracking-wide">If</span>
+          <span className="text-sm font-black italic text-dark uppercase tracking-wide">If</span>
           {
             rule.conditions.length > 1 && (
               <Select
@@ -169,7 +169,7 @@ export function LinkRule({ rule, priority, onChange, onDelete, dragHandleProps, 
               >
                 {/* First condition shows "If", rest show AND/OR */}
                 {index === 0 ? (
-                  <span className={`hidden sm:block text-sm font-bold text-dark/70 uppercase tracking-wide text-right ${rule.conditions.length > 1 ? 'w-16' : ''}`}>If</span>
+                  <span className={`hidden sm:block text-sm font-black italic text-dark uppercase tracking-wide text-right ${rule.conditions.length > 1 ? 'w-16' : ''}`}>If</span>
                 ) : index === 1 ? (
                   // Second condition has editable AND/OR selector
                   <Select
@@ -200,12 +200,12 @@ export function LinkRule({ rule, priority, onChange, onDelete, dragHandleProps, 
           </AnimatePresence>
 
           {/* Add Condition Button */}
-          <div className="flex items-center gap-2">
-            <span className={`hidden sm:block ${rule.conditions.length > 1 ? 'w-16' : 'hidden'}`}></span>
+          <div className="flex items-center">
+            <span className={`hidden sm:block ${rule.conditions.length > 1 ? 'w-16 ml-2' : 'hidden'}`}></span>
             <button
               onClick={handleAddCondition}
               disabled={rule.conditions.length >= maxConditions}
-              className="inline-flex items-center gap-1 px-2 py-1 text-sm text-dark/40 hover:text-dark/70 border border-dashed border-dark/20 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-dark/5 transition-colors"
+              className="inline-flex items-center gap-1 px-12 py-1 text-sm text-dark/40 hover:text-dark/70 border border-dashed border-dark/20 rounded-lg hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:bg-dark/5 transition-colors"
               title={rule.conditions.length >= maxConditions ? `Maximum ${maxConditions} ${maxConditions === 1 ? 'condition' : 'conditions'} allowed` : ''}
             >
               <TbPlus size={12} />
@@ -216,7 +216,7 @@ export function LinkRule({ rule, priority, onChange, onDelete, dragHandleProps, 
 
         {/* Main Action */}
         <div className="flex items-center gap-2 flex-wrap">
-          <span className={`text-xs font-bold text-dark/70 uppercase tracking-wide text-right ${rule.conditions.length > 1 ? 'w-16' : ''}`}>
+          <span className={`text-xs font-black italic text-dark uppercase tracking-wide text-right ${rule.conditions.length > 1 ? 'w-16' : ''}`}>
             Then
           </span>
           <RuleAction
@@ -237,7 +237,7 @@ export function LinkRule({ rule, priority, onChange, onDelete, dragHandleProps, 
               transition={{ duration: 0.2, ease: 'easeOut' }}
               className="flex items-center gap-2 flex-wrap"
             >
-              <span className={`text-xs font-bold text-dark/70 uppercase tracking-wide text-right ${rule.conditions.length > 1 ? 'w-16' : ''}`}>
+              <span className={`text-xs font-black italic text-dark uppercase tracking-wide text-right ${rule.conditions.length > 1 ? 'w-16' : ''}`}>
                 Else
               </span>
               <RuleAction
@@ -261,7 +261,7 @@ export function LinkRule({ rule, priority, onChange, onDelete, dragHandleProps, 
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
               onClick={handleAddElseAction}
-              className="inline-flex items-center gap-1 px-2 py-1 text-sm text-dark/40 hover:text-dark/70 border border-dashed border-dark/20 rounded-md hover:bg-dark/5 transition-colors"
+              className="inline-flex items-center gap-1 px-2 py-1 text-sm text-dark/40 hover:text-dark/70 border border-dashed border-dark/20 rounded-lg hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:bg-dark/5 transition-colors"
             >
               <TbPlus size={12} />
               <span>Add &quot;Else&quot; action</span>
