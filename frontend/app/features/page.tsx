@@ -9,284 +9,661 @@ import {
   TbApi,
   TbUser,
   TbBolt,
-  TbClock,
-  TbCheck,
-  TbStar,
   TbRocket,
+  TbWorld,
+  TbCode,
+  TbArrowRight,
 } from "react-icons/tb";
 import Button from "@/app/components/ui/Button/Button";
 import Link from "next/link";
-
-interface Feature {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  status: "live" | "soon";
-  quarter?: string;
-}
-
-const liveFeatures: Feature[] = [
-  {
-    icon: <TbLink size={32} />,
-    title: "Link Shortening",
-    description: "Create short, memorable links in seconds.",
-    status: "live",
-  },
-  {
-    icon: <TbChartBar size={32} />,
-    title: "Access Analytics",
-    description: "Track every click with detailed analytics. See IPs, locations, browsers, and more.",
-    status: "live",
-  },
-  {
-    icon: <TbSettings size={32} />,
-    title: "Link Management",
-    description: "Edit, activate, deactivate, or delete your links anytime.",
-    status: "live",
-  },
-];
-
-const upcomingFeatures: Feature[] = [
-  {
-    icon: <TbTags size={32} />,
-    title: "Groups & Tags",
-    description: "Organize your links with groups and tags for better management.",
-    status: "soon",
-    quarter: "Q1 2025",
-  },
-  {
-    icon: <TbBolt size={32} />,
-    title: "Link Rules",
-    description: "Advanced routing with conditions, A/B testing, smart redirects, protection, and more.",
-    status: "soon",
-    quarter: "Q2 2025",
-  },
-  {
-    icon: <TbApi size={32} />,
-    title: "Developer API",
-    description: "Full REST API for programmatic link management and analytics.",
-    status: "soon",
-    quarter: "Q2 2025",
-  },
-  {
-    icon: <TbUser size={32} />,
-    title: "Bio Pages",
-    description: "Create your own link-in-bio page with custom branding.",
-    status: "soon",
-    quarter: "Q3 2025",
-  },
-];
 
 export default function FeaturesPage() {
   return (
     <div className="min-h-screen">
       <Navbar />
 
-      <main className="w-full px-4 py-24">
-        <div className="max-w-7xl mx-auto">
-          {/* Hero */}
-          <motion.div
+      <main className="w-full px-4 py-16 md:py-24">
+        <article className="max-w-4xl mx-auto">
+
+          {/* Header */}
+          <motion.header
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "backOut" }}
-            className="text-center mb-20"
+            transition={{ duration: 0.6 }}
+            className="mb-16 md:mb-24"
+          >
+            <div className="inline-block mb-6">
+              <div className="bg-primary text-dark px-4 py-2 rounded-xl border-2 border-dark shadow-[3px_3px_0_var(--color-dark)]">
+                <p className="font-black italic text-sm">FEATURES</p>
+              </div>
+            </div>
+
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-black italic mb-6 leading-tight">
+              More than just a link shortener
+            </h1>
+
+            <p className="text-lg md:text-xl text-dark/70 font-medium leading-relaxed">
+              Linkkk gives you the tools to create, manage, and understand your links like never before.
+              Here's everything you can do.
+            </p>
+          </motion.header>
+
+          {/* Link Shortening */}
+          <motion.section
+            initial={{ opacity: 0, scale: 0.95, y: 30 }}
+            whileInView={{ opacity: 1, scale: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
+            className="mb-16 md:mb-20"
           >
             <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2, duration: 0.5, ease: "backOut" }}
-              className="inline-block mb-6"
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2, ease: "backOut" }}
+              className="flex items-center gap-4 mb-6"
             >
-              <div className="bg-primary text-dark px-6 py-3 rounded-2xl border border-dark shadow-[4px_4px_0_var(--color-dark)] transform -rotate-2">
-                <p className="font-black italic text-xl flex items-center gap-2">
-                  <TbRocket size={24} />
-                  Features & Roadmap
+              <motion.div
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                transition={{ duration: 0.2 }}
+                className="w-12 h-12 bg-primary rounded-xl border-2 border-dark shadow-[3px_3px_0_var(--color-dark)] flex items-center justify-center"
+              >
+                <TbLink size={24} className="text-dark" />
+              </motion.div>
+              <h2 className="text-2xl md:text-3xl font-black italic">Link Shortening</h2>
+            </motion.div>
+
+            <div className="prose prose-lg max-w-none">
+              <p className="text-lg md:text-xl text-dark/80 font-medium leading-relaxed mb-4">
+                At its core, Linkkk makes long, unwieldy URLs short and shareable. But we go beyond just shortening.
+              </p>
+
+              <p className="text-lg text-dark/70 leading-relaxed mb-4">
+                You can create <strong className="text-dark">custom aliases</strong> for your links, making them memorable
+                and on-brand. Instead of a random string like <code className="px-2 py-1 bg-dark/10 rounded text-sm">linkkk.dev/x7k9m</code>,
+                you can have <code className="px-2 py-1 bg-dark/10 rounded text-sm">linkkk.dev/summer-sale</code> or <code className="px-2 py-1 bg-dark/10 rounded text-sm">linkkk.dev/portfolio</code>.
+              </p>
+
+              <p className="text-lg text-dark/70 leading-relaxed">
+                Every URL is validated and sanitized automatically, so you never have to worry about broken links or security issues.
+              </p>
+            </div>
+          </motion.section>
+
+          {/* Link Management */}
+          <motion.section
+            initial={{ opacity: 0, scale: 0.95, y: 30 }}
+            whileInView={{ opacity: 1, scale: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
+            className="mb-16 md:mb-20"
+          >
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2, ease: "backOut" }}
+              className="flex items-center gap-4 mb-6"
+            >
+              <motion.div
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                transition={{ duration: 0.2 }}
+                className="w-12 h-12 bg-primary rounded-xl border-2 border-dark shadow-[3px_3px_0_var(--color-dark)] flex items-center justify-center"
+              >
+                <TbSettings size={24} className="text-dark" />
+              </motion.div>
+              <h2 className="text-2xl md:text-3xl font-black italic">Link Management</h2>
+            </motion.div>
+
+            <div className="prose prose-lg max-w-none">
+              <p className="text-lg md:text-xl text-dark/80 font-medium leading-relaxed mb-4">
+                Your links aren't set in stone. Change them, pause them, or delete them whenever you need to.
+              </p>
+
+              <p className="text-lg text-dark/70 leading-relaxed mb-4">
+                Made a mistake in the destination URL? No problem. You can <strong className="text-dark">edit the long URL</strong> without
+                changing your short link. Your audience keeps using the same short link, but it now points to the updated destination.
+              </p>
+
+              <p className="text-lg text-dark/70 leading-relaxed">
+                Need to temporarily disable a link? <strong className="text-dark">Deactivate it</strong> with one click.
+                The short link will show a friendly message instead of redirecting. Reactivate it just as easily when you're ready.
+              </p>
+            </div>
+          </motion.section>
+
+          {/* Analytics */}
+          <motion.section
+            initial={{ opacity: 0, scale: 0.95, y: 30 }}
+            whileInView={{ opacity: 1, scale: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
+            className="mb-16 md:mb-20"
+          >
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2, ease: "backOut" }}
+              className="flex items-center gap-4 mb-6"
+            >
+              <motion.div
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                transition={{ duration: 0.2 }}
+                className="w-12 h-12 bg-primary rounded-xl border-2 border-dark shadow-[3px_3px_0_var(--color-dark)] flex items-center justify-center"
+              >
+                <TbChartBar size={24} className="text-dark" />
+              </motion.div>
+              <h2 className="text-2xl md:text-3xl font-black italic">Access Analytics</h2>
+            </motion.div>
+
+            <div className="prose prose-lg max-w-none">
+              <p className="text-lg md:text-xl text-dark/80 font-medium leading-relaxed mb-4">
+                Know exactly who's clicking your links and where they're coming from.
+              </p>
+
+              <p className="text-lg text-dark/70 leading-relaxed mb-4">
+                Every time someone clicks your link, we track detailed information: their <strong className="text-dark">country,
+                region, and city</strong>, what <strong className="text-dark">device and browser</strong> they're using,
+                and even what website referred them to your link.
+              </p>
+
+              <p className="text-lg text-dark/70 leading-relaxed mb-6">
+                All this data is presented in a clean, easy-to-understand dashboard. You'll see patterns emerge: maybe most of your
+                mobile traffic comes from Instagram, or your European audience prefers Firefox. Use these insights to optimize your
+                marketing strategy.
+              </p>
+
+              <div className="bg-dark/5 border-2 border-dark/10 rounded-2xl p-6">
+                <p className="text-base text-dark/70 italic mb-0">
+                  "I used to wonder where my traffic was coming from. Now I know exactly which platforms drive engagement,
+                  and I can focus my efforts there." — Typical Linkkk user
                 </p>
               </div>
-            </motion.div>
+            </div>
+          </motion.section>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.5, ease: "backOut" }}
-              className="text-5xl md:text-7xl font-black italic mb-6"
-            >
-              What&apos;s Now &{" "}
-              <span className="text-primary text-shadow-[6px_6px_0_var(--color-dark)]">
-                What&apos;s Next
-              </span>
-            </motion.h1>
-
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.5, ease: "backOut" }}
-              className="text-xl md:text-2xl text-light/70 max-w-3xl mx-auto font-medium"
-            >
-              Building the most powerful link management platform, one feature at a time.
-            </motion.p>
-          </motion.div>
-
-          {/* Live Features */}
+          {/* Link Rules */}
           <motion.section
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.5, ease: "backOut" }}
-            className="mb-24"
+            initial={{ opacity: 0, scale: 0.95, y: 30 }}
+            whileInView={{ opacity: 1, scale: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
+            className="mb-16 md:mb-20"
           >
-            <div className="flex items-center gap-4 mb-8">
-              <div className="flex items-center gap-3">
-                <motion.div 
-                initial={{ opacity: 0.5, scale: 0.8}}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.2, duration: 1, ease: "backInOut", repeat: Infinity, repeatType: "reverse"}}
-
-                  className="w-4 h-4 bg-primary shadow-[2px_2px_0_var(--color-dark)] rounded-full animate-pulse"></motion.div>
-
-                <h2 className="text-4xl font-black italic">Live Now</h2>
-              </div>
-              <div className="flex-1 h-1 bg-dark/20 rounded-full"></div>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-6">
-              {liveFeatures.map((feature, index) => (
-                <motion.div
-                  key={feature.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6 + index * 0.1, duration: 0.4, ease: "backOut" }}
-                  className="bg-light text-dark p-6 rounded-3xl border-2 border-dark shadow-[8px_8px_0_var(--color-dark)] hover:shadow-[12px_12px_0_var(--color-dark)] hover:-translate-y-1 transition-all group"
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="w-16 h-16 bg-primary rounded-2xl border border-dark shadow-[2px_2px_0_var(--color-dark)] flex items-center justify-center group-hover:scale-110 transition-transform">
-                      {feature.icon}
-                    </div>
-                    <div className="bg-primary text-dark px-3 py-1 rounded-full border border-dark shadow-[2px_2px_0_var(--color-dark)] flex items-center gap-1">
-                      <TbCheck size={16} />
-                      <span className="text-xs font-black italic">LIVE</span>
-                    </div>
-                  </div>
-
-                  <h3 className="text-2xl font-black italic mb-3">{feature.title}</h3>
-                  <p className="text-dark/70 font-medium leading-relaxed">
-                    {feature.description}
-                  </p>
-                </motion.div>
-              ))}
-            </div>
-
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1, duration: 0.4 }}
-              className="text-center mt-8"
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2, ease: "backOut" }}
+              className="flex items-center gap-4 mb-6"
             >
-              <Link href="/auth/register">
-                <Button
-                  size="lg"
-                  rounded="xl"
-                  className="bg-primary border text-dark hover:bg-primary hover:text-dark hover:shadow-[6px_6px_0_var(--color-dark)] hover:-translate-y-1 transition-all"
+              <motion.div
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                transition={{ duration: 0.2 }}
+                className="w-12 h-12 bg-primary rounded-xl border-2 border-dark shadow-[3px_3px_0_var(--color-dark)] flex items-center justify-center"
+              >
+                <TbBolt size={24} className="text-dark" />
+              </motion.div>
+              <div className="relative">
+                <h2 className="text-2xl md:text-3xl font-black italic">Link Rules</h2>
+                <motion.span
+                  initial={{ opacity: 0, scale: 0.5, rotate: 0 }}
+                  whileInView={{ opacity: 1, scale: 1, rotate: 10 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: 0.4, ease: "backOut" }}
+                  className="absolute -top-3 -right-11 inline-block bg-primary text-dark text-xs px-2 py-1 rounded-full border border-dark font-black italic mt-1"
                 >
-                  <p className="font-black italic text-xl flex items-center gap-2">
-                    <TbRocket size={24} />
-                    Start Using Now - It&apos;s Free
+                  NEW
+                </motion.span>
+              </div>
+            </motion.div>
+
+            <div className="prose prose-lg max-w-none">
+              <p className="text-lg md:text-xl text-dark/80 font-medium leading-relaxed mb-4">
+                This is where Linkkk becomes truly powerful. Link Rules let you create smart, conditional redirects based on
+                who's clicking your link and where they're coming from.
+              </p>
+
+              <motion.h3
+                initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
+                className="text-2xl font-black italic mt-8 mb-4"
+              >
+                How it works
+              </motion.h3>
+
+              <motion.p
+                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.1, ease: "backOut" }}
+                className="text-lg text-dark/70 leading-relaxed mb-4"
+              >
+                Think of rules like "if this, then that" statements. You set a <strong className="text-dark">condition</strong> (like
+                "if the user is on mobile" or "if they're from Spain"), and then an <strong className="text-dark">action</strong> (like
+                "redirect to this specific URL" or "show a password gate").
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2, ease: [0.34, 1.56, 0.64, 1] }}
+                whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+                className="bg-primary/15 rounded-2xl p-6 my-8 border-2 border-primary/20 shadow-[4px_4px_0_var(--color-primary)] hover:shadow-[6px_6px_0_var(--color-primary)] transition-shadow"
+              >
+                <p className="text-sm font-black italic text-dark/50 mb-3">EXAMPLE USE CASE</p>
+                <p className="text-lg font-medium text-dark/90 mb-4">
+                  You're running an international campaign. You want users from the US to see your English landing page,
+                  users from Spain to see the Spanish version, and everyone else to see a generic page.
+                </p>
+                <p className="text-base text-dark/70">
+                  <strong>Rule 1:</strong> If country = US → redirect to english-page.com<br />
+                  <strong>Rule 2:</strong> If country = Spain → redirect to spanish-page.com<br />
+                  <strong>Default:</strong> redirect to generic-page.com
+                </p>
+              </motion.div>
+
+              <motion.h3
+                initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
+                className="text-2xl font-black italic mt-8 mb-4"
+              >
+                Available Conditions
+              </motion.h3>
+
+              <motion.p
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.1, ease: "backOut" }}
+                className="text-lg text-dark/70 leading-relaxed mb-6"
+              >
+                You can trigger rules based on any of these visitor characteristics:
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 30 }}
+                whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2, ease: [0.34, 1.56, 0.64, 1] }}
+                whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+                className="bg-light border-2 border-dark rounded-2xl overflow-hidden mb-8 shadow-[4px_4px_0_var(--color-dark)] hover:shadow-[8px_8px_0_var(--color-dark)] transition-shadow"
+              >
+                <table className="w-full">
+                  <thead>
+                    <tr className="bg-dark text-light">
+                      <th className="text-left py-3 px-4 font-black italic">Condition</th>
+                      <th className="text-left py-3 px-4 font-black italic">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <motion.tr
+                      initial={{ opacity: 0, scale: 0.8, x: -30 }}
+                      whileInView={{ opacity: 1, scale: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
+                      whileHover={{ x: 4, transition: { duration: 0.2 } }}
+                      className="border-b-2 border-dark/10 hover:bg-primary/10 transition-colors"
+                    >
+                      <td className="py-3 px-4 font-black text-dark">Geographic Location</td>
+                      <td className="py-3 px-4 text-dark/70">Match by country, region, or specific city</td>
+                    </motion.tr>
+                    <motion.tr
+                      initial={{ opacity: 0, scale: 0.8, x: -30 }}
+                      whileInView={{ opacity: 1, scale: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: 0.35, ease: [0.34, 1.56, 0.64, 1] }}
+                      whileHover={{ x: 4, transition: { duration: 0.2 } }}
+                      className="border-b-2 border-dark/10 bg-dark/5 hover:bg-primary/10 transition-colors"
+                    >
+                      <td className="py-3 px-4 font-black text-dark">Device Type</td>
+                      <td className="py-3 px-4 text-dark/70">Checks if the visitor is using a Mobile, Desktop, or Tablet</td>
+                    </motion.tr>
+                    <motion.tr
+                      initial={{ opacity: 0, scale: 0.8, x: -30 }}
+                      whileInView={{ opacity: 1, scale: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
+                      whileHover={{ x: 4, transition: { duration: 0.2 } }}
+                      className="border-b-2 border-dark/10 hover:bg-primary/10 transition-colors"
+                    >
+                      <td className="py-3 px-4 font-black text-dark">IP Address</td>
+                      <td className="py-3 px-4 text-dark/70">Match an specific IP address</td>
+                    </motion.tr>
+                    <motion.tr
+                      initial={{ opacity: 0, scale: 0.8, x: -30 }}
+                      whileInView={{ opacity: 1, scale: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: 0.45, ease: [0.34, 1.56, 0.64, 1] }}
+                      whileHover={{ x: 4, transition: { duration: 0.2 } }}
+                      className="border-b-2 border-dark/10 bg-dark/5 hover:bg-primary/10 transition-colors"
+                    >
+                      <td className="py-3 px-4 font-black text-dark">Is VPN</td>
+                      <td className="py-3 px-4 text-dark/70">Checks if the visitor is using a VPN</td>
+                    </motion.tr>
+                    <motion.tr
+                      initial={{ opacity: 0, scale: 0.8, x: -30 }}
+                      whileInView={{ opacity: 1, scale: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
+                      whileHover={{ x: 4, transition: { duration: 0.2 } }}
+                      className="border-b-2 border-dark/10 hover:bg-primary/10 transition-colors"
+                    >
+                      <td className="py-3 px-4 font-black text-dark">Is Bot</td>
+                      <td className="py-3 px-4 text-dark/70">Checks if the visitor is a robot</td>
+                    </motion.tr>
+                    <motion.tr
+                      initial={{ opacity: 0, scale: 0.8, x: -30 }}
+                      whileInView={{ opacity: 1, scale: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: 0.55, ease: [0.34, 1.56, 0.64, 1] }}
+                      whileHover={{ x: 4, transition: { duration: 0.2 } }}
+                      className="border-b-2 border-dark/10 bg-dark/5 hover:bg-primary/10 transition-colors"
+                    >
+                      <td className="py-3 px-4 font-black text-dark">Date & Time</td>
+                      <td className="py-3 px-4 text-dark/70">Specific dates or time ranges</td>
+                    </motion.tr>
+                    <motion.tr
+                      initial={{ opacity: 0, scale: 0.8, x: -30 }}
+                      whileInView={{ opacity: 1, scale: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
+                      whileHover={{ x: 4, transition: { duration: 0.2 } }}
+                      className="hover:bg-primary/10 transition-colors"
+                    >
+                      <td className="py-3 px-4 font-black text-dark">Access Count</td>
+                      <td className="py-3 px-4 text-dark/70">Compare the number of access to a specific link</td>
+                    </motion.tr>
+                  </tbody>
+                </table>
+              </motion.div>
+
+              <motion.h3
+                initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
+                className="text-2xl font-black italic mt-8 mb-4"
+              >
+                Available Actions
+              </motion.h3>
+
+              <motion.p
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.1, ease: "backOut" }}
+                className="text-lg text-dark/70 leading-relaxed mb-6"
+              >
+                When a condition is met, you can choose what happens:
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 30 }}
+                whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2, ease: [0.34, 1.56, 0.64, 1] }}
+                whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+                className="bg-light border-2 border-dark rounded-2xl overflow-hidden mb-8 shadow-[4px_4px_0_var(--color-dark)] hover:shadow-[8px_8px_0_var(--color-dark)] transition-shadow"
+              >
+                <table className="w-full">
+                  <thead>
+                    <tr className="bg-dark text-light">
+                      <th className="text-left py-3 px-4 font-black italic">Action</th>
+                      <th className="text-left py-3 px-4 font-black italic">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <motion.tr
+                      initial={{ opacity: 0, scale: 0.8, x: -30 }}
+                      whileInView={{ opacity: 1, scale: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
+                      whileHover={{ x: 4, transition: { duration: 0.2 } }}
+                      className="border-b-2 border-dark/10 hover:bg-success/10 transition-colors"
+                    >
+                      <td className="py-3 px-4 font-black text-dark whitespace-nowrap">Redirect to URL</td>
+                      <td className="py-3 px-4 text-dark/70">Send visitors to a specific destination.</td>
+                    </motion.tr>
+                    <motion.tr
+                      initial={{ opacity: 0, scale: 0.8, x: -30 }}
+                      whileInView={{ opacity: 1, scale: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: 0.35, ease: [0.34, 1.56, 0.64, 1] }}
+                      whileHover={{ x: 4, transition: { duration: 0.2 } }}
+                      className="border-b-2 border-dark/10 bg-dark/5 hover:bg-danger/10 transition-colors"
+                    >
+                      <td className="py-3 px-4 font-black text-dark whitespace-nowrap">Block access</td>
+                      <td className="py-3 px-4 text-dark/70">Block visitors to access the link. You can set block reason.</td>
+                    </motion.tr>
+                    <motion.tr
+                      initial={{ opacity: 0, scale: 0.8, x: -30 }}
+                      whileInView={{ opacity: 1, scale: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
+                      whileHover={{ x: 4, transition: { duration: 0.2 } }}
+                      className="border-b-2 border-dark/10 hover:bg-warning/10 transition-colors"
+                    >
+                      <td className="py-3 px-4 font-black text-dark whitespace-nowrap">Password Gate</td>
+                      <td className="py-3 px-4 text-dark/70">Require a password before continue. You can set a specific password for each rule and give visitors a password hint.</td>
+                    </motion.tr>
+                    <motion.tr
+                      initial={{ opacity: 0, scale: 0.8, x: -30 }}
+                      whileInView={{ opacity: 1, scale: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: 0.45, ease: [0.34, 1.56, 0.64, 1] }}
+                      whileHover={{ x: 4, transition: { duration: 0.2 } }}
+                      className="bg-dark/5 hover:bg-info/10 transition-colors"
+                    >
+                      <td className="py-3 px-4 font-black text-dark whitespace-nowrap">Notify</td>
+                      <td className="py-3 px-4 text-dark/70">Notify via WebHook when a condition is met.</td>
+                    </motion.tr>
+                  </tbody>
+                </table>
+              </motion.div>
+
+              <motion.p
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, ease: "backOut" }}
+                className="text-lg text-dark/70 leading-relaxed mb-4"
+              >
+                <strong className="text-dark">You can combine multiple rules</strong> in a single link. For example:
+                redirect to a URL <em>and</em> send a webhook notification at the same time.
+              </motion.p>
+
+              <motion.p
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.1, ease: "backOut" }}
+                className="text-lg text-dark/70 leading-relaxed mb-4"
+              >
+                Each rule can have <strong className="text-dark">multiple conditions</strong>. An "else" action can also be added in case the conditions are not met.
+              </motion.p>
+
+              <motion.p
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.2, ease: "backOut" }}
+                className="text-lg text-dark/70 leading-relaxed"
+              >
+                Rules are evaluated in order from top to bottom, and the <strong className="text-dark">first matching rule wins</strong>.
+                This gives you precise control over exactly how your links behave in different scenarios.
+              </motion.p>
+            </div>
+          </motion.section>
+
+          {/* Coming Soon */}
+          <motion.section
+            initial={{ opacity: 0, scale: 0.95, y: 30 }}
+            whileInView={{ opacity: 1, scale: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
+            className="mb-16 md:mb-20"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2, ease: [0.34, 1.56, 0.64, 1] }}
+              whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+              className="bg-primary/15 rounded-3xl p-8 md:p-12 border-2 border-primary/20 shadow-[6px_6px_0_var(--color-primary)] hover:shadow-[10px_10px_0_var(--color-primary)] transition-shadow"
+            >
+              <motion.h2
+                initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
+                className="text-2xl md:text-3xl font-black italic mb-6"
+              >
+                What's coming next
+              </motion.h2>
+
+              <div className="space-y-8">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8, x: -30 }}
+                  whileInView={{ opacity: 1, scale: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
+                  whileHover={{ x: 4, transition: { duration: 0.2 } }}
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <motion.div
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <TbLink size={24} className="text-dark/70" />
+                    </motion.div>
+                    <h3 className="text-2xl font-black italic">Custom Suffix</h3>
+                    <span className="text-sm font-black italic text-dark/50">Q1 2025</span>
+                  </div>
+                  <p className="text-lg text-dark/70">
+                    Customize the end of your short links with your own suffix. Make your links even more memorable and on-brand.
                   </p>
-                </Button>
-              </Link>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8, x: -30 }}
+                  whileInView={{ opacity: 1, scale: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
+                  whileHover={{ x: 4, transition: { duration: 0.2 } }}
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <motion.div
+                      whileHover={{ scale: 1.2, rotate: 10 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <TbTags size={24} className="text-dark/70" />
+                    </motion.div>
+                    <h3 className="text-2xl font-black italic">Groups & Tags</h3>
+                    <span className="text-sm font-black italic text-dark/50">Q2 2025</span>
+                  </div>
+                  <p className="text-lg text-dark/70">
+                    Organize your links with groups, tags, and folders. Perfect for managing hundreds of links across multiple campaigns.
+                  </p>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8, x: -30 }}
+                  whileInView={{ opacity: 1, scale: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
+                  whileHover={{ x: 4, transition: { duration: 0.2 } }}
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <motion.div
+                      whileHover={{ scale: 1.2, rotate: 10 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <TbWorld size={24} className="text-dark/70" />
+                    </motion.div>
+                    <h3 className="text-2xl font-black italic">Custom Domains</h3>
+                    <span className="text-sm font-black italic text-dark/50">Q2 2025</span>
+                  </div>
+                  <p className="text-lg text-dark/70">
+                    Use your own domain for branded short links. Instead of linkkk.dev/abc, have yourbrand.com/abc.
+                  </p>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8, x: -30 }}
+                  whileInView={{ opacity: 1, scale: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: 0.7, ease: [0.34, 1.56, 0.64, 1] }}
+                  whileHover={{ x: 4, transition: { duration: 0.2 } }}
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <motion.div
+                      whileHover={{ scale: 1.2, rotate: 10 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <TbUser size={24} className="text-dark/70" />
+                    </motion.div>
+                    <h3 className="text-2xl font-black italic">Bio Pages</h3>
+                    <span className="text-sm font-black italic text-dark/50">Q3 2025</span>
+                  </div>
+                  <p className="text-lg text-dark/70">
+                    Create beautiful link-in-bio pages with custom branding. One short link that showcases all your important links.
+                  </p>
+                </motion.div>
+              </div>
             </motion.div>
           </motion.section>
 
-          {/* Coming Soon Features */}
-          <motion.section
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7, duration: 0.5, ease: "backOut" }}
-            className="mb-24"
-          >
-            <div className="flex items-center gap-4 mb-8">
-              <div className="flex items-center gap-3">
-                <div className="w-4 h-4 bg-warning shadow-[2px_2px_0_var(--color-dark)] rounded-full"></div>
-                <h2 className="text-4xl font-black italic">Coming Soon</h2>
-              </div>
-              <div className="flex-1 h-1 bg-dark/20 rounded-full"></div>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-6">
-              {upcomingFeatures.map((feature, index) => (
-                <motion.div
-                  key={feature.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.8 + index * 0.1, duration: 0.4, ease: "backOut" }}
-                  className="bg-dark/5 backdrop-blur-sm text-dark p-6 rounded-3xl border-2 border-dark/10 hover:border-warning transition-all group relative overflow-hidden"
-                >
-                  <div className="relative z-10">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="w-16 h-16 bg-warning/15 border border-warning/30 text-dark/50 rounded-2xl flex items-center justify-center group-hover:text-warning group-hover:bg-warning/25 group-hover:border-warning transition-all">
-                        {feature.icon}
-                      </div>
-                      <div className="bg-warning text-dark px-3 py-1 rounded-full border border-dark shadow-[2px_2px_0_var(--color-dark)] flex items-center gap-1">
-                        <TbClock size={16} />
-                        <span className="text-xs font-black italic">{feature.quarter}</span>
-                      </div>
-                    </div>
-
-                    <h3 className="text-2xl font-black italic mb-3">{feature.title}</h3>
-                    <p className="font-medium leading-relaxed">
-                      {feature.description}
-                    </p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.section>
-
-          {/* CTA Footer */}
+          {/* CTA */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.2, duration: 0.5 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
             className="text-center"
           >
-            <div className="bg-primary text-dark p-8 rounded-3xl border-2 border-dark shadow-[12px_12px_0_var(--color-dark)]">
-              <h3 className="text-3xl font-black italic mb-4">
-                Want to influence our roadmap?
+            <div className="bg-primary text-dark p-8 md:p-12 rounded-3xl border-2 border-dark shadow-[8px_8px_0_var(--color-dark)]">
+              <TbRocket size={48} className="mx-auto mb-6" />
+              <h3 className="text-3xl md:text-4xl font-black italic mb-4">
+                Ready to try Linkkk?
               </h3>
-              <p className="text-xl mb-6 font-medium">
-                Share your ideas and vote on features in our{" "}
-                <a
-                  href="https://github.com/aka-alvaroso/linkkk/discussions"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline font-black hover:opacity-80 transition-opacity"
-                >
-                  GitHub Discussions
-                </a>
+              <p className="text-lg md:text-xl mb-8 font-medium max-w-2xl mx-auto">
+                Sign up for free and start creating smarter links in seconds. No credit card required.
               </p>
               <div className="flex gap-4 justify-center flex-wrap">
                 <Link href="/auth/register">
                   <Button
                     size="lg"
-                    rounded="xl"
-                    className="bg-dark hover:bg-dark text-light hover:shadow-[6px_6px_0_var(--color-dark)] transition-all"
+                    rounded="2xl"
+                    className="bg-dark text-light hover:bg-dark hover:shadow-[6px_6px_0_var(--color-dark)]"
                   >
-                    <p className="font-black italic">Get Started Free</p>
+                    <span className="font-black italic">Get Started Free</span>
                   </Button>
                 </Link>
                 <a href="https://github.com/aka-alvaroso/linkkk" target="_blank" rel="noopener noreferrer">
                   <Button
                     variant="outline"
                     size="lg"
-                    rounded="xl"
-                    className="border border-dark hover:bg-dark hover:text-light transition-all"
+                    rounded="2xl"
+                    className="border-2 border-dark hover:bg-dark hover:text-light"
                   >
-                    <p className="font-black italic">View on GitHub</p>
+                    <span className="font-black italic flex items-center gap-2">
+                      <TbCode size={24} />
+                      View on GitHub
+                    </span>
                   </Button>
                 </a>
               </div>
             </div>
           </motion.div>
-        </div>
+
+        </article>
       </main>
     </div>
   );
