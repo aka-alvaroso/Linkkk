@@ -201,7 +201,7 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
         value={condition.field}
         onChange={handleFieldChange}
         buttonClassName="w-auto rounded-lg text-sm border border-dark/10 bg-light px-2 py-1 hover:border-dark/20 whitespace-nowrap"
-        listClassName="rounded-lg w-auto shadow-lg"
+        listClassName="rounded-lg w-auto shadow-lg h-48 overflow-auto"
         optionClassName='rounded-md p-1.5 text-sm'
       />
 

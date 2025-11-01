@@ -57,10 +57,10 @@ export default function NotFoundPage() {
         </div>
 
         {/* Footer */}
-        <div className="mt-8 pt-6 border-t border-dark/10">
-          <p className="text-sm text-dark/50">
-            Powered by <span className="font-black italic">Linkkk</span>
-          </p>
+        <div className="mt-8 pt-6">
+          <Link href="/" className="text-sm text-dark/50">
+            Powered by <span className="font-black italic">Linkkk.</span>
+          </Link>
         </div>
       </div>
     </div>

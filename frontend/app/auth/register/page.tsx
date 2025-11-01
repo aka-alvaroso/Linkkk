@@ -22,28 +22,28 @@ export default function Register() {
     e.preventDefault();
 
     if (!email || !username || !password) {
-      toast.error("Campos requeridos", {
-        description: "Por favor completa todos los campos",
+      toast.error("Required fields", {
+        description: "Please fill in all fields",
       });
       return;
     }
 
     if (password.length < 8) {
-      toast.error("Contraseña muy corta", {
-        description: "La contraseña debe tener al menos 8 caracteres",
+      toast.error("Password too short", {
+        description: "Password must be at least 8 characters",
       });
       return;
     }
 
     const result = await register({ email, username, password });
     if (result.success) {
-      toast.success("¡Cuenta creada exitosamente!", {
-        description: "Bienvenido a Linkkk",
+      toast.success("Account created successfully!", {
+        description: "Welcome to Linkkk",
       });
       router.push("/dashboard");
     } else {
-      toast.error("Error al registrarse", {
-        description: result.error || "No se pudo crear la cuenta",
+      toast.error("Registration failed", {
+        description: result.error || "Could not create account",
       });
     }
   };

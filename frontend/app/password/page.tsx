@@ -7,6 +7,7 @@ import { TbLock, TbKey, TbAlertCircle } from 'react-icons/tb';
 import * as motion from 'motion/react-client';
 import { linkService } from '@/app/services/api/linkService';
 import { HttpError } from '@/app/utils/errors';
+import Link from 'next/link';
 
 export default function PasswordPage() {
   const searchParams = useSearchParams();
@@ -82,7 +83,7 @@ export default function PasswordPage() {
           transition={{ delay: 0.3, duration: 0.3 }}
           className="text-3xl md:text-4xl font-black italic mb-2 text-dark text-center"
         >
-          Password Protected
+          Link Protected
         </motion.h1>
 
         {/* Description */}
@@ -95,24 +96,11 @@ export default function PasswordPage() {
           This link is password protected. Enter the password to continue.
         </motion.p>
 
-        {/* Hint */}
-        {hint && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.3 }}
-            className="bg-info/5 border border-info/20 rounded-2xl p-4 flex flex-col items-start"
-          >
-              <h6 className='font-bold text-info'>Hint:</h6>
-              <p className="text-dark/70">{hint}</p>
-          </motion.div>
-        )}
-
         {/* Form */}
         <motion.form
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.3 }}
+          transition={{ delay: 0.5, duration: 0.3 }}
           onSubmit={handleSubmit}
           className="space-y-4"
         >
@@ -130,6 +118,19 @@ export default function PasswordPage() {
             />
           </div>
 
+          {/* Hint */}
+          {hint && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.3 }}
+              className="flex items-center gap-2 justify-center"
+            >
+              <TbKey size={14} className='text-dark/40' />
+              <p className="text-xs text-dark/50 italic">{hint}</p>
+            </motion.div>
+          )}
+
           {/* Error Message */}
           {error && (
             <motion.div
@@ -142,23 +143,32 @@ export default function PasswordPage() {
             </motion.div>
           )}
 
-          <Button
-            type="submit"
-            variant="solid"
-            size="lg"
-            rounded="2xl"
-            disabled={isLoading}
-            className="w-full bg-primary text-dark border border-dark hover:bg-primary/90 hover:shadow-[4px_4px_0_var(--color-dark)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          <motion.div
+            initial={false}
+            animate={{
+              opacity: password.trim() ? 1 : 0.5,
+              scale: password.trim() ? 1 : 0.95,
+            }}
+            transition={{ duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
           >
-            {isLoading ? 
-              <p className='font-black italic'>
-                  Verifying...
-              </p> : 
-              <p className='font-black italic'>
-                Unlock
-              </p>
-            }
-          </Button>
+            <Button
+              type="submit"
+              variant="solid"
+              size="lg"
+              rounded="2xl"
+              disabled={isLoading || !password.trim()}
+              className="w-full bg-primary text-dark border border-dark hover:bg-primary/90 hover:shadow-[4px_4px_0_var(--color-dark)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isLoading ?
+                <p className='font-black italic'>
+                    Verifying...
+                </p> :
+                <p className='font-black italic'>
+                  Unlock
+                </p>
+              }
+            </Button>
+          </motion.div>
         </motion.form>
 
         {/* Footer */}
@@ -166,11 +176,11 @@ export default function PasswordPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7, duration: 0.3 }}
-          className="mt-4 pt-6 border-t border-dark/10 text-center"
+          className="mt-4 pt-6 text-center"
         >
-          <p className="text-sm text-dark/50">
-            Powered by <span className="font-black italic">Linkkk</span>
-          </p>
+          <Link href="/" className="text-sm text-dark/50">
+              Powered by <span className="font-black italic">Linkkk.</span>
+          </Link>
         </motion.div>
       </motion.div>
     </div>

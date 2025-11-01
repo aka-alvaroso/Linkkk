@@ -252,8 +252,7 @@ export default function FeaturesPage() {
                 whileInView={{ opacity: 1, scale: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.2, ease: [0.34, 1.56, 0.64, 1] }}
-                whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-                className="bg-primary/15 rounded-2xl p-6 my-8 border-2 border-primary/20 shadow-[4px_4px_0_var(--color-primary)] hover:shadow-[6px_6px_0_var(--color-primary)] transition-shadow"
+                className="bg-primary/15 rounded-2xl p-6 my-8 border-2 border-primary/20"
               >
                 <p className="text-sm font-black italic text-dark/50 mb-3">EXAMPLE USE CASE</p>
                 <p className="text-lg font-medium text-dark/90 mb-4">
@@ -292,8 +291,7 @@ export default function FeaturesPage() {
                 whileInView={{ opacity: 1, scale: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.2, ease: [0.34, 1.56, 0.64, 1] }}
-                whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-                className="bg-light border-2 border-dark rounded-2xl overflow-hidden mb-8 shadow-[4px_4px_0_var(--color-dark)] hover:shadow-[8px_8px_0_var(--color-dark)] transition-shadow"
+                className="bg-light border-2 border-dark rounded-2xl overflow-hidden mb-8"
               >
                 <table className="w-full">
                   <thead>
@@ -308,8 +306,7 @@ export default function FeaturesPage() {
                       whileInView={{ opacity: 1, scale: 1, x: 0 }}
                       viewport={{ once: true }}
                       transition={{ duration: 0.5, delay: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
-                      whileHover={{ x: 4, transition: { duration: 0.2 } }}
-                      className="border-b-2 border-dark/10 hover:bg-primary/10 transition-colors"
+                      className="border-b-2 border-dark/10 hover:bgtransition-colors"
                     >
                       <td className="py-3 px-4 font-black text-dark">Geographic Location</td>
                       <td className="py-3 px-4 text-dark/70">Match by country, region, or specific city</td>
@@ -319,8 +316,7 @@ export default function FeaturesPage() {
                       whileInView={{ opacity: 1, scale: 1, x: 0 }}
                       viewport={{ once: true }}
                       transition={{ duration: 0.5, delay: 0.35, ease: [0.34, 1.56, 0.64, 1] }}
-                      whileHover={{ x: 4, transition: { duration: 0.2 } }}
-                      className="border-b-2 border-dark/10 bg-dark/5 hover:bg-primary/10 transition-colors"
+                      className="border-b-2 border-dark/10 bg-dark/5 "
                     >
                       <td className="py-3 px-4 font-black text-dark">Device Type</td>
                       <td className="py-3 px-4 text-dark/70">Checks if the visitor is using a Mobile, Desktop, or Tablet</td>
@@ -330,8 +326,7 @@ export default function FeaturesPage() {
                       whileInView={{ opacity: 1, scale: 1, x: 0 }}
                       viewport={{ once: true }}
                       transition={{ duration: 0.5, delay: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
-                      whileHover={{ x: 4, transition: { duration: 0.2 } }}
-                      className="border-b-2 border-dark/10 hover:bg-primary/10 transition-colors"
+                      className="border-b-2 border-dark/10 "
                     >
                       <td className="py-3 px-4 font-black text-dark">IP Address</td>
                       <td className="py-3 px-4 text-dark/70">Match an specific IP address</td>
@@ -341,8 +336,7 @@ export default function FeaturesPage() {
                       whileInView={{ opacity: 1, scale: 1, x: 0 }}
                       viewport={{ once: true }}
                       transition={{ duration: 0.5, delay: 0.45, ease: [0.34, 1.56, 0.64, 1] }}
-                      whileHover={{ x: 4, transition: { duration: 0.2 } }}
-                      className="border-b-2 border-dark/10 bg-dark/5 hover:bg-primary/10 transition-colors"
+                      className="border-b-2 border-dark/10 bg-dark/5 "
                     >
                       <td className="py-3 px-4 font-black text-dark">Is VPN</td>
                       <td className="py-3 px-4 text-dark/70">Checks if the visitor is using a VPN</td>
@@ -352,8 +346,7 @@ export default function FeaturesPage() {
                       whileInView={{ opacity: 1, scale: 1, x: 0 }}
                       viewport={{ once: true }}
                       transition={{ duration: 0.5, delay: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
-                      whileHover={{ x: 4, transition: { duration: 0.2 } }}
-                      className="border-b-2 border-dark/10 hover:bg-primary/10 transition-colors"
+                      className="border-b-2 border-dark/10 "
                     >
                       <td className="py-3 px-4 font-black text-dark">Is Bot</td>
                       <td className="py-3 px-4 text-dark/70">Checks if the visitor is a robot</td>
@@ -363,8 +356,7 @@ export default function FeaturesPage() {
                       whileInView={{ opacity: 1, scale: 1, x: 0 }}
                       viewport={{ once: true }}
                       transition={{ duration: 0.5, delay: 0.55, ease: [0.34, 1.56, 0.64, 1] }}
-                      whileHover={{ x: 4, transition: { duration: 0.2 } }}
-                      className="border-b-2 border-dark/10 bg-dark/5 hover:bg-primary/10 transition-colors"
+                      className="border-b-2 border-dark/10 bg-dark/5 "
                     >
                       <td className="py-3 px-4 font-black text-dark">Date & Time</td>
                       <td className="py-3 px-4 text-dark/70">Specific dates or time ranges</td>
@@ -374,8 +366,7 @@ export default function FeaturesPage() {
                       whileInView={{ opacity: 1, scale: 1, x: 0 }}
                       viewport={{ once: true }}
                       transition={{ duration: 0.5, delay: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
-                      whileHover={{ x: 4, transition: { duration: 0.2 } }}
-                      className="hover:bg-primary/10 transition-colors"
+                      className=""
                     >
                       <td className="py-3 px-4 font-black text-dark">Access Count</td>
                       <td className="py-3 px-4 text-dark/70">Compare the number of access to a specific link</td>
@@ -409,8 +400,7 @@ export default function FeaturesPage() {
                 whileInView={{ opacity: 1, scale: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.2, ease: [0.34, 1.56, 0.64, 1] }}
-                whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-                className="bg-light border-2 border-dark rounded-2xl overflow-hidden mb-8 shadow-[4px_4px_0_var(--color-dark)] hover:shadow-[8px_8px_0_var(--color-dark)] transition-shadow"
+                className="bg-light border-2 border-dark rounded-2xl overflow-hidden mb-8"
               >
                 <table className="w-full">
                   <thead>
@@ -425,8 +415,7 @@ export default function FeaturesPage() {
                       whileInView={{ opacity: 1, scale: 1, x: 0 }}
                       viewport={{ once: true }}
                       transition={{ duration: 0.5, delay: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
-                      whileHover={{ x: 4, transition: { duration: 0.2 } }}
-                      className="border-b-2 border-dark/10 hover:bg-success/10 transition-colors"
+                      className="border-b-2 border-dark/10 "
                     >
                       <td className="py-3 px-4 font-black text-dark whitespace-nowrap">Redirect to URL</td>
                       <td className="py-3 px-4 text-dark/70">Send visitors to a specific destination.</td>
@@ -436,8 +425,7 @@ export default function FeaturesPage() {
                       whileInView={{ opacity: 1, scale: 1, x: 0 }}
                       viewport={{ once: true }}
                       transition={{ duration: 0.5, delay: 0.35, ease: [0.34, 1.56, 0.64, 1] }}
-                      whileHover={{ x: 4, transition: { duration: 0.2 } }}
-                      className="border-b-2 border-dark/10 bg-dark/5 hover:bg-danger/10 transition-colors"
+                      className="border-b-2 border-dark/10 bg-dark/5"
                     >
                       <td className="py-3 px-4 font-black text-dark whitespace-nowrap">Block access</td>
                       <td className="py-3 px-4 text-dark/70">Block visitors to access the link. You can set block reason.</td>
@@ -447,8 +435,7 @@ export default function FeaturesPage() {
                       whileInView={{ opacity: 1, scale: 1, x: 0 }}
                       viewport={{ once: true }}
                       transition={{ duration: 0.5, delay: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
-                      whileHover={{ x: 4, transition: { duration: 0.2 } }}
-                      className="border-b-2 border-dark/10 hover:bg-warning/10 transition-colors"
+                      className="border-b-2 border-dark/10 "
                     >
                       <td className="py-3 px-4 font-black text-dark whitespace-nowrap">Password Gate</td>
                       <td className="py-3 px-4 text-dark/70">Require a password before continue. You can set a specific password for each rule and give visitors a password hint.</td>
@@ -458,8 +445,7 @@ export default function FeaturesPage() {
                       whileInView={{ opacity: 1, scale: 1, x: 0 }}
                       viewport={{ once: true }}
                       transition={{ duration: 0.5, delay: 0.45, ease: [0.34, 1.56, 0.64, 1] }}
-                      whileHover={{ x: 4, transition: { duration: 0.2 } }}
-                      className="bg-dark/5 hover:bg-info/10 transition-colors"
+                      className="bg-dark/5"
                     >
                       <td className="py-3 px-4 font-black text-dark whitespace-nowrap">Notify</td>
                       <td className="py-3 px-4 text-dark/70">Notify via WebHook when a condition is met.</td>
@@ -515,8 +501,7 @@ export default function FeaturesPage() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2, ease: [0.34, 1.56, 0.64, 1] }}
-              whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-              className="bg-primary/15 rounded-3xl p-8 md:p-12 border-2 border-primary/20 shadow-[6px_6px_0_var(--color-primary)] hover:shadow-[10px_10px_0_var(--color-primary)] transition-shadow"
+              className="bg-primary/15 rounded-3xl p-8 md:p-12 border-2 border-primary/20"
             >
               <motion.h2
                 initial={{ opacity: 0, scale: 0.8, y: 20 }}
@@ -534,7 +519,6 @@ export default function FeaturesPage() {
                   whileInView={{ opacity: 1, scale: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
-                  whileHover={{ x: 4, transition: { duration: 0.2 } }}
                 >
                   <div className="flex items-center gap-3 mb-3">
                     <motion.div
@@ -556,7 +540,6 @@ export default function FeaturesPage() {
                   whileInView={{ opacity: 1, scale: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
-                  whileHover={{ x: 4, transition: { duration: 0.2 } }}
                 >
                   <div className="flex items-center gap-3 mb-3">
                     <motion.div
@@ -578,7 +561,6 @@ export default function FeaturesPage() {
                   whileInView={{ opacity: 1, scale: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
-                  whileHover={{ x: 4, transition: { duration: 0.2 } }}
                 >
                   <div className="flex items-center gap-3 mb-3">
                     <motion.div
@@ -600,7 +582,6 @@ export default function FeaturesPage() {
                   whileInView={{ opacity: 1, scale: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: 0.7, ease: [0.34, 1.56, 0.64, 1] }}
-                  whileHover={{ x: 4, transition: { duration: 0.2 } }}
                 >
                   <div className="flex items-center gap-3 mb-3">
                     <motion.div
@@ -641,7 +622,7 @@ export default function FeaturesPage() {
                   <Button
                     size="lg"
                     rounded="2xl"
-                    className="bg-dark text-light hover:bg-dark hover:shadow-[6px_6px_0_var(--color-dark)]"
+                    className="bg-dark text-light hover:bg-primary hover:text-dark"
                   >
                     <span className="font-black italic">Get Started Free</span>
                   </Button>
@@ -651,7 +632,7 @@ export default function FeaturesPage() {
                     variant="outline"
                     size="lg"
                     rounded="2xl"
-                    className="border-2 border-dark hover:bg-dark hover:text-light"
+                    className="border-2 border-dark"
                   >
                     <span className="font-black italic flex items-center gap-2">
                       <TbCode size={24} />

@@ -5,6 +5,7 @@ import { cn } from "@/app/utils/cn";
 
 type AnimationType = "fade" | "slide" | "scale" | "blur" | "flip";
 type TriggerMode = "hover" | "click" | "none";
+type SlideDirection = "left" | "right" | "up" | "down";
 
 interface AnimatedTextProps {
   initialText: string;
@@ -13,6 +14,7 @@ interface AnimatedTextProps {
   animationType?: AnimationType;
   triggerMode?: TriggerMode;
   duration?: number;
+  slideDirection?: SlideDirection;
   onTextChange?: (text: string) => void;
 }
 
@@ -31,6 +33,7 @@ const AnimatedText = forwardRef<AnimatedTextRef, AnimatedTextProps>(
       animationType = "fade",
       triggerMode = "none",
       duration = 0.3,
+      slideDirection = "left",
       onTextChange,
     },
     ref
@@ -87,11 +90,29 @@ const AnimatedText = forwardRef<AnimatedTextRef, AnimatedTextProps>(
             exit: { opacity: 0 },
           };
         case "slide":
-          return {
-            initial: { opacity: 0, x: -20 },
-            animate: { opacity: 1, x: 0 },
-            exit: { opacity: 0, x: 20 },
+          const slideVariants = {
+            left: {
+              initial: { opacity: 0, x: -20 },
+              animate: { opacity: 1, x: 0 },
+              exit: { opacity: 0, x: 20 },
+            },
+            right: {
+              initial: { opacity: 0, x: 20 },
+              animate: { opacity: 1, x: 0 },
+              exit: { opacity: 0, x: -20 },
+            },
+            up: {
+              initial: { opacity: 0, y: 20 },
+              animate: { opacity: 1, y: 0 },
+              exit: { opacity: 0, y: -20 },
+            },
+            down: {
+              initial: { opacity: 0, y: -20 },
+              animate: { opacity: 1, y: 0 },
+              exit: { opacity: 0, y: 20 },
+            },
           };
+          return slideVariants[slideDirection];
         case "scale":
           return {
             initial: { opacity: 0, scale: 0.8 },
@@ -123,7 +144,7 @@ const AnimatedText = forwardRef<AnimatedTextRef, AnimatedTextProps>(
 
     return (
       <span
-        className={cn(className)}
+        className={cn("inline-block", className)}
         onMouseEnter={() => triggerMode === "hover" && setIsHovered(true)}
         onMouseLeave={() => triggerMode === "hover" && setIsHovered(false)}
         onClick={handleClick}
@@ -138,7 +159,7 @@ const AnimatedText = forwardRef<AnimatedTextRef, AnimatedTextProps>(
             animate={variants.animate}
             exit={variants.exit}
             transition={{ duration, ease: "backOut" }}
-            className="block overflow-hidden text-ellipsis whitespace-nowrap"
+            className="inline-block"
           >
             {currentText}
           </motion.span>

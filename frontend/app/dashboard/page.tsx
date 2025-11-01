@@ -1,6 +1,6 @@
 "use client"
-import { useState, useEffect } from "react";
-import { TbFilterPlus, TbSwitchVertical, TbPlus} from "react-icons/tb";
+import { useState, useEffect, useRef } from "react";
+import { TbFilterPlus, TbSwitchVertical, TbPlus } from "react-icons/tb";
 
 import { useLinks, useStats } from "@/app/hooks";
 import { useAuth } from "@/app/stores/authStore";
@@ -15,22 +15,40 @@ import { useSidebarStore } from "@/app/stores/sidebarStore";
 import type { LinkFilters } from "@/app/types";
 import * as motion from 'motion/react-client';
 import { useMotionValue, useTransform, animate } from 'motion/react';
+import AnimatedText, { AnimatedTextRef } from "@/app/components/ui/AnimatedText";
 
 function AnimatedCounter({ value, delay = 0 }: { value: number; delay?: number }) {
   const count = useMotionValue(0);
   const rounded = useTransform(count, (latest) => Math.round(latest));
+  const textRef = useRef<AnimatedTextRef>(null);
+  const [currentValue, setCurrentValue] = useState(0);
 
   useEffect(() => {
     const controls = animate(count, value, {
-      duration: 1,
+      duration: 0.1,
       delay,
-      ease: "easeOut"
+      ease: "easeOut",
+      onUpdate: (latest) => {
+        const newValue = Math.round(latest);
+        if (newValue !== currentValue) {
+          setCurrentValue(newValue);
+          textRef.current?.setText(newValue.toString());
+        }
+      }
     });
 
     return controls.stop;
-  }, [count, value, delay]);
+  }, [count, value, delay, currentValue]);
 
-  return <motion.span>{rounded}</motion.span>;
+  return (
+    <AnimatedText
+      ref={textRef}
+      initialText={currentValue.toString()}
+      animationType="slide"
+      slideDirection="up"
+      triggerMode="none"
+    />
+  );
 }
 
 export default function Dashboard() {
@@ -47,10 +65,6 @@ export default function Dashboard() {
       fetchLinks();
     }
   }, [fetchLinks, isAuthenticated, isGuest]);
-
-  const handleApplyFilters = (newFilters: LinkFilters) => {
-    updateFilters(newFilters);
-  };
 
   const hasActiveFilters = () => {
     return filters.search !== '' ||
@@ -81,7 +95,7 @@ export default function Dashboard() {
             className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
               <h2 className='text-md'>Total links</h2>
               <p className='text-end text-5xl font-black italic'>
-                <AnimatedCounter value={totalLinks} delay={0.1} />
+                <AnimatedCounter value={totalLinks} delay={0.15} />
               </p>
             </motion.div>
             <motion.div
@@ -101,7 +115,7 @@ export default function Dashboard() {
             className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
               <h2 className='text-md'>Active links</h2>
               <p className='text-end text-5xl font-black italic'>
-                <AnimatedCounter value={activeLinks} delay={0.2} />
+                <AnimatedCounter value={activeLinks} delay={0.15} />
               </p>
             </motion.div>
             {/* <div className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
@@ -112,17 +126,19 @@ export default function Dashboard() {
             </div> */}
           </div>
 
-          
-          <div className='flex flex-wrap items-center justify-between'>
-            
-            <div className='flex items-center gap-2'>
-              <motion.h3 
+
+          <div className='flex flex-wrap items-center justify-between gap-4'>
+
+            <div className='flex items-center gap-2 flex-wrap'>
+              <motion.h3
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.4, ease: "backInOut" }}
                 className='text-3xl font-black italic'>
                 My links
               </motion.h3>
+
+              {/* Filter Button */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -134,42 +150,36 @@ export default function Dashboard() {
                   rounded="xl"
                   leftIcon={<TbFilterPlus size={20} />}
                   onClick={() => setFilterModalOpen(true)}
-                  className={hasActiveFilters() ? 'bg-info/10 text-info hover:bg-info/20' : ''}
+                  className={hasActiveFilters() ? 'text-info' : ''}
                 >
-                  <span className=''>
-                    {hasActiveFilters() ? 'Filters active' : 'Add filter'}
-                  </span>
+                  <span>{hasActiveFilters() ? 'Filters active' : 'Filters'}</span>
                 </Button>
               </motion.div>
             </div>
 
-              <div className='flex items-center gap-2'>
-                  {/* <Button variant='ghost' size='sm' rounded='xl' leftIcon={<TbEdit size={20} />}>
-                      Edit view
-                  </Button> */}
-                  
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3, duration: 0.4, ease: "backInOut" }}
-                >
-                  <Button variant="ghost" className="" size="sm" rounded="xl" leftIcon={<TbSwitchVertical size={20} />}>
-                    <span className=''>Order by</span>
-                  </Button>
-                </motion.div>
-                
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.35, duration: 0.4, ease: "backInOut" }}
-                >
-                  <Button variant='solid' size='sm' rounded='xl' leftIcon={<TbPlus size={20} />} onClick={() => setCreateLinkDrawerOpen(true)}
-                    className="hover:bg-primary hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)]"
-                    >
-                      New link
-                  </Button>
-                  </motion.div>
-              </div>
+            <div className='flex items-center gap-2'>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.4, ease: "backInOut" }}
+              >
+                <Button variant="ghost" className="" size="sm" rounded="xl" leftIcon={<TbSwitchVertical size={20} />}>
+                  <span className=''>Order by</span>
+                </Button>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.35, duration: 0.4, ease: "backInOut" }}
+              >
+                <Button variant='solid' size='sm' rounded='xl' leftIcon={<TbPlus size={20} />} onClick={() => setCreateLinkDrawerOpen(true)}
+                  className="hover:bg-primary hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)]"
+                  >
+                    New link
+                </Button>
+              </motion.div>
+            </div>
           </div>
 
           {view === 'details' && <LinkDetails links={filteredLinks} />}
@@ -178,7 +188,7 @@ export default function Dashboard() {
           <FilterModal
             open={filterModalOpen}
             onClose={() => setFilterModalOpen(false)}
-            onApplyFilters={handleApplyFilters}
+            onApplyFilters={updateFilters}
             initialFilters={filters}
           />
         </div>

@@ -3,9 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useSidebarStore } from '@/app/stores/sidebarStore';
 import Link from 'next/link';
 import Button from '@/app/components/ui/Button/Button';
-import Dropdown from '@/app/components/ui/Dropdown/Dropdown';
-import type { DropdownItem } from '@/app/components/ui/Dropdown/Dropdown';
-import { TbDirection, TbLayoutSidebarLeftCollapse, TbLayoutSidebarLeftExpand, TbPlus, TbSettings, TbLogout, TbUser, TbLogin } from 'react-icons/tb';
+import { TbLayoutSidebarLeftCollapse, TbLayoutSidebarLeftExpand, TbPlus, TbUser, TbLogin } from 'react-icons/tb';
 import { HiHome } from 'react-icons/hi';
 import Image from 'next/image';
 import CreateLinkDrawer from '@/app/components/Drawer/CreateLinkDrawer';
@@ -43,37 +41,6 @@ const DesktopSidebar = () => {
             setAvatarUrl(url);
         }
     }, [user?.email, user?.avatarUrl]);
-
-    const userMenuItems: DropdownItem[] = [
-        {
-            label: 'Profile',
-            value: 'profile',
-            icon: <TbUser size={18} />,
-            onClick: () => {
-                // Navigate to profile page
-                window.location.href = '/profile';
-            },
-        },
-        {
-            label: 'Settings',
-            value: 'settings',
-            icon: <TbSettings size={18} />,
-            onClick: () => {
-                // Navigate to settings page
-                window.location.href = '/settings';
-            },
-        },
-        {
-            label: 'Logout',
-            value: 'logout',
-            icon: <TbLogout size={18} />,
-            separator: true,
-            onClick: async () => {
-                await logout();
-            },
-            customClassName: 'text-danger hover:bg-danger/5'
-        },
-    ];
 
     return (
         <motion.div
@@ -198,13 +165,12 @@ const DesktopSidebar = () => {
                     
             {
                 isAuthenticated ? (
-                    <Dropdown
-                    trigger={
+                    <Link href="/profile" className='mt-auto w-full'>
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.4, duration: 0.4, ease: "backInOut" }} 
-                            className='relative w-full flex justify-between text-dark bg-dark/5 hover:cursor-pointer rounded-xl p-2 group'>
+                            transition={{ delay: 0.4, duration: 0.4, ease: "backInOut" }}
+                            className='relative w-full flex justify-between text-dark bg-dark/5 hover:bg-dark/10 hover:cursor-pointer rounded-xl p-2 group transition-colors'>
                             <div className="relative rounded-full size-11 overflow-hidden flex-shrink-0 border-2 border-dark shadow-[2px_2px_0_var(--color-dark)]">
                                 {avatarUrl && (
                                     <Image
@@ -228,25 +194,8 @@ const DesktopSidebar = () => {
                                 <span className='text-sm font-medium truncate'>{user?.username}</span>
                                 <span className='text-xs text-dark/50 truncate'>{user?.email}</span>
                             </motion.div>
-                            <motion.div
-                                initial={{ opacity: 0, width: 0 }}
-                                animate={{
-                                    opacity: 1,
-                                    width: 24
-                                }}
-                                transition={{ duration: 0.2 }}
-                                className="flex items-center justify-center overflow-hidden"
-                            >
-                                <TbDirection size={20} className='text-dark/50' />
-                            </motion.div>
                         </motion.div>
-                    }
-                    items={userMenuItems}
-                    placement="top-right"
-                    className='mt-auto w-full'
-                    menuClassName='p-2 shadow-none w-full bg-transparent border-transparent'
-                    itemClassName='text-dark hover:cursor-pointer rounded-xl'
-                />
+                    </Link>
                 ) : (
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}

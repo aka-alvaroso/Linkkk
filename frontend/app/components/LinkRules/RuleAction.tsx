@@ -158,7 +158,7 @@ export function RuleAction({
         onChange={handleTypeChange}
         className='w-auto text-sm'
         buttonClassName="w-auto rounded-lg text-sm border border-dark/10 bg-light px-2 py-1 hover:border-dark/20 whitespace-nowrap"
-        listClassName="rounded-lg w-auto shadow-lg"
+        listClassName="rounded-lg w-auto shadow-lg bottom-full mb-1"
         optionClassName='rounded-md p-1.5 text-sm'
       />
       {/* Dynamic Settings inline */}

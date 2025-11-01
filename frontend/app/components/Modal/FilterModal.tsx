@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import Modal from '@/app/components/ui/Modal/Modal';
 import Input from '@/app/components/ui/Input/Input';
-import Select from '@/app/components/ui/Select/Select';
+import InlineSelect from '@/app/components/ui/InlineSelect/InlineSelect';
 import Button from '@/app/components/ui/Button/Button';
-import { TbSearch, TbCircleDashedCheck, TbCircleDashed, TbFilterOff, TbCircleFilled } from 'react-icons/tb';
+import { TbSearch, TbCircleDashedCheck, TbCircleDashed, TbFilterOff, TbCircleFilled, TbX } from 'react-icons/tb';
 import * as motion from 'motion/react-client';
 import { AnimatePresence } from 'motion/react';
 
@@ -70,6 +70,7 @@ export default function FilterModal({
       size="lg"
       rounded="3xl"
       closeOnOverlayClick={true}
+      className='shadow-none'
     >
       <div className="p-6 flex flex-col gap-6">
         {/* Header */}
@@ -141,88 +142,64 @@ export default function FilterModal({
 
         {/* Status Filter */}
         <div className="flex flex-col gap-2">
-          <motion.label 
+          <motion.label
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.15, ease: "backInOut" }}
             className="text-lg font-semibold">
               Status
           </motion.label>
-          
+
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.175, ease: "backInOut" }}
             className=""
           >
-            <Select
+            <InlineSelect
               options={[
                 {
                   label: 'All',
                   value: 'all',
                   leftIcon: <TbCircleFilled size={16} />,
-                  customClassName: 'text-dark/50 bg-dark/10 hover:text-dark hover:bg-dark/25',
-                  selectedClassName: 'text-dark bg-dark/25'
                 },
                 {
                   label: 'Active',
                   value: 'active',
                   leftIcon: <TbCircleDashedCheck size={16} />,
-                  customClassName: 'mt-1 text-dark bg-success/25 hover:bg-success',
-                  selectedClassName: 'bg-success'
                 },
                 {
                   label: 'Inactive',
                   value: 'inactive',
                   leftIcon: <TbCircleDashed size={16} />,
-                  customClassName: 'mt-1 text-light bg-danger/25 hover:bg-danger',
-                  selectedClassName: 'bg-danger'
                 },
               ]}
               value={filters.status}
               onChange={(v) => setFilters({ ...filters, status: v as LinkFilters['status'] })}
-              listClassName="rounded-2xl p-1 shadow-none transform origin-bottom bottom-12"
-              buttonClassName="rounded-2xl border-dark/10 w-full"
-              optionClassName="rounded-xl"
+              buttonClassName=''
+              selectedClassName={`${filters.status === "active" ? 'bg-primary border-dark' : filters.status === "inactive" ? 'bg-danger border-dark' : 'bg-light border-dark/30'}`}
+
             />
           </motion.div>
         </div>
 
         {/* Actions */}
-        <div className="flex gap-2 mt-4">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2, ease: "backInOut" }}
-            className="flex-1"
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2, ease: "backInOut" }}
+          className="mt-4"
+        >
+          <Button
+            variant="solid"
+            size="md"
+            rounded="2xl"
+            className='w-full rounded-xl hover:bg-primary hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)]'
+            onClick={handleApply}
           >
-            <Button
-              variant="outline"
-              size="md"
-              rounded="2xl"
-              className='w-full rounded-xl border-danger text-danger hover:bg-danger/15 hover:text-danger'
-              onClick={onClose}
-              >
-              Cancel
-            </Button>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.25, ease: "backInOut" }}
-            className="flex-1"
-          >
-            <Button
-              variant="solid"
-              size="md"
-              rounded="2xl"
-              className='w-full rounded-xl hover:bg-primary hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)]'
-              onClick={handleApply}
-            >
-              Apply Filters
-            </Button>
-          </motion.div>
-        </div>
+            Apply Filters
+          </Button>
+        </motion.div>
       </div>
     </Modal>
   );

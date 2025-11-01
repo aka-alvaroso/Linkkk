@@ -86,9 +86,10 @@ export default function Landing() {
               <motion.div
                 animate={{
                   opacity: isShortening ? 0 : 1,
-                  x: isShortening ? -20 : 0
+                  x: isShortening ? -20 : 0,
+                  paddingRight: url && !isShortening ? "140px" : "0px"
                 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
                 className="flex-1"
               >
                 <Input
@@ -96,9 +97,9 @@ export default function Landing() {
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
                   placeholder="Paste your long URL here..."
-                  className="border-none shadow-none focus:ring-0 text-lg focus:outline-none"
+                  className="bg-transparent border-none shadow-none focus:ring-0 text-lg focus:outline-none"
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
+                    if (e.key === 'Enter' && url) {
                       handleShorten();
                     }
                   }}
@@ -106,11 +107,14 @@ export default function Landing() {
                 />
               </motion.div>
               <motion.div
+                initial={false}
                 animate={{
-                  width: isShortening ? "calc(100% - 1rem)" : "auto"
+                  width: isShortening ? "calc(100% - 1rem)" : url ? "auto" : 0,
+                  opacity: url || isShortening ? 1 : 0,
+                  scale: url || isShortening ? 1 : 0.8,
                 }}
-                transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="absolute right-2 top-1/2 -translate-y-1/2"
+                transition={{ duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 overflow-hidden"
               >
                 <Button
                   size="lg"
@@ -118,12 +122,11 @@ export default function Landing() {
                   className="
                   w-full h-full
                   bg-dark hover:bg-primary text-light hover:text-dark whitespace-nowrap
-                  hover:shadow-[_4px_4px_0_var(--color-dark)]
-                  disabled:bg-primary disabled:text-dark disabled:opacity-30 disabled:cursor-not-allowed
+                  hover:shadow-[_0_0_0_var(--color-dark)]
                   "
                   leftIcon={isShortening ? <RiLoader5Fill size={18} className="animate-spin" /> : <TbBolt size={18} />}
                   onClick={handleShorten}
-                  disabled={isShortening || !url}
+                  disabled={isShortening}
                 >
                   <p className="font-black italic">
                     {isShortening ? "Generating..." : "Shorten"}

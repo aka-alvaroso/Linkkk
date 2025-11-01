@@ -22,19 +22,19 @@ export default function Login() {
         e.preventDefault();
 
         if (!email || !password) {
-            toast.error('Campos requeridos', {
-                description: 'Por favor completa todos los campos'
+            toast.error('Required fields', {
+                description: 'Please fill in all fields'
             });
             return;
         }
 
         const result = await login({ usernameOrEmail: email, password });
         if (result.success) {
-            toast.success('¡Bienvenido de nuevo!');
+            toast.success('Welcome back!');
             router.push('/dashboard');
         } else {
-            toast.error('Error al iniciar sesión', {
-                description: result.error || 'Credenciales incorrectas'
+            toast.error('Login failed', {
+                description: result.error || 'Invalid credentials'
             });
         }
     };

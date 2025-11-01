@@ -18,6 +18,11 @@ import {
   TbEyeOff,
   TbTrash,
   TbRefresh,
+  TbUser,
+  TbMail,
+  TbLock,
+  TbShieldLock,
+  TbAlertTriangle,
 } from "react-icons/tb";
 import Input from "../components/ui/Input/Input";
 import { getUserAvatarUrl } from "@/app/utils/gravatar";
@@ -63,7 +68,7 @@ export default function ProfilePage() {
   }, [user?.email, user?.avatarUrl]);
 
   const handleUpdateUsername = async () => {
-    if (!username.trim()) return toast.error("Username requerido");
+    if (!username.trim()) return toast.error("Username required");
 
     setIsUpdating(true);
     try {
@@ -77,21 +82,21 @@ export default function ProfilePage() {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        toast.success("Username actualizado");
+        toast.success("Username updated");
         useAuthStore.getState().setUser({ ...user!, username });
         setIsEditingUsername(false);
       } else {
-        toast.error("Error al actualizar");
+        toast.error("Failed to update");
       }
     } catch {
-      toast.error("Error de conexión");
+      toast.error("Connection error");
     } finally {
       setIsUpdating(false);
     }
   };
 
   const handleUpdateEmail = async () => {
-    if (!email.trim()) return toast.error("Email requerido");
+    if (!email.trim()) return toast.error("Email required");
 
     setIsUpdating(true);
     try {
@@ -105,23 +110,23 @@ export default function ProfilePage() {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        toast.success("Email actualizado");
+        toast.success("Email updated");
         useAuthStore.getState().setUser({ ...user!, email });
         setIsEditingEmail(false);
       } else {
-        toast.error("Error al actualizar");
+        toast.error("Failed to update");
       }
     } catch {
-      toast.error("Error de conexión");
+      toast.error("Connection error");
     } finally {
       setIsUpdating(false);
     }
   };
 
   const handleUpdatePassword = async () => {
-    if (!newPassword || !confirmPassword) return toast.error("Completa todos los campos");
-    if (newPassword !== confirmPassword) return toast.error("Las contraseñas no coinciden");
-    if (newPassword.length < 8) return toast.error("Mínimo 8 caracteres");
+    if (!newPassword || !confirmPassword) return toast.error("Fill in all fields");
+    if (newPassword !== confirmPassword) return toast.error("Passwords don't match");
+    if (newPassword.length < 8) return toast.error("Minimum 8 characters");
 
     setIsUpdating(true);
     try {
@@ -135,15 +140,15 @@ export default function ProfilePage() {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        toast.success("Contraseña actualizada");
+        toast.success("Password updated");
         setNewPassword("");
         setConfirmPassword("");
         setIsEditingPassword(false);
       } else {
-        toast.error("Error al actualizar");
+        toast.error("Failed to update");
       }
     } catch {
-      toast.error("Error de conexión");
+      toast.error("Connection error");
     } finally {
       setIsUpdating(false);
     }
@@ -160,20 +165,19 @@ export default function ProfilePage() {
 
       if (response.ok && data.success) {
         setApiKey(data.data.apiKey);
-        setShowApiKey(true);
-        toast.success("API Key generada");
+        toast.success("API Key generated");
       } else {
-        toast.error("Error al generar API Key");
+        toast.error("Failed to generate API Key");
       }
     } catch {
-      toast.error("Error de conexión");
+      toast.error("Connection error");
     }
   };
 
   const handleCopyApiKey = () => {
     if (apiKey) {
       navigator.clipboard.writeText(apiKey);
-      toast.success("API Key copiada");
+      toast.success("API Key copied");
     }
   };
 
@@ -188,12 +192,12 @@ export default function ProfilePage() {
 
       if (response.ok && data.success) {
         setApiKey(null);
-        toast.success("API Key eliminada");
+        toast.success("API Key deleted");
       } else {
-        toast.error("Error al resetear");
+        toast.error("Failed to reset");
       }
     } catch {
-      toast.error("Error de conexión");
+      toast.error("Connection error");
     }
   };
 
@@ -208,12 +212,12 @@ export default function ProfilePage() {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        toast.success("Enlaces eliminados");
+        toast.success("Links deleted");
       } else {
-        toast.error("Error al eliminar");
+        toast.error("Failed to delete");
       }
     } catch {
-      toast.error("Error de conexión");
+      toast.error("Connection error");
     } finally {
       setIsDeleting(false);
     }
@@ -221,7 +225,7 @@ export default function ProfilePage() {
 
   const handleDeleteAccount = async () => {
     if (confirmDeleteText !== "DELETE") {
-      return toast.error('Escribe "DELETE" para confirmar');
+      return toast.error('Type "DELETE" to confirm');
     }
 
     setIsDeleting(true);
@@ -234,13 +238,13 @@ export default function ProfilePage() {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        toast.success("Cuenta eliminada");
+        toast.success("Account deleted");
         setTimeout(() => logout(), 2000);
       } else {
-        toast.error("Error al eliminar");
+        toast.error("Failed to delete");
       }
     } catch {
-      toast.error("Error de conexión");
+      toast.error("Connection error");
     } finally {
       setIsDeleting(false);
     }
@@ -250,15 +254,16 @@ export default function ProfilePage() {
     <RouteGuard type="user-only" title="Profile - Linkkk">
       <Navbar />
 
-      <div className="pt-24 w-full md:w-3/4 mx-auto flex flex-col items-center justify-center gap-8 px-4 pb-16">
-        {/* User basic info */}
-        <div className="flex w-full items-center justify-center gap-2">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ ease: "backInOut" }}
-            className="relative size-18 rounded-full overflow-hidden border-2 border-dark shadow-[4px_4px_0_var(--color-dark)]"
-          >
+      <div className="pt-24 w-full max-w-6xl mx-auto px-4 pb-16">
+
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ ease: "backInOut" }}
+          className="mb-12 flex flex-col md:flex-row items-center gap-6 p-8 bg-light border-2 border-dark rounded-3xl shadow-[8px_8px_0_var(--color-dark)]"
+        >
+          <div className="relative size-32 rounded-full overflow-hidden border-4 border-dark shadow-[4px_4px_0_var(--color-dark)]">
             {avatarUrl && (
               <Image
                 src={avatarUrl}
@@ -267,366 +272,373 @@ export default function ProfilePage() {
                 alt={`${user?.username}'s avatar`}
               />
             )}
-          </motion.div>
-          <div>
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.05, ease: "backInOut" }}
-              className="font-black italic text-2xl max-w-48 md:max-w-96 text-ellipsis overflow-hidden"
-            >
-              {user?.username}
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1, ease: "backInOut" }}
-              className="italic max-w-48 md:max-w-96 text-ellipsis overflow-hidden"
-            >
-              {user?.email}
-            </motion.p>
           </div>
 
+          <div className="flex-1 text-center md:text-left">
+            <h1 className="text-4xl md:text-5xl font-black italic mb-2">
+              {user?.username}
+            </h1>
+            <p className="text-lg text-dark/70 italic">
+              {user?.email}
+            </p>
+          </div>
+
+          <Button
+            size="lg"
+            onClick={logout}
+            leftIcon={<TbLogout size={24} />}
+            className="bg-danger text-light hover:bg-danger hover:shadow-[4px_4px_0_var(--color-dark)]"
+            rounded="2xl"
+          >
+            <span className="font-black italic">Logout</span>
+          </Button>
+        </motion.div>
+
+        {/* Grid Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+          {/* Account Information Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, ease: "backInOut" }}
+            className="p-6 bg-light border-2 border-dark rounded-3xl shadow-[6px_6px_0_var(--color-dark)]"
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-3 bg-info/20 border-2 border-dark rounded-2xl">
+                <TbUser size={28} className="text-info" />
+              </div>
+              <h2 className="text-2xl font-black italic">Account</h2>
+            </div>
+
+            <div className="space-y-6">
+              {/* Username */}
+              <div>
+                <label className="text-sm font-bold text-dark/70 mb-2 block">Username</label>
+                {isEditingUsername ? (
+                  <div className="flex gap-2">
+                    <Input
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      className="flex-1 rounded-2xl"
+                    />
+                    <Button
+                      size="md"
+                      rounded="xl"
+                      onClick={handleUpdateUsername}
+                      disabled={isUpdating}
+                      className="bg-primary hover:bg-primary text-dark"
+                      iconOnly
+                    >
+                      <TbCheck size={20} />
+                    </Button>
+                    <Button
+                      size="md"
+                      variant="outline"
+                      rounded="xl"
+                      onClick={() => {
+                        setIsEditingUsername(false);
+                        setUsername(user?.username || "");
+                      }}
+                      iconOnly
+                    >
+                      <TbX size={20} />
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between p-3 bg-dark/5 rounded-2xl">
+                    <span className="font-medium">{user?.username}</span>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      rounded="xl"
+                      onClick={() => setIsEditingUsername(true)}
+                      leftIcon={<TbEdit size={16} />}
+                    >
+                      Edit
+                    </Button>
+                  </div>
+                )}
+              </div>
+
+              {/* Email */}
+              <div>
+                <label className="text-sm font-bold text-dark/70 mb-2 block">Email</label>
+                {isEditingEmail ? (
+                  <div className="flex gap-2">
+                    <Input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="flex-1 rounded-2xl"
+                    />
+                    <Button
+                      size="md"
+                      rounded="xl"
+                      onClick={handleUpdateEmail}
+                      disabled={isUpdating}
+                      className="bg-primary hover:bg-primary text-dark"
+                      iconOnly
+                    >
+                      <TbCheck size={20} />
+                    </Button>
+                    <Button
+                      size="md"
+                      variant="outline"
+                      rounded="xl"
+                      onClick={() => {
+                        setIsEditingEmail(false);
+                        setEmail(user?.email || "");
+                      }}
+                      iconOnly
+                    >
+                      <TbX size={20} />
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between p-3 bg-dark/5 rounded-2xl">
+                    <span className="font-medium">{user?.email}</span>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      rounded="xl"
+                      onClick={() => setIsEditingEmail(true)}
+                      leftIcon={<TbEdit size={16} />}
+                    >
+                      Edit
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Security Card */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15, ease: "backInOut" }}
-            className="ml-auto"
+            className="p-6 bg-light border-2 border-dark rounded-3xl shadow-[6px_6px_0_var(--color-dark)]"
           >
-            <Button
-              size="lg"
-              onClick={logout}
-              leftIcon={<TbLogout size={24} />}
-              className="bg-danger text-light hover:bg-danger hover:shadow-[_4px_4px_0_var(--color-dark)]"
-              rounded="xl"
-              iconOnly
-            />
-          </motion.div>
-        </div>
-
-        {/* Username */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, ease: "backInOut" }}
-          className="w-full flex flex-col"
-        >
-          <p className="text-lg font-bold">Username</p>
-          <div className="flex items-center justify-between">
-          {isEditingUsername ? (
-            <div className="flex gap-2">
-              <Input
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="flex-1 rounded-2xl"
-              />
-              <Button
-                size="md"
-                rounded="xl"
-                onClick={handleUpdateUsername}
-                disabled={isUpdating}
-                className="bg-primary hover:bg-primary text-dark hover:shadow-[_4px_4px_0_var(--color-dark)]"
-                iconOnly
-              >
-                <TbCheck size={20} />
-              </Button>
-              <Button
-                size="md"
-                variant="outline"
-                rounded="xl"
-                onClick={() => {
-                  setIsEditingUsername(false);
-                  setUsername(user?.username || "");
-                }}
-                className="border-2"
-                iconOnly
-              >
-                <TbX size={20} />
-              </Button>
-            </div>
-          ) : (
-              <p className="">{user?.username}</p>
-          )}
-            {!isEditingUsername && (
-              <Button
-                size="xs"
-                variant="outline"
-                rounded="xl"
-                onClick={() => setIsEditingUsername(true)}
-                leftIcon={<TbEdit size={16} />}
-                className="border-2"
-              >
-                <p className="font-bold italic">Edit</p>
-              </Button>
-            )}
-          </div>
-
-          
-        </motion.div>
-
-        {/* Email */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25, ease: "backInOut" }}
-          className="w-full flex flex-col"
-        >
-          <p className="text-lg font-bold">Email</p>
-          <div className="flex items-center justify-between">
-            {isEditingEmail ? (
-              <div className="flex gap-2">
-                <Input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="flex-1 rounded-2xl"
-                />
-                <Button
-                  size="md"
-                  rounded="xl"
-                  onClick={handleUpdateEmail}
-                  disabled={isUpdating}
-                  className="bg-primary hover:bg-primary text-dark hover:shadow-[_4px_4px_0_var(--color-dark)]"
-                  iconOnly
-                >
-                  <TbCheck size={20} />
-                </Button>
-                <Button
-                  size="md"
-                  variant="outline"
-                  rounded="xl"
-                  onClick={() => {
-                    setIsEditingEmail(false);
-                    setEmail(user?.email || "");
-                  }}
-                  className="border-2"
-                  iconOnly
-                >
-                  <TbX size={20} />
-                </Button>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-3 bg-warning/20 border-2 border-dark rounded-2xl">
+                <TbLock size={28} className="text-warning" />
               </div>
-            ) : (
-              <p className="">{user?.email}</p>
-            )}
-            {!isEditingEmail && (
-              <Button
-                size="xs"
-                variant="outline"
-                rounded="xl"
-                onClick={() => setIsEditingEmail(true)}
-                leftIcon={<TbEdit size={16} />}
-                className="border-2"
-              >
-                <p className="font-bold italic">Edit</p>
-              </Button>
-            )}
-          </div>
-        </motion.div>
+              <h2 className="text-2xl font-black italic">Security</h2>
+            </div>
 
-        {/* Password */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, ease: "backInOut" }}
-          className="w-full flex flex-col"
-        >
-          <p className="text-lg font-bold">Password</p>
-          <div className="flex items-center justify-between">
-            {isEditingPassword ? (
-              <div className="space-y-2 flex-1">
-                <div className="relative">
-                  <Input
-                    type={showPassword ? "text" : "password"}
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="New password"
-                    className="rounded-2xl"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2"
-                  >
-                    {showPassword ? <TbEyeOff size={20} /> : <TbEye size={20} />}
-                  </button>
-                </div>
-                <div className="flex gap-2">
+            <div>
+              <label className="text-sm font-bold text-dark/70 mb-2 block">Password</label>
+              {isEditingPassword ? (
+                <div className="space-y-3">
+                  <div className="relative">
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="New password"
+                      className="rounded-2xl pr-12"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-dark/50 hover:text-dark"
+                    >
+                      {showPassword ? <TbEyeOff size={20} /> : <TbEye size={20} />}
+                    </button>
+                  </div>
                   <Input
                     type={showPassword ? "text" : "password"}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Confirm password"
-                    className="rounded-2xl flex-1"
+                    className="rounded-2xl"
                   />
+                  <div className="flex gap-2">
+                    <Button
+                      size="md"
+                      rounded="2xl"
+                      onClick={handleUpdatePassword}
+                      disabled={isUpdating}
+                      className="bg-primary hover:bg-primary text-dark flex-1"
+                    >
+                      <span className="font-black italic">Save</span>
+                    </Button>
+                    <Button
+                      size="md"
+                      variant="outline"
+                      rounded="2xl"
+                      onClick={() => {
+                        setIsEditingPassword(false);
+                        setNewPassword("");
+                        setConfirmPassword("");
+                      }}
+                    >
+                      <span className="font-black italic">Cancel</span>
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between p-3 bg-dark/5 rounded-2xl">
+                  <span className="font-medium">••••••••</span>
                   <Button
-                    size="md"
+                    size="sm"
+                    variant="ghost"
                     rounded="xl"
-                    onClick={handleUpdatePassword}
-                    disabled={isUpdating}
-                    className="bg-primary hover:bg-primary text-dark hover:shadow-[_4px_4px_0_var(--color-dark)]"
-                    iconOnly
+                    onClick={() => setIsEditingPassword(true)}
+                    leftIcon={<TbEdit size={16} />}
                   >
-                    <TbCheck size={20} />
+                    Change
                   </Button>
+                </div>
+              )}
+            </div>
+          </motion.div>
+
+          {/* API Key Card - Full Width */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, ease: "backInOut" }}
+            className="lg:col-span-2 p-6 bg-light border-2 border-dark rounded-3xl shadow-[6px_6px_0_var(--color-dark)]"
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-3 bg-success/20 border-2 border-dark rounded-2xl">
+                <TbShieldLock size={28} className="text-success" />
+              </div>
+              <h2 className="text-2xl font-black italic">API Access</h2>
+            </div>
+
+            {apiKey ? (
+              <div className="space-y-4">
+                <div className="flex gap-2">
+                  <Input
+                    type={showApiKey ? "text" : "password"}
+                    value={apiKey}
+                    readOnly
+                    className="flex-1 font-mono rounded-2xl"
+                  />
                   <Button
                     size="md"
                     variant="outline"
                     rounded="xl"
-                    onClick={() => {
-                      setIsEditingPassword(false);
-                      setNewPassword("");
-                      setConfirmPassword("");
-                    }}
-                    className="border-2"
+                    onClick={() => setShowApiKey(!showApiKey)}
                     iconOnly
                   >
-                    <TbX size={20} />
+                    {showApiKey ? <TbEyeOff size={20} /> : <TbEye size={20} />}
+                  </Button>
+                  <Button
+                    size="md"
+                    rounded="xl"
+                    onClick={handleCopyApiKey}
+                    className="bg-dark hover:bg-primary hover:text-dark"
+                    iconOnly
+                  >
+                    <TbCopy size={20} />
+                  </Button>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    rounded="2xl"
+                    onClick={handleGenerateApiKey}
+                    leftIcon={<TbRefresh size={16} />}
+                  >
+                    <span className="font-black italic">Regenerate</span>
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    rounded="2xl"
+                    onClick={handleResetApiKey}
+                    leftIcon={<TbTrash size={16} />}
+                    className="border-danger text-danger hover:bg-danger hover:text-light"
+                  >
+                    <span className="font-black italic">Delete</span>
                   </Button>
                 </div>
               </div>
             ) : (
-              <p className="">••••••••</p>
-            )}
-            {!isEditingPassword && (
               <Button
-                size="xs"
-                variant="outline"
-                rounded="xl"
-                onClick={() => setIsEditingPassword(true)}
-                leftIcon={<TbEdit size={16} />}
-                className="border-2"
+                size="lg"
+                rounded="2xl"
+                onClick={handleGenerateApiKey}
+                leftIcon={<TbKey size={24} />}
+                className="bg-dark hover:bg-primary hover:text-dark w-full md:w-auto"
               >
-                <p className="font-bold italic">Change</p>
+                <span className="font-black italic">Generate API Key</span>
               </Button>
             )}
-          </div>
-        </motion.div>
+          </motion.div>
 
-        {/* API Key */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35, ease: "backInOut" }}
-          className="w-full flex flex-col gap-2"
-        >
-          <p className="text-lg font-bold">API Key</p>
+          {/* Danger Zone Card - Full Width */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25, ease: "backInOut" }}
+            className="lg:col-span-2 p-6 bg-danger/5 border-2 border-danger rounded-3xl shadow-[6px_6px_0_var(--color-danger)]"
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-3 bg-danger/20 border-2 border-danger rounded-2xl">
+                <TbAlertTriangle size={28} className="text-danger" />
+              </div>
+              <h2 className="text-2xl font-black italic text-danger">Danger Zone</h2>
+            </div>
 
-          {apiKey ? (
-            <div className="space-y-2">
-              <div className="flex gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Delete Links */}
+              <div className="space-y-3">
+                <div>
+                  <h3 className="font-bold text-dark mb-1">Delete All Links</h3>
+                  <p className="text-sm text-dark/60">
+                    Permanently remove all your shortened links
+                  </p>
+                </div>
+                <Button
+                  size="md"
+                  variant="outline"
+                  rounded="2xl"
+                  onClick={handleDeleteLinks}
+                  disabled={isDeleting}
+                  leftIcon={<TbTrash size={20} />}
+                  className="border-2 border-danger text-danger hover:bg-danger hover:text-light w-full"
+                >
+                  <span className="font-black italic">Delete All Links</span>
+                </Button>
+              </div>
+
+              {/* Delete Account */}
+              <div className="space-y-3">
+                <div>
+                  <h3 className="font-bold text-dark mb-1">Delete Account</h3>
+                  <p className="text-sm text-dark/60 mb-2">
+                    Type <span className="font-bold text-danger">DELETE</span> to confirm
+                  </p>
+                </div>
                 <Input
-                  type={showApiKey ? "text" : "password"}
-                  value={apiKey}
-                  readOnly
-                  className="flex-1 font-mono"
+                  value={confirmDeleteText}
+                  onChange={(e) => setConfirmDeleteText(e.target.value)}
+                  placeholder="DELETE"
+                  className="rounded-2xl"
                 />
                 <Button
                   size="md"
-                  variant="outline"
-                  rounded="xl"
-                  onClick={() => setShowApiKey(!showApiKey)}
-                  className="border-2"
-                  iconOnly
+                  rounded="2xl"
+                  onClick={handleDeleteAccount}
+                  disabled={isDeleting || confirmDeleteText !== "DELETE"}
+                  leftIcon={<TbTrash size={20} />}
+                  className="bg-danger text-light hover:bg-danger/80 disabled:opacity-50 w-full"
                 >
-                  {showApiKey ? <TbEyeOff size={20} /> : <TbEye size={20} />}
-                </Button>
-                <Button
-                  size="md"
-                  rounded="xl"
-                  onClick={handleCopyApiKey}
-                  className="bg-dark hover:bg-primary hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)]"
-                  iconOnly
-                >
-                  <TbCopy size={20} />
-                </Button>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  rounded="xl"
-                  onClick={handleGenerateApiKey}
-                  leftIcon={<TbRefresh size={16} />}
-                  className="border-2"
-                >
-                  <p className="font-bold italic">Regenerate</p>
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  rounded="xl"
-                  onClick={handleResetApiKey}
-                  leftIcon={<TbTrash size={16} />}
-                  className="border-2 border-danger text-danger hover:bg-danger hover:text-light"
-                >
-                  <p className="font-bold italic">Reset</p>
+                  <span className="font-black italic">
+                    {isDeleting ? "Deleting..." : "Delete Account"}
+                  </span>
                 </Button>
               </div>
             </div>
-          ) : (
-            <Button
-              size="md"
-              rounded="xl"
-              onClick={handleGenerateApiKey}
-              leftIcon={<TbKey size={20} />}
-              className="bg-dark hover:bg-primary hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)] w-fit"
-            >
-              <p className="font-bold italic">Generate API Key</p>
-            </Button>
-          )}
-        </motion.div>
+          </motion.div>
 
-        {/* Danger zone */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, ease: "backInOut" }}
-          className="w-full flex flex-col gap-4 pt-8 border-t-2 border-danger/30"
-        >
-          <p className="text-lg font-bold text-danger">Danger Zone</p>
-
-          {/* Delete Links */}
-          <div className="flex flex-col gap-2">
-            <p className="text-sm font-bold">Delete all links</p>
-            <Button
-              size="sm"
-              variant="outline"
-              rounded="xl"
-              onClick={handleDeleteLinks}
-              disabled={isDeleting}
-              leftIcon={<TbTrash size={16} />}
-              className="border-2 border-danger text-danger hover:bg-danger hover:text-light w-fit"
-            >
-              <p className="font-bold italic">Delete All Links</p>
-            </Button>
-          </div>
-
-          {/* Delete Account */}
-          <div className="flex flex-col gap-2">
-            <p className="text-sm font-bold">Delete account</p>
-            <p className="text-xs ">
-              Type <span className="font-bold text-danger">DELETE</span> to confirm
-            </p>
-            <Input
-              value={confirmDeleteText}
-              onChange={(e) => setConfirmDeleteText(e.target.value)}
-              placeholder="DELETE"
-              className="max-w-xs rounded-2xl"
-            />
-            <Button
-              size="sm"
-              rounded="xl"
-              onClick={handleDeleteAccount}
-              disabled={isDeleting || confirmDeleteText !== "DELETE"}
-              leftIcon={<TbTrash size={16} />}
-              className="bg-danger text-light hover:bg-danger/80 disabled:opacity-50 w-fit"
-            >
-              <p className="font-bold italic">
-                {isDeleting ? "Deleting..." : "Delete Account"}
-              </p>
-            </Button>
-          </div>
-        </motion.div>
+        </div>
       </div>
     </RouteGuard>
   );

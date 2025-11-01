@@ -163,7 +163,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
             rounded='3xl'
             className='h-full overflow-hidden flex flex-col'
         >
-            <div className='flex-1 overflow-auto flex flex-col gap-2 items-center p-4'>
+            <div className='flex-1 overflow-auto flex flex-col gap-2 items-center p-4 pb-32'>
 
                 {/* Tabs */}
                 <div className='w-full flex flex-wrap gap-2 mb-6'>

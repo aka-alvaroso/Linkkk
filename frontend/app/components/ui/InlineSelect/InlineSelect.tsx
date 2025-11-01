@@ -90,7 +90,7 @@ export default function InlineSelect({
         layout
         className={cn(
           "inline-flex items-center rounded-full",
-          isExpanded ? "gap-1 bg-dark/5 p-1" : ""
+          isExpanded ? "gap-1 bg-dark/5 p-1" : "p-1"
         )}
         transition={{ duration: 0.25, ease: [0.34, 1.56, 0.64, 1] }}
       >
@@ -103,7 +103,7 @@ export default function InlineSelect({
             title={selectedOption?.title}
             className={cn(
               "inline-flex items-center gap-2 px-3 py-1.5",
-              "border-2 border-dark rounded-2xl",
+              "border border-dark rounded-2xl",
               "bg-light text-dark font-medium text-sm",
               "transition-all duration-200",
               "hover:shadow-[2px_2px_0_var(--color-dark)]",

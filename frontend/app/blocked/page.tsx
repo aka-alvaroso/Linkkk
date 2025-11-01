@@ -96,11 +96,11 @@ export default function BlockedPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7, duration: 0.3 }}
-          className="mt-8 pt-6 border-t border-dark/10"
+          className="mt-8 pt-6"
         >
-          <p className="text-sm text-dark/50">
-            Powered by <span className="font-black italic">Linkkk.</span>
-          </p>
+          <Link href="/" className="text-sm text-dark/50">
+              Powered by <span className="font-black italic">Linkkk.</span>
+          </Link>
         </motion.div>
       </motion.div>
     </div>
