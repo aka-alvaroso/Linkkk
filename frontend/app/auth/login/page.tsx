@@ -4,12 +4,13 @@ import Navbar from "../../components/Navbar/Navbar";
 import Link from "next/link";
 import { LuArrowUpRight } from "react-icons/lu";
 import { useState } from "react";
-import { useAuth } from "../../stores/authStore";
+import { useAuth } from "@/app/hooks";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/app/hooks/useToast";
 import Button from "@/app/components/ui/Button/Button";
 import * as motion from "motion/react-client";
 import { TbArrowUpRight } from "react-icons/tb";
+import Image from "next/image";
 
 export default function Login() {
     const { login } = useAuth();
@@ -43,7 +44,7 @@ export default function Login() {
         <RouteGuard type="public" title="Login - Linkkk">
             <Navbar />
             <main className="w-full h-[calc(100dvh-10rem)] flex items-center justify-center">
-                <div className="text-dark bg-light p-8 w-11/12 md:w-3/4 max-w-xl mx-auto rounded-3xl">
+                <div className="text-dark bg-light p-8 w-11/12 md:w-3/4 max-w-xl mx-auto rounded-3xl z-120 border">
                         <motion.h1 
                             initial={{ opacity: 0, y: -20 }}
                             animate={{ opacity: 1, y: 0 }}

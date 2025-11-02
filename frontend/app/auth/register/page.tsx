@@ -3,7 +3,7 @@ import RouteGuard from "../../components/RouteGuard/RouteGuard";
 import Navbar from "../../components/Navbar/Navbar";
 import Link from "next/link";
 import { useState } from "react";
-import { useAuth } from "../../stores/authStore";
+import { useAuth } from "@/app/hooks";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/app/hooks/useToast";
 import Button from "@/app/components/ui/Button/Button";

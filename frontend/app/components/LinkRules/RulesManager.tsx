@@ -27,7 +27,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { LinkRule as LinkRuleType } from '@/app/types/linkRules';
-import { useAuth } from '@/app/stores/authStore';
+import { useAuth } from '@/app/hooks';
 import { PLAN_LIMITS } from '@/app/constants/limits';
 import Link from 'next/link';
 

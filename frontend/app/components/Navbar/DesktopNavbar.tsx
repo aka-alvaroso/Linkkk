@@ -2,12 +2,12 @@ import { useState } from "react";
 import Link from "next/link";
 import Button from "../ui/Button/Button";
 import CreateLinkDrawer from "../Drawer/CreateLinkDrawer";
-import { useAuthStore } from "../../stores/authStore";
+import { useAuth } from "@/app/hooks";
 import { TbExternalLink, TbPlus } from "react-icons/tb";
 import * as motion from "motion/react-client";
 
 export default function DesktopNavbar() {
-  const { user, logout } = useAuthStore();
+  const { user, logout } = useAuth();
   const [createLinkDrawer, setCreateLinkDrawer] = useState(false);
 
 

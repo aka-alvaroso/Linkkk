@@ -12,7 +12,7 @@ import { AnimatePresence } from 'motion/react';
 import { useLinkRules } from '@/app/hooks';
 import { LinkRule as LinkRuleType } from '@/app/types/linkRules';
 import { LinkRule } from '../LinkRules/LinkRule';
-import { useAuth } from '@/app/stores/authStore';
+import { useAuth } from '@/app/hooks';
 import { PLAN_LIMITS } from '@/app/constants/limits';
 import AnimatedText, { AnimatedTextRef } from '../ui/AnimatedText';
 

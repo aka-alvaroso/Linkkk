@@ -4,11 +4,11 @@ import { PiList } from "react-icons/pi";
 import { AiOutlineClose } from "react-icons/ai";
 import Link from "next/link";
 import Button from "../ui/Button/Button";
-import { useAuthStore } from "../../stores/authStore";
+import { useAuth } from "@/app/hooks";
 
 export default function MobileNavbar() {
     const [isOpen, setIsOpen] = useState(false);
-    const { logout, isAuthenticated } = useAuthStore();
+    const { logout, isAuthenticated } = useAuth();
     
     const toggleMenu = () => {
         setIsOpen(!isOpen);

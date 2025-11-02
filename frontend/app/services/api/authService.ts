@@ -1,6 +1,7 @@
 import { API_CONFIG, defaultFetchOptions } from "@/app/config/api";
 import { HttpError, NetworkError, TimeoutError } from "@/app/utils/errors";
 import type { ApiResponse } from "@/app/types";
+import type { User } from "@/app/stores/authStore";
 
 interface LoginDTO {
   usernameOrEmail: string;
@@ -11,14 +12,6 @@ interface RegisterDTO {
   username: string;
   email: string;
   password: string;
-}
-
-interface User {
-  id: string;
-  username: string;
-  email: string;
-  planId?: string;
-  createdAt: string;
 }
 
 interface SessionResponse {

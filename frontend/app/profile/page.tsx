@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import RouteGuard from "@/app/components/RouteGuard/RouteGuard";
 import Navbar from "@/app/components/Navbar/Navbar";
+import { useAuth } from "@/app/hooks";
 import { useAuthStore } from "@/app/stores/authStore";
 import { useToast } from "@/app/hooks/useToast";
 import Button from "@/app/components/ui/Button/Button";
@@ -30,7 +31,7 @@ import { getUserAvatarUrl } from "@/app/utils/gravatar";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 export default function ProfilePage() {
-  const { user, logout } = useAuthStore();
+  const { user, logout } = useAuth();
   const toast = useToast();
 
   // Avatar
@@ -577,7 +578,7 @@ export default function ProfilePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25, ease: "backInOut" }}
-            className="lg:col-span-2 p-6 bg-danger/5 border-2 border-danger rounded-3xl shadow-[6px_6px_0_var(--color-danger)]"
+            className="lg:col-span-2 p-6 border-2 border-danger rounded-3xl shadow-[6px_6px_0_var(--color-danger)]"
           >
             <div className="flex items-center gap-3 mb-6">
               <div className="p-3 bg-danger/20 border-2 border-danger rounded-2xl">

@@ -1,4 +1,5 @@
 "use client";
+import RouteGuard from "@/app/components/RouteGuard/RouteGuard";
 import Navbar from "@/app/components/Navbar/Navbar";
 import * as motion from "motion/react-client";
 import {
@@ -19,8 +20,9 @@ import Link from "next/link";
 
 export default function FeaturesPage() {
   return (
-    <div className="min-h-screen">
-      <Navbar />
+    <RouteGuard type="public" title="Features - Linkkk">
+      <div className="min-h-screen">
+        <Navbar />
 
       <main className="w-full px-4 py-16 md:py-24">
         <article className="max-w-4xl mx-auto">
@@ -646,6 +648,7 @@ export default function FeaturesPage() {
 
         </article>
       </main>
-    </div>
+      </div>
+    </RouteGuard>
   );
 }

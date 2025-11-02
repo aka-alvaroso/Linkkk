@@ -1,4 +1,5 @@
 "use client";
+import RouteGuard from '@/app/components/RouteGuard/RouteGuard';
 import Link from 'next/link';
 import Button from '@/app/components/ui/Button/Button';
 import { TbHome, TbLinkOff } from 'react-icons/tb';
@@ -6,7 +7,8 @@ import * as motion from 'motion/react-client';
 
 export default function DisabledPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-warning/5 via-light to-secondary/5">
+    <RouteGuard type="public" title="Link Disabled - Linkkk">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-warning/5 via-light to-secondary/5">
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -86,13 +88,14 @@ export default function DisabledPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7, duration: 0.3 }}
-          className="mt-8 pt-6 border-t border-dark/10"
+          className="mt-8 pt-6"
         >
-          <p className="text-sm text-dark/50">
-            Powered by <span className="font-black italic">Linkkk</span>
-          </p>
+          <Link href="/" className="text-sm text-dark/50">
+            Powered by <span className="font-black italic">Linkkk.</span>
+          </Link>
         </motion.div>
       </motion.div>
-    </div>
+      </div>
+    </RouteGuard>
   );
 }

@@ -8,7 +8,7 @@ import { HiHome } from 'react-icons/hi';
 import Image from 'next/image';
 import CreateLinkDrawer from '@/app/components/Drawer/CreateLinkDrawer';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/app/stores/authStore';
+import { useAuth } from '@/app/hooks';
 import * as motion from 'motion/react-client';
 import { getUserAvatarUrl } from '@/app/utils/gravatar';
 

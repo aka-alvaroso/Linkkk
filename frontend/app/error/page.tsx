@@ -1,4 +1,5 @@
 "use client";
+import RouteGuard from '@/app/components/RouteGuard/RouteGuard';
 import Link from 'next/link';
 import Button from '@/app/components/ui/Button/Button';
 import { TbHome, TbAlertTriangle, TbRefresh } from 'react-icons/tb';
@@ -9,7 +10,8 @@ export default function ErrorPage() {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-danger/5 via-light to-warning/5">
+    <RouteGuard type="public" title="Error - Linkkk">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-danger/5 via-light to-warning/5">
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -109,6 +111,7 @@ export default function ErrorPage() {
           </p>
         </motion.div>
       </motion.div>
-    </div>
+      </div>
+    </RouteGuard>
   );
 }

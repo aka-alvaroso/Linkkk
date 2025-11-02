@@ -8,6 +8,7 @@ import { useLinkStore } from "@/app/stores/linkStore";
 import { linkService } from "@/app/services";
 import { HttpError, NetworkError, TimeoutError } from "@/app/utils/errors";
 import type { CreateLinkDTO, UpdateLinkDTO } from "@/app/types";
+import { useAuth } from "./useAuth";
 
 export function useLinks() {
   const {
@@ -26,6 +27,8 @@ export function useLinks() {
     setError,
     reset,
   } = useLinkStore();
+
+  const { ensureSession } = useAuth();
 
   /**
    * Get user-friendly error message from error object
@@ -68,6 +71,18 @@ export function useLinks() {
    */
   const createLink = useCallback(
     async (linkData: CreateLinkDTO) => {
+      // Ensure we have a session (user or guest) before creating
+      const hasSession = await ensureSession();
+      if (!hasSession) {
+        return {
+          success: false as const,
+          data: null,
+          error: "Unable to create session",
+          errorCode: "SESSION_REQUIRED",
+          validation: undefined
+        };
+      }
+
       setLoading(true);
       setError(null);
 
@@ -86,7 +101,7 @@ export function useLinks() {
         setLoading(false);
       }
     },
-    [addLink, setLoading, setError]
+    [addLink, setLoading, setError, ensureSession]
   );
 
   /**
@@ -94,6 +109,18 @@ export function useLinks() {
    */
   const updateLink = useCallback(
     async (shortUrl: string, linkData: UpdateLinkDTO) => {
+      // Ensure we have a session before updating
+      const hasSession = await ensureSession();
+      if (!hasSession) {
+        return {
+          success: false as const,
+          data: null,
+          error: "Unable to create session",
+          errorCode: "SESSION_REQUIRED",
+          validation: undefined
+        };
+      }
+
       setLoading(true);
       setError(null);
 
@@ -112,7 +139,7 @@ export function useLinks() {
         setLoading(false);
       }
     },
-    [updateLinkInStore, setLoading, setError]
+    [updateLinkInStore, setLoading, setError, ensureSession]
   );
 
   /**
@@ -120,6 +147,16 @@ export function useLinks() {
    */
   const deleteLink = useCallback(
     async (shortUrl: string) => {
+      // Ensure we have a session before deleting
+      const hasSession = await ensureSession();
+      if (!hasSession) {
+        return {
+          success: false as const,
+          error: "Unable to create session",
+          errorCode: "SESSION_REQUIRED"
+        };
+      }
+
       setLoading(true);
       setError(null);
 
@@ -137,7 +174,7 @@ export function useLinks() {
         setLoading(false);
       }
     },
-    [removeLinkFromStore, setLoading, setError]
+    [removeLinkFromStore, setLoading, setError, ensureSession]
   );
 
   /**

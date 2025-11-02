@@ -7,6 +7,7 @@ import { useCallback } from 'react';
 import { useLinkRulesStore } from '@/app/stores/linkRulesStore';
 import { linkRulesService } from '@/app/services';
 import { CreateRuleDTO, UpdateRuleDTO } from '@/app/types/linkRules';
+import { useAuth } from './useAuth';
 
 export function useLinkRules() {
   const {
@@ -22,6 +23,8 @@ export function useLinkRules() {
     setError,
     reset,
   } = useLinkRulesStore();
+
+  const { ensureSession } = useAuth();
 
   /**
    * Fetch all rules for a link
@@ -49,6 +52,14 @@ export function useLinkRules() {
    */
   const createRule = useCallback(
     async (shortUrl: string, ruleData: CreateRuleDTO) => {
+      // Ensure we have a session before creating a rule
+      const hasSession = await ensureSession();
+      if (!hasSession) {
+        const error = new Error('Unable to create session');
+        setError('Unable to create session');
+        throw error;
+      }
+
       setLoading(true);
       setError(null);
       try {
@@ -64,7 +75,7 @@ export function useLinkRules() {
         setLoading(false);
       }
     },
-    [setLoading, setError, addRule]
+    [setLoading, setError, addRule, ensureSession]
   );
 
   /**
@@ -72,6 +83,14 @@ export function useLinkRules() {
    */
   const updateRule = useCallback(
     async (shortUrl: string, ruleId: number, updates: UpdateRuleDTO) => {
+      // Ensure we have a session before updating
+      const hasSession = await ensureSession();
+      if (!hasSession) {
+        const error = new Error('Unable to create session');
+        setError('Unable to create session');
+        throw error;
+      }
+
       setLoading(true);
       setError(null);
       try {
@@ -87,7 +106,7 @@ export function useLinkRules() {
         setLoading(false);
       }
     },
-    [setLoading, setError, updateRuleInStore]
+    [setLoading, setError, updateRuleInStore, ensureSession]
   );
 
   /**
@@ -95,6 +114,14 @@ export function useLinkRules() {
    */
   const deleteRule = useCallback(
     async (shortUrl: string, ruleId: number) => {
+      // Ensure we have a session before deleting
+      const hasSession = await ensureSession();
+      if (!hasSession) {
+        const error = new Error('Unable to create session');
+        setError('Unable to create session');
+        throw error;
+      }
+
       setLoading(true);
       setError(null);
       try {
@@ -109,7 +136,7 @@ export function useLinkRules() {
         setLoading(false);
       }
     },
-    [setLoading, setError, removeRule]
+    [setLoading, setError, removeRule, ensureSession]
   );
 
   /**
@@ -117,6 +144,14 @@ export function useLinkRules() {
    */
   const reorderRules = useCallback(
     async (shortUrl: string, ruleIds: number[]) => {
+      // Ensure we have a session before reordering
+      const hasSession = await ensureSession();
+      if (!hasSession) {
+        const error = new Error('Unable to create session');
+        setError('Unable to create session');
+        throw error;
+      }
+
       setLoading(true);
       setError(null);
       try {
@@ -132,7 +167,7 @@ export function useLinkRules() {
         setLoading(false);
       }
     },
-    [setLoading, setError, reorderRulesInStore]
+    [setLoading, setError, reorderRulesInStore, ensureSession]
   );
 
   return {

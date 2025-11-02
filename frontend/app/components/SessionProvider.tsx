@@ -1,13 +1,11 @@
 'use client';
 
 import { RiLoader5Fill } from "react-icons/ri";
-import { useAuth } from "../stores/authStore";
+import { useAuth } from "@/app/hooks";
 import { useEffect } from "react";
 
 export default function SessionProvider({ children }: { children: React.ReactNode }) {
-  const checkSession = useAuth(state => state.checkSession);
-  const isLoading = useAuth(state => state.isLoading);
-  const sessionChecked = useAuth(state => state.sessionChecked);
+  const { checkSession, isLoading, sessionChecked } = useAuth();
 
   useEffect(() => {
     checkSession();

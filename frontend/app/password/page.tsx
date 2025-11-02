@@ -1,4 +1,5 @@
 "use client";
+import RouteGuard from '@/app/components/RouteGuard/RouteGuard';
 import { useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Button from '@/app/components/ui/Button/Button';
@@ -59,7 +60,8 @@ export default function PasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-primary/5 via-light to-info/5">
+    <RouteGuard type="public" title="Password Protected Link - Linkkk">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-primary/5 via-light to-info/5">
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -183,6 +185,7 @@ export default function PasswordPage() {
           </Link>
         </motion.div>
       </motion.div>
-    </div>
+      </div>
+    </RouteGuard>
   );
 }

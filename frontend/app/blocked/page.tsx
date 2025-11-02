@@ -1,4 +1,5 @@
 "use client";
+import RouteGuard from '@/app/components/RouteGuard/RouteGuard';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Button from '@/app/components/ui/Button/Button';
@@ -12,7 +13,8 @@ export default function BlockedPage() {
   const message = searchParams.get('message');
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <RouteGuard type="public" title="Access Blocked - Linkkk">
+      <div className="min-h-screen flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -103,6 +105,7 @@ export default function BlockedPage() {
           </Link>
         </motion.div>
       </motion.div>
-    </div>
+      </div>
+    </RouteGuard>
   );
 }
