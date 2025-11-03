@@ -76,7 +76,7 @@ export default function Dashboard() {
         <Sidebar />
 
         {/* Dashboard */}
-        <div className={`mt-20 md:mt-0 transition-all flex-1 md:pr-18 space-y-8 min-w-0 ${desktopOpen ? 'md:ml-64' : 'md:ml-20'}`}>
+        <div className={`transition-all flex-1 md:pr-18 space-y-8 min-w-0 ${desktopOpen ? 'md:ml-64' : 'md:ml-20'}`}>
           <motion.h1 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

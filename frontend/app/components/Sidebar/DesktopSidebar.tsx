@@ -51,7 +51,7 @@ const DesktopSidebar = () => {
             className="m-4 h-[calc(100vh-2rem)] hidden md:flex flex-col gap-2 items-center fixed top-0 left-0 flex-shrink-0"
         >
 
-            <div className='w-full flex flex-col gap-2 items-center p-2 bg-dark/5 rounded-xl'>
+            <div className='w-full flex-1 flex flex-col gap-2 items-center p-2 bg-dark/5 rounded-xl'>
                 {/* Header */}
                 <div className="flex items-center justify-between w-full">
                     {/* Logo */}

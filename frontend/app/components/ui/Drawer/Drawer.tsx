@@ -66,9 +66,9 @@ const Drawer: React.FC<DrawerProps> = ({
         right: isAnimating ? 'translate-x-0 opacity-100' : 'translate-x-10 opacity-0',
     };
 
-    const mainPlacement = placement.includes('top') ? 'top' 
+    const mainPlacement = placement.includes('top') ? 'top'
                         : placement.includes('bottom') ? 'bottom'
-                        : placement.includes('left') ? 'left' 
+                        : placement.includes('left') ? 'left'
                         : 'right';
 
     const placementClasses = {
@@ -123,7 +123,15 @@ const Drawer: React.FC<DrawerProps> = ({
     const drawerContent = (
         <div className={`fixed inset-0 flex z-[9997] p-6 m-0 transition-all duration-300 ease-in-out ${placementClasses[placement]}`}>
             {modal && <div className={overlayClasses} onClick={open ? onClose : undefined} />}
-            <div className={drawerClasses}>
+            <div className={cn(drawerClasses, 'relative')}>
+                {/* Close button */}
+                <button
+                    onClick={onClose}
+                    className="absolute top-4 right-4 p-2 rounded-lg hover:bg-dark/5 transition-colors z-10"
+                    aria-label="Close drawer"
+                >
+                    <TbX size={20} className="text-dark" strokeWidth={2.5} />
+                </button>
                 {children}
             </div>
         </div>

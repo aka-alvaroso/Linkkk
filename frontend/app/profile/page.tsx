@@ -1,9 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
 import RouteGuard from "@/app/components/RouteGuard/RouteGuard";
-import Navbar from "@/app/components/Navbar/Navbar";
+import Sidebar from "@/app/components/Sidebar/Sidebar";
 import { useAuth } from "@/app/hooks";
 import { useAuthStore } from "@/app/stores/authStore";
+import { useSidebarStore } from "@/app/stores/sidebarStore";
 import { useToast } from "@/app/hooks/useToast";
 import Button from "@/app/components/ui/Button/Button";
 import * as motion from "motion/react-client";
@@ -251,18 +252,22 @@ export default function ProfilePage() {
     }
   };
 
+  const { desktopOpen } = useSidebarStore();
+
   return (
     <RouteGuard type="user-only" title="Profile - Linkkk">
-      <Navbar />
+      <div className="relative md:flex md:flex-row justify-center p-4 md:gap-11 max-w-[128rem] mx-auto">
+        <Sidebar />
 
-      <div className="pt-24 w-full max-w-6xl mx-auto px-4 pb-16">
+        <div className={`mt-0 transition-all flex-1 md:pr-18 min-w-0 ${desktopOpen ? 'md:ml-64' : 'md:ml-20'}`}>
+          <div className="w-full max-w-6xl mx-auto pb-16">
 
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ ease: "backInOut" }}
-          className="mb-12 flex flex-col md:flex-row items-center gap-6 p-8 bg-light border-2 border-dark rounded-3xl shadow-[8px_8px_0_var(--color-dark)]"
+          className="mb-6 flex flex-col md:flex-row items-center gap-6 p-8 bg-light border-2 border-dark rounded-3xl shadow-[8px_8px_0_var(--color-dark)]"
         >
           <div className="relative size-32 rounded-full overflow-hidden border-4 border-dark shadow-[4px_4px_0_var(--color-dark)]">
             {avatarUrl && (
@@ -639,6 +644,10 @@ export default function ProfilePage() {
             </div>
           </motion.div>
 
+        </div>
+        {/* End Grid Layout */}
+
+          </div>
         </div>
       </div>
     </RouteGuard>

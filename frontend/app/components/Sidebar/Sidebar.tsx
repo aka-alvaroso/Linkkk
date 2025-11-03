@@ -1,11 +1,12 @@
 import React from 'react';
 import DesktopSidebar from './DesktopSidebar';
-import MobileNavbar from '../Navbar/MobileNavbar';
+import MobileNavigation from "../Navigation/MobileNavigation";
+
 
 const Sidebar = () => {
     return (
         <div>
-            <MobileNavbar />
+            <MobileNavigation />
             <DesktopSidebar />
         </div>
     );

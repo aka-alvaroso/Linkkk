@@ -55,3 +55,12 @@ body {
   display: none;  /* Safari and Chrome */
 }
 
+/* Safe area for mobile devices (iPhone notch, etc.) */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.pb-safe {
+  padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
+}
+
