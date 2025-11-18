@@ -6,6 +6,7 @@ const {
   getLinksLimiter,
   updateLinkLimiter,
   passwordVerifyLimiter,
+  passwordVerifyGlobalLimiter,
   createRuleLimiter,
   updateRuleLimiter,
   deleteRuleLimiter,
@@ -37,9 +38,11 @@ router.put("/:shortUrl", auth, updateLinkLimiter, updateLink);
 router.delete("/:shortUrl", auth, deleteLink);
 
 // Password verification (public endpoint - no auth required)
+// SECURITY: Apply both per-IP and global rate limiters to prevent brute force
 router.post(
   "/:shortUrl/verify-password",
-  passwordVerifyLimiter,
+  passwordVerifyGlobalLimiter, // Apply global limit first
+  passwordVerifyLimiter, // Then per-IP limit
   verifyPasswordGate
 );
 

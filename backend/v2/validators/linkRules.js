@@ -1,4 +1,5 @@
 const z = require("zod");
+const validator = require("validator");
 
 // ============================================
 // ENUMS (matching Prisma schema)
@@ -155,19 +156,44 @@ const redirectSettingsSchema = z.object({
 
 // Block access action settings
 const blockAccessSettingsSchema = z.object({
-  reason: z.string().min(1).max(500).optional(),
+  reason: z
+    .string()
+    .min(1)
+    .max(500)
+    .transform((text) => validator.escape(text)) // SECURITY: Sanitize to prevent XSS
+    .optional(),
 });
 
 // Notify action settings
 const notifySettingsSchema = z.object({
-  webhookUrl: z.string().url().optional(),
-  message: z.string().min(1).max(1000).optional(),
+  webhookUrl: z
+    .string()
+    .url()
+    .refine((url) => {
+      // Only allow HTTPS for webhook URLs (security)
+      return url.startsWith("https://");
+    }, { message: "Webhook URL must use HTTPS" })
+    .refine((url) => {
+      const { isValidWebhookUrl } = require("../utils/webhookValidator");
+      return isValidWebhookUrl(url);
+    }, { message: "Webhook URL is not allowed (blocked for security reasons)" })
+    .optional(),
+  message: z
+    .string()
+    .min(1)
+    .max(1000)
+    .transform((text) => validator.escape(text)) // SECURITY: Sanitize to prevent XSS
+    .optional(),
 });
 
 // Password gate action settings
 const passwordGateSettingsSchema = z.object({
   passwordHash: z.string().min(1),
-  hint: z.string().max(200).optional(),
+  hint: z
+    .string()
+    .max(200)
+    .transform((text) => validator.escape(text)) // SECURITY: Sanitize to prevent XSS
+    .optional(),
 });
 
 // ============================================

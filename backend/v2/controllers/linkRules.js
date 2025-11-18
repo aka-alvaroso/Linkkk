@@ -19,10 +19,21 @@ const checkLinkAccess = async (shortUrl, user, guest) => {
     return { link: null, hasAccess: false, error: ERRORS.LINK_NOT_FOUND };
   }
 
-  const hasUserAccess = user && link.userId === user.id;
-  const hasGuestAccess = guest && link.guestSessionId === guest.guestSessionId;
+  // SECURITY: Strict authorization check with null validation (prevents BOLA)
+  let hasAccess = false;
 
-  if (!hasUserAccess && !hasGuestAccess) {
+  // User access: Both IDs must exist and match
+  if (user?.id && link.userId && link.userId === user.id) {
+    hasAccess = true;
+  }
+
+  // Guest access: Both IDs must exist and match
+  if (!hasAccess && guest?.guestSessionId && link.guestSessionId &&
+      link.guestSessionId === guest.guestSessionId) {
+    hasAccess = true;
+  }
+
+  if (!hasAccess) {
     return { link, hasAccess: false, error: ERRORS.LINK_ACCESS_DENIED };
   }
 

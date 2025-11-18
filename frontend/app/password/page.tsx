@@ -50,7 +50,7 @@ export default function PasswordPage() {
       console.error('Password verification error:', err);
 
       if (err instanceof HttpError) {
-        setError(err.userMessage || err.message || 'Incorrect password');
+        setError(err.message || 'Incorrect password');
       } else {
         setError('An error occurred. Please try again.');
       }

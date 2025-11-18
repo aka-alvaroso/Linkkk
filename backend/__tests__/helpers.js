@@ -25,6 +25,9 @@ async function createTestUser(username = 'test_user', email = 'test@example.com'
 
   const token = jwt.sign({ id: user.id }, process.env.V2_AUTH_SECRET_KEY, {
     expiresIn: '7d',
+    algorithm: 'HS256',
+    issuer: 'linkkk-api',
+    audience: 'linkkk-users',
   });
 
   return { user, token, password };
@@ -73,11 +76,22 @@ function extractCookie(cookies, cookieName) {
   return match ? match[1] : null;
 }
 
+/**
+ * Get CSRF token from the server
+ */
+async function getCsrfToken() {
+  const response = await request(app).get('/csrf-token');
+  const csrfToken = response.body.csrfToken;
+  const cookies = response.headers['set-cookie'];
+  return { csrfToken, cookies };
+}
+
 module.exports = {
   createTestUser,
   createGuestSession,
   createTestLink,
   extractCookie,
+  getCsrfToken,
   app,
   prisma,
 };

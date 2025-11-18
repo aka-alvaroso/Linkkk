@@ -34,8 +34,13 @@ export function RuleAction({
   actionSettings,
   onChange
 }: RuleActionProps) {
-  const handleTypeChange = (newType: string | number | null) => {
-    const type = newType as ActionType;
+  const handleTypeChange = (newType: React.SetStateAction<string | number | null>) => {
+    // Handle both direct values and functions (SetStateAction)
+    const resolvedType = typeof newType === 'function'
+      ? newType(actionType)
+      : newType;
+
+    const type = resolvedType as ActionType;
 
     // Don't trigger change if it's the same type
     if (type === actionType) return;
@@ -103,7 +108,6 @@ export function RuleAction({
         return (
           <div className="flex items-center gap-2">
             <Input
-              type="password"
               placeholder="Password"
               value={passwordSettings.passwordHash || ''}
               onChange={(e) => handleSettingChange('passwordHash', e.target.value)}

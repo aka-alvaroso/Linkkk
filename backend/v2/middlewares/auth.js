@@ -4,6 +4,9 @@ const AUTH_SECRET_KEY = process.env.V2_AUTH_SECRET_KEY;
 const GUEST_SECRET_KEY = process.env.V2_GUEST_SECRET_KEY;
 const { errorResponse } = require("../utils/response");
 const ERRORS = require("../constants/errorCodes");
+// SECURITY: JWT secret rotation support
+const { verifyWithRotation } = require("../utils/jwtSecrets");
+const logger = require("../utils/logger");
 
 // Must be authenticated as user or guest
 const auth = async (req, res, next) => {
@@ -26,7 +29,12 @@ const auth = async (req, res, next) => {
 
   if (token) {
     try {
-      const userDecoded = jwt.verify(token, AUTH_SECRET_KEY);
+      // SECURITY: Use rotation-aware verification
+      const userDecoded = verifyWithRotation(token, jwt, 'auth', {
+        algorithms: ["HS256"],
+        issuer: "linkkk-api",
+        audience: "linkkk-users",
+      });
 
       // Fetch full user data from database
       const user = await prisma.user.findUnique({
@@ -47,14 +55,19 @@ const auth = async (req, res, next) => {
         process.env.ENV === "development" &&
         process.env.NODE_ENV !== "test"
       ) {
-        console.warn("User token validation failed:", error.message);
+        logger.debug("User token validation failed", { error: error.message });
       }
     }
   }
 
   if (guestToken) {
     try {
-      const guestDecoded = jwt.verify(guestToken, GUEST_SECRET_KEY);
+      // SECURITY: Use rotation-aware verification
+      const guestDecoded = verifyWithRotation(guestToken, jwt, 'guest', {
+        algorithms: ["HS256"],
+        issuer: "linkkk-api",
+        audience: "linkkk-guests",
+      });
       req.guest = guestDecoded;
     } catch (error) {
       // Guest token invalid or expired - log but don't throw
@@ -62,7 +75,7 @@ const auth = async (req, res, next) => {
         process.env.ENV === "development" &&
         process.env.NODE_ENV !== "test"
       ) {
-        console.warn("Guest token validation failed:", error.message);
+        logger.debug("Guest token validation failed", { error: error.message });
       }
     }
   }
@@ -130,16 +143,23 @@ const optionalGuest = async (req, res, next) => {
 
   if (guestToken) {
     try {
-      const guestDecoded = jwt.verify(guestToken, GUEST_SECRET_KEY);
+      // SECURITY: Use rotation-aware verification
+      const guestDecoded = verifyWithRotation(guestToken, jwt, 'guest', {
+        algorithms: ["HS256"],
+        issuer: "linkkk-api",
+        audience: "linkkk-guests",
+      });
       req.guest = guestDecoded;
     } catch (error) {
       // Optional guest auth - token validation failed but that's ok
       req.guest = null;
-      if (process.env.ENV === "development" && process.env.NODE_ENV !== "test") {
-        console.warn(
-          "Optional guest (optionalGuest) token validation failed:",
-          error.message
-        );
+      if (
+        process.env.ENV === "development" &&
+        process.env.NODE_ENV !== "test"
+      ) {
+        logger.debug("Optional guest token validation failed", {
+          error: error.message,
+        });
       }
     }
   }
@@ -161,7 +181,11 @@ const optionalAuth = async (req, res, next) => {
 
   if (token) {
     try {
-      const decoded = jwt.verify(token, AUTH_SECRET_KEY);
+      const decoded = jwt.verify(token, AUTH_SECRET_KEY, {
+        algorithms: ["HS256"],
+        issuer: "linkkk-api",
+        audience: "linkkk-users",
+      });
 
       // Fetch full user data from database
       const user = await prisma.user.findUnique({
@@ -178,21 +202,32 @@ const optionalAuth = async (req, res, next) => {
     } catch (error) {
       // Optional auth - token validation failed but that's ok
       req.user = null;
-      if (process.env.ENV === "development" && process.env.NODE_ENV !== "test") {
-        console.warn("Optional user token validation failed:", error.message);
+      if (
+        process.env.ENV === "development" &&
+        process.env.NODE_ENV !== "test"
+      ) {
+        logger.debug("Optional user token validation failed", { error: error.message });
       }
     }
   }
 
   if (guestToken) {
     try {
-      const guestDecoded = jwt.verify(guestToken, GUEST_SECRET_KEY);
+      // SECURITY: Use rotation-aware verification
+      const guestDecoded = verifyWithRotation(guestToken, jwt, 'guest', {
+        algorithms: ["HS256"],
+        issuer: "linkkk-api",
+        audience: "linkkk-guests",
+      });
       req.guest = guestDecoded;
     } catch (error) {
       // Optional auth - guest token validation failed but that's ok
       req.guest = null;
-      if (process.env.ENV === "development" && process.env.NODE_ENV !== "test") {
-        console.warn("Optional guest token validation failed:", error.message);
+      if (
+        process.env.ENV === "development" &&
+        process.env.NODE_ENV !== "test"
+      ) {
+        logger.debug("Optional guest token validation failed", { error: error.message });
       }
     }
   }

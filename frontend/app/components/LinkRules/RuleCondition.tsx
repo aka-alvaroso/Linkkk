@@ -69,8 +69,13 @@ const BOOLEAN_OPTIONS = [
 ];
 
 export function RuleCondition({ condition, onChange, onDelete }: RuleConditionProps) {
-  const handleFieldChange = (newField: string | number | null) => {
-    const fieldType = newField as FieldType;
+  const handleFieldChange = (newField: React.SetStateAction<string | number | null>) => {
+    // Handle both direct values and functions (SetStateAction)
+    const resolvedField = typeof newField === 'function'
+      ? newField(condition.field)
+      : newField;
+
+    const fieldType = resolvedField as FieldType;
     const availableOperators = OPERATOR_OPTIONS[fieldType];
 
     // Set default value based on field type
@@ -88,17 +93,27 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
     });
   };
 
-  const handleOperatorChange = (newOperator: string | number | null) => {
+  const handleOperatorChange = (newOperator: React.SetStateAction<string | number | null>) => {
+    // Handle both direct values and functions (SetStateAction)
+    const resolvedOperator = typeof newOperator === 'function'
+      ? newOperator(condition.operator)
+      : newOperator;
+
     onChange({
       ...condition,
-      operator: newOperator as OperatorType,
+      operator: resolvedOperator as OperatorType,
     });
   };
 
   const handleValueChange = (newValue: any) => {
+    // Handle both direct values and functions (SetStateAction) for Select compatibility
+    const resolvedValue = typeof newValue === 'function'
+      ? newValue(condition.value)
+      : newValue;
+
     onChange({
       ...condition,
-      value: newValue,
+      value: resolvedValue,
     });
   };
 
@@ -154,7 +169,7 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
       case 'date':
         return (
           <Input
-            type="datetime-local"
+            {...({ type: "datetime-local" } as any)}
             value={condition.value as string}
             onChange={(e) => handleValueChange(e.target.value)}
             size="sm"
@@ -166,8 +181,7 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
       case 'access_count':
         return (
           <Input
-            type="number"
-            min="0"
+            {...({ type: "number", min: "0" } as any)}
             value={condition.value as number}
             onChange={(e) => handleValueChange(parseInt(e.target.value) || 0)}
             size="sm"

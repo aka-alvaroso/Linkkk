@@ -48,7 +48,7 @@ const detectDevice = (userAgent) => {
  */
 const validateConditionStructure = (condition) => {
   // Basic structure validation
-  if (!condition || typeof condition !== 'object') {
+  if (!condition || typeof condition !== "object") {
     return false;
   }
 
@@ -60,20 +60,28 @@ const validateConditionStructure = (condition) => {
   }
 
   // Validate field types
-  const validFields = ['country', 'device', 'ip', 'is_vpn', 'is_bot', 'date', 'access_count'];
+  const validFields = [
+    "country",
+    "device",
+    "ip",
+    "is_vpn",
+    "is_bot",
+    "date",
+    "access_count",
+  ];
   if (!validFields.includes(field)) {
     return false;
   }
 
   // Validate operators per field type
   const validOperators = {
-    country: ['in', 'not_in'],
-    device: ['equals', 'not_equals'],
-    ip: ['equals', 'not_equals'],
-    is_vpn: ['equals'],
-    is_bot: ['equals'],
-    date: ['before', 'after', 'equals'],
-    access_count: ['equals', 'greater_than', 'less_than'],
+    country: ["in", "not_in"],
+    device: ["equals", "not_equals"],
+    ip: ["equals", "not_equals"],
+    is_vpn: ["equals"],
+    is_bot: ["equals"],
+    date: ["before", "after", "equals"],
+    access_count: ["equals", "greater_than", "less_than"],
   };
 
   if (!validOperators[field] || !validOperators[field].includes(operator)) {
@@ -81,15 +89,18 @@ const validateConditionStructure = (condition) => {
   }
 
   // Validate value types per field
-  if (field === 'country' && !Array.isArray(value)) {
+  if (field === "country" && !Array.isArray(value)) {
     return false;
   }
 
-  if ((field === 'is_vpn' || field === 'is_bot') && typeof value !== 'boolean') {
+  if (
+    (field === "is_vpn" || field === "is_bot") &&
+    typeof value !== "boolean"
+  ) {
     return false;
   }
 
-  if (field === 'access_count' && typeof value !== 'number') {
+  if (field === "access_count" && typeof value !== "number") {
     return false;
   }
 
@@ -105,7 +116,10 @@ const validateConditionStructure = (condition) => {
 const evaluateCondition = async (condition, context) => {
   // Runtime validation to protect against malformed data from database
   if (!validateConditionStructure(condition)) {
-    console.error("Invalid condition structure detected:", JSON.stringify(condition));
+    console.error(
+      "Invalid condition structure detected:",
+      JSON.stringify(condition)
+    );
     // Fail closed - treat invalid conditions as not matching
     return false;
   }
@@ -312,11 +326,6 @@ const evaluateAction = async (action, link) => {
   }
 };
 
-/**
- * Validates if a URL is safe for redirection
- * @param {string} url - URL to validate
- * @returns {boolean} - True if URL is safe
- */
 const isValidRedirectUrl = (url) => {
   try {
     const parsed = new URL(url);
@@ -324,23 +333,25 @@ const isValidRedirectUrl = (url) => {
     const hostname = parsed.hostname.toLowerCase();
 
     // Only allow http and https protocols
-    if (protocol !== 'http:' && protocol !== 'https:') {
+    if (protocol !== "http:" && protocol !== "https:") {
       return false;
     }
 
     // Block localhost and private IPs (SSRF protection)
-    if (hostname === 'localhost' ||
-        hostname === '127.0.0.1' ||
-        hostname === '0.0.0.0' ||
-        hostname === '::1' ||
-        hostname.endsWith('.local') ||
-        hostname.endsWith('.localhost') ||
-        hostname.startsWith('127.') ||
-        hostname.startsWith('192.168.') ||
-        hostname.startsWith('10.') ||
-        hostname.startsWith('169.254.') ||
-        hostname === '169.254.169.254' || // AWS metadata
-        hostname.match(/^172\.(1[6-9]|2[0-9]|3[01])\./)) {
+    if (
+      hostname === "localhost" ||
+      hostname === "127.0.0.1" ||
+      hostname === "0.0.0.0" ||
+      hostname === "::1" ||
+      hostname.endsWith(".local") ||
+      hostname.endsWith(".localhost") ||
+      hostname.startsWith("127.") ||
+      hostname.startsWith("192.168.") ||
+      hostname.startsWith("10.") ||
+      hostname.startsWith("169.254.") ||
+      hostname === "169.254.169.254" || // AWS metadata
+      hostname.match(/^172\.(1[6-9]|2[0-9]|3[01])\./)
+    ) {
       return false;
     }
 
@@ -350,23 +361,82 @@ const isValidRedirectUrl = (url) => {
   }
 };
 
-/**
- * Replaces template variables in URLs
- * @param {string} url - URL with potential variables
- * @param {Object} link - Link object
- * @returns {string} - URL with variables replaced
- */
 const replaceVariables = (url, link) => {
-  const replaced = url
-    .replace(/\{\{longUrl\}\}/g, link.longUrl)
-    .replace(/\{\{shortUrl\}\}/g, link.shortUrl);
-
-  // Validate the final URL after replacement (prevents open redirect)
-  if (!isValidRedirectUrl(replaced)) {
-    throw new Error("Invalid redirect URL after variable replacement");
+  // SECURITY: Validate source values before replacement (prevents template injection)
+  if (!isValidRedirectUrl(link.longUrl)) {
+    throw new Error("Invalid longUrl for template replacement");
   }
 
-  return replaced;
+  // SECURITY: Prevent nested template injection - check for template syntax in values
+  const templatePattern = /\{\{.*?\}\}/;
+  if (templatePattern.test(link.longUrl) || templatePattern.test(link.shortUrl)) {
+    throw new Error("Template syntax not allowed in link values (nested template injection attempt)");
+  }
+
+  // SECURITY: Prevent other injection patterns
+  const dangerousPatterns = [
+    /javascript:/i,
+    /data:/i,
+    /vbscript:/i,
+    /file:/i,
+    /<script/i,
+    /on\w+\s*=/i, // Event handlers like onclick=
+  ];
+
+  for (const pattern of dangerousPatterns) {
+    if (pattern.test(link.longUrl) || pattern.test(link.shortUrl)) {
+      throw new Error("Dangerous pattern detected in link values (injection attempt)");
+    }
+  }
+
+  // SECURITY: Check for excessive length to prevent DoS
+  if (link.longUrl.length > 2048 || link.shortUrl.length > 100) {
+    throw new Error("Link values exceed maximum allowed length");
+  }
+
+  // SECURITY: URL-encode template values to prevent injection
+  // Check if we're replacing in query params or path
+  const encodedLongUrl = encodeURIComponent(link.longUrl);
+  const encodedShortUrl = encodeURIComponent(link.shortUrl);
+
+  // Perform replacement with encoded values
+  let replaced = url
+    .replace(/\{\{longUrl\}\}/g, encodedLongUrl)
+    .replace(/\{\{shortUrl\}\}/g, encodedShortUrl);
+
+  // SECURITY: After replacement, check for remaining template syntax (indicates nested templates)
+  if (templatePattern.test(replaced)) {
+    throw new Error("Template syntax detected after replacement (nested template injection attempt)");
+  }
+
+  // Try to decode and validate if it's a complete URL
+  try {
+    // If the replaced URL is valid, use it as-is
+    const testUrl = new URL(replaced);
+    // Valid URL, but let's still validate for security
+    if (!isValidRedirectUrl(replaced)) {
+      throw new Error("Invalid redirect URL after variable replacement");
+    }
+    return replaced;
+  } catch {
+    // If not a valid complete URL, it might be a relative path or needs decoding
+    // In this case, try with un-encoded values (backward compatibility)
+    replaced = url
+      .replace(/\{\{longUrl\}\}/g, link.longUrl)
+      .replace(/\{\{shortUrl\}\}/g, link.shortUrl);
+
+    // SECURITY: Check again for template syntax after unencoded replacement
+    if (templatePattern.test(replaced)) {
+      throw new Error("Template syntax detected after replacement (nested template injection attempt)");
+    }
+
+    // Validate the final URL after replacement (prevents open redirect)
+    if (!isValidRedirectUrl(replaced)) {
+      throw new Error("Invalid redirect URL after variable replacement");
+    }
+
+    return replaced;
+  }
 };
 
 // ============================================

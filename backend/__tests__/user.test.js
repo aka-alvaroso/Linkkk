@@ -279,9 +279,14 @@ describe("User Operations", () => {
         .expect(200);
 
       expect(response.body.success).toBe(true);
-      // Password should be returned (as per current implementation)
-      // but in production, you might want to exclude it
-      expect(response.body.data).toHaveProperty("password");
+      // SECURITY: Password should NOT be returned in response
+      expect(response.body.data).not.toHaveProperty("password");
+      expect(response.body.data).not.toHaveProperty("apiKey");
+      // Should only return safe fields
+      expect(response.body.data).toHaveProperty("id");
+      expect(response.body.data).toHaveProperty("username");
+      expect(response.body.data).toHaveProperty("email");
+      expect(response.body.data).toHaveProperty("createdAt");
     });
   });
 

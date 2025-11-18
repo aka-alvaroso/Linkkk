@@ -48,11 +48,23 @@ app.use(
   })
 );
 
+// SECURITY: Additional security headers
 app.use((req, res, next) => {
+  // Restrict browser features
   res.setHeader(
     "Permissions-Policy",
     "geolocation=(), microphone=(), camera=()"
   );
+
+  // SECURITY: Prevent MIME type sniffing
+  res.setHeader("X-Content-Type-Options", "nosniff");
+
+  // SECURITY: Prevent downloads from opening automatically in IE
+  res.setHeader("X-Download-Options", "noopen");
+
+  // SECURITY: Control DNS prefetching
+  res.setHeader("X-DNS-Prefetch-Control", "off");
+
   next();
 });
 
@@ -73,23 +85,43 @@ app.use(
   cors({
     origin: [process.env.FRONTEND_URL],
     methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization", "guest-token"],
+    allowedHeaders: ["Content-Type", "Authorization", "guest-token", "X-CSRF-Token", "CSRF-Token"],
     credentials: true,
+    exposedHeaders: ["X-Request-ID"], // Allow frontend to read request ID
   })
 );
 app.use(cookieParser());
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 
+// SECURITY: Content-Type validation (VUL-009 fix)
+const { validateContentType } = require("./v2/middlewares/contentType");
+app.use(validateContentType);
+
+// SECURITY: JSON depth and complexity validation (prevents DoS attacks)
+const { validateJsonDepth, validateJsonKeys } = require("./v2/middlewares/jsonDepthValidator");
+app.use(validateJsonDepth(10)); // Max depth: 10 levels
+app.use(validateJsonKeys(1000)); // Max total keys: 1000
+
+// CSRF Protection
+const { csrfTokenGenerator, csrfProtection, getCsrfToken } = require("./v2/middlewares/csrf");
+
+// Generate CSRF token for all requests
+app.use(csrfTokenGenerator);
+
+// Endpoint to get CSRF token (for SPAs)
+app.get("/csrf-token", getCsrfToken);
+
 app.get("/status", (req, res) => {
   res.send("Server running");
 });
 
 // API routes (must be before redirect catch-all)
-app.use("/auth", authRouter);
-app.use("/link", linkRouter);
-app.use("/accesses", accessesRouter);
-app.use("/user", userRouter);
+// CSRF protection applied to state-changing routes
+app.use("/auth", csrfProtection, authRouter);
+app.use("/link", csrfProtection, linkRouter);
+app.use("/accesses", accessesRouter); // GET only, no CSRF needed
+app.use("/user", csrfProtection, userRouter);
 
 // Public redirect endpoint (LAST - catches everything else)
 app.get("/r/:shortUrl", redirectLink);
@@ -109,22 +141,9 @@ app.use((req, res, next) => {
 
 // Global Error Handler
 app.use((err, req, res, next) => {
-  // Log error with context for debugging
-  const errorLog = {
-    timestamp: new Date().toISOString(),
-    message: err.message,
-    code: err.code,
-    url: req.url,
-    method: req.method,
-    userId: req.user?.id || null,
-    guestId: req.guest?.guestSessionId || null,
-  };
-
-  // Only log stack trace in development
-  if (process.env.ENV === "development") {
-    errorLog.stack = err.stack;
-    errorLog.context = err.context;
-  }
+  // SECURITY: Sanitize error logs to prevent PII leaks (GDPR compliance)
+  const { sanitizeError } = require("./v2/utils/logSanitizer");
+  const errorLog = sanitizeError(err, req);
 
   console.error("Error:", errorLog);
 

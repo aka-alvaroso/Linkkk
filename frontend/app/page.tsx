@@ -95,10 +95,10 @@ export default function Landing() {
                 <Input
                   autoFocus
                   value={url}
-                  onChange={(e) => setUrl(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUrl(e.target.value)}
                   placeholder="Paste your long URL here..."
                   className="bg-transparent border-none shadow-none focus:ring-0 text-lg focus:outline-none"
-                  onKeyDown={(e) => {
+                  onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
                     if (e.key === 'Enter' && url) {
                       handleShorten();
                     }

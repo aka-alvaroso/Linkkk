@@ -2,9 +2,6 @@ const jwt = require("jsonwebtoken");
 const prisma = require("../prisma/client");
 const bcryptjs = require("bcryptjs");
 
-const GUEST_SECRET_KEY = process.env.V2_GUEST_SECRET_KEY;
-const ENV = process.env.ENV;
-
 const { successResponse, errorResponse } = require("../utils/response");
 const ERRORS = require("../constants/errorCodes");
 const { registerSchema, loginSchema } = require("../validators/auth");
@@ -39,12 +36,13 @@ const createGuestSession = async (req, res) => {
     });
 
     const token = jwt.sign(
-      {
-        guestSessionId: guestSession.id,
-      },
-      GUEST_SECRET_KEY,
+      { guestSessionId: guestSession.id },
+      process.env.V2_GUEST_SECRET_KEY,
       {
         expiresIn: "1h",
+        algorithm: "HS256",
+        issuer: "linkkk-api",
+        audience: "linkkk-guests",
       }
     );
 
@@ -93,7 +91,8 @@ const register = async (req, res) => {
       return errorResponse(res, ERRORS.USER_EXISTS);
     }
 
-    const hashedPassword = await bcryptjs.hash(password, 10);
+    // SECURITY: Use bcrypt with 12 rounds (OWASP recommendation)
+    const hashedPassword = await bcryptjs.hash(password, 12);
     const user = await prisma.user.create({
       data: {
         username,
@@ -116,6 +115,9 @@ const register = async (req, res) => {
 
     const token = jwt.sign({ id: user.id }, process.env.V2_AUTH_SECRET_KEY, {
       expiresIn: "7d",
+      algorithm: "HS256",
+      issuer: "linkkk-api",
+      audience: "linkkk-users",
     });
 
     res.cookie("token", token, {
@@ -181,6 +183,9 @@ const login = async (req, res) => {
 
     const token = jwt.sign({ id: user.id }, process.env.V2_AUTH_SECRET_KEY, {
       expiresIn: "7d",
+      algorithm: "HS256",
+      issuer: "linkkk-api",
+      audience: "linkkk-users",
     });
 
     res.cookie("token", token, {

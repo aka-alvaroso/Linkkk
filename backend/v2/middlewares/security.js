@@ -12,8 +12,10 @@ const authLimiter = rateLimit({
   max: process.env.ENV === "development" ? 1000 : 10,
   standardHeaders: true,
   legacyHeaders: false,
+  // SECURITY: Use only IP for rate limiting (VUL-006 fix)
+  // User-Agent can be easily spoofed to bypass limits
   keyGenerator: (req) => {
-    return req.ip + ":" + (req.get("User-Agent") || "");
+    return req.ip;
   },
   handler: rateLimitHandler,
 });
@@ -85,15 +87,40 @@ const linkValidatorLimiter = rateLimit({
   handler: rateLimitHandler,
 });
 
+// SECURITY: Strict rate limiting for password verification to prevent brute force
+// 3 attempts per hour per IP+link (prevents targeted attacks)
 const passwordVerifyLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 5,
+  max: process.env.ENV === "development" ? 1000 : 3, // Reduced from 5 to 3
   skipSuccessfulRequests: true,
+  standardHeaders: true,
+  legacyHeaders: false,
   keyGenerator: (req) => {
     const shortUrl = req.params.shortUrl || "";
     return req.ip + ":" + shortUrl;
   },
   handler: rateLimitHandler,
+});
+
+// SECURITY: Global limit for password verification per link (prevents distributed attacks)
+// 20 attempts per hour per link from all IPs combined
+const passwordVerifyGlobalLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: process.env.ENV === "development" ? 1000 : 20, // Global limit per link
+  skipSuccessfulRequests: true,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => {
+    const shortUrl = req.params.shortUrl || "";
+    return `global:${shortUrl}`;
+  },
+  handler: (req, res, next, options) => {
+    return errorResponse(res, {
+      code: 'PASSWORD_VERIFY_LIMIT_EXCEEDED',
+      message: 'Too many password attempts for this link. Please try again later.',
+      statusCode: 429,
+    });
+  },
 });
 
 const getLinkAccessesLimiter = rateLimit({
@@ -143,6 +170,7 @@ module.exports = {
   getLinksLimiter,
   linkValidatorLimiter,
   passwordVerifyLimiter,
+  passwordVerifyGlobalLimiter,
   getLinkAccessesLimiter,
   createRuleLimiter,
   updateRuleLimiter,

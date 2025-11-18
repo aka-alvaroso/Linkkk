@@ -22,21 +22,31 @@ const updateUser = async (req, res) => {
     return errorResponse(res, ERRORS.INVALID_DATA, issues);
   }
 
-  let hashedPassword;
-  if (password) {
-    hashedPassword = await bcryptjs.hash(password, 10);
-  }
-
   try {
+    // SECURITY: Explicitly build update object with only allowed fields (prevents Mass Assignment)
+    const updateData = {};
+
+    if (email !== undefined) updateData.email = validate.data.email;
+    if (username !== undefined) updateData.username = validate.data.username;
+    if (avatarUrl !== undefined) updateData.avatarUrl = validate.data.avatarUrl;
+
+    if (password !== undefined) {
+      // SECURITY: Use bcrypt with 12 rounds (OWASP recommendation)
+      updateData.password = await bcryptjs.hash(validate.data.password, 12);
+    }
+
     const updatedUser = await prisma.user.update({
       where: {
         id: user.id,
       },
-      data: {
-        email,
-        username,
-        password: hashedPassword,
-        avatarUrl,
+      data: updateData,
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        avatarUrl: true,
+        createdAt: true,
+        // Don't return password or apiKey
       },
     });
 
