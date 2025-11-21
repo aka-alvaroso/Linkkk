@@ -4,13 +4,11 @@ import Input from '@/app/components/ui/Input/Input';
 import Button from '@/app/components/ui/Button/Button';
 import { TbCircleDashed, TbCircleDashedCheck, TbChevronDown, TbRocket, TbPlus } from 'react-icons/tb';
 import { useLinks } from '@/app/hooks';
-import InlineSelect from '../ui/InlineSelect/InlineSelect';
-import { FiCornerDownRight } from 'react-icons/fi';
 import { useToast } from '@/app/hooks/useToast';
 import * as motion from 'motion/react-client';
 import { AnimatePresence } from 'motion/react';
 import { useLinkRules } from '@/app/hooks';
-import { LinkRule as LinkRuleType } from '@/app/types/linkRules';
+import { LinkRule as LinkRuleType, RuleCondition } from '@/app/types/linkRules';
 import { LinkRule } from '../LinkRules/LinkRule';
 import { useAuth } from '@/app/hooks';
 import { PLAN_LIMITS } from '@/app/constants/limits';
@@ -51,7 +49,7 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
     }, [newLink]);
 
     // Process conditions to convert country string to array and filter "always"
-    const processConditions = (conditions: any[]) => {
+    const processConditions = (conditions: RuleCondition[]) => {
         return conditions
             .filter(condition => condition.field !== 'always')
             .map(condition => {

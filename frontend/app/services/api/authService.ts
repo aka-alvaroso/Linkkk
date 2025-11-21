@@ -2,6 +2,7 @@ import { API_CONFIG, defaultFetchOptions } from "@/app/config/api";
 import { HttpError, NetworkError, TimeoutError } from "@/app/utils/errors";
 import type { ApiResponse } from "@/app/types";
 import type { User } from "@/app/stores/authStore";
+import { csrfService } from "./csrfService";
 
 interface LoginDTO {
   usernameOrEmail: string;
@@ -47,7 +48,7 @@ class AuthService {
         data.code || 'UNKNOWN_ERROR',
         data.message || response.statusText,
         response.status >= 500,
-        (data as any).validation
+        undefined // TODO: Convert validation format if needed
       );
     }
 
@@ -74,9 +75,27 @@ class AuthService {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT);
 
+      // Get CSRF token for non-GET requests
+      const method = options.method?.toUpperCase() || 'GET';
+      const headers: HeadersInit = {
+        ...defaultFetchOptions.headers,
+        ...(options.headers || {}),
+      };
+
+      if (method !== 'GET') {
+        try {
+          const csrfToken = await csrfService.getToken();
+          (headers as Record<string, string>)['X-CSRF-Token'] = csrfToken;
+        } catch (error) {
+          console.error('Failed to get CSRF token:', error);
+          // Continue without CSRF token - let the server handle it
+        }
+      }
+
       const response = await fetch(url, {
         ...defaultFetchOptions,
         ...options,
+        headers,
         signal: controller.signal,
       });
 

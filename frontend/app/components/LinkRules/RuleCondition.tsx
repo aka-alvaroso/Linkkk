@@ -7,7 +7,7 @@ import React from 'react';
 import Select from '../ui/Select/Select';
 import Input from '../ui/Input/Input';
 import { TbTrash } from 'react-icons/tb';
-import { RuleCondition as RuleConditionType, FieldType, OperatorType, DeviceType } from '@/app/types/linkRules';
+import { RuleCondition as RuleConditionType, FieldType, OperatorType, DeviceType, ConditionValue } from '@/app/types/linkRules';
 
 interface RuleConditionProps {
   condition: RuleConditionType;
@@ -79,7 +79,7 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
     const availableOperators = OPERATOR_OPTIONS[fieldType];
 
     // Set default value based on field type
-    let defaultValue: any = '';
+    let defaultValue: ConditionValue = '';
     if (fieldType === 'always') defaultValue = true;
     else if (fieldType === 'country') defaultValue = '';
     else if (fieldType === 'device') defaultValue = 'mobile';
@@ -105,6 +105,7 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
     });
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleValueChange = (newValue: any) => {
     // Handle both direct values and functions (SetStateAction) for Select compatibility
     const resolvedValue = typeof newValue === 'function'
@@ -169,6 +170,7 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
       case 'date':
         return (
           <Input
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             {...({ type: "datetime-local" } as any)}
             value={condition.value as string}
             onChange={(e) => handleValueChange(e.target.value)}
@@ -181,6 +183,7 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
       case 'access_count':
         return (
           <Input
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             {...({ type: "number", min: "0" } as any)}
             value={condition.value as number}
             onChange={(e) => handleValueChange(parseInt(e.target.value) || 0)}

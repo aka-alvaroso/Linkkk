@@ -3,14 +3,13 @@ import RouteGuard from '@/app/components/RouteGuard/RouteGuard';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Button from '@/app/components/ui/Button/Button';
-import { TbHandStop, TbHome, TbLock, TbShieldX } from 'react-icons/tb';
+import { TbHandStop, TbHome } from 'react-icons/tb';
 import * as motion from 'motion/react-client';
 
 export default function BlockedPage() {
   const searchParams = useSearchParams();
   const shortUrl = searchParams.get('url');
   const reason = searchParams.get('reason');
-  const message = searchParams.get('message');
 
   return (
     <RouteGuard type="public" title="Access Blocked - Linkkk">

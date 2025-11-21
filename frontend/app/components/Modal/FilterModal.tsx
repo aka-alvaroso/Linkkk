@@ -3,7 +3,7 @@ import Modal from '@/app/components/ui/Modal/Modal';
 import Input from '@/app/components/ui/Input/Input';
 import InlineSelect from '@/app/components/ui/InlineSelect/InlineSelect';
 import Button from '@/app/components/ui/Button/Button';
-import { TbSearch, TbCircleDashedCheck, TbCircleDashed, TbFilterOff, TbCircleFilled, TbX } from 'react-icons/tb';
+import { TbSearch, TbCircleDashedCheck, TbCircleDashed, TbFilterOff, TbCircleFilled } from 'react-icons/tb';
 import * as motion from 'motion/react-client';
 import { AnimatePresence } from 'motion/react';
 
@@ -38,7 +38,7 @@ export default function FilterModal({
   };
 
   useEffect(() => {
-    
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Enter') {
         handleApply();
@@ -51,7 +51,7 @@ export default function FilterModal({
       document.removeEventListener('keydown', handleKeyDown);
     };
 
-  }, [filters]);
+  }, [filters, handleApply]);
 
   const handleReset = () => {
     setFilters(defaultFilters);

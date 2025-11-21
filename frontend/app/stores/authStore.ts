@@ -58,7 +58,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       user,
       isAuthenticated: !!user,
       isGuest: false,
-      guestSession: user ? null : undefined as any,
+      guestSession: user ? null : undefined,
     }),
 
   setGuestSession: (guestSession) =>
@@ -66,7 +66,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       guestSession,
       isGuest: !!guestSession,
       isAuthenticated: false,
-      user: guestSession ? null : undefined as any,
+      user: guestSession ? null : undefined,
     }),
 
   setAuthenticated: (isAuthenticated) => set({ isAuthenticated }),

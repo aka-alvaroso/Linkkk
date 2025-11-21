@@ -55,7 +55,7 @@ const Drawer: React.FC<DrawerProps> = ({
             const timeout = setTimeout(() => setShow(false), 300);
             return () => clearTimeout(timeout);
         }
-    }, [open]);
+    }, [open, onClose]);
 
     if (!show || !mounted) return null;
 

@@ -7,13 +7,11 @@ import {
   TbChartBar,
   TbSettings,
   TbTags,
-  TbApi,
   TbUser,
   TbBolt,
   TbRocket,
   TbWorld,
   TbCode,
-  TbArrowRight,
 } from "react-icons/tb";
 import Button from "@/app/components/ui/Button/Button";
 import Link from "next/link";
@@ -46,7 +44,7 @@ export default function FeaturesPage() {
 
             <p className="text-lg md:text-xl text-dark/70 font-medium leading-relaxed">
               Linkkk gives you the tools to create, manage, and understand your links like never before.
-              Here's everything you can do.
+              Here&apos;s everything you can do.
             </p>
           </motion.header>
 
@@ -119,7 +117,7 @@ export default function FeaturesPage() {
 
             <div className="prose prose-lg max-w-none">
               <p className="text-lg md:text-xl text-dark/80 font-medium leading-relaxed mb-4">
-                Your links aren't set in stone. Change them, pause them, or delete them whenever you need to.
+                Your links aren&apos;t set in stone. Change them, pause them, or delete them whenever you need to.
               </p>
 
               <p className="text-lg text-dark/70 leading-relaxed mb-4">
@@ -129,7 +127,7 @@ export default function FeaturesPage() {
 
               <p className="text-lg text-dark/70 leading-relaxed">
                 Need to temporarily disable a link? <strong className="text-dark">Deactivate it</strong> with one click.
-                The short link will show a friendly message instead of redirecting. Reactivate it just as easily when you're ready.
+                The short link will show a friendly message instead of redirecting. Reactivate it just as easily when you&apos;re ready.
               </p>
             </div>
           </motion.section>
@@ -161,25 +159,25 @@ export default function FeaturesPage() {
 
             <div className="prose prose-lg max-w-none">
               <p className="text-lg md:text-xl text-dark/80 font-medium leading-relaxed mb-4">
-                Know exactly who's clicking your links and where they're coming from.
+                Know exactly who&apos;s clicking your links and where they&apos;re coming from.
               </p>
 
               <p className="text-lg text-dark/70 leading-relaxed mb-4">
                 Every time someone clicks your link, we track detailed information: their <strong className="text-dark">country,
-                region, and city</strong>, what <strong className="text-dark">device and browser</strong> they're using,
+                region, and city</strong>, what <strong className="text-dark">device and browser</strong> they&apos;re using,
                 and even what website referred them to your link.
               </p>
 
               <p className="text-lg text-dark/70 leading-relaxed mb-6">
-                All this data is presented in a clean, easy-to-understand dashboard. You'll see patterns emerge: maybe most of your
+                All this data is presented in a clean, easy-to-understand dashboard. You&apos;ll see patterns emerge: maybe most of your
                 mobile traffic comes from Instagram, or your European audience prefers Firefox. Use these insights to optimize your
                 marketing strategy.
               </p>
 
               <div className="bg-dark/5 border-2 border-dark/10 rounded-2xl p-6">
                 <p className="text-base text-dark/70 italic mb-0">
-                  "I used to wonder where my traffic was coming from. Now I know exactly which platforms drive engagement,
-                  and I can focus my efforts there." — Typical Linkkk user
+                  &ldquo;I used to wonder where my traffic was coming from. Now I know exactly which platforms drive engagement,
+                  and I can focus my efforts there.&rdquo; — Typical Linkkk user
                 </p>
               </div>
             </div>
@@ -224,7 +222,7 @@ export default function FeaturesPage() {
             <div className="prose prose-lg max-w-none">
               <p className="text-lg md:text-xl text-dark/80 font-medium leading-relaxed mb-4">
                 This is where Linkkk becomes truly powerful. Link Rules let you create smart, conditional redirects based on
-                who's clicking your link and where they're coming from.
+                who&apos;s clicking your link and where they&apos;re coming from.
               </p>
 
               <motion.h3
@@ -244,9 +242,9 @@ export default function FeaturesPage() {
                 transition={{ duration: 0.5, delay: 0.1, ease: "backOut" }}
                 className="text-lg text-dark/70 leading-relaxed mb-4"
               >
-                Think of rules like "if this, then that" statements. You set a <strong className="text-dark">condition</strong> (like
-                "if the user is on mobile" or "if they're from Spain"), and then an <strong className="text-dark">action</strong> (like
-                "redirect to this specific URL" or "show a password gate").
+                Think of rules like &ldquo;if this, then that&rdquo; statements. You set a <strong className="text-dark">condition</strong> (like
+                &ldquo;if the user is on mobile&rdquo; or &ldquo;if they&apos;re from Spain&rdquo;), and then an <strong className="text-dark">action</strong> (like
+                &ldquo;redirect to this specific URL&rdquo; or &ldquo;show a password gate&rdquo;).
               </motion.p>
 
               <motion.div
@@ -258,7 +256,7 @@ export default function FeaturesPage() {
               >
                 <p className="text-sm font-black italic text-dark/50 mb-3">EXAMPLE USE CASE</p>
                 <p className="text-lg font-medium text-dark/90 mb-4">
-                  You're running an international campaign. You want users from the US to see your English landing page,
+                  You&apos;re running an international campaign. You want users from the US to see your English landing page,
                   users from Spain to see the Spanish version, and everyone else to see a generic page.
                 </p>
                 <p className="text-base text-dark/70">
@@ -474,7 +472,7 @@ export default function FeaturesPage() {
                 transition={{ duration: 0.5, delay: 0.1, ease: "backOut" }}
                 className="text-lg text-dark/70 leading-relaxed mb-4"
               >
-                Each rule can have <strong className="text-dark">multiple conditions</strong>. An "else" action can also be added in case the conditions are not met.
+                Each rule can have <strong className="text-dark">multiple conditions</strong>. An &ldquo;else&rdquo; action can also be added in case the conditions are not met.
               </motion.p>
 
               <motion.p
@@ -512,7 +510,7 @@ export default function FeaturesPage() {
                 transition={{ duration: 0.6, delay: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
                 className="text-2xl md:text-3xl font-black italic mb-6"
               >
-                What's coming next
+                What&apos;s coming next
               </motion.h2>
 
               <div className="space-y-8">

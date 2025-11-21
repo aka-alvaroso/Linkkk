@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from "react";
 import { cn } from "@/app/utils/cn";
 import { TbX } from "react-icons/tb";
 import * as motion from "motion/react-client";
-import { AnimatePresence } from "motion/react";
 
 interface Option {
   label?: string;

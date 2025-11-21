@@ -26,7 +26,7 @@ import {
   verticalListSortingStrategy
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { LinkRule as LinkRuleType } from '@/app/types/linkRules';
+import { LinkRule as LinkRuleType, RuleCondition, UpdateRuleDTO, RedirectSettings, PasswordGateSettings } from '@/app/types/linkRules';
 import { useAuth } from '@/app/hooks';
 import { PLAN_LIMITS } from '@/app/constants/limits';
 import Link from 'next/link';
@@ -100,10 +100,10 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
   }, [shortUrl, fetchRules]);
 
   // Convert conditions from backend format (array) to UI format (string for countries)
-  const normalizeConditionsForUI = (conditions: any[]) => {
+  const normalizeConditionsForUI = (conditions: RuleCondition[]) => {
     // If no conditions, add "always" condition for UI
     if (conditions.length === 0) {
-      return [{ field: 'always', operator: 'equals', value: true }];
+      return [{ field: 'always' as const, operator: 'equals' as const, value: true }];
     }
 
     return conditions.map(condition => {
@@ -132,7 +132,7 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
     // Validate action settings based on type
     switch (rule.actionType) {
       case 'redirect':
-        const url = (rule.actionSettings as any).url;
+        const url = (rule.actionSettings as RedirectSettings).url;
         if (!url || url.trim() === '') {
           return 'Redirect URL is required';
         }
@@ -142,7 +142,7 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
         }
         break;
       case 'password_gate':
-        const passwordHash = (rule.actionSettings as any).passwordHash;
+        const passwordHash = (rule.actionSettings as PasswordGateSettings).passwordHash;
         if (!passwordHash || passwordHash.trim() === '') {
           return 'Password is required for password gate';
         }
@@ -172,7 +172,7 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
   };
 
   // Process conditions to convert country string to array and filter "always"
-  const processConditions = (conditions: any[]) => {
+  const processConditions = (conditions: RuleCondition[]) => {
     return conditions
       .filter(condition => condition.field !== 'always') // Remove "always" conditions (frontend-only)
       .map(condition => {
@@ -234,7 +234,7 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
           });
         } else if (JSON.stringify(originalRule) !== JSON.stringify(localRule)) {
           // Modified rule
-          const updatePayload: any = {
+          const updatePayload: UpdateRuleDTO = {
             priority: localRule.priority,
             enabled: localRule.enabled,
             match: localRule.match,

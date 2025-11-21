@@ -79,7 +79,7 @@ export default function DisabledPage() {
           </Link>
 
           <p className="text-xs text-dark/50 mt-2">
-            If you're the link owner, you can re-enable it from your dashboard.
+            If you&apos;re the link owner, you can re-enable it from your dashboard.
           </p>
         </motion.div>
 

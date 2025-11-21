@@ -7,7 +7,7 @@ import { TbExternalLink, TbPlus } from "react-icons/tb";
 import * as motion from "motion/react-client";
 
 export default function DesktopNavbar() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [createLinkDrawer, setCreateLinkDrawer] = useState(false);
 
 

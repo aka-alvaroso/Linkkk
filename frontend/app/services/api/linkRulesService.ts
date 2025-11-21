@@ -14,10 +14,30 @@ import {
 } from '@/app/types/linkRules';
 
 import { API_CONFIG } from '@/app/config/api';
+import { csrfService } from './csrfService';
 
 const API_BASE_URL = API_CONFIG.BASE_URL;
 
 class LinkRulesService {
+  /**
+   * Get headers with CSRF token for non-GET requests
+   */
+  private async getHeaders(method: string = 'GET'): Promise<HeadersInit> {
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+
+    if (method.toUpperCase() !== 'GET') {
+      try {
+        const csrfToken = await csrfService.getToken();
+        (headers as Record<string, string>)['X-CSRF-Token'] = csrfToken;
+      } catch (error) {
+        console.error('Failed to get CSRF token:', error);
+      }
+    }
+
+    return headers;
+  }
   /**
    * Get all rules for a specific link
    */
@@ -42,7 +62,7 @@ class LinkRulesService {
       return data.data || [];
     } catch (err) {
       // If it's a network error or endpoint doesn't exist, return empty array
-      if (err instanceof TypeError || (err as any).code === 'ECONNREFUSED') {
+      if (err instanceof TypeError || (err instanceof Error && 'code' in err && err.code === 'ECONNREFUSED')) {
         console.warn('Network error, returning empty rules array');
         return [];
       }
@@ -79,9 +99,7 @@ class LinkRulesService {
 
     const response = await fetch(`${API_BASE_URL}/link/${shortUrl}/rules`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: await this.getHeaders('POST'),
       credentials: 'include',
       body: JSON.stringify(cleanedData),
     });
@@ -106,7 +124,7 @@ class LinkRulesService {
     updates: UpdateRuleDTO
   ): Promise<LinkRule> {
     // Clean up action settings if present - remove empty optional fields
-    let cleanedUpdates: any = { ...updates };
+    const cleanedUpdates: UpdateRuleDTO = { ...updates };
 
     if (updates.action) {
       cleanedUpdates.action = {
@@ -137,9 +155,7 @@ class LinkRulesService {
 
     const response = await fetch(`${API_BASE_URL}/link/${shortUrl}/rules/${ruleId}`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: await this.getHeaders('PUT'),
       credentials: 'include',
       body: JSON.stringify(cleanedUpdates),
     });
@@ -161,6 +177,7 @@ class LinkRulesService {
   async deleteRule(shortUrl: string, ruleId: number): Promise<void> {
     const response = await fetch(`${API_BASE_URL}/link/${shortUrl}/rules/${ruleId}`, {
       method: 'DELETE',
+      headers: await this.getHeaders('DELETE'),
       credentials: 'include',
     });
 
@@ -182,9 +199,7 @@ class LinkRulesService {
 
     const response = await fetch(`${API_BASE_URL}/link/${shortUrl}/rules/reorder`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: await this.getHeaders('PUT'),
       credentials: 'include',
       body: JSON.stringify({ updates }),
     });

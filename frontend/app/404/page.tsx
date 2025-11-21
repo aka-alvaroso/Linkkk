@@ -48,10 +48,10 @@ export default function NotFoundPage() {
         >
           {shortUrl ? (
             <>
-              The short link <span className="font-bold text-dark">/{shortUrl}</span> doesn't exist or has been deleted.
+              The short link <span className="font-bold text-dark">/{shortUrl}</span> doesn&apos;t exist or has been deleted.
             </>
           ) : (
-            "The link you're looking for doesn't exist or has been deleted."
+            "The link you&apos;re looking for doesn&apos;t exist or has been deleted."
           )}
         </motion.p>
 

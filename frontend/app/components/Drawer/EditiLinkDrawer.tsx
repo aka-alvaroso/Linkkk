@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Drawer from '@/app/components/ui/Drawer/Drawer';
 import { FiCornerDownRight } from 'react-icons/fi';
-import { TbChartBar, TbCircleDashed, TbCircleDashedCheck, TbCopy, TbExternalLink, TbLink, TbSettings, TbTrash } from 'react-icons/tb';
+import { TbChartBar, TbCircleDashed, TbCircleDashedCheck, TbCopy, TbSettings } from 'react-icons/tb';
 import Button from '../ui/Button/Button';
-import Select from '../ui/Select/Select';
-import Chip from '../ui/Chip/Chip';
 import Input from '../ui/Input/Input';
 import { useLinks } from '@/app/hooks';
 import type { Link } from '@/app/types';
@@ -13,7 +11,6 @@ import { useToast } from '@/app/hooks/useToast';
 import * as motion from 'motion/react-client';
 import { AnimatePresence } from 'motion/react';
 import { RulesManager } from '../LinkRules/RulesManager';
-import InlineSelect from '../ui/InlineSelect';
 import AnimatedText, { AnimatedTextRef } from '../ui/AnimatedText';
 
 interface EditiLinkDrawerProps {
@@ -23,7 +20,7 @@ interface EditiLinkDrawerProps {
 }
 
 export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawerProps) {
-    const { updateLink, fetchLinks, deleteLink } = useLinks();
+    const { updateLink, fetchLinks } = useLinks();
     const toast = useToast();
     const [tab, setTab] = useState('settings');
     const [statusBar, setShowStatusBar] = useState("none");
@@ -473,7 +470,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                         Unsaved Changes
                                     </p>
                                     <p className='text-sm text-dark/70'>
-                                        You have changes that haven't been saved yet
+                                        You have changes that haven&apos;t been saved yet
                                     </p>
                                 </div>
                             </div>

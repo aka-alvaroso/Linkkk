@@ -65,7 +65,7 @@ export function RuleAction({
     onChange(type, defaultSettings);
   };
 
-  const handleSettingChange = (key: string, value: any) => {
+  const handleSettingChange = (key: string, value: string | number | boolean) => {
     onChange(actionType, { ...actionSettings, [key]: value });
   };
 

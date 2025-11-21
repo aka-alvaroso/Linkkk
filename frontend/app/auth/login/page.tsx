@@ -2,7 +2,6 @@
 import RouteGuard from "../../components/RouteGuard/RouteGuard";
 import Navbar from "../../components/Navbar/Navbar";
 import Link from "next/link";
-import { LuArrowUpRight } from "react-icons/lu";
 import { useState } from "react";
 import { useAuth } from "@/app/hooks";
 import { useRouter } from "next/navigation";
@@ -10,7 +9,6 @@ import { useToast } from "@/app/hooks/useToast";
 import Button from "@/app/components/ui/Button/Button";
 import * as motion from "motion/react-client";
 import { TbArrowUpRight } from "react-icons/tb";
-import Image from "next/image";
 
 export default function Login() {
     const { login } = useAuth();

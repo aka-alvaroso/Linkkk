@@ -21,7 +21,6 @@ import {
   TbTrash,
   TbRefresh,
   TbUser,
-  TbMail,
   TbLock,
   TbShieldLock,
   TbAlertTriangle,
@@ -325,7 +324,7 @@ export default function ProfilePage() {
                   <div className="flex gap-2">
                     <Input
                       value={username}
-                      onChange={(e) => setUsername(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
                       className="flex-1 rounded-2xl"
                     />
                     <Button
@@ -375,7 +374,7 @@ export default function ProfilePage() {
                     <Input
                       type="email"
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                       className="flex-1 rounded-2xl"
                     />
                     <Button
@@ -441,7 +440,7 @@ export default function ProfilePage() {
                     <Input
                       type={showPassword ? "text" : "password"}
                       value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewPassword(e.target.value)}
                       placeholder="New password"
                       className="rounded-2xl pr-12"
                     />
@@ -456,7 +455,7 @@ export default function ProfilePage() {
                   <Input
                     type={showPassword ? "text" : "password"}
                     value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}
                     placeholder="Confirm password"
                     className="rounded-2xl"
                   />
@@ -624,7 +623,7 @@ export default function ProfilePage() {
                 </div>
                 <Input
                   value={confirmDeleteText}
-                  onChange={(e) => setConfirmDeleteText(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfirmDeleteText(e.target.value)}
                   placeholder="DELETE"
                   className="rounded-2xl"
                 />

@@ -7,8 +7,6 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RuleCondition } from './RuleCondition';
 import { RuleAction } from './RuleAction';
-import Button from '../ui/Button/Button';
-import Switch from '../ui/Switch/Switch';
 import Select from '../ui/Select/Select';
 import { TbPlus, TbTrash, TbGripVertical, TbX } from 'react-icons/tb';
 import {
@@ -24,17 +22,13 @@ interface LinkRuleProps {
   priority: number;
   onChange: (rule: LinkRuleType) => void;
   onDelete: () => void;
-  dragHandleProps?: any; // For drag & drop
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  dragHandleProps?: any; // For drag & drop (from dnd-kit, needs to be flexible)
   maxConditions: number; // Max conditions allowed per rule
 }
 
 export function LinkRule({ rule, priority, onChange, onDelete, dragHandleProps, maxConditions }: LinkRuleProps) {
   const [showElseAction, setShowElseAction] = useState(!!rule.elseActionType);
-
-  // Handle enabled toggle
-  const handleEnabledToggle = (enabled: boolean) => {
-    onChange({ ...rule, enabled });
-  };
 
   // Handle match type change
   const handleMatchChange = (match: MatchType) => {

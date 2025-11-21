@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useSidebarStore } from '@/app/stores/sidebarStore';
 import Link from 'next/link';
 import Button from '@/app/components/ui/Button/Button';
-import { TbLayoutSidebarLeftCollapse, TbLayoutSidebarLeftExpand, TbPlus, TbUser, TbLogin } from 'react-icons/tb';
+import { TbLayoutSidebarLeftCollapse, TbLayoutSidebarLeftExpand, TbPlus, TbLogin } from 'react-icons/tb';
 import { HiHome } from 'react-icons/hi';
 import Image from 'next/image';
 import CreateLinkDrawer from '@/app/components/Drawer/CreateLinkDrawer';
@@ -15,7 +15,7 @@ import { getUserAvatarUrl } from '@/app/utils/gravatar';
 const DesktopSidebar = () => {
     const router = useRouter();
     const { desktopOpen, toggleDesktop } = useSidebarStore();
-    const { user, logout, isAuthenticated } = useAuth();
+    const { user, isAuthenticated } = useAuth();
     const [createLinkDrawer, setCreateLinkDrawer] = useState(false);
     const [ selected, setSelected ] = useState('dashboard');
     const [avatarUrl, setAvatarUrl] = useState<string>("");

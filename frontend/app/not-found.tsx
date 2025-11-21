@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import Button from "@/app/components/ui/Button/Button";
-import { TbHome, TbAlertTriangle, TbArrowLeft, TbDashboard } from "react-icons/tb";
+import { TbHome, TbArrowLeft, TbDashboard } from "react-icons/tb";
 import * as motion from "motion/react-client";
 
 export default function NotFound() {
@@ -59,7 +59,7 @@ export default function NotFound() {
           transition={{ delay: 0.5, duration: 0.4, ease: "backOut" }}
           className="text-dark/70 mb-8 font-medium"
         >
-          Oops! The page you're looking for doesn't exist or has been moved.
+          Oops! The page you&apos;re looking for doesn&apos;t exist or has been moved.
         </motion.p>
 
         {/* Actions */}

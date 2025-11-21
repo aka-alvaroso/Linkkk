@@ -56,7 +56,7 @@ export default function ErrorPage() {
           className="bg-danger/10 border border-danger/20 rounded-2xl p-4 mb-6"
         >
           <p className="text-sm text-dark/80">
-            Don't worry! This error has been logged and we'll look into it. Please try again in a few moments.
+            Don&apos;t worry! This error has been logged and we&apos;ll look into it. Please try again in a few moments.
           </p>
         </motion.div>
 

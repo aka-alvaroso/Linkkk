@@ -11,14 +11,12 @@ import Sidebar from "@/app/components/Sidebar/Sidebar";
 import CreateLinkDrawer from "@/app/components/Drawer/CreateLinkDrawer";
 import FilterModal from "@/app/components/Modal/FilterModal";
 import { useSidebarStore } from "@/app/stores/sidebarStore";
-import type { LinkFilters } from "@/app/types";
 import * as motion from 'motion/react-client';
-import { useMotionValue, useTransform, animate } from 'motion/react';
+import { useMotionValue, animate } from 'motion/react';
 import AnimatedText, { AnimatedTextRef } from "@/app/components/ui/AnimatedText";
 
 function AnimatedCounter({ value, delay = 0 }: { value: number; delay?: number }) {
   const count = useMotionValue(0);
-  const rounded = useTransform(count, (latest) => Math.round(latest));
   const textRef = useRef<AnimatedTextRef>(null);
   const [currentValue, setCurrentValue] = useState(0);
 
@@ -54,7 +52,7 @@ export default function Dashboard() {
   const { filteredLinks, filters, fetchLinks, updateFilters } = useLinks();
   const { totalLinks, activeLinks, totalClicks } = useStats();
   const { isAuthenticated, isGuest } = useAuth();
-  const [view, setView] = useState('details');
+  const [view] = useState('details');
   const { desktopOpen } = useSidebarStore();
   const [createLinkDrawerOpen, setCreateLinkDrawerOpen] = useState(false);
   const [filterModalOpen, setFilterModalOpen] = useState(false);

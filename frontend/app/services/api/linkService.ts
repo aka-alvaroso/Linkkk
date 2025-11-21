@@ -7,6 +7,7 @@ import type {
   ApiResponse,
   GetAllLinksResponse,
 } from "@/app/types";
+import { csrfService } from "./csrfService";
 
 class LinkService {
   private baseUrl = `${API_CONFIG.BASE_URL}/link`;
@@ -36,7 +37,7 @@ class LinkService {
         data.code || 'UNKNOWN_ERROR',
         data.message || response.statusText,
         response.status >= 500, // Server errors are retryable
-        (data as any).validation // Include validation errors if present
+        undefined // TODO: Convert validation format if needed
       );
     }
 
@@ -64,9 +65,27 @@ class LinkService {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT);
 
+      // Get CSRF token for non-GET requests
+      const method = options.method?.toUpperCase() || 'GET';
+      const headers: HeadersInit = {
+        ...defaultFetchOptions.headers,
+        ...(options.headers || {}),
+      };
+
+      if (method !== 'GET') {
+        try {
+          const csrfToken = await csrfService.getToken();
+          (headers as Record<string, string>)['X-CSRF-Token'] = csrfToken;
+        } catch (error) {
+          console.error('Failed to get CSRF token:', error);
+          // Continue without CSRF token - let the server handle it
+        }
+      }
+
       const response = await fetch(url, {
         ...defaultFetchOptions,
         ...options,
+        headers,
         signal: controller.signal,
       });
 
