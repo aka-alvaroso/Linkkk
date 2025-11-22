@@ -225,16 +225,16 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                 className='text-2xl md:text-3xl italic font-black'
                                 onMouseDown={(e) => {
                                     e.preventDefault();
-                                    navigator.clipboard.writeText(`https://linkkk.dev/${newLink.shortUrl}`);
+                                    navigator.clipboard.writeText(`https://linkkk.dev/r/${newLink.shortUrl}`);
                                     shortUrlTextRef.current?.setText('Copied!');
                                     setTimeout(() => {
                                         shortUrlTextRef.current?.reset();
                                     }, 2000);
-                                }}    
+                                }}
                             >
                                 <AnimatedText
                                     ref={shortUrlTextRef}
-                                    initialText={`linkkk.dev/${newLink.shortUrl}`}
+                                    initialText={`linkkk.dev/r/${newLink.shortUrl}`}
                                     animationType="slide"
                                     triggerMode="none"
                                 />
@@ -257,7 +257,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                             className='bg-primary text-dark'
                                             onMouseDown={(e) => {
                                                 e.preventDefault();
-                                                navigator.clipboard.writeText(`https://linkkk.dev/${newLink.shortUrl}`);
+                                                navigator.clipboard.writeText(`https://linkkk.dev/r/${newLink.shortUrl}`);
                                                 shortUrlTextRef.current?.setText('Copied!');
                                                 setTimeout(() => {
                                                     shortUrlTextRef.current?.reset();

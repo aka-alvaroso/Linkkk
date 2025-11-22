@@ -37,7 +37,7 @@ export default function LinkItem({ view, data }: LinkItemProps) {
                         className='text-dark/40 hover:text-info hover:bg-info/10' 
                         onClick={(e) => {
                             e.stopPropagation();
-                            navigator.clipboard.writeText(`https://linkkk.dev/${data.shortUrl}`);
+                            navigator.clipboard.writeText(`https://linkkk.dev/r/${data.shortUrl}`);
                         }}
                     />
                     <Button 
@@ -77,7 +77,7 @@ export default function LinkItem({ view, data }: LinkItemProps) {
                         {/* URLs */}
                         <div className='flex flex-col w-full sm:max-w-1/2'>
                             <div className='flex items-center justify-between'>
-                                <p className='text-lg italic'>linkkk.dev/<span className='font-bold'>{data.shortUrl}</span></p>
+                                <p className='text-lg italic'>linkkk.dev/r/<span className='font-bold'>{data.shortUrl}</span></p>
                             </div>
                             <div className='flex items-center gap-2 text-dark/50'>
                                 <FiCornerDownRight size={20} /> 
