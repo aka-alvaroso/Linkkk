@@ -21,6 +21,9 @@ const { redirectLink } = require("./v2/controllers/link");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Trust proxy - Required when behind nginx reverse proxy
+app.set('trust proxy', true);
+
 app.use(
   helmet({
     contentSecurityPolicy: {
