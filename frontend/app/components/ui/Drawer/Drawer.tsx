@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom';
-import { TbX } from 'react-icons/tb';
+import { TbArrowLeft } from 'react-icons/tb';
 import { cn } from '@/app/utils/cn';
 
 interface DrawerProps {
@@ -44,11 +44,19 @@ const Drawer: React.FC<DrawerProps> = ({
 
             document.addEventListener('keydown', handleEsc);
 
+            // Prevent background scroll
+            const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+            document.body.style.overflow = 'hidden';
+            document.body.style.paddingRight = `${scrollbarWidth}px`;
+
             setShow(true);
             setTimeout(() => setIsAnimating(true), 10);
 
             return () => {
                 document.removeEventListener('keydown', handleEsc);
+                // Restore background scroll
+                document.body.style.overflow = '';
+                document.body.style.paddingRight = '';
             };
         } else {
             setIsAnimating(false);
@@ -130,7 +138,7 @@ const Drawer: React.FC<DrawerProps> = ({
                     className="absolute top-4 right-4 p-2 rounded-lg hover:bg-dark/5 transition-colors z-10"
                     aria-label="Close drawer"
                 >
-                    <TbX size={20} className="text-dark" strokeWidth={2.5} />
+                    <TbArrowLeft size={20} className="text-dark" strokeWidth={2.5} />
                 </button>
                 {children}
             </div>

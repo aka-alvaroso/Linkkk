@@ -6,6 +6,7 @@
 
 const crypto = require('crypto');
 const { errorResponse } = require('../utils/response');
+const config = require('../config/environment');
 
 /**
  * Generate a cryptographically secure CSRF token
@@ -25,9 +26,7 @@ const csrfTokenGenerator = (req, res, next) => {
 
     // Set cookie with token
     res.cookie('csrfToken', token, {
-      httpOnly: true,
-      secure: process.env.ENV === 'production',
-      sameSite: 'strict',
+      ...config.security.cookies,
       maxAge: 1000 * 60 * 60 * 24, // 24 hours
     });
 
@@ -46,7 +45,7 @@ const csrfTokenGenerator = (req, res, next) => {
 const csrfProtection = (req, res, next) => {
   // BYPASS CSRF in test environment for easier testing
   // In production, ALWAYS enforce CSRF
-  if (process.env.NODE_ENV === 'test') {
+  if (!config.security.csrf.enabled) {
     return next();
   }
 

@@ -42,7 +42,7 @@ export default function Login() {
         <RouteGuard type="public" title="Login - Linkkk">
             <Navbar />
             <main className="w-full h-[calc(100dvh-10rem)] flex items-center justify-center">
-                <div className="text-dark bg-light p-8 w-11/12 md:w-3/4 max-w-xl mx-auto rounded-3xl z-120 border">
+                <div className="text-dark bg-light p-8 w-11/12 md:w-3/4 max-w-xl mx-auto rounded-3xl">
                         <motion.h1 
                             initial={{ opacity: 0, y: -20 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -82,7 +82,7 @@ export default function Login() {
                                 </motion.div>
                             </div>
                             <div className="flex flex-col">
-                                <motion.label 
+                                <motion.label
                                     initial={{ opacity: 0, y: -20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.2, ease: "backInOut" }}
@@ -92,7 +92,7 @@ export default function Login() {
                                 <motion.div
                                     initial={{ opacity: 0, y: -20 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.15, ease: "backInOut" }}
+                                    transition={{ delay: 0.25, ease: "backInOut" }}
                                     className="w-full"
                                 >
                                 <input 
@@ -109,43 +109,34 @@ export default function Login() {
                             <motion.div
                                 initial={{ opacity: 0, y: -20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.25, ease: "backInOut" }}
+                                transition={{ delay: 0.3, ease: "backInOut" }}
                                 className="w-full"
                             >
-                            <Button 
-                                variant="solid"
-                                size="lg"
-                                rounded="xl"
-                                type="submit" 
-                                className="w-full mt-4 transition-all duration-300 ease-in-out hover:bg-primary hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)]"
-                            >
-                                <p className="text-xl font-black italic">
-                                    Log In
-                                </p>
-                            </Button>
+                                <Button
+                                    variant="solid"
+                                    size="lg"
+                                    rounded="xl"
+                                    type="submit"
+                                    className="w-full mt-4 transition-all duration-300 ease-in-out hover:bg-primary hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)]"
+                                >
+                                    <p className="text-xl font-black italic">Log In</p>
+                                </Button>
                             </motion.div>
                         </form>
-                        
 
-                        
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.2, ease: "backInOut" }}
+                            transition={{ delay: 0.35, ease: "backInOut" }}
                             className="text-center mt-8"
                         >
-                            <Link
-                            href="/auth/register"
-                            className="relative group inlin"
-                            >
-                            <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
-                            <p className="font-black italic z-20 relative inline-flex items-center">
-                                Don&apos;t have an account?
-                                <span className="underline ml-2">
-                                Create one
-                                </span>
-                                <TbArrowUpRight size={18} className="ml-2" />
-                            </p>
+                            <Link href="/auth/register" className="relative group">
+                                <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
+                                <p className="font-black italic z-20 relative inline-flex items-center">
+                                    Don&apos;t have an account?
+                                    <span className="underline ml-2">Sign Up</span>
+                                    <TbArrowUpRight size={18} className="ml-2" />
+                                </p>
                             </Link>
                         </motion.div>
                 </div>

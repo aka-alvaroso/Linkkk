@@ -1,5 +1,3 @@
-const dotenv = require("dotenv");
-dotenv.config();
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
@@ -8,6 +6,9 @@ const rateLimit = require("express-rate-limit");
 const { errorResponse } = require("./v2/utils/response");
 const ERRORS = require("./v2/constants/errorCodes");
 const AppError = require("./v2/utils/AppError");
+
+// Load centralized configuration
+const config = require("./v2/config/environment");
 
 // Routers
 const authRouter = require("./v2/routers/auth");
@@ -19,37 +20,42 @@ const userRouter = require("./v2/routers/user");
 const { redirectLink } = require("./v2/controllers/link");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = config.server.port;
 
 // Trust proxy - Required when behind nginx reverse proxy
 app.set('trust proxy', true);
 
-app.use(
-  helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        scriptSrc: ["'self'"],
-        imgSrc: ["'self'", "data:", "https:"],
-        connectSrc: ["'self'"],
-        fontSrc: ["'self'"],
-        objectSrc: ["'none'"],
-        mediaSrc: ["'self'"],
-        frameSrc: ["'none'"],
-      },
+// Helmet configuration - adjusted for environment
+const helmetConfig = {
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'"],
+      fontSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      mediaSrc: ["'self'"],
+      frameSrc: ["'none'"],
     },
-    crossOriginEmbedderPolicy: false,
-    hsts: {
-      maxAge: 31536000,
-      includeSubDomains: true,
-      preload: true,
-    },
-    referrerPolicy: { policy: "strict-origin-when-cross-origin" },
-    noSniff: true,
-    xssFilter: true,
-  })
-);
+  },
+  crossOriginEmbedderPolicy: false,
+  referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+  noSniff: true,
+  xssFilter: true,
+};
+
+// Only enable HSTS in production
+if (config.env.isProduction) {
+  helmetConfig.hsts = {
+    maxAge: 31536000,
+    includeSubDomains: true,
+    preload: true,
+  };
+}
+
+app.use(helmet(helmetConfig));
 
 // SECURITY: Additional security headers
 app.use((req, res, next) => {
@@ -71,9 +77,10 @@ app.use((req, res, next) => {
   next();
 });
 
+// General rate limiter
 const generalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: process.env.ENV === "development" ? 1000 : 500,
+  windowMs: config.rateLimit.general.windowMs,
+  max: config.rateLimit.general.max,
   handler: (req, res, next, options) => {
     return errorResponse(res, ERRORS.RATE_LIMIT_EXCEEDED);
   },
@@ -84,15 +91,36 @@ const generalLimiter = rateLimit({
 
 app.use(generalLimiter);
 
-app.use(
-  cors({
-    origin: [process.env.FRONTEND_URL],
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization", "guest-token", "X-CSRF-Token", "CSRF-Token"],
-    credentials: true,
-    exposedHeaders: ["X-Request-ID"], // Allow frontend to read request ID
-  })
-);
+// CORS configuration
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, Postman, etc.)
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    // In development, allow all localhost origins
+    if (config.env.isDevelopment) {
+      if (origin.startsWith('http://localhost') || origin.startsWith('http://127.0.0.1')) {
+        return callback(null, true);
+      }
+    }
+
+    // Check if origin is in allowed list
+    if (config.frontend.allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    // Reject all other origins
+    callback(new Error('Not allowed by CORS'));
+  },
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization", "guest-token", "X-CSRF-Token", "CSRF-Token"],
+  credentials: true,
+  exposedHeaders: ["X-Request-ID"],
+};
+
+app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true, limit: "1mb" }));
@@ -214,10 +242,13 @@ process.on("uncaughtException", (error) => {
 // ============================================================================
 
 // Only start server if not in test mode
-if (process.env.NODE_ENV !== "test") {
+if (!config.env.isTest) {
   app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`📝 Environment: ${process.env.ENV || "development"}`);
+    console.log(`\n🚀 Server running on port ${PORT}`);
+    console.log(`📝 Environment: ${config.env.nodeEnv}`);
+    console.log(`🌐 Frontend: ${config.frontend.url}`);
+    console.log(`🔒 CORS: ${config.env.isDevelopment ? 'Development (permissive)' : 'Production (strict)'}`);
+    console.log(`⏱️  Rate limits: ${config.env.isDevelopment ? 'Development (relaxed)' : 'Production (strict)'}\n`);
   });
 }
 

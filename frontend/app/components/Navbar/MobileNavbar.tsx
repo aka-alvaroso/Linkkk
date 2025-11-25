@@ -34,13 +34,13 @@ export default function MobileNavbar() {
               <PiList size={24} />
           </Button>
         
-          <div className={`absolute inset-0 w-screen h-screen bg-light ${isOpen ? 'block' : 'hidden'}`} >
+          <div className={`absolute inset-0 w-screen h-screen bg-light z-50 ${isOpen ? 'block' : 'hidden'}`} >
             
-            <Button 
+            <Button
                 onClick={toggleMenu}
                 variant="ghost"
                 iconOnly
-                className="md:hidden fixed top-5 right-5"
+                className="md:hidden fixed top-5 right-5 z-50"
                 aria-label="Abrir menú de navegación"
             >
                 <AiOutlineClose size={24}/>

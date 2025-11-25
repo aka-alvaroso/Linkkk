@@ -22,7 +22,7 @@ export default function FeaturesPage() {
       <div className="min-h-screen">
         <Navbar />
 
-      <main className="w-full px-4 py-16 md:py-24">
+      <main className="w-full px-4 pt-24 pb-16 md:py-24">
         <article className="max-w-4xl mx-auto">
 
           {/* Header */}
