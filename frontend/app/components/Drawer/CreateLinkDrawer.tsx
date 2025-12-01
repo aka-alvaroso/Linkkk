@@ -177,21 +177,6 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
         setLocalRules(localRules.filter(r => r.id !== ruleId));
     };
 
-    useEffect(() => {
-        if (!open) return;
-
-        const handleKeyDown = async (e: KeyboardEvent) => {
-            if (e.key === 'Enter' && !e.shiftKey && newLink.longUrl.trim()) {
-                e.preventDefault();
-                setShowStatusBar("loading");
-                await handleCreateLink();
-            }
-        };
-
-        document.addEventListener('keydown', handleKeyDown);
-        return () => document.removeEventListener('keydown', handleKeyDown);
-    }, [open, newLink.longUrl, handleCreateLink]);
-
     return (
         <Drawer
             open={open}
@@ -232,7 +217,7 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
                             size='sm'
                             rounded='xl'
                             leftIcon={newLink.status ? <TbCircleDashedCheck size={20} /> : <TbCircleDashed size={20} />}
-                            className={`${newLink.status ? 'bg-success text-dark' : 'bg-danger text-light'}`}
+                            className={`${newLink.status ? 'bg-primary text-dark' : 'bg-danger text-light'}`}
                             onClick={() => {
                                 statusButtonTextRef.current?.setText(newLink.status ? 'Inactive' : 'Active');
                                 setNewLink({ ...newLink, status: !newLink.status })
