@@ -75,26 +75,6 @@ export default function Dashboard() {
       <div className="relative p-2 md:p-4 md:mt-20 md:max-w-3/4 mx-auto">
         {/* Dashboard */}
         <div className="space-y-6">
-          {/* Home Button - Mobile only */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0, duration: 0.3, ease: "backInOut" }}
-            className="md:hidden"
-          >
-            <Link href="/">
-              <Button
-                variant="ghost"
-                size="sm"
-                rounded="xl"
-                leftIcon={<TbArrowLeft size={20} />}
-                className="bg-dark/5"
-              >
-                Home
-              </Button>
-            </Link>
-          </motion.div>
-
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
