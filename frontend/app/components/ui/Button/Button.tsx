@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { cn } from '@/app/utils/cn';
+import * as motion from 'motion/react-client';
+import { AnimatePresence } from 'motion/react';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'solid' | 'outline' | 'ghost' | 'link';
@@ -9,6 +11,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
   iconOnly?: boolean;
+  expandOnHover?: 'text' | 'icon' | 'none';
   children?: React.ReactNode;
 }
 
@@ -22,6 +25,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       leftIcon,
       rightIcon,
       iconOnly = false,
+      expandOnHover = 'none',
       className = '',
       disabled,
       children,
@@ -29,6 +33,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) => {
+    const [isHovered, setIsHovered] = useState(false);
     const roundedClasses = {
       none: 'rounded-none',
       xs: 'rounded-xs',
@@ -125,23 +130,23 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       if (loading) {
         return (
           <>
-            <svg 
-              className="animate-spin -ml-1 mr-2 h-4 w-4" 
-              xmlns="http://www.w3.org/2000/svg" 
-              fill="none" 
+            <svg
+              className="animate-spin -ml-1 mr-2 h-4 w-4"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
               viewBox="0 0 24 24"
             >
-              <circle 
-                className="opacity-25" 
-                cx="12" 
-                cy="12" 
-                r="10" 
-                stroke="currentColor" 
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
                 strokeWidth="4"
               />
-              <path 
-                className="opacity-75" 
-                fill="currentColor" 
+              <path
+                className="opacity-75"
+                fill="currentColor"
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               />
             </svg>
@@ -152,6 +157,94 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
       if (iconOnly) {
         return leftIcon || rightIcon || children;
+      }
+
+      // expandOnHover="text" - Show icon only, expand to show text on hover
+      if (expandOnHover === 'text') {
+        if (leftIcon) {
+          return (
+            <>
+              <span>{leftIcon}</span>
+              <AnimatePresence>
+                {isHovered && children && (
+                  <motion.span
+                    initial={{ width: 0, opacity: 0, marginLeft: 0 }}
+                    animate={{ width: "auto", opacity: 1, marginLeft: 8 }}
+                    exit={{ width: 0, opacity: 0, marginLeft: 0 }}
+                    transition={{ duration: 0.2, ease: "easeInOut" }}
+                    className="overflow-hidden whitespace-nowrap"
+                  >
+                    {children}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </>
+          );
+        }
+        if (rightIcon) {
+          return (
+            <>
+              <AnimatePresence>
+                {isHovered && children && (
+                  <motion.span
+                    initial={{ width: 0, opacity: 0, marginRight: 0 }}
+                    animate={{ width: "auto", opacity: 1, marginRight: 8 }}
+                    exit={{ width: 0, opacity: 0, marginRight: 0 }}
+                    transition={{ duration: 0.2, ease: "easeInOut" }}
+                    className="overflow-hidden whitespace-nowrap"
+                  >
+                    {children}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+              <span>{rightIcon}</span>
+            </>
+          );
+        }
+      }
+
+      // expandOnHover="icon" - Show text only, expand to show icon on hover
+      if (expandOnHover === 'icon') {
+        if (leftIcon) {
+          return (
+            <>
+              <AnimatePresence>
+                {isHovered && (
+                  <motion.span
+                    initial={{ width: 0, opacity: 0, marginRight: 0 }}
+                    animate={{ width: "auto", opacity: 1, marginRight: 8 }}
+                    exit={{ width: 0, opacity: 0, marginRight: 0 }}
+                    transition={{ duration: 0.2, ease: "easeInOut" }}
+                    className="overflow-hidden"
+                  >
+                    {leftIcon}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+              {children}
+            </>
+          );
+        }
+        if (rightIcon) {
+          return (
+            <>
+              {children}
+              <AnimatePresence>
+                {isHovered && (
+                  <motion.span
+                    initial={{ width: 0, opacity: 0, marginLeft: 0 }}
+                    animate={{ width: "auto", opacity: 1, marginLeft: 8 }}
+                    exit={{ width: 0, opacity: 0, marginLeft: 0 }}
+                    transition={{ duration: 0.2, ease: "easeInOut" }}
+                    className="overflow-hidden"
+                  >
+                    {rightIcon}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </>
+          );
+        }
       }
 
       return (
@@ -168,6 +261,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         className={buttonClasses}
         disabled={disabled || loading}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
         {...props}
       >
         {buttonContent()}
