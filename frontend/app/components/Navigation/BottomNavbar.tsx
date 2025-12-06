@@ -17,7 +17,7 @@ export default function BottomNavbar() {
     ? [
         // Authenticated users
         { id: "dashboard", label: "Dashboard", icon: TbLayoutDashboard, href: "/dashboard" },
-        { id: "settings", label: "Settings", icon: TbSettings, href: "/profile" }, // Will be /settings in the future
+        { id: "settings", label: "Settings", icon: TbSettings, href: "/settings" },
         { id: "create", label: "Create", icon: TbPlus, action: "create", isFAB: true },
       ]
     : [

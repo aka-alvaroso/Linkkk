@@ -78,7 +78,7 @@ export default function TopNavbar({ showCreate = false }: TopNavbarProps) {
           {/* Right Section - User/Login Button */}
           <div className="ml-auto z-10">
           {user ? (
-            <Link href="/profile">
+            <Link href="/settings">
               <Button
                 variant='solid'
                 size='md'
