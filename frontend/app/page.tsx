@@ -11,9 +11,11 @@ import Link from "next/link";
 import { useLinks } from "@/app/hooks/useLinks";
 import { RiLoader5Fill } from "react-icons/ri";
 import { useToast } from "@/app/hooks/useToast";
+import { useAuth } from "@/app/hooks";
 
 export default function Landing() {
   const { createLink } = useLinks();
+  const { isAuthenticated } = useAuth();
   const router = useRouter();
   const toast = useToast();
   const [url, setUrl] = useState("");
@@ -144,27 +146,29 @@ export default function Landing() {
             </div>
           </motion.div>
 
-          {/* Link secundario simple */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, ease: "backInOut" }}
-            className="text-center"
-          >
-            <Link
-              href="/auth/login"
-              className="relative group inline"
+          {/* Link secundario simple - Only show if not authenticated */}
+          {!isAuthenticated && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, ease: "backInOut" }}
+              className="text-center"
             >
-              <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
-              <p className="font-black italic z-20 relative inline-flex items-center">
-                <span className="underline mr-2">
-                  Sign in
-                </span>
-                to get full access
-                <TbArrowUpRight size={18} className="ml-2" />
-              </p>
-            </Link>
-          </motion.div>
+              <Link
+                href="/auth/login"
+                className="relative group inline"
+              >
+                <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
+                <p className="font-black italic z-20 relative inline-flex items-center">
+                  <span className="underline mr-2">
+                    Sign in
+                  </span>
+                  to get full access
+                  <TbArrowUpRight size={18} className="ml-2" />
+                </p>
+              </Link>
+            </motion.div>
+          )}
           
         </div>
 
