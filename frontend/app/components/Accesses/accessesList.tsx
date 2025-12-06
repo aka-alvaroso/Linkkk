@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import Chip from '../ui/Chip/Chip';
-import { TbShieldCheck, TbShieldX, TbRobot, TbUser, TbWorld, TbClock, TbWifi, TbBrowser } from 'react-icons/tb';
+import Image from 'next/image';
+import { TbShieldCheck, TbShieldX, TbRobot, TbUser, TbWifi, TbBrowser, TbLocationOff, TbShare3 } from 'react-icons/tb';
 import * as motion from 'motion/react-client';
+import Button from '../ui/Button/Button';
+import { useToast } from "@/app/hooks/useToast";
 
 interface Access {
     id: number;
@@ -19,6 +21,7 @@ interface AccessesListProps {
 }
 
 export const AccessesList = ({ shortUrl }: AccessesListProps) => {
+    const toast = useToast();
     const [accesses, setAccesses] = useState<Access[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -77,12 +80,31 @@ export const AccessesList = ({ shortUrl }: AccessesListProps) => {
         });
     };
 
+    // Normaliza el nombre del navegador al slug que usa Simple Icons
+    const getBrowserSlug = (browserName: string): string => {
+        const slugMap: Record<string, string> = {
+            'Chrome': 'googlechrome',
+            'Edge': 'microsoftedge',
+        };
+        
+        // Si tiene mapeo específico, lo usa; si no, convierte a minúsculas
+        return slugMap[browserName] || browserName.toLowerCase();
+    };
+
+    // Genera la URL del logo automáticamente desde el nombre del navegador
+    const getBrowserLogoUrl = (browserName: string): string | null => {
+        if (browserName === 'Unknown') return null;
+        const slug = getBrowserSlug(browserName);
+        return `https://cdn.simpleicons.org/${slug}`;
+    };
+
     const getBrowserInfo = (userAgent: string) => {
-        if (userAgent.includes('Chrome')) return { name: 'Chrome', icon: '🌐' };
-        if (userAgent.includes('Firefox')) return { name: 'Firefox', icon: '🦊' };
-        if (userAgent.includes('Safari')) return { name: 'Safari', icon: '🧭' };
-        if (userAgent.includes('Edge')) return { name: 'Edge', icon: '🔷' };
-        return { name: 'Unknown', icon: '❓' };
+        console.log(userAgent)
+        if (userAgent.includes('Chrome')) return 'Chrome';
+        if (userAgent.includes('Firefox')) return 'Firefox';
+        if (userAgent.includes('Safari')) return 'Safari';
+        if (userAgent.includes('Edge')) return 'Edge';
+        return 'Unknown';
     };
 
     if (isLoading) {
@@ -94,19 +116,35 @@ export const AccessesList = ({ shortUrl }: AccessesListProps) => {
         );
     }
 
+    // Empty state
     if (accesses.length === 0) {
         return (
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
-                className="w-full py-16 text-center"
+                className="w-full py-8 md:py-12"
             >
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-dark/5 mb-4">
-                    <TbWifi size={40} className="text-dark/30" />
+                <div className="md:p-12 text-center">
+                    <div className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 bg-mb-4 ">
+                        <TbLocationOff size={32} className="text-secondary" />
+                    </div>
+                    <h3 className="text-xl md:text-2xl font-black italic mb-2">No clicks yet</h3>
+                    <p className="text-dark/60 text-sm md:text-base">Share your link and watch the magic happen!</p>
+                    <Button
+                     variant='solid'
+                     size='md'
+                     rounded='2xl'
+                     leftIcon={<TbShare3 size={20} />}
+                     onClick={() => {
+                        navigator.clipboard.writeText(`https://linkkk.dev/r/${shortUrl}`);
+                        toast.success('Link copied to clipboard!');
+                     }}
+                     className='mt-2 hover:bg-primary hover:text-dark'
+                    >
+                        Share Link
+                    </Button>
                 </div>
-                <p className="text-xl font-bold text-dark/70">No accesses yet</p>
-                <p className="text-dark/50 mt-2">When someone visits your link, it will appear here</p>
             </motion.div>
         );
     }
@@ -123,196 +161,113 @@ export const AccessesList = ({ shortUrl }: AccessesListProps) => {
                 <h3 className="text-xl font-black">Recent Accesses ({accesses.length})</h3>
             </motion.div>
 
-            {/* Desktop Table */}
-            <div className="hidden md:block w-full overflow-x-auto">
-                <table className="w-full border-collapse">
+            {/* Table - Scrollable on mobile */}
+            <div className="w-full overflow-x-auto rounded-2xl scrollbar-hide">
+                <table className="w-full border-collapse min-w-[800px]">
                     <thead>
-                        <tr className="border-b-2 border-dark/10">
-                            <th className="px-4 py-3 text-left font-bold text-sm text-dark/60">
-                                <div className="flex items-center gap-2">
-                                    <TbClock size={16} />
-                                    Time
-                                </div>
+                        <tr className="border-b border-dark/15">
+                            <th className="px-4 py-3 text-left font-black italic text-md">
+                                Time
                             </th>
-                            <th className="px-4 py-3 text-left font-bold text-sm text-dark/60">
-                                <div className="flex items-center gap-2">
-                                    <TbWorld size={16} />
-                                    Location
-                                </div>
+                            <th className="px-4 py-3 text-left font-black italic text-md">
+                                Location
                             </th>
-                            <th className="px-4 py-3 text-left font-bold text-sm text-dark/60">
-                                <div className="flex items-center gap-2">
-                                    <TbWifi size={16} />
-                                    IP
-                                </div>
+                            <th className="px-4 py-3 text-left font-black italic text-md">
+                                IP Address
                             </th>
-                            <th className="px-4 py-3 text-left font-bold text-sm text-dark/60">
-                            <div className="flex items-center gap-2">
-                                    <TbBrowser size={16} />
-                                    Browser
-                                </div>
+                            <th className="px-4 py-3 text-left font-black italic text-md">
+                                Browser
                             </th>
-                            <th className="px-4 py-3 text-center font-bold text-sm text-dark/60">
-                                <div className="flex items-center justify-center gap-2">
-                                    <TbShieldCheck size={16} />
-                                    VPN
-                                </div>
+                            <th className="px-4 py-3 text-center font-black italic text-md">
+                                VPN
                             </th>
-                            <th className="px-4 py-3 text-center font-bold text-sm text-dark/60">
-                                <div className="flex items-center justify-center gap-2">
-                                    <TbRobot size={16} />
-                                    Bot
-                                </div>
+                            <th className="px-4 py-3 text-center font-black italic text-md">
+                                Bot
                             </th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="bg-light">
                         {accesses.map((access, index) => {
                             const browser = getBrowserInfo(access.userAgent);
                             return (
                                 <motion.tr
                                     key={access.id}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
                                     transition={{ delay: index * 0.05, duration: 0.3 }}
-                                    className="border-b border-dark/5 hover:bg-primary/5 transition-colors group"
+                                    className="border-b border-dark/15 hover:bg-dark/5 transition-colors"
                                 >
-                                    <td className="px-4 py-3">
+                                    <td className="px-4 py-4">
                                         <div className="flex flex-col">
-                                            <span className="font-medium text-sm">{formatDate(access.createdAt)}</span>
-                                            <span className="text-xs text-dark/50 group-hover:text-dark/70 transition-colors">
+                                            <span className="font-bold text-sm">{formatDate(access.createdAt)}</span>
+                                            <span className="text-xs text-dark/50">
                                                 {formatFullDate(access.createdAt)}
                                             </span>
                                         </div>
                                     </td>
-                                    <td className="px-4 py-3">
+                                    <td className="px-4 py-4">
                                         <div className="flex items-center gap-2">
-                                            <span className="text-xl">{access.country === 'Unknown' ? '🌍' : '🚩'}</span>
-                                            <span className="font-medium">{access.country}</span>
+                                            {/* TODO: Flag */}
+                                            <span className="font-bold text-sm">{access.country}</span>
                                         </div>
                                     </td>
-                                    <td className="px-4 py-3">
-                                        <code className="px-2 py-1 bg-dark/5 rounded-lg text-sm font-mono">
+                                    <td className="px-4 py-4">
+                                        <code className="px-2.5 py-1.5 bg-dark/5 rounded-lg text-xs font-mono font-bold border border-dark/10">
                                             {access.ip}
                                         </code>
                                     </td>
-                                    <td className="px-4 py-3">
+                                    <td className="px-4 py-4">
                                         <div className="flex items-center gap-2">
-                                            <span>{browser.icon}</span>
-                                            <span className="text-sm font-medium">{browser.name}</span>
+                                            {getBrowserLogoUrl(browser) ? (
+                                                <Image 
+                                                    src={getBrowserLogoUrl(browser)!} 
+                                                    alt={browser}
+                                                    width={20}
+                                                    height={20}
+                                                    className="object-contain"
+                                                    unoptimized
+                                                />
+                                            ) : (
+                                                <TbBrowser size={20} className="text-dark/40" />
+                                            )}
+                                            <span className="text-sm font-bold">{browser}</span>
                                         </div>
                                     </td>
-                                    <td className="px-4 py-3 text-center">
-                                        {access.isVPN ? (
-                                            <Chip variant='danger' size='sm'>
-                                                <p className='flex items-center gap-2'>
-                                                    <TbShieldX size={14} />
-                                                    Yes
-                                                </p>
-                                            </Chip>
-                                        ) : (
-                                            <Chip variant='success' size='sm'>
-                                                <p className='flex items-center gap-2'>
-                                                    <TbShieldCheck size={14} />
-                                                    No
-                                                </p>
-                                            </Chip>
-                                        )}
+                                    <td className="px-4 py-4">
+                                        <div className="flex justify-center">
+                                            {access.isVPN ? (
+                                                <div className="px-3 py-1.5 bg-danger text-light rounded-lg flex items-center gap-1.5">
+                                                    <TbShieldX size={14} className="text-light" />
+                                                    <span className="text-xs font-black">Yes</span>
+                                                </div>
+                                            ) : (
+                                                <div className="px-3 py-1.5 bg-success rounded-lg flex items-center gap-1.5">
+                                                    <TbShieldCheck size={14} className="text-dark" />
+                                                    <span className="text-xs font-black">No</span>
+                                                </div>
+                                            )}
+                                        </div>
                                     </td>
-                                    <td className="px-4 py-3 text-center">
-                                        {access.isBot ? (
-                                            <Chip variant='danger' size='sm'>
-                                                <p className='flex items-center gap-2'>
-                                                    <TbRobot size={14} />
-                                                    Yes
-                                                </p>
-                                            </Chip>
-                                        ) : (
-                                            <Chip variant='success' size='sm'>
-                                            <p className='flex items-center gap-2'>
-                                                <TbUser size={14} />
-                                                No
-                                            </p>
-                                            </Chip>
-                                        )}
+                                    <td className="px-4 py-4">
+                                        <div className="flex justify-center">
+                                            {access.isBot ? (
+                                                <div className="px-3 py-1.5 bg-danger text-light rounded-lg flex items-center gap-1.5">
+                                                    <TbRobot size={14} className="text-light" />
+                                                    <span className="text-xs font-black">Yes</span>
+                                                </div>
+                                            ) : (
+                                                <div className="px-3 py-1.5 bg-success rounded-lg flex items-center gap-1.5">
+                                                    <TbUser size={14} className="text-dark" />
+                                                    <span className="text-xs font-black">No</span>
+                                                </div>
+                                            )}
+                                        </div>
                                     </td>
                                 </motion.tr>
                             );
                         })}
                     </tbody>
                 </table>
-            </div>
-
-            {/* Mobile Cards */}
-            <div className="md:hidden space-y-3">
-                {accesses.map((access, index) => {
-                    const browser = getBrowserInfo(access.userAgent);
-                    return (
-                        <motion.div
-                            key={access.id}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.05, duration: 0.3 }}
-                            className="bg-light border-2 border-dark/10 rounded-2xl p-4 space-y-3"
-                        >
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <TbClock size={16} className="text-dark/50" />
-                                    <span className="text-sm font-medium">{formatDate(access.createdAt)}</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-lg">{access.country === 'Unknown' ? '🌍' : '🚩'}</span>
-                                    <span className="font-bold text-sm">{access.country}</span>
-                                </div>
-                            </div>
-
-                            <div className="flex items-center gap-2">
-                                <span>{browser.icon}</span>
-                                <span className="text-sm font-medium flex-1">{browser.name}</span>
-                                <code className="px-2 py-1 bg-dark/5 rounded-lg text-xs font-mono">
-                                    {access.ip}
-                                </code>
-                            </div>
-
-                            <div className="flex gap-2">
-                                <div className="flex-1">
-                                    <p className="text-xs text-dark/50 mb-1">VPN</p>
-                                    {access.isVPN ? (
-                                        <Chip variant='danger' size='sm' className="w-full justify-center">
-                                            <TbShieldX size={14} />
-                                            Yes
-                                        </Chip>
-                                    ) : (
-                                        <Chip variant='success' size='sm' className="w-full justify-center">
-                                            <TbShieldCheck size={14} />
-                                            No
-                                        </Chip>
-                                    )}
-                                </div>
-                                <div className="flex-1">
-                                    <p className="text-xs text-dark/50 mb-1">Bot</p>
-                                    {access.isBot ? (
-                                        <Chip variant='danger' size='sm' className="w-full justify-center">
-                                            <TbRobot size={14} />
-                                            Yes
-                                        </Chip>
-                                    ) : (
-                                        <Chip variant='success' size='sm' className="w-full justify-center">
-                                            <TbUser size={14} />
-                                            No
-                                        </Chip>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="pt-2 border-t border-dark/10">
-                                <p className="text-xs text-dark/50 truncate" title={access.userAgent}>
-                                    {access.userAgent}
-                                </p>
-                            </div>
-                        </motion.div>
-                    );
-                })}
             </div>
         </div>
     );
