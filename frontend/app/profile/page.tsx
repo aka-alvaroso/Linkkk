@@ -1,10 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
 import RouteGuard from "@/app/components/RouteGuard/RouteGuard";
-import Sidebar from "@/app/components/Sidebar/Sidebar";
+import Navigation from "@/app/components/Navigation/Navigation";
 import { useAuth } from "@/app/hooks";
 import { useAuthStore } from "@/app/stores/authStore";
-import { useSidebarStore } from "@/app/stores/sidebarStore";
 import { useToast } from "@/app/hooks/useToast";
 import Button from "@/app/components/ui/Button/Button";
 import * as motion from "motion/react-client";
@@ -251,15 +250,12 @@ export default function ProfilePage() {
     }
   };
 
-  const { desktopOpen } = useSidebarStore();
-
   return (
     <RouteGuard type="user-only" title="Profile - Linkkk">
-      <div className="relative md:flex md:flex-row justify-center p-4 md:gap-11 max-w-[128rem] mx-auto">
-        <Sidebar />
+      <Navigation />
 
-        <div className={`mt-0 transition-all flex-1 md:pr-18 min-w-0 ${desktopOpen ? 'md:ml-64' : 'md:ml-20'}`}>
-          <div className="w-full max-w-6xl mx-auto pb-16">
+      <div className="relative p-2 md:p-4 md:mt-20 md:max-w-3/4 mx-auto">
+        <div className="w-full mx-auto pb-16">
 
         {/* Header */}
         <motion.div
@@ -646,7 +642,6 @@ export default function ProfilePage() {
         </div>
         {/* End Grid Layout */}
 
-          </div>
         </div>
       </div>
     </RouteGuard>

@@ -1,7 +1,7 @@
 "use client"
 import { useState } from "react";
 import RouteGuard from "@/app/components/RouteGuard/RouteGuard";
-import Navbar from "@/app/components/Navbar/Navbar";
+import Navigation from "@/app/components/Navigation/Navigation";
 import Input from "@/app/components/ui/Input/Input";
 import Button from "@/app/components/ui/Button/Button";
 import { useRouter } from "next/navigation";
@@ -56,21 +56,29 @@ export default function Landing() {
 
   return (
     <RouteGuard type="public" title="Linkkk - Shorten Your URLs">
-      <Navbar />
+      <Navigation />
 
-      <section className="w-full h-[calc(100vh-136px)] flex items-center justify-center px-4">
+      <section className="w-full min-h-[100dvh] flex items-center justify-center px-4 pb-24 md:pb-0 overflow-x-hidden">
         <div className="max-w-2xl w-full mx-auto space-y-8">
+
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, ease: "backInOut" }}
+            className="mx-auto text-sm font-black italic max-w-24 py-1 text-center m-0 bg-secondary text-light rounded-full shadow-lg">
+            v2.0 Beta
+          </motion.p>
 
           {/* Headline simple y grande */}
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, ease: "backInOut" }}
-            className="text-5xl md:text-7xl font-black italic text-center "
+            className="text-4xl md:text-7xl font-black italic text-center px-2"
           >
             Your links,
             <br />
-            <span className="text-shadow-[_6px_6px_0_var(--color-primary)]">
+            <span className="text-shadow-[_4px_4px_0_var(--color-primary)] md:text-shadow-[_6px_6px_0_var(--color-primary)]">
               supercharged
             </span>
           </motion.h1>

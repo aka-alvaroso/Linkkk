@@ -1,16 +1,17 @@
 "use client"
 import { useState, useEffect, useRef } from "react";
-import { TbFilterPlus, TbPlus } from "react-icons/tb";
+import { TbFilterPlus, TbPlus, TbArrowLeft } from "react-icons/tb";
+import Link from "next/link";
 
 import { useLinks, useStats, useAuth } from "@/app/hooks";
 
 import RouteGuard from '@/app/components/RouteGuard/RouteGuard';
 import Button from "@/app/components/ui/Button/Button";
 import LinkDetails from "@/app/components/LinkList/LinkDetails";
-import Sidebar from "@/app/components/Sidebar/Sidebar";
+import Navigation from "@/app/components/Navigation/Navigation";
 import CreateLinkDrawer from "@/app/components/Drawer/CreateLinkDrawer";
 import FilterModal from "@/app/components/Modal/FilterModal";
-import { useSidebarStore } from "@/app/stores/sidebarStore";
+import Alert from "@/app/components/ui/Alert/Alert";
 import * as motion from 'motion/react-client';
 import { useMotionValue, animate } from 'motion/react';
 import AnimatedText, { AnimatedTextRef } from "@/app/components/ui/AnimatedText";
@@ -53,7 +54,6 @@ export default function Dashboard() {
   const { totalLinks, activeLinks, totalClicks } = useStats();
   const { isAuthenticated, isGuest } = useAuth();
   const [view] = useState('details');
-  const { desktopOpen } = useSidebarStore();
   const [createLinkDrawerOpen, setCreateLinkDrawerOpen] = useState(false);
   const [filterModalOpen, setFilterModalOpen] = useState(false);
 
@@ -65,31 +65,64 @@ export default function Dashboard() {
 
   const hasActiveFilters = () => {
     return filters.search !== '' ||
-           filters.status !== 'all';
+      filters.status !== 'all';
   };
 
   return (
     <RouteGuard type="guest-or-user" title="Dashboard - Linkkk">
-      <div className="relative md:flex md:flex-row justify-center p-4 md:gap-11 max-w-[128rem] mx-auto">
-        <Sidebar />
+      <Navigation showCreate={true} />
 
+      <div className="relative p-2 md:p-4 md:mt-20 md:max-w-3/4 mx-auto">
         {/* Dashboard */}
-        <div className={`transition-all flex-1 md:pr-18 space-y-8 min-w-0 ${desktopOpen ? 'md:ml-64' : 'md:ml-20'}`}>
-          <motion.h1 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0, duration: 0.4, ease: "backInOut" }}
-              className="text-4xl font-black mb-2 italic">
+        <div className="space-y-6">
+          {/* Home Button - Mobile only */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0, duration: 0.3, ease: "backInOut" }}
+            className="md:hidden"
+          >
+            <Link href="/">
+              <Button
+                variant="ghost"
+                size="sm"
+                rounded="xl"
+                leftIcon={<TbArrowLeft size={20} />}
+                className="bg-dark/5"
+              >
+                Home
+              </Button>
+            </Link>
+          </motion.div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05, duration: 0.4, ease: "backInOut" }}
+            className="text-4xl font-black mb-2 italic">
             Dashboard
           </motion.h1>
-          
+
+          {/* Guest User Alert */}
+          {isGuest && (
+            <Alert
+              id="guest-link-expiration"
+              type="warning"
+              // title="Guest Account"
+              message="Your links will be automatically deleted after 7 days. Create an account to keep your links forever and unlock more features!"
+              dismissible={true}
+              persistent={false}
+              className="p-2"
+            />
+          )}
+
           {/* Widgets */}
           <div className='flex items-center gap-1 overflow-x-auto scrollbar-hide lg:grid lg:gap-2 lg:grid-cols-4'>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.05, duration: 0.4, ease: "backInOut" }}
-            className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
+              className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
               <h2 className='text-md'>Total links</h2>
               <p className='text-end text-5xl font-black italic'>
                 <AnimatedCounter value={totalLinks} delay={0.15} />
@@ -99,7 +132,7 @@ export default function Dashboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1, duration: 0.4, ease: "backInOut" }}
-            className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
+              className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
               <h2 className='text-md'>Total clicks</h2>
               <p className='text-end text-5xl font-black italic'>
                 <AnimatedCounter value={totalClicks} delay={0.15} />
@@ -109,7 +142,7 @@ export default function Dashboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15, duration: 0.4, ease: "backInOut" }}
-            className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
+              className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
               <h2 className='text-md'>Active links</h2>
               <p className='text-end text-5xl font-black italic'>
                 <AnimatedCounter value={activeLinks} delay={0.15} />
@@ -162,8 +195,8 @@ export default function Dashboard() {
               >
                 <Button variant='solid' size='sm' rounded='xl' leftIcon={<TbPlus size={20} />} onClick={() => setCreateLinkDrawerOpen(true)}
                   className="hover:bg-primary hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)]"
-                  >
-                    New link
+                >
+                  New link
                 </Button>
               </motion.div>
             </div>
