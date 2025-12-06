@@ -311,7 +311,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                                 variant='solid'
                                                 size='sm'
                                                 rounded='xl'
-                                                className="bg-primary text-dark flex-shrink-0 inline-flex items-center justify-center rounded-lg"
+                                                className="bg-primary text-dark flex-shrink-0 inline-flex items-center justify-center"
                                                 onMouseDown={(e) => {
                                                     e.preventDefault();
                                                     navigator.clipboard.writeText(newLink.longUrl);
@@ -381,6 +381,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                         initialText={newLink.status ? 'Active' : 'Inactive'}
                                         animationType="slide"
                                         triggerMode='none'
+                                        className='cursor-pointer'
                                     />
                                 </Button>
                             </motion.div>

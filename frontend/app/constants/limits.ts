@@ -9,8 +9,8 @@ export const PLAN_LIMITS = {
     conditionsPerRule: 1,
   },
   user: {
-    rulesPerLink: 5,
-    conditionsPerRule: 3,
+    rulesPerLink: 3,
+    conditionsPerRule: 2,
   },
 } as const;
 

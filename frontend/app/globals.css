@@ -5,11 +5,12 @@
     
     --color-light: #F2F3F4;
     --color-dark: #1B1B1B;
-    --color-primary: #88FA1E;
+    --color-primary: #72d763;
     --color-info: #279AF1;
-    --color-danger: #EF233C;
-    --color-warning: #F1A208;
-    --color-success: #88FA1E;
+    --color-danger: #FC5444;
+    --color-warning: #FDC344;
+    --color-success: #72d763;
+    --color-secondary: #7F2CCB;
 }
 
 :root {

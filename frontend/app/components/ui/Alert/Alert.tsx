@@ -53,31 +53,27 @@ const Alert: React.FC<AlertProps> = ({
     onDismiss?.();
   };
 
-  // Type-based styling
+  // Type-based styling (toast style)
   const typeConfig = {
     info: {
       bg: 'bg-info',
-      border: 'border-info',
       text: 'text-light',
-      icon: <TbInfoCircle size={24} />,
+      icon: <TbInfoCircle size={20} />,
     },
     warning: {
       bg: 'bg-warning',
-      border: 'border-warning',
       text: 'text-dark',
-      icon: <TbAlertTriangle size={24} />,
+      icon: <TbAlertTriangle size={20} />,
     },
     success: {
       bg: 'bg-success',
-      border: 'border-success',
       text: 'text-dark',
-      icon: <TbCircleCheck size={24} />,
+      icon: <TbCircleCheck size={20} />,
     },
     error: {
       bg: 'bg-danger',
-      border: 'border-danger',
       text: 'text-light',
-      icon: <TbAlertCircle size={24} />,
+      icon: <TbAlertCircle size={20} />,
     },
   };
 
@@ -93,9 +89,8 @@ const Alert: React.FC<AlertProps> = ({
           exit={{ opacity: 0, y: -20, height: 0 }}
           transition={{ duration: 0.3, ease: 'backInOut' }}
           className={cn(
-            'overflow-hidden flex items-center gap-3 p-4 rounded-2xl border',
+            'overflow-hidden flex items-center gap-3 p-3 rounded-xl border border-dark shadow-[4px_4px_0_var(--color-dark)]',
             config.bg,
-            config.border,
             className
           )}
         >
@@ -107,11 +102,11 @@ const Alert: React.FC<AlertProps> = ({
             {/* Content */}
             <div className="flex-1 min-w-0">
               {title && (
-                <h3 className={cn('font-black italic text-lg mb-1', config.text)}>
+                <h3 className={cn('font-bold text-sm mb-0.5', config.text)}>
                   {title}
                 </h3>
               )}
-              <p className={cn('text-sm', config.text)}>
+              <p className={cn('text-xs leading-tight', config.text, title ? 'opacity-90' : 'opacity-95')}>
                 {message}
               </p>
             </div>
@@ -124,10 +119,10 @@ const Alert: React.FC<AlertProps> = ({
                 iconOnly
                 rounded="xl"
                 onClick={handleDismiss}
-                className="flex-shrink-0 hover:bg-dark/10"
+                className={cn('flex-shrink-0', config.text === 'text-light' ? 'hover:bg-light/10' : 'hover:bg-dark/10')}
                 aria-label="Dismiss alert"
               >
-                <TbX size={18} />
+                <TbX size={16} className={config.text} />
               </Button>
             )}
         </motion.div>
