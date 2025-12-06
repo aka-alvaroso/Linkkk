@@ -2,114 +2,112 @@
 
 ![Linkkk Logo](frontend/public/favicon.svg)
 
-# **Linkkk v2**
+# **Linkkk**
 
-### _The smart URL shortener that thinks before it redirects._
+### _Enlaces inteligentes que se adaptan a tu audiencia_
 
-[![Next.js](https://img.shields.io/badge/Next.js-15.5-black?style=flat-square&logo=next.js)](https://nextjs.org/)
-[![React](https://img.shields.io/badge/React-19.1-61DAFB?style=flat-square&logo=react)](https://reactjs.org/)
-[![Node.js](https://img.shields.io/badge/Node.js-Express-339933?style=flat-square&logo=node.js)](https://nodejs.org/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Prisma-316192?style=flat-square&logo=postgresql)](https://www.postgresql.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
+[![Live Demo](https://img.shields.io/badge/🚀_Demo-linkkk.dev-88FA1E?style=for-the-badge)](https://linkkk.dev)
 
-**[Live Demo](https://linkkk.dev)** • **[API Reference](#-api)**
+**[Prueba Gratis](https://linkkk.dev)** • **[Ver Demo](https://linkkk.dev)** • **[Contacto](#-contacto)**
 
 ---
 
 </div>
 
-## 🎯 **What Makes Linkkk Different?**
+## 🎯 **¿Qué es Linkkk?**
 
-Linkkk isn't just another URL shortener. It's a **rules-based redirection engine** that lets you create intelligent links that adapt to your audience.
+**Linkkk no es solo un acortador de URLs.** Es un **motor de redirección inteligente** que te permite crear enlaces que piensan por sí mismos y se adaptan automáticamente a cada visitante.
 
-### **Think of it like this:**
+### **Imagina poder hacer esto:**
 
-- 🌍 **Geo-targeting** → Send visitors from Spain to `/es` and UK visitors to `/en`
-- 📱 **Device detection** → Mobile users get the app store, desktop users see the website
-- 🤖 **Bot filtering** → Block crawlers or redirect them to a special page
-- 🔐 **Password gates** → Protect sensitive links with passwords and hints
-- 🚫 **VPN detection** → Block or redirect VPN traffic
-- 📊 **Access count conditions** → Create self-destructing links after N clicks
-- 🕒 **Time-based rules** → Activate links only during specific dates/times
+- 🌍 **Dirigir a españoles a `/es` y a británicos a `/en`** → Sin configurar nada manualmente
+- 📱 **Enviar usuarios móviles a la app y usuarios de escritorio a la web** → Automáticamente
+- 🤖 **Bloquear bots o redirigirlos a una página especial** → Con un clic
+- 🔐 **Proteger enlaces sensibles con contraseña** → Con pistas opcionales
+- 🚫 **Detectar y bloquear tráfico VPN** → Para contenido exclusivo
+- 📊 **Evitar accesos tras N clics** → Lanzamientos limitados
+- 🕒 **Activar enlaces solo en fechas/horas específicas** → Campañas programadas
+- 🚀 **Y más que se irán añadiendo con el tiempo**
 
-**All of this, without writing a single line of code.**
+**Todo esto sin escribir una sola línea de código.**
 
 ---
 
-## ✨ **Core Features**
+## ✨ **Características Principales**
 
 <table>
 <tr>
 <td width="50%">
 
-### 🔗 **Smart Link Management**
+### 🔗 **Gestión Inteligente de Enlaces**
 
-- Create short, memorable URLs
-- Toggle links on/off instantly
-- Track every click with detailed analytics
-- Filter and search your links
-- Drag-and-drop rule prioritization
-
-</td>
-<td width="50%">
-
-### 🧠 **Conditional Link Rules**
-
-- **7 condition types**: Country, device, IP, VPN, bot, date, access count
-- **4 action types**: Redirect, block, password gate, webhooks
-- **AND/OR logic** for complex scenarios
-- **Else actions** for fallback behavior
-- **Priority-based evaluation**
-
-</td>
-</tr>
-<tr>
-<td width="50%">
-
-### 📊 **Deep Analytics**
-
-- Real-time click tracking
-- Geographic distribution (country detection)
-- Device breakdown (mobile/tablet/desktop)
-- VPN and bot detection
-- Access history with IP logging
-- Full access records per link
+- Crea URLs cortas y memorables al instante
+- Activa/desactiva enlaces con un toggle
+- Rastrea cada clic con analíticas detalladas
+- Filtra y busca entre tus enlaces
+- Reorganiza reglas con drag & drop
+- Edición inline súper rápida
 
 </td>
 <td width="50%">
 
-### 🎨 **Modern UI/UX**
+### 🧠 **Reglas Condicionales Avanzadas**
 
-- Neo-brutalist design language
-- Smooth animations (Framer Motion)
-- Mobile-first responsive design
-- Bottom navigation for mobile
-- Dark mode interface
-- Inline editing and creation
+- **7 tipos de condiciones**: País, dispositivo, IP, VPN, bot, fecha, contador
+- **4 tipos de acciones**: Redirección, bloqueo, contraseña, webhooks
+- **Lógica AND/OR** para escenarios complejos
+- **Acciones ELSE** para comportamiento alternativo
+- **Sistema de prioridades** configurable
 
 </td>
 </tr>
 <tr>
 <td width="50%">
 
-### 🔐 **Multi-Tier Authentication**
+### 📊 **Analíticas en Tiempo Real**
 
-- **Guest mode**: Try before you sign up (1-hour sessions)
-- **User accounts**: Full analytics and higher limits
-- **JWT-based auth** with httpOnly cookies
-- **Automatic link migration** from guest to user
+- Seguimiento de clics en vivo
+- Distribución geográfica (detección de país)
+- Desglose por dispositivo (móvil/tablet/escritorio)
+- Detección de VPN y bots
+- Historial completo con registro de IPs
+- Exporta tus datos cuando quieras
 
 </td>
 <td width="50%">
 
-### 🛡️ **Enterprise-Grade Security**
+### 🎨 **Interfaz Moderna y Fluida**
 
-- CSRF protection (SameSite cookies)
-- XSS prevention (httpOnly cookies)
-- SSRF protection (URL validation)
-- SQL injection immunity (Prisma ORM)
-- Rate limiting per endpoint
-- Bcrypt password hashing (12 rounds)
+- Diseño neo-brutalista único
+- Animaciones suaves (Framer Motion)
+- 100% responsive (mobile-first)
+- Navegación inferior en móvil
+- Modo oscuro elegante
+- Experiencia de usuario premium
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+### 🔐 **Acceso Flexible**
+
+- **Modo invitado**: Prueba sin registrarte (sesiones de 1 hora)
+- **Cuentas de usuario**: Analíticas completas y límites más altos
+- **Migración automática** de enlaces de invitado a usuario
+- **API keys** para integración programática
+
+</td>
+<td width="50%">
+
+### 🛡️ **Seguridad desde el inicio**
+
+- Protección CSRF y XSS
+- Prevención de inyección SQL
+- Rate limiting por endpoint
+- Encriptación de contraseñas (bcrypt)
+- Validación de URLs (anti-SSRF)
+- Cookies httpOnly seguras
 
 </td>
 </tr>
@@ -117,908 +115,241 @@ Linkkk isn't just another URL shortener. It's a **rules-based redirection engine
 
 ---
 
-## 🚀 **Quick Start**
+## 🚀 **Casos de Uso Reales**
 
-### **Prerequisites**
+### **1. Marketing Multiregional**
 
-- Node.js 18+
-- PostgreSQL 14+
-- npm or yarn
+```
+SI país EN [ES, MX, AR] Y dispositivo = móvil
+  → Redirigir a https://tuapp.com/mobile-es
+SINO
+  → Redirigir a https://tuapp.com/en
+```
 
-### **1. Clone & Install**
+**Perfecto para:** Campañas internacionales, landing pages localizadas, apps con versiones regionales.
+
+---
+
+### **2. Lanzamientos Exclusivos**
+
+```
+SI contador_accesos < 100
+  → Requiere contraseña "early2025"
+SINO
+  → Bloquear acceso (cupo agotado)
+```
+
+**Perfecto para:** Acceso anticipado, beta testing, eventos con aforo limitado.
+
+---
+
+### **3. Protección Anti-Bot**
+
+```
+SI es_bot = true O es_vpn = true
+  → Bloquear acceso
+SINO
+  → Redirigir a contenido original
+```
+
+**Perfecto para:** Proteger contenido premium, evitar scraping, filtrar tráfico sospechoso.
+
+---
+
+### **4. Campañas Temporales**
+
+```
+SI fecha ENTRE "2025-12-01" Y "2025-12-25"
+  → Redirigir a https://tutienda.com/navidad
+SINO
+  → Redirigir a https://tutienda.com
+```
+
+**Perfecto para:** Promociones estacionales, eventos limitados, ofertas flash.
+
+---
+
+### **5. Optimización Móvil**
+
+```
+SI dispositivo = móvil
+  → Redirigir a app store (iOS/Android)
+SINO
+  → Redirigir a sitio web
+```
+
+**Perfecto para:** Aumentar descargas de apps, mejorar conversión móvil, deep linking.
+
+---
+
+## 🎨 **Diseño que Enamora**
+
+Linkkk no solo funciona bien, **se ve increíble**. Nuestro diseño neo-brutalista combina:
+
+- **Colores vibrantes** → Verde lima (#88FA1E) como color principal
+- **Sombras audaces** → `8px 8px 0 #1B1B1B` para ese look único
+- **Animaciones fluidas** → Transiciones suaves con Framer Motion
+- **Tipografía moderna** → Fuentes optimizadas para legibilidad
+- **Componentes personalizados** → Botones, modales, drawers, toasts y más
+
+### **Componentes Disponibles:**
+
+| Componente | Características |
+|------------|-----------------|
+| **Button** | 4 variantes, 5 tamaños, estados de carga, iconos |
+| **Input** | Texto, textarea, password, con iconos, mensajes de error |
+| **Modal** | 6 tamaños, 3 posiciones, cierre con ESC |
+| **Drawer** | 8 posiciones (lados + esquinas), múltiples tamaños |
+| **Toast** | 4 tipos (success, error, warning, info), auto-dismiss |
+| **Switch** | Toggle animado y suave |
+| **Chip** | Tags/badges con variantes e iconos |
+
+---
+
+## 📊 **Planes y Límites**
+
+| Característica | Invitado | Usuario Registrado |
+|----------------|----------|-------------------|
+| **Enlaces máximos** | 10 | 50 |
+| **Duración de enlaces** | 7 días | Ilimitado |
+| **Reglas por enlace** | 1 | 5 |
+| **Condiciones por regla** | 1 | 3 |
+| **Analíticas detalladas** | ❌ | ✅ |
+| **API Key** | ❌ | ✅ |
+| **Exportar datos** | ❌ | ✅ |
+
+> **¿Necesitas más?** Contáctanos para planes empresariales o ampliados personalizados.
+
+---
+
+## 🧪 **Motor de Reglas: El Cerebro de Linkkk**
+
+### **Tipos de Condiciones**
+
+| Campo | Operadores | Valores de Ejemplo |
+|-------|-----------|-------------------|
+| `country` | `in`, `not_in` | `["ES", "US", "MX"]` |
+| `device` | `equals`, `not_equals` | `"mobile"`, `"tablet"`, `"desktop"` |
+| `ip` | `equals`, `not_equals` | `"192.168.1.1"` |
+| `is_vpn` | `equals` | `true`, `false` |
+| `is_bot` | `equals` | `true`, `false` |
+| `date` | `before`, `after`, `equals` | `"2025-12-31T23:59:59Z"` |
+| `access_count` | `equals`, `greater_than`, `less_than` | `100` |
+
+### **Tipos de Acciones**
+
+1. **`redirect`** → Envía usuarios a una URL diferente
+   - Soporta variables: `{{longUrl}}`, `{{shortUrl}}`
+   - Protección anti-SSRF integrada
+
+2. **`block_access`** → Muestra un mensaje personalizado y bloquea el acceso
+   - Ideal para restricciones geográficas o de contenido
+
+3. **`password_gate`** → Requiere contraseña para continuar
+   - Con pistas opcionales para ayudar a los usuarios
+
+4. **`notify`** → Dispara un webhook al acceder al enlace
+   - Perfecto para integraciones con Slack, Discord, Zapier, etc.
+
+### **Flujo de Evaluación**
+
+1. Las reglas se ordenan por **prioridad** (menor = primero)
+2. Las condiciones se evalúan según **tipo de match** (AND/OR)
+3. Si las condiciones coinciden → se ejecuta la **acción principal**
+4. Si no coinciden → se ejecuta la **acción ELSE** (si está definida)
+5. La primera regla que coincide gana (la evaluación se detiene)
+
+---
+
+## 🌟 **¿Por Qué Elegir Linkkk?**
+
+### **vs. Acortadores Tradicionales (bit.ly, TinyURL)**
+
+| Característica | Linkkk | Otros |
+|----------------|--------|-------|
+| Redirección condicional | ✅ | ❌ |
+| Detección de país/dispositivo | ✅ | ❌ |
+| Protección con contraseña | ✅ | ❌ |
+| Detección de VPN/bots | ✅ | ❌ |
+| Enlaces autodestructivos | ✅ | ❌ |
+| Webhooks integrados | ✅ | ❌ |
+| Diseño moderno | ✅ | ⚠️ |
+| Modo invitado sin registro | ✅ | ❌ |
+
+---
+
+## 🔗 **Empieza Ahora**
+
+### **1. Modo Invitado (Sin Registro)**
+
+1. Ve a [linkkk.dev](https://linkkk.dev)
+2. Haz clic en "Continuar como invitado"
+3. Crea tu primer enlace inteligente
+4. ¡Listo! Tienes 10 enlaces durante 7 días
+
+### **2. Cuenta Completa (Gratis)**
+
+1. Regístrate en [linkkk.dev](https://linkkk.dev)
+2. Verifica tu email
+3. Disfruta de 50 enlaces ilimitados
+4. Accede a analíticas completas y API
+
+### **3. Integración API**
 
 ```bash
-git clone https://github.com/aka-alvaroso/Linkkk.git
-cd Linkkk
-
-# Install backend dependencies
-cd backend
-npm install
-
-# Install frontend dependencies
-cd ../frontend
-npm install
-```
-
-### **2. Configure Environment**
-
-**Backend** (`backend/.env`):
-
-```env
-DATABASE_URL="postgresql://user:password@localhost:5432/linkkk"
-JWT_SECRET="your-super-secret-jwt-key-change-this"
-FRONTEND_URL="http://localhost:3001"
-NODE_ENV="development"
-PORT=3000
-```
-
-**Frontend** (`frontend/.env.local`):
-
-```env
-NEXT_PUBLIC_API_URL="http://localhost:3000"
-```
-
-### **3. Database Setup**
-
-```bash
-cd backend
-npx prisma migrate dev
-npx prisma generate
-```
-
-### **4. Run the App**
-
-**Backend** (port 3000):
-
-```bash
-cd backend
-npm run dev
-```
-
-**Frontend** (port 3001):
-
-```bash
-cd frontend
-npm run dev
-```
-
-🎉 **Open** → [http://localhost:3001](http://localhost:3001)
-
----
-
-## 📚 **Architecture**
-
-```
-Linkkk v2/
-│
-├── 🎨 frontend/          # Next.js 15 + React 19 + TypeScript
-│   ├── app/
-│   │   ├── components/   # UI components (Button, Input, Drawer, etc.)
-│   │   ├── hooks/        # Custom hooks (useAuth, useLinks, etc.)
-│   │   ├── stores/       # Zustand state management
-│   │   ├── services/     # API client services
-│   │   └── utils/        # Helpers and utilities
-│   └── public/           # Static assets
-│
-└── ⚙️ backend/           # Express.js + Prisma + PostgreSQL
-    └── v2/
-        ├── controllers/  # Business logic
-        ├── routers/      # Route definitions
-        ├── middlewares/  # Auth & rate limiting
-        ├── validators/   # Zod schemas
-        ├── utils/        # Link rules engine, helpers
-        ├── prisma/       # Database schema & client
-        └── constants/    # Error codes & configs
-```
-
-### **Tech Stack**
-
-| Layer             | Technology                                                     |
-| ----------------- | -------------------------------------------------------------- |
-| **Frontend**      | Next.js 15, React 19, TypeScript, Tailwind CSS 4, Zustand     |
-| **Backend**       | Node.js, Express.js, Prisma ORM, PostgreSQL                   |
-| **Security**      | Helmet, JWT, bcryptjs, express-rate-limit                     |
-| **Animations**    | Framer Motion (`motion` library)                              |
-| **Validation**    | Zod                                                           |
-| **UI Components** | Custom component library (Button, Input, Modal, Drawer, Toast)|
-| **Drag & Drop**   | @dnd-kit                                                      |
-| **Icons**         | react-icons                                                   |
-
----
-
-## 🧪 **Link Rules Engine**
-
-The heart of Linkkk v2. Here's how it works:
-
-### **Anatomy of a Rule**
-
-```json
-{
-  "priority": 1,
-  "enabled": true,
-  "match": "AND",
-  "conditions": [
-    {
-      "field": "country",
-      "operator": "in",
-      "value": ["ES", "MX", "AR"]
-    },
-    {
-      "field": "device",
-      "operator": "equals",
-      "value": "mobile"
-    }
-  ],
-  "actionType": "redirect",
-  "actionSettings": {
-    "url": "https://example.com/mobile-es"
-  },
-  "elseActionType": "redirect",
-  "elseActionSettings": {
-    "url": "{{longUrl}}"
-  }
-}
-```
-
-### **Condition Types**
-
-| Field          | Operators                             | Example Values                      |
-| -------------- | ------------------------------------- | ----------------------------------- |
-| `country`      | `in`, `not_in`                        | `["US", "CA", "GB"]`                |
-| `device`       | `equals`, `not_equals`                | `"mobile"`, `"tablet"`, `"desktop"` |
-| `ip`           | `equals`, `not_equals`                | `"192.168.1.1"`                     |
-| `is_vpn`       | `equals`                              | `true`, `false`                     |
-| `is_bot`       | `equals`                              | `true`, `false`                     |
-| `date`         | `before`, `after`, `equals`           | `"2025-12-31T23:59:59Z"`            |
-| `access_count` | `equals`, `greater_than`, `less_than` | `100`                               |
-
-### **Action Types**
-
-1. **`redirect`** → Send users to a different URL
-
-   - Supports template variables: `{{longUrl}}`, `{{shortUrl}}`
-   - SSRF protection (blocks private IPs)
-
-2. **`block_access`** → Show a custom message and prevent access
-
-   ```json
-   {
-     "reason": "This content is not available in your region."
-   }
-   ```
-
-3. **`password_gate`** → Require a password to continue
-
-   ```json
-   {
-     "password": "secret123",
-     "hint": "Starts with 's'"
-   }
-   ```
-
-4. **`notify`** → Trigger a webhook on link access
-
-   ```json
-   {
-     "webhookUrl": "https://your-server.com/webhook",
-     "method": "POST"
-   }
-   ```
-
-### **Evaluation Flow**
-
-1. Rules are sorted by **priority** (lower = first)
-2. Conditions are evaluated based on **match type** (AND/OR)
-3. If conditions match → **primary action** executes
-4. If conditions don't match → **else action** executes (if defined)
-5. First matching rule wins (evaluation stops)
-
-### **Example Use Cases**
-
-**Geo-targeting with fallback:**
-
-```
-IF country IN [ES, MX, AR] AND device = mobile
-  → Redirect to https://example.com/mobile-es
-ELSE
-  → Redirect to original URL
-```
-
-**Password-protected link:**
-
-```
-IF access_count < 50
-  → Require password "launch2025"
-ELSE
-  → Block access (expired)
-```
-
-**Bot filtering:**
-
-```
-IF is_bot = true
-  → Block access
-ELSE
-  → Redirect to original URL
-```
-
----
-
-## 🔒 **Security Features**
-
-| Feature            | Implementation                                                                        |
-| ------------------ | ------------------------------------------------------------------------------------- |
-| **Authentication** | JWT tokens (7-day expiration for users, 1-hour for guests)                           |
-| **Cookies**        | httpOnly, SameSite=Strict, Secure (production)                                        |
-| **Passwords**      | bcrypt hashing (10 rounds for auth, 12 for link passwords)                            |
-| **SQL Injection**  | Prisma ORM with parameterized queries                                                 |
-| **XSS**            | httpOnly cookies, User-Agent sanitization (max 500 chars)                             |
-| **CSRF**           | SameSite=Strict cookies                                                               |
-| **SSRF**           | URL validation blocks private/local IPs (192.168.x, 10.x, 127.x, AWS metadata)        |
-| **Rate Limiting**  | Per-endpoint limits (e.g., 5 login attempts/15min, 50 link creations/hour)            |
-| **Headers**        | Helmet.js (CSP, HSTS, X-Frame-Options, Permissions-Policy)                            |
-| **Enumeration**    | Generic error messages (no user existence leakage)                                    |
-
----
-
-## 📊 **Plan Limits**
-
-| Feature                 | Guest  | Registered User |
-| ----------------------- | ------ | --------------- |
-| **Max Links**           | 10     | 50              |
-| **Link Expiration**     | 7 days | Never           |
-| **Rules per Link**      | 1      | 5               |
-| **Conditions per Rule** | 1      | 3               |
-| **Analytics**           | ❌     | ✅              |
-
----
-
-## 🌐 **API**
-
-### **Authentication**
-
-All endpoints require a JWT token (except `/auth/*` and `/r/:shortUrl`).
-
-**Token can be provided via:**
-
-- Cookie: `token` (httpOnly)
-- Header: `Authorization: Bearer <token>`
-
-### **Base URL**
-
-```
-http://localhost:3000
-```
-
-### **Endpoints**
-
-<details>
-<summary><b>🔐 Authentication</b></summary>
-
-#### **POST** `/auth/register`
-
-Create a new user account.
-
-**Request:**
-
-```json
-{
-  "username": "john_doe",
-  "email": "john@example.com",
-  "password": "SecurePass123!"
-}
-```
-
-**Response:**
-
-```json
-{
-  "success": true,
-  "data": {
-    "user": {
-      "id": 1,
-      "username": "john_doe",
-      "email": "john@example.com"
-    },
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-  }
-}
-```
-
----
-
-#### **POST** `/auth/login`
-
-Authenticate and get a token.
-
-**Request:**
-
-```json
-{
-  "email": "john@example.com",
-  "password": "SecurePass123!"
-}
-```
-
-**Response:**
-
-```json
-{
-  "success": true,
-  "data": {
-    "user": { ... },
-    "token": "eyJ..."
-  }
-}
-```
-
----
-
-#### **POST** `/auth/guest`
-
-Create a guest session (1-hour token).
-
-**Response:**
-
-```json
-{
-  "success": true,
-  "data": {
-    "guestSession": { "id": 1 },
-    "token": "eyJ..."
-  }
-}
-```
-
----
-
-#### **GET** `/auth/validate`
-
-Check if current token is valid.
-
-**Response:**
-
-```json
-{
-  "success": true,
-  "data": {
-    "user": { ... }  // or "guestSession": { ... }
-  }
-}
-```
-
----
-
-#### **POST** `/auth/logout`
-
-Clear authentication tokens.
-
-**Response:**
-
-```json
-{
-  "success": true
-}
-```
-
-</details>
-
-<details>
-<summary><b>🔗 Link Management</b></summary>
-
-#### **POST** `/link`
-
-Create a short link.
-
-**Request:**
-
-```json
-{
-  "longUrl": "https://example.com/very/long/url",
-  "status": true
-}
-```
-
-**Response:**
-
-```json
-{
-  "success": true,
-  "data": {
-    "id": 1,
-    "shortUrl": "a1b2c3d4",
-    "longUrl": "https://example.com/very/long/url",
-    "status": true,
-    "accessCount": 0,
-    "createdAt": "2025-01-15T10:00:00Z"
-  }
-}
-```
-
----
-
-#### **GET** `/link`
-
-Get all your links.
-
-**Response:**
-
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": 1,
-      "shortUrl": "a1b2c3d4",
-      "longUrl": "https://example.com",
-      "status": true,
-      "accessCount": 42,
-      "createdAt": "2025-01-15T10:00:00Z"
-    }
-  ]
-}
-```
-
----
-
-#### **GET** `/link/:shortUrl`
-
-Get a single link by shortUrl.
-
-**Response:**
-
-```json
-{
-  "success": true,
-  "data": {
-    "id": 1,
-    "shortUrl": "a1b2c3d4",
+# Genera tu API key desde el panel
+curl -X POST https://api.linkkk.dev/link \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
     "longUrl": "https://example.com",
-    "status": true,
-    "accessCount": 42,
-    "createdAt": "2025-01-15T10:00:00Z"
-  }
-}
+    "status": true
+  }'
 ```
 
 ---
 
-#### **PUT** `/link/:shortUrl`
+## 🛠️ **Stack Tecnológico**
 
-Update a link.
+Construido con las mejores tecnologías modernas:
 
-**Request:**
-
-```json
-{
-  "longUrl": "https://new-url.com",
-  "status": false
-}
-```
-
----
-
-#### **DELETE** `/link/:shortUrl`
-
-Delete a link (cascades to rules and access records).
-
-</details>
-
-<details>
-<summary><b>📏 Link Rules</b></summary>
-
-#### **POST** `/link/:shortUrl/rules`
-
-Create a rule for a link.
-
-**Request:**
-
-```json
-{
-  "priority": 1,
-  "enabled": true,
-  "match": "AND",
-  "conditions": [
-    {
-      "field": "country",
-      "operator": "in",
-      "value": ["US", "CA"]
-    }
-  ],
-  "actionType": "redirect",
-  "actionSettings": {
-    "url": "https://example.com/us-ca"
-  }
-}
-```
+| Capa | Tecnología |
+|------|-----------|
+| **Frontend** | Next.js 15, React 19, TypeScript, Tailwind CSS 4 |
+| **Backend** | Node.js, Express.js, Prisma ORM |
+| **Base de Datos** | PostgreSQL |
+| **Seguridad** | JWT, bcrypt, Helmet, Rate Limiting |
+| **Animaciones** | Framer Motion |
+| **Validación** | Zod |
+| **Drag & Drop** | @dnd-kit |
 
 ---
 
-#### **GET** `/link/:shortUrl/rules`
+## 📧 **Contacto**
 
-Get all rules for a link.
-
----
-
-#### **GET** `/link/:shortUrl/rules/:ruleId`
-
-Get a single rule.
-
----
-
-#### **PUT** `/link/:shortUrl/rules/:ruleId`
-
-Update a rule.
-
----
-
-#### **DELETE** `/link/:shortUrl/rules/:ruleId`
-
-Delete a rule.
-
----
-
-#### **POST** `/link/:shortUrl/rules/batch`
-
-Create multiple rules at once (max 20).
-
-</details>
-
-<details>
-<summary><b>📊 Analytics</b></summary>
-
-#### **GET** `/accesses/link/:shortUrl`
-
-Get all access records for a link.
-
-**Response:**
-
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": 1,
-      "userAgent": "Mozilla/5.0...",
-      "ip": "203.0.113.45",
-      "country": "US",
-      "isVPN": false,
-      "isBot": false,
-      "createdAt": "2025-01-15T14:30:00Z"
-    }
-  ]
-}
-```
-
-</details>
-
-<details>
-<summary><b>👤 User Management</b></summary>
-
-#### **PUT** `/user`
-
-Update user profile.
-
-**Request:**
-
-```json
-{
-  "username": "new_username",
-  "email": "newemail@example.com",
-  "password": "NewPassword123!"
-}
-```
-
----
-
-#### **POST** `/user/api-key`
-
-Generate API key for programmatic access.
-
-**Response:**
-
-```json
-{
-  "success": true,
-  "data": {
-    "apiKey": "a1b2c3d4e5f6..."
-  }
-}
-```
-
----
-
-#### **DELETE** `/user/api-key`
-
-Revoke current API key.
-
----
-
-#### **DELETE** `/user/data`
-
-Delete all user links (keeps account).
-
----
-
-#### **DELETE** `/user`
-
-Delete account and all associated data.
-
-</details>
-
-<details>
-<summary><b>🌐 Public Redirect</b></summary>
-
-#### **GET** `/r/:shortUrl`
-
-Public endpoint that evaluates rules and redirects.
-
-**Query params:**
-
-- `password` (optional) - For password-protected links
-
-**Behavior:**
-
-1. Evaluates all rules in priority order
-2. Tracks the access (IP, country, device, VPN, bot)
-3. Executes the matching action
-4. Returns 302 redirect, 403 blocked, or 200 password gate
-
-</details>
-
-### **Error Responses**
-
-```json
-{
-  "success": false,
-  "code": "LINK_NOT_FOUND",
-  "message": "The requested link does not exist."
-}
-```
-
-**Common Error Codes:**
-
-- `UNAUTHORIZED` - Invalid or missing token
-- `LINK_NOT_FOUND` - Link doesn't exist
-- `LINK_LIMIT_EXCEEDED` - User hit their plan's link limit
-- `RULE_LIMIT_EXCEEDED` - Too many rules for this link
-- `INVALID_DATA` - Validation error (check `validation` field)
-- `RATE_LIMIT_EXCEEDED` - Too many requests
-
----
-
-## 🗂️ **Database Schema**
-
-```prisma
-model User {
-  id        Int      @id @default(autoincrement())
-  username  String   @unique
-  email     String   @unique
-  password  String
-  avatarUrl String?
-  apiKey    String?  @unique
-  createdAt DateTime @default(now())
-  links     Link[]
-}
-
-model GuestSession {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  links     Link[]
-}
-
-model Link {
-  id             Int           @id @default(autoincrement())
-  userId         Int?
-  guestSessionId Int?
-  shortUrl       String        @unique
-  longUrl        String
-  status         Boolean       @default(true)
-  accessCount    Int           @default(0)
-  createdAt      DateTime      @default(now())
-  user           User?         @relation(fields: [userId], references: [id])
-  guestSession   GuestSession? @relation(fields: [guestSessionId], references: [id])
-  accesses       Access[]
-  rules          LinkRule[]
-}
-
-model Access {
-  id        Int      @id @default(autoincrement())
-  linkId    Int
-  createdAt DateTime @default(now())
-  userAgent String
-  ip        String
-  country   String
-  isVPN     Boolean
-  isBot     Boolean
-  link      Link     @relation(fields: [linkId], references: [id], onDelete: Cascade)
-}
-
-model LinkRule {
-  id                 Int             @id @default(autoincrement())
-  linkId             Int
-  link               Link            @relation(fields: [linkId], references: [id], onDelete: Cascade)
-  priority           Int             @default(0)
-  enabled            Boolean         @default(true)
-  match              MatchType       @default(AND)
-  conditions         RuleCondition[]
-  actionType         ActionType
-  actionSettings     Json?
-  elseActionType     ActionType?
-  elseActionSettings Json?
-  createdAt          DateTime        @default(now())
-  updatedAt          DateTime        @updatedAt
-}
-
-model RuleCondition {
-  id       Int          @id @default(autoincrement())
-  ruleId   Int
-  rule     LinkRule     @relation(fields: [ruleId], references: [id], onDelete: Cascade)
-  field    FieldType
-  operator OperatorType
-  value    Json
-}
-```
-
----
-
-## 🎨 **UI Components**
-
-Linkkk v2 includes a custom-built component library with a **neo-brutalist design** aesthetic.
-
-### **Available Components:**
-
-| Component        | Features                                                                 |
-| ---------------- | ------------------------------------------------------------------------ |
-| **Button**       | 4 variants (solid, outline, ghost, link), 5 sizes, loading states, icons |
-| **Input**        | Text, textarea, password, with icons, error messages, 4 sizes            |
-| **Select**       | Dropdown with custom styling                                             |
-| **InlineSelect** | Button-style option selector                                             |
-| **Modal**        | 6 sizes, 3 positions, backdrop click, ESC key, portal rendering          |
-| **Drawer**       | 8 placements (sides + corners), modal mode, multiple sizes               |
-| **Toast**        | 4 types (success, error, warning, info), auto-dismiss, progress bar      |
-| **AnimatedText** | 7 animation types (fade, slide, scale, blur, flip)                       |
-| **Switch**       | Toggle switch with smooth animations                                     |
-| **Chip**         | Tags/badges with variants and icons                                      |
-| **Dropdown**     | Dropdown menu component                                                  |
-
-### **Design Tokens:**
-
-```css
---color-primary: #88FA1E   /* Lime green */
---color-dark: #1B1B1B      /* Almost black */
---color-light: #F2F3F4     /* Off-white */
---color-info: #279AF1      /* Blue */
---color-danger: #EF233C    /* Red */
---color-warning: #F1A208   /* Orange */
---color-success: #88FA1E   /* Lime (same as primary) */
-```
-
-**Shadow style:**
-
-```css
-box-shadow: 8px 8px 0 var(--color-dark);
-```
-
----
-
-## 🧪 **Testing**
-
-```bash
-cd backend
-npm test                # Run all tests
-npm run test:watch      # Watch mode
-npm run test:coverage   # Coverage report
-```
-
-**Test stack:**
-
-- Jest
-- Supertest (API testing)
-- Prisma test environment
-
----
-
-## 📦 **Deployment**
-
-### **Frontend (Vercel)**
-
-```bash
-cd frontend
-npm run build
-npm start
-```
-
-Set environment variables:
-
-- `NEXT_PUBLIC_API_URL` → Your backend URL
-
-### **Backend (Railway / Render / VPS)**
-
-```bash
-cd backend
-npm install --production
-npx prisma migrate deploy
-npx prisma generate
-npm start  # or: node v2.js
-```
-
-Set environment variables:
-
-- `DATABASE_URL`
-- `JWT_SECRET`
-- `FRONTEND_URL`
-- `NODE_ENV=production`
-- `PORT` (optional, defaults to 3000)
-
----
-
-## 🛠️ **Development Scripts**
-
-**Backend:**
-
-```bash
-npm run dev           # Watch mode (v2.js)
-npm start             # Production (v1.js, legacy)
-npm test              # Run tests
-npx prisma studio     # Database GUI
-npx prisma migrate dev # Create migration
-```
-
-**Frontend:**
-
-```bash
-npm run dev          # Development server
-npm run build        # Production build
-npm run start        # Start production server
-npm run lint         # ESLint
-```
-
----
-
-## 🤝 **Contributing**
-
-This project was created as a **Final Degree Project (TFG)** for a Higher Degree in Web Application Development.
-
-If you'd like to contribute:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
----
-
-## 📄 **License**
-
-This project is licensed under the **ISC License**.
-
----
-
-## 🙏 **Acknowledgments**
-
-- **Next.js Team** - For the amazing React framework
-- **Prisma Team** - For the best ORM experience
-- **Vercel** - For hosting and deployment tools
-- **Open Source Community** - For all the incredible libraries used
-
----
-
-## 📧 **Contact**
+¿Tienes preguntas? ¿Necesitas un plan empresarial? ¿Quieres colaborar?
 
 **Álvaro** - [@aka-alvaroso](https://github.com/aka-alvaroso)
 
-**Project Link:** [https://github.com/aka-alvaroso/Linkkk](https://github.com/aka-alvaroso/Linkkk)
+**Proyecto:** [github.com/aka-alvaroso/Linkkk](https://github.com/aka-alvaroso/Linkkk)
 
-**Live Demo:** [https://linkkk.dev](https://linkkk.dev)
+**Demo en Vivo:** [linkkk.dev](https://linkkk.dev)
+
+---
+
+## 📄 **Licencia**
+
+Este proyecto está licenciado bajo la **Licencia ISC**.
 
 ---
 
 <div align="center">
 
-**Made with ❤️ and lots of ☕**
+**Hecho con ❤️ y mucho ☕**
 
-_Linkkk v2 - Smart links for smart people._
+_Linkkk - Enlaces inteligentes para gente inteligente._
+
+[![GitHub stars](https://img.shields.io/github/stars/aka-alvaroso/Linkkk?style=social)](https://github.com/aka-alvaroso/Linkkk)
+[![Twitter Follow](https://img.shields.io/twitter/follow/aka_alvaroso?style=social)](https://twitter.com/aka_alvaroso)
 
 </div>

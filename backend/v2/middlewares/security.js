@@ -1,6 +1,7 @@
 const rateLimit = require("express-rate-limit");
 const { errorResponse } = require("../utils/response");
 const ERRORS = require("../constants/errorCodes");
+const config = require("../config/environment");
 
 // Handler simple para rate limiting
 const rateLimitHandler = (req, res, next, options) => {
@@ -9,7 +10,7 @@ const rateLimitHandler = (req, res, next, options) => {
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: process.env.ENV === "development" ? 1000 : 10,
+  max: config.env.isDevelopment ? 1000 : 10,
   standardHeaders: true,
   legacyHeaders: false,
   // SECURITY: Use only IP for rate limiting (VUL-006 fix)
@@ -22,7 +23,7 @@ const authLimiter = rateLimit({
 
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: process.env.ENV === "development" ? 1000 : 5,
+  max: config.env.isDevelopment ? 1000 : 5,
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => {
@@ -34,7 +35,7 @@ const loginLimiter = rateLimit({
 
 const registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: process.env.ENV === "development" ? 1000 : 5,
+  max: config.env.isDevelopment ? 1000 :5,
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => req.ip,
@@ -43,7 +44,7 @@ const registerLimiter = rateLimit({
 
 const guestLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: process.env.ENV === "development" ? 1000 : 10,
+  max: config.env.isDevelopment ? 1000 :10,
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => req.ip,
@@ -53,7 +54,7 @@ const guestLimiter = rateLimit({
 // Link limiters
 const createLinkLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: process.env.ENV === "development" ? 1000 : 50,
+  max: config.env.isDevelopment ? 1000 :50,
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => req.ip,
@@ -62,7 +63,7 @@ const createLinkLimiter = rateLimit({
 
 const updateLinkLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: process.env.ENV === "development" ? 1000 : 50,
+  max: config.env.isDevelopment ? 1000 :50,
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => req.ip,
@@ -71,7 +72,7 @@ const updateLinkLimiter = rateLimit({
 
 const getLinksLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: process.env.ENV === "development" ? 1000 : 100,
+  max: config.env.isDevelopment ? 1000 :100,
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => req.ip,
@@ -80,7 +81,7 @@ const getLinksLimiter = rateLimit({
 
 const linkValidatorLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: process.env.ENV === "development" ? 1000 : 50,
+  max: config.env.isDevelopment ? 1000 :50,
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => req.ip,
@@ -91,7 +92,7 @@ const linkValidatorLimiter = rateLimit({
 // 3 attempts per hour per IP+link (prevents targeted attacks)
 const passwordVerifyLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: process.env.ENV === "development" ? 1000 : 3, // Reduced from 5 to 3
+  max: config.env.isDevelopment ? 1000 :3, // Reduced from 5 to 3
   skipSuccessfulRequests: true,
   standardHeaders: true,
   legacyHeaders: false,
@@ -106,7 +107,7 @@ const passwordVerifyLimiter = rateLimit({
 // 20 attempts per hour per link from all IPs combined
 const passwordVerifyGlobalLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: process.env.ENV === "development" ? 1000 : 20, // Global limit per link
+  max: config.env.isDevelopment ? 1000 :20, // Global limit per link
   skipSuccessfulRequests: true,
   standardHeaders: true,
   legacyHeaders: false,
@@ -125,7 +126,7 @@ const passwordVerifyGlobalLimiter = rateLimit({
 
 const getLinkAccessesLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: process.env.ENV === "development" ? 1000 : 100,
+  max: config.env.isDevelopment ? 1000 :100,
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => req.ip,
@@ -135,7 +136,7 @@ const getLinkAccessesLimiter = rateLimit({
 // Rule CRUD operation limiters
 const createRuleLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: process.env.ENV === "development" ? 1000 : 100,
+  max: config.env.isDevelopment ? 1000 :100,
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => req.ip + ":" + (req.user?.id || req.guest?.guestSessionId),
@@ -144,7 +145,7 @@ const createRuleLimiter = rateLimit({
 
 const updateRuleLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: process.env.ENV === "development" ? 1000 : 200,
+  max: config.env.isDevelopment ? 1000 :200,
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => req.ip + ":" + (req.user?.id || req.guest?.guestSessionId),
@@ -153,7 +154,7 @@ const updateRuleLimiter = rateLimit({
 
 const deleteRuleLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: process.env.ENV === "development" ? 1000 : 200,
+  max: config.env.isDevelopment ? 1000 :200,
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => req.ip + ":" + (req.user?.id || req.guest?.guestSessionId),

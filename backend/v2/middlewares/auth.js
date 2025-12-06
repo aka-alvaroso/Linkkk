@@ -7,6 +7,7 @@ const ERRORS = require("../constants/errorCodes");
 // SECURITY: JWT secret rotation support
 const { verifyWithRotation } = require("../utils/jwtSecrets");
 const logger = require("../utils/logger");
+const config = require("../config/environment");
 
 // Must be authenticated as user or guest
 const auth = async (req, res, next) => {
@@ -52,7 +53,7 @@ const auth = async (req, res, next) => {
       // Token invalid or expired - log but don't throw
       // We check req.user later, so just leave it undefined
       if (
-        process.env.ENV === "development" &&
+        config.env.isDevelopment &&
         process.env.NODE_ENV !== "test"
       ) {
         logger.debug("User token validation failed", { error: error.message });
@@ -72,7 +73,7 @@ const auth = async (req, res, next) => {
     } catch (error) {
       // Guest token invalid or expired - log but don't throw
       if (
-        process.env.ENV === "development" &&
+        config.env.isDevelopment &&
         process.env.NODE_ENV !== "test"
       ) {
         logger.debug("Guest token validation failed", { error: error.message });
@@ -154,7 +155,7 @@ const optionalGuest = async (req, res, next) => {
       // Optional guest auth - token validation failed but that's ok
       req.guest = null;
       if (
-        process.env.ENV === "development" &&
+        config.env.isDevelopment &&
         process.env.NODE_ENV !== "test"
       ) {
         logger.debug("Optional guest token validation failed", {
@@ -203,7 +204,7 @@ const optionalAuth = async (req, res, next) => {
       // Optional auth - token validation failed but that's ok
       req.user = null;
       if (
-        process.env.ENV === "development" &&
+        config.env.isDevelopment &&
         process.env.NODE_ENV !== "test"
       ) {
         logger.debug("Optional user token validation failed", { error: error.message });
@@ -224,7 +225,7 @@ const optionalAuth = async (req, res, next) => {
       // Optional auth - guest token validation failed but that's ok
       req.guest = null;
       if (
-        process.env.ENV === "development" &&
+        config.env.isDevelopment &&
         process.env.NODE_ENV !== "test"
       ) {
         logger.debug("Optional guest token validation failed", { error: error.message });

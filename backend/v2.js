@@ -243,12 +243,17 @@ process.on("uncaughtException", (error) => {
 
 // Only start server if not in test mode
 if (!config.env.isTest) {
+  // Start scheduled jobs
+  const { startCleanupJob } = require('./v2/jobs/cleanupGuestLinks');
+  startCleanupJob();
+
   app.listen(PORT, () => {
     console.log(`\n🚀 Server running on port ${PORT}`);
     console.log(`📝 Environment: ${config.env.nodeEnv}`);
     console.log(`🌐 Frontend: ${config.frontend.url}`);
     console.log(`🔒 CORS: ${config.env.isDevelopment ? 'Development (permissive)' : 'Production (strict)'}`);
-    console.log(`⏱️  Rate limits: ${config.env.isDevelopment ? 'Development (relaxed)' : 'Production (strict)'}\n`);
+    console.log(`⏱️  Rate limits: ${config.env.isDevelopment ? 'Development (relaxed)' : 'Production (strict)'}`);
+    console.log(`🧹 Cleanup job: Guest links (7 days) - Daily at 3:00 AM\n`);
   });
 }
 

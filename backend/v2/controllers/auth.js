@@ -5,6 +5,7 @@ const bcryptjs = require("bcryptjs");
 const { successResponse, errorResponse } = require("../utils/response");
 const ERRORS = require("../constants/errorCodes");
 const { registerSchema, loginSchema } = require("../validators/auth");
+const config = require("../config/environment");
 
 const validateSession = (req, res) => {
   const user = req.user;
@@ -49,7 +50,7 @@ const createGuestSession = async (req, res) => {
     res.cookie("guestToken", token, {
       maxAge: 1000 * 60 * 60,
       httpOnly: true,
-      secure: process.env.ENV === "production",
+      secure: config.env.isProduction,
       sameSite: "strict",
     });
     return successResponse(
@@ -108,7 +109,7 @@ const register = async (req, res) => {
 
       res.clearCookie("guestToken", {
         httpOnly: true,
-        secure: process.env.ENV === "production",
+        secure: config.env.isProduction,
         sameSite: "strict",
       });
     }
@@ -123,7 +124,7 @@ const register = async (req, res) => {
     res.cookie("token", token, {
       maxAge: 1000 * 60 * 60 * 24 * 7,
       httpOnly: true,
-      secure: process.env.ENV === "production",
+      secure: config.env.isProduction,
       sameSite: "strict",
     });
 
@@ -176,7 +177,7 @@ const login = async (req, res) => {
 
       res.clearCookie("guestToken", {
         httpOnly: true,
-        secure: process.env.ENV === "production",
+        secure: config.env.isProduction,
         sameSite: "strict",
       });
     }
@@ -191,7 +192,7 @@ const login = async (req, res) => {
     res.cookie("token", token, {
       maxAge: 1000 * 60 * 60 * 24 * 7,
       httpOnly: true,
-      secure: process.env.ENV === "production",
+      secure: config.env.isProduction,
       sameSite: "strict",
     });
 
