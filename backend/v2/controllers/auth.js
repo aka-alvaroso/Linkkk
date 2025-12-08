@@ -38,9 +38,9 @@ const createGuestSession = async (req, res) => {
 
     const token = jwt.sign(
       { guestSessionId: guestSession.id },
-      process.env.V2_GUEST_SECRET_KEY,
+      config.security.jwt.guestSecret,
       {
-        expiresIn: "1h",
+        expiresIn: config.security.jwt.guestExpiresIn,
         algorithm: "HS256",
         issuer: "linkkk-api",
         audience: "linkkk-guests",
@@ -48,10 +48,10 @@ const createGuestSession = async (req, res) => {
     );
 
     res.cookie("guestToken", token, {
-      maxAge: 1000 * 60 * 60,
-      httpOnly: true,
-      secure: config.env.isProduction,
-      sameSite: "strict",
+      maxAge: config.security.cookies.guestMaxAge,
+      httpOnly: config.security.cookies.httpOnly,
+      secure: config.security.cookies.secure,
+      sameSite: config.security.cookies.sameSite,
     });
     return successResponse(
       res,
@@ -108,24 +108,24 @@ const register = async (req, res) => {
       await deleteGuestSession(guest.guestSessionId);
 
       res.clearCookie("guestToken", {
-        httpOnly: true,
-        secure: config.env.isProduction,
-        sameSite: "strict",
+        httpOnly: config.security.cookies.httpOnly,
+        secure: config.security.cookies.secure,
+        sameSite: config.security.cookies.sameSite,
       });
     }
 
-    const token = jwt.sign({ id: user.id }, process.env.V2_AUTH_SECRET_KEY, {
-      expiresIn: "7d",
+    const token = jwt.sign({ id: user.id }, config.security.jwt.authSecret, {
+      expiresIn: config.security.jwt.authExpiresIn,
       algorithm: "HS256",
       issuer: "linkkk-api",
       audience: "linkkk-users",
     });
 
     res.cookie("token", token, {
-      maxAge: 1000 * 60 * 60 * 24 * 7,
-      httpOnly: true,
-      secure: config.env.isProduction,
-      sameSite: "strict",
+      maxAge: config.security.cookies.authMaxAge,
+      httpOnly: config.security.cookies.httpOnly,
+      secure: config.security.cookies.secure,
+      sameSite: config.security.cookies.sameSite,
     });
 
     return successResponse(
@@ -176,24 +176,24 @@ const login = async (req, res) => {
       await deleteGuestSession(guest.guestSessionId);
 
       res.clearCookie("guestToken", {
-        httpOnly: true,
-        secure: config.env.isProduction,
-        sameSite: "strict",
+        httpOnly: config.security.cookies.httpOnly,
+        secure: config.security.cookies.secure,
+        sameSite: config.security.cookies.sameSite,
       });
     }
 
-    const token = jwt.sign({ id: user.id }, process.env.V2_AUTH_SECRET_KEY, {
-      expiresIn: "7d",
+    const token = jwt.sign({ id: user.id }, config.security.jwt.authSecret, {
+      expiresIn: config.security.jwt.authExpiresIn,
       algorithm: "HS256",
       issuer: "linkkk-api",
       audience: "linkkk-users",
     });
 
     res.cookie("token", token, {
-      maxAge: 1000 * 60 * 60 * 24 * 7,
-      httpOnly: true,
-      secure: config.env.isProduction,
-      sameSite: "strict",
+      maxAge: config.security.cookies.authMaxAge,
+      httpOnly: config.security.cookies.httpOnly,
+      secure: config.security.cookies.secure,
+      sameSite: config.security.cookies.sameSite,
     });
 
     return successResponse(res, {
@@ -213,15 +213,15 @@ const login = async (req, res) => {
 const logout = (req, res) => {
   // Clear both cookies
   res.clearCookie("token", {
-    httpOnly: true,
-    secure: process.env.ENV === "production",
-    sameSite: "strict",
+    httpOnly: config.security.cookies.httpOnly,
+    secure: config.security.cookies.secure,
+    sameSite: config.security.cookies.sameSite,
   });
 
   res.clearCookie("guestToken", {
-    httpOnly: true,
-    secure: process.env.ENV === "production",
-    sameSite: "strict",
+    httpOnly: config.security.cookies.httpOnly,
+    secure: config.security.cookies.secure,
+    sameSite: config.security.cookies.sameSite,
   });
 
   return successResponse(res, {

@@ -6,6 +6,7 @@ const planLimits = require("../utils/limits");
 const { successResponse, errorResponse } = require("../utils/response");
 const ERRORS = require("../constants/errorCodes");
 const logger = require("../utils/logger");
+const config = require("../config/environment");
 
 const { defineCountry, defineIsVPN } = require("../utils/access");
 const { evaluateLinkRules, detectDevice } = require("../utils/linkRulesEngine");
@@ -350,12 +351,12 @@ const redirectLink = async (req, res) => {
     });
 
     if (!link) {
-      return res.redirect(`${process.env.FRONTEND_URL}/404?url=${shortUrl}`);
+      return res.redirect(`${config.frontend.url}/404?url=${shortUrl}`);
     }
 
     // Check status
     if (!link.status) {
-      return res.redirect(`${process.env.FRONTEND_URL}/disabled`);
+      return res.redirect(`${config.frontend.url}/disabled`);
     }
 
     // Build evaluation context
@@ -444,7 +445,7 @@ const redirectLink = async (req, res) => {
 
         return res.redirect(
           `${
-            process.env.FRONTEND_URL
+            config.frontend.url
           }/blocked?url=${shortUrl}&reason=${encodeURIComponent(action.reason)}`
         );
 
@@ -452,7 +453,7 @@ const redirectLink = async (req, res) => {
         // DO NOT increment counter here - it will be incremented after successful password verification
         // This prevents counting failed password attempts as actual access
         return res.redirect(
-          `${process.env.FRONTEND_URL}/password?shortUrl=${shortUrl}${
+          `${config.frontend.url}/password?shortUrl=${shortUrl}${
             action.hint ? `&hint=${encodeURIComponent(action.hint)}` : ""
           }`
         );
@@ -558,7 +559,7 @@ const redirectLink = async (req, res) => {
     }
   } catch (error) {
     logger.error('Redirect error', { shortUrl, error: error.message, stack: error.stack });
-    return res.redirect(`${process.env.FRONTEND_URL}/error`);
+    return res.redirect(`${config.frontend.url}/error`);
   }
 };
 

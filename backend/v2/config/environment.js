@@ -47,11 +47,6 @@ const config = {
     port: parseInt(process.env.PORT, 10) || 3000,
   },
 
-  // Database
-  database: {
-    url: process.env.DATABASE_URL,
-  },
-
   // Frontend
   frontend: {
     url: process.env.FRONTEND_URL || 'http://localhost:3000',
@@ -73,87 +68,21 @@ const config = {
       guestSecret: process.env.V2_GUEST_SECRET_KEY,
       authSecretPrevious: process.env.V2_AUTH_SECRET_KEY_PREVIOUS,
       guestSecretPrevious: process.env.V2_GUEST_SECRET_KEY_PREVIOUS,
-      expiresIn: '7d',
+      authExpiresIn: '7d',
+      guestExpiresIn: '30d',
     },
     cookies: {
       httpOnly: true,
       secure: isProduction,
       sameSite: isProduction ? 'strict' : 'lax',
+      authMaxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
+      guestMaxAge: 30 * 24 * 60 * 60 * 1000, // 30 days in milliseconds
     },
     csrf: {
       enabled: !isTest,
     },
   },
 
-  // Rate Limiting
-  rateLimit: {
-    // General API rate limit
-    general: {
-      windowMs: 15 * 60 * 1000, // 15 minutes
-      max: isDevelopment ? 1000 : 500,
-    },
-    // Auth endpoints (stricter)
-    auth: {
-      register: {
-        windowMs: 60 * 60 * 1000, // 1 hour
-        max: isDevelopment ? 100 : 5,
-      },
-      login: {
-        windowMs: 15 * 60 * 1000, // 15 minutes
-        max: isDevelopment ? 100 : 10,
-      },
-      logout: {
-        windowMs: 15 * 60 * 1000, // 15 minutes
-        max: isDevelopment ? 100 : 10,
-      },
-      validate: {
-        windowMs: 15 * 60 * 1000, // 15 minutes
-        max: isDevelopment ? 500 : 100,
-      },
-    },
-    // Link operations
-    link: {
-      create: {
-        windowMs: 60 * 60 * 1000, // 1 hour
-        max: isDevelopment ? 500 : 50,
-      },
-      update: {
-        windowMs: 60 * 60 * 1000, // 1 hour
-        max: isDevelopment ? 500 : 50,
-      },
-      delete: {
-        windowMs: 60 * 60 * 1000, // 1 hour
-        max: isDevelopment ? 500 : 100,
-      },
-      list: {
-        windowMs: 60 * 60 * 1000, // 1 hour
-        max: isDevelopment ? 500 : 200,
-      },
-      // Password verification for protected links
-      passwordAttempts: {
-        windowMs: 60 * 60 * 1000, // 1 hour
-        max: isDevelopment ? 100 : 3,
-        skipSuccessfulRequests: true,
-      },
-      // Rule operations per link
-      ruleOperations: {
-        windowMs: 60 * 60 * 1000, // 1 hour
-        max: isDevelopment ? 100 : 20,
-        skipSuccessfulRequests: true,
-      },
-    },
-    // Analytics
-    analytics: {
-      windowMs: 60 * 60 * 1000, // 1 hour
-      max: isDevelopment ? 500 : 200,
-    },
-  },
-
-  // Logging
-  logging: {
-    level: isDevelopment ? 'debug' : 'info',
-    includeStackTrace: isDevelopment,
-  },
 };
 
 // Log configuration on startup (hide sensitive data)
@@ -163,7 +92,6 @@ if (!isTest) {
   console.log(`   Port: ${config.server.port}`);
   console.log(`   Frontend: ${config.frontend.url}`);
   console.log(`   CORS Origins: ${config.frontend.allowedOrigins.join(', ')}`);
-  console.log(`   Database: ${config.database.url ? '✓ Connected' : '✗ Not configured'}`);
   console.log(`   JWT Auth Secret: ${config.security.jwt.authSecret ? '✓ Set' : '✗ Missing'}`);
   console.log(`   JWT Guest Secret: ${config.security.jwt.guestSecret ? '✓ Set' : '✗ Missing'}`);
 }

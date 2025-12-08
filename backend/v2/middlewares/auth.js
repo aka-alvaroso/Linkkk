@@ -1,7 +1,5 @@
 const jwt = require("jsonwebtoken");
 const prisma = require("../prisma/client");
-const AUTH_SECRET_KEY = process.env.V2_AUTH_SECRET_KEY;
-const GUEST_SECRET_KEY = process.env.V2_GUEST_SECRET_KEY;
 const { errorResponse } = require("../utils/response");
 const ERRORS = require("../constants/errorCodes");
 // SECURITY: JWT secret rotation support
@@ -54,7 +52,7 @@ const auth = async (req, res, next) => {
       // We check req.user later, so just leave it undefined
       if (
         config.env.isDevelopment &&
-        process.env.NODE_ENV !== "test"
+        !config.env.isTest
       ) {
         logger.debug("User token validation failed", { error: error.message });
       }
@@ -74,7 +72,7 @@ const auth = async (req, res, next) => {
       // Guest token invalid or expired - log but don't throw
       if (
         config.env.isDevelopment &&
-        process.env.NODE_ENV !== "test"
+        !config.env.isTest
       ) {
         logger.debug("Guest token validation failed", { error: error.message });
       }
@@ -156,7 +154,7 @@ const optionalGuest = async (req, res, next) => {
       req.guest = null;
       if (
         config.env.isDevelopment &&
-        process.env.NODE_ENV !== "test"
+        !config.env.isTest
       ) {
         logger.debug("Optional guest token validation failed", {
           error: error.message,
@@ -182,7 +180,7 @@ const optionalAuth = async (req, res, next) => {
 
   if (token) {
     try {
-      const decoded = jwt.verify(token, AUTH_SECRET_KEY, {
+      const decoded = jwt.verify(token, config.security.jwt.authSecret, {
         algorithms: ["HS256"],
         issuer: "linkkk-api",
         audience: "linkkk-users",
@@ -205,7 +203,7 @@ const optionalAuth = async (req, res, next) => {
       req.user = null;
       if (
         config.env.isDevelopment &&
-        process.env.NODE_ENV !== "test"
+        !config.env.isTest
       ) {
         logger.debug("Optional user token validation failed", { error: error.message });
       }
@@ -226,7 +224,7 @@ const optionalAuth = async (req, res, next) => {
       req.guest = null;
       if (
         config.env.isDevelopment &&
-        process.env.NODE_ENV !== "test"
+        !config.env.isTest
       ) {
         logger.debug("Optional guest token validation failed", { error: error.message });
       }
