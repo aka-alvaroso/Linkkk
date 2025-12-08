@@ -79,8 +79,8 @@ app.use((req, res, next) => {
 
 // General rate limiter
 const generalLimiter = rateLimit({
-  windowMs: config.rateLimit.general.windowMs,
-  max: config.rateLimit.general.max,
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: config.env.isDevelopment ? 1000 : 500,
   handler: (req, res, next, options) => {
     return errorResponse(res, ERRORS.RATE_LIMIT_EXCEEDED);
   },
