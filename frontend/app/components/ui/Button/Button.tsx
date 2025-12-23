@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { cn } from '@/app/utils/cn';
 import * as motion from 'motion/react-client';
 import { AnimatePresence } from 'motion/react';
+import { useTranslations } from 'next-intl';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'solid' | 'outline' | 'ghost' | 'link';
@@ -96,19 +97,19 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     const sizeClasses = {
-      xs: iconOnly 
-        ? ['w-6', 'h-6', 'p-1', 'text-xs'] 
+      xs: iconOnly
+        ? ['w-6', 'h-6', 'p-1', 'text-xs']
         : ['px-2', 'py-1', 'text-xs'],
-      sm: iconOnly 
-        ? ['w-8', 'h-8', 'p-1.5', 'text-sm'] 
+      sm: iconOnly
+        ? ['w-8', 'h-8', 'p-1.5', 'text-sm']
         : ['px-3', 'py-1.5', 'text-sm'],
-      md: iconOnly 
-        ? ['w-10', 'h-10', 'p-2', 'text-base'] 
+      md: iconOnly
+        ? ['w-10', 'h-10', 'p-2', 'text-base']
         : ['px-4', 'py-2', 'text-base'],
-      lg: iconOnly 
-        ? ['w-12', 'h-12', 'p-2.5', 'text-lg'] 
+      lg: iconOnly
+        ? ['w-12', 'h-12', 'p-2.5', 'text-lg']
         : ['px-6', 'py-3', 'text-lg'],
-      xl: iconOnly 
+      xl: iconOnly
         ? ['w-14', 'h-14', 'p-3', 'text-xl']
         : ['px-8', 'py-4', 'text-xl'],
     };
@@ -125,6 +126,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       ...additionalClasses,
       className
     );
+
+    const t = useTranslations('Common');
 
     const buttonContent = () => {
       if (loading) {
@@ -150,7 +153,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               />
             </svg>
-            {!iconOnly && (children || 'Loading...')}
+            {!iconOnly && (children || t('loading'))}
           </>
         );
       }

@@ -8,8 +8,11 @@ import { useToast } from "@/app/hooks/useToast";
 import Button from "@/app/components/ui/Button/Button";
 import * as motion from "motion/react-client";
 import { TbArrowUpRight, TbX, TbEye, TbEyeOff, TbLogin } from "react-icons/tb";
+import { useTranslations } from 'next-intl';
 
 export default function Login() {
+    const t = useTranslations('Auth');
+    const tLogin = useTranslations('Auth.Login');
     const { login } = useAuth();
     const router = useRouter();
     const toast = useToast();
@@ -21,19 +24,19 @@ export default function Login() {
         e.preventDefault();
 
         if (!email || !password) {
-            toast.error('Required fields', {
-                description: 'Please fill in all fields'
+            toast.error(tLogin('requiredFields'), {
+                description: tLogin('pleaseFillAllFields')
             });
             return;
         }
 
         const result = await login({ usernameOrEmail: email, password });
         if (result.success) {
-            toast.success('Welcome back!');
+            toast.success(tLogin('welcomeBack'));
             router.push('/dashboard');
         } else {
-            toast.error('Login failed', {
-                description: result.error || 'Invalid credentials'
+            toast.error(tLogin('loginFailed'), {
+                description: result.error || tLogin('invalidCredentials')
             });
         }
     };
@@ -57,7 +60,7 @@ export default function Login() {
                         expandOnHover="text"
                         className="bg-dark/5 hover:bg-dark/10 p-2 leading-5"
                     >
-                      Home
+                      {t('home')}
                     </Button>
                     </Link>
                 </motion.div>
@@ -86,7 +89,7 @@ export default function Login() {
                                     type="text"
                                     name="email"
                                     id="email"
-                                    placeholder="Email or username"
+                                    placeholder={tLogin('emailPlaceholder')}
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     className="w-full transition bg-dark/5 border-2 border-transparent text-dark rounded-xl p-2 px-3 hover:outline-none focus:outline-none focus:border-2 focus:border-dark focus:border-dashed"
@@ -103,7 +106,7 @@ export default function Login() {
                                     type={showPassword ? "text" : "password"}
                                     name="password"
                                     id="password"
-                                    placeholder="Password"
+                                    placeholder={tLogin('passwordPlaceholder')}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     className="w-full transition bg-dark/5 border-2 border-transparent text-dark rounded-xl p-2 px-3 pr-12 hover:outline-none focus:outline-none focus:border-2 focus:border-dark focus:border-dashed"
@@ -112,6 +115,7 @@ export default function Login() {
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
                                     className="absolute right-3 top-1/2 -translate-y-1/2 text-dark/50 hover:text-info hover:cursor-pointer transition-colors"
+                                    title={tLogin('togglePasswordTitle')}
                                 >
                                     {showPassword ? <TbEyeOff size={20} /> : <TbEye size={20} />}
                                 </button>
@@ -131,7 +135,7 @@ export default function Login() {
                                     expandOnHover="icon"
                                     className="w-full mt-4 transition-all duration-300 ease-in-out hover:bg-primary hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)]"
                                 >
-                                    <p className="text-xl font-black italic">Log In</p>
+                                    <p className="text-xl font-black italic">{tLogin('loginButton')}</p>
                                 </Button>
                             </motion.div>
                         </form>
@@ -145,8 +149,9 @@ export default function Login() {
                             <Link href="/auth/register" className="relative group">
                                 <div className="absolute top-0 left-0 w-0 h-full bg-warning z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
                                 <p className="font-black italic z-20 relative inline-flex flex-col md:flex-row items-center">
-                                    Don&apos;t have an account?
-                                    <span className="underline ml-2 flex items-center">Sign Up
+                                    {tLogin('noAccount')}
+                                    <span className="underline ml-2 flex items-center">
+                                        {tLogin('signUp')}
                                     <TbArrowUpRight size={18} className="ml-2" />
                                     </span>
                                 </p>

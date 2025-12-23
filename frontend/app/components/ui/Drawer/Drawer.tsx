@@ -2,17 +2,18 @@ import React, { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom';
 import { TbArrowLeft } from 'react-icons/tb';
 import { cn } from '@/app/utils/cn';
+import { useTranslations } from 'next-intl';
 
 interface DrawerProps {
-  open: boolean;
-  placement?: 'top-left' | 'top' | 'top-right' | 'right' | 'bottom-right' | 'bottom' | 'bottom-left' | 'left';
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | 'full';
-  rounded?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | 'full';
-  modal?: boolean;
-  children: React.ReactNode;
-  className?: string;
-  overlayClassName?: string;
-  onClose: () => void;
+    open: boolean;
+    placement?: 'top-left' | 'top' | 'top-right' | 'right' | 'bottom-right' | 'bottom' | 'bottom-left' | 'left';
+    size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | 'full';
+    rounded?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | 'full';
+    modal?: boolean;
+    children: React.ReactNode;
+    className?: string;
+    overlayClassName?: string;
+    onClose: () => void;
 }
 
 const Drawer: React.FC<DrawerProps> = ({
@@ -24,8 +25,9 @@ const Drawer: React.FC<DrawerProps> = ({
     children = null,
     className,
     overlayClassName,
-    onClose = () => {}
+    onClose = () => { }
 }) => {
+    const t = useTranslations('Common');
     const [show, setShow] = useState(open);
     const [isAnimating, setIsAnimating] = useState(false);
     const [mounted, setMounted] = useState(false);
@@ -75,9 +77,9 @@ const Drawer: React.FC<DrawerProps> = ({
     };
 
     const mainPlacement = placement.includes('top') ? 'top'
-                        : placement.includes('bottom') ? 'bottom'
-                        : placement.includes('left') ? 'left'
-                        : 'right';
+        : placement.includes('bottom') ? 'bottom'
+            : placement.includes('left') ? 'left'
+                : 'right';
 
     const placementClasses = {
         'top-left': 'justify-start items-start',
@@ -89,7 +91,7 @@ const Drawer: React.FC<DrawerProps> = ({
         'bottom-left': 'justify-start items-end',
         left: 'justify-start items-center',
     };
-    
+
     const sizeClasses = {
         xs: 'w-full md:w-3/12 h-3/12',
         sm: 'w-full md:w-4/12 h-4/12',
@@ -136,7 +138,7 @@ const Drawer: React.FC<DrawerProps> = ({
                 <button
                     onClick={onClose}
                     className="absolute top-4 right-4 p-2 rounded-lg hover:bg-dark/5 transition-colors z-10"
-                    aria-label="Close drawer"
+                    aria-label={t('closeDrawer')}
                 >
                     <TbArrowLeft size={20} className="text-dark" strokeWidth={2.5} />
                 </button>

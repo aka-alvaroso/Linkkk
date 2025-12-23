@@ -4,6 +4,7 @@ import { TbX, TbInfoCircle, TbAlertTriangle, TbCircleCheck, TbAlertCircle } from
 import * as motion from 'motion/react-client';
 import { AnimatePresence } from 'motion/react';
 import Button from '../Button/Button';
+import { useTranslations } from 'next-intl';
 
 interface AlertProps {
   id: string; // Unique ID for localStorage persistence
@@ -28,6 +29,7 @@ const Alert: React.FC<AlertProps> = ({
   className = '',
   onDismiss,
 }) => {
+  const t = useTranslations('Common');
   const [isVisible, setIsVisible] = useState(true);
   const storageKey = `alert-dismissed-${id}`;
 
@@ -94,37 +96,37 @@ const Alert: React.FC<AlertProps> = ({
             className
           )}
         >
-            {/* Icon */}
-            <div className={cn('flex-shrink-0', config.text)}>
-              {displayIcon}
-            </div>
+          {/* Icon */}
+          <div className={cn('flex-shrink-0', config.text)}>
+            {displayIcon}
+          </div>
 
-            {/* Content */}
-            <div className="flex-1 min-w-0">
-              {title && (
-                <h3 className={cn('font-bold text-sm mb-0.5', config.text)}>
-                  {title}
-                </h3>
-              )}
-              <p className={cn('text-xs leading-tight', config.text, title ? 'opacity-90' : 'opacity-95')}>
-                {message}
-              </p>
-            </div>
-
-            {/* Dismiss button */}
-            {dismissible && (
-              <Button
-                variant="ghost"
-                size="sm"
-                iconOnly
-                rounded="xl"
-                onClick={handleDismiss}
-                className={cn('flex-shrink-0', config.text === 'text-light' ? 'hover:bg-light/10' : 'hover:bg-dark/10')}
-                aria-label="Dismiss alert"
-              >
-                <TbX size={16} className={config.text} />
-              </Button>
+          {/* Content */}
+          <div className="flex-1 min-w-0">
+            {title && (
+              <h3 className={cn('font-bold text-sm mb-0.5', config.text)}>
+                {title}
+              </h3>
             )}
+            <p className={cn('text-xs leading-tight', config.text, title ? 'opacity-90' : 'opacity-95')}>
+              {message}
+            </p>
+          </div>
+
+          {/* Dismiss button */}
+          {dismissible && (
+            <Button
+              variant="ghost"
+              size="sm"
+              iconOnly
+              rounded="xl"
+              onClick={handleDismiss}
+              className={cn('flex-shrink-0', config.text === 'text-light' ? 'hover:bg-light/10' : 'hover:bg-dark/10')}
+              aria-label={t('dismissAlert')}
+            >
+              <TbX size={16} className={config.text} />
+            </Button>
+          )}
         </motion.div>
       )}
     </AnimatePresence>

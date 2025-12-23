@@ -6,6 +6,7 @@ import Chip from '@/app/components/ui/Chip/Chip';
 import EditLinkDrawer from '@/app/components/Drawer/EditiLinkDrawer';
 import { useLinks } from '@/app/hooks';
 import { Link } from '@/app/types';
+import { useTranslations } from 'next-intl';
 
 
 
@@ -15,7 +16,8 @@ interface LinkItemProps {
   }
 
 export default function LinkItem({ view, data }: LinkItemProps) {
-    const { deleteLink } = useLinks();    
+    const t = useTranslations('Dashboard');
+    const { deleteLink } = useLinks();
     const [linkDetailsDrawer, setLinkDetailsDrawer] = useState(false);
 
     
@@ -89,11 +91,11 @@ export default function LinkItem({ view, data }: LinkItemProps) {
                         <div className='flex gap-2 sm:flex-col sm:items-end'>
                                 {data.status ?
                                     <Chip variant="success" size='sm' leftIcon={<TbLocation size={16} />}>
-                                        Active
+                                        {t('active')}
                                     </Chip>
                                     :
                                     <Chip variant="danger" size='sm' leftIcon={<TbLocationOff size={16} />}>
-                                        Inactive
+                                        {t('inactive')}
                                     </Chip>
                                 }
                         </div> 

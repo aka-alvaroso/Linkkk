@@ -30,6 +30,7 @@ import { LinkRule as LinkRuleType, RuleCondition, UpdateRuleDTO, RedirectSetting
 import { useAuth } from '@/app/hooks';
 import { PLAN_LIMITS } from '@/app/constants/limits';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 interface RulesManagerProps {
   shortUrl: string;
@@ -74,6 +75,7 @@ function SortableLinkRule(props: {
 }
 
 export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
+  const t = useTranslations('RulesManager');
   const { rules: fetchedRules, isLoading, error, fetchRules, createRule, updateRule, deleteRule, reorderRules } = useLinkRules();
   const { isAuthenticated } = useAuth();
 
@@ -134,17 +136,17 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
       case 'redirect':
         const url = (rule.actionSettings as RedirectSettings).url;
         if (!url || url.trim() === '') {
-          return 'Redirect URL is required';
+          return t('errorRedirectRequired');
         }
         // Check if it's a valid URL or template variable
         if (!url.includes('{{') && !url.startsWith('http://') && !url.startsWith('https://')) {
-          return 'Redirect URL must start with http:// or https://';
+          return t('errorRedirectInvalid');
         }
         break;
       case 'password_gate':
         const passwordHash = (rule.actionSettings as PasswordGateSettings).passwordHash;
         if (!passwordHash || passwordHash.trim() === '') {
-          return 'Password is required for password gate';
+          return t('errorPasswordRequired');
         }
         break;
       // block_access and notify have optional settings
@@ -159,11 +161,11 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
             ? condition.value.join(',')
             : '';
         if (!value || value.trim() === '') {
-          return 'At least one country code is required';
+          return t('errorCountryRequired');
         }
       } else if (condition.field === 'ip') {
         if (!condition.value || (condition.value as string).trim() === '') {
-          return 'IP address is required';
+          return t('errorIpRequired');
         }
       }
     }
@@ -193,7 +195,7 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
     try {
       // Validate limits
       if (localRules.length > limits.rulesPerLink) {
-        throw new Error(`Maximum ${limits.rulesPerLink} ${limits.rulesPerLink === 1 ? 'rule' : 'rules'} allowed per link`);
+        throw new Error(t('errorMaxRules', { count: limits.rulesPerLink, plural: limits.rulesPerLink === 1 ? t('rule') : t('rules') }));
       }
 
       // Validate all rules before saving
@@ -202,12 +204,12 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
 
         // Validate conditions limit
         if (rule.conditions.length > limits.conditionsPerRule) {
-          throw new Error(`Rule ${i + 1}: Maximum ${limits.conditionsPerRule} ${limits.conditionsPerRule === 1 ? 'condition' : 'conditions'} allowed per rule`);
+          throw new Error(t('errorMaxConditions', { ruleNumber: i + 1, count: limits.conditionsPerRule, plural: limits.conditionsPerRule === 1 ? t('condition') : t('conditions') }));
         }
 
         const error = validateRule(rule);
         if (error) {
-          throw new Error(`Rule ${i + 1}: ${error}`);
+          throw new Error(t('errorRulePrefix', { ruleNumber: i + 1, error }));
         }
       }
 
@@ -247,7 +249,7 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
 
           // Only include elseAction if it changed from original
           if (localRule.elseActionType !== originalRule.elseActionType ||
-              JSON.stringify(localRule.elseActionSettings) !== JSON.stringify(originalRule.elseActionSettings)) {
+            JSON.stringify(localRule.elseActionSettings) !== JSON.stringify(originalRule.elseActionSettings)) {
             updatePayload.elseAction = localRule.elseActionType ? {
               type: localRule.elseActionType,
               settings: localRule.elseActionSettings!
@@ -337,7 +339,7 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
         <div className="flex items-center justify-between">
           <h3 className="text-xl font-black text-dark flex items-center gap-2">
             <TbRocket size={24} />
-            Link Rules
+            {t('linkRules')}
           </h3>
         </div>
         <div className="flex items-center justify-center py-12">
@@ -356,7 +358,7 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
       >
         <div className='flex items-center gap-2'>
           <TbRocket size={20} />
-          <span className='font-black italic'>Link Rules</span>
+          <span className='font-black italic'>{t('linkRules')}</span>
           <span className='text-xs text-dark/50'>
             ({localRules.length}/{limits.rulesPerLink})
           </span>
@@ -390,7 +392,7 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span>Error loading rules: {error}</span>
+                    <span>{t('errorLoading', { error })}</span>
                   </div>
                 </div>
               )}
@@ -433,14 +435,14 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
                     onClick={handleAddRule}
                     disabled={localRules.length >= limits.rulesPerLink}
                     className="bg-primary text-dark hover:bg-primary hover:shadow-[4px_4px_0_var(--color-dark)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
-                    title={localRules.length >= limits.rulesPerLink ? `Maximum ${limits.rulesPerLink} ${limits.rulesPerLink === 1 ? 'rule' : 'rules'} allowed` : ''}
+                    title={localRules.length >= limits.rulesPerLink ? t('maxRulesTitle', { count: limits.rulesPerLink, plural: limits.rulesPerLink === 1 ? t('rule') : t('rules') }) : ''}
                   >
-                    Add Rule
+                    {t('addRule')}
                   </Button>
 
                   {/* Info Message */}
                   <p className='text-xs text-dark/50 text-center'>
-                    Rules are evaluated in order from top to bottom
+                    {t('rulesEvaluationNote')}
                   </p>
                 </>
               ) : (
@@ -454,10 +456,10 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
                     onClick={handleAddRule}
                     className="w-full bg-dark/5 hover:bg-dark/10"
                   >
-                    Create Your First Rule
+                    {t('createFirstRule')}
                   </Button>
                   <p className='text-xs text-dark/50 text-center'>
-                    Rules are evaluated in order from top to bottom
+                    {t('rulesEvaluationNote')}
                   </p>
                 </>
               )}

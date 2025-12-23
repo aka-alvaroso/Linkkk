@@ -13,13 +13,16 @@ import { LinkRule } from '../LinkRules/LinkRule';
 import { useAuth } from '@/app/hooks';
 import { PLAN_LIMITS } from '@/app/constants/limits';
 import AnimatedText, { AnimatedTextRef } from '../ui/AnimatedText';
+import { useTranslations } from 'next-intl';
 
 interface CreateLinkDrawerProps {
     open: boolean;
     onClose: () => void;
+    onSuccess?: () => void;
 }
 
-export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProps) {
+export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLinkDrawerProps) {
+    const t = useTranslations('CreateLinkDrawer');
     const { createLink } = useLinks();
     const { createRule } = useLinkRules();
     const { isAuthenticated } = useAuth();
@@ -66,7 +69,7 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
 
     const handleCreateLink = useCallback(async () => {
         if (!newLink.longUrl) {
-            toast.error('Long URL is required');
+            toast.error(t('toastLongUrlRequired'));
             return;
         }
 
@@ -101,15 +104,15 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
                         });
                     } catch (err) {
                         console.error('Error creating rule:', err);
-                        toast.error('Link created but some rules failed', {
+                        toast.error(t('toastRulesFailed'), {
                             showIcon: false,
-                            description: 'Some rules could not be created.',
+                            description: t('toastRulesFailedDesc'),
                         });
                     }
                 }
             }
 
-            toast.success('Link created successfully!', {
+            toast.success(t('toastLinkCreated'), {
                 showIcon: false,
             });
 
@@ -120,31 +123,36 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
             setLocalRules([]);
             setShowRules(false);
             onClose();
+
+            // Call onSuccess callback if provided (e.g., redirect to dashboard)
+            if (onSuccess) {
+                onSuccess();
+            }
         } else {
             if (response.errorCode === 'LINK_LIMIT_EXCEEDED') {
-                toast.error('Error creating link', {
+                toast.error(t('toastErrorCreating'), {
                     showIcon: false,
-                    description: 'You\'ve reached your link limit. Upgrade your plan to create more links.',
+                    description: t('toastLinkLimitExceeded'),
                     duration: 6000,
                 });
             } else if (response.errorCode === 'UNAUTHORIZED') {
-                toast.error('Error creating link', {
+                toast.error(t('toastErrorCreating'), {
                     showIcon: false,
-                    description: 'Please login again to continue.',
+                    description: t('toastUnauthorized'),
                 });
             } else if (response.errorCode === 'INVALID_DATA') {
-                toast.error('Error creating link', {
+                toast.error(t('toastErrorCreating'), {
                     showIcon: false,
-                    description: 'Please check your input and try again.',
+                    description: t('toastInvalidData'),
                 });
             } else {
-                toast.error('Error creating link', {
+                toast.error(t('toastErrorCreating'), {
                     showIcon: false,
-                    description: 'An unexpected error occurred.',
+                    description: t('toastUnexpectedError'),
                 });
             }
 
-            setError('Error creating link');
+            setError(t('toastErrorCreating'));
         }
 
         setLoading(false);
@@ -189,12 +197,12 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
         >
             <div className='flex-1 overflow-auto flex flex-col gap-4 p-4 pb-32'>
                 <div className='flex items-center'>
-                    <motion.p 
+                    <motion.p
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0, duration: 0.4, ease: "backInOut" }}
                         className='text-2xl md:text-3xl font-black italic w-full'>
-                        Create a new link
+                        {t('title')}
                     </motion.p>
                 </div>
 
@@ -205,7 +213,7 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.05, duration: 0.4, ease: "backInOut" }}
                         className='text-lg font-black italic'>
-                        Status
+                        {t('status')}
                     </motion.p>
                     <motion.div
                         initial={{ opacity: 0, x: 20 }}
@@ -219,13 +227,13 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
                             leftIcon={newLink.status ? <TbCircleDashedCheck size={20} /> : <TbCircleDashed size={20} />}
                             className={`${newLink.status ? 'bg-primary text-dark' : 'bg-danger text-light'}`}
                             onClick={() => {
-                                statusButtonTextRef.current?.setText(newLink.status ? 'Inactive' : 'Active');
+                                statusButtonTextRef.current?.setText(newLink.status ? t('inactive') : t('active'));
                                 setNewLink({ ...newLink, status: !newLink.status })
                             }}
                         >
                             <AnimatedText
                                 ref={statusButtonTextRef}
-                                initialText={newLink.status ? 'Active' : 'Inactive'}
+                                initialText={newLink.status ? t('active') : t('inactive')}
                                 animationType="slide"
                                 triggerMode='none'
                             />
@@ -240,7 +248,7 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.15, duration: 0.4, ease: "backInOut" }}
                         className='text-lg font-black italic'>
-                        Long URL <span className='text-danger'>*</span>
+                        {t('longUrl')} <span className='text-danger'>{t('required')}</span>
                     </motion.p>
                     <motion.div
                         initial={{ opacity: 0, x: 20 }}
@@ -250,7 +258,7 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
                     >
                         <Input
                             value={newLink.longUrl}
-                            onChange={(e) => {setNewLink({ ...newLink, longUrl: e.target.value }); setShowStatusBar("confirm")}}
+                            onChange={(e) => { setNewLink({ ...newLink, longUrl: e.target.value }); setShowStatusBar("confirm") }}
                             onKeyDown={async (e) => {
                                 if (e.key === 'Enter' && !e.shiftKey && newLink.longUrl.trim()) {
                                     e.preventDefault();
@@ -258,7 +266,7 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
                                     await handleCreateLink();
                                 }
                             }}
-                            placeholder='https://example.com'
+                            placeholder={t('urlPlaceholder')}
                             size='md'
                             rounded='2xl'
                             className='w-full max-w-md'
@@ -282,7 +290,7 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
                         >
                             <div className='flex items-center gap-2'>
                                 <TbRocket size={20} />
-                                <span className='font-black italic'>Link Rules</span>
+                                <span className='font-black italic'>{t('linkRules')}</span>
                                 <span className='text-xs text-dark/50'>
                                     ({localRules.length}/{limits.rulesPerLink})
                                 </span>
@@ -332,12 +340,12 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
                                                     onClick={handleAddRule}
                                                     disabled={localRules.length >= limits.rulesPerLink}
                                                     className='bg-primary text-dark hover:bg-primary hover:shadow-[4px_4px_0_var(--color-dark)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none'
-                                                    title={localRules.length >= limits.rulesPerLink ? `Maximum ${limits.rulesPerLink} ${limits.rulesPerLink === 1 ? 'rule' : 'rules'} allowed` : ''}
+                                                    title={localRules.length >= limits.rulesPerLink ? t('maxRulesTitle', { count: limits.rulesPerLink, plural: limits.rulesPerLink === 1 ? t('rule') : t('rules') }) : ''}
                                                 >
-                                                    Add Rule
+                                                    {t('addRule')}
                                                 </Button>
                                                 <p className='text-xs text-dark/50 text-center'>
-                                                    Rules are evaluated in order from top to bottom
+                                                    {t('rulesEvaluationNote')}
                                                 </p>
                                             </>
                                         ) : (
@@ -350,10 +358,10 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
                                                     onClick={handleAddRule}
                                                     className='w-full bg-dark/5 hover:bg-dark/10'
                                                 >
-                                                    Create Your First Rule
+                                                    {t('createFirstRule')}
                                                 </Button>
                                                 <p className='text-xs text-dark/50 text-center'>
-                                                    Rules are evaluated in order from top to bottom
+                                                    {t('rulesEvaluationNote')}
                                                 </p>
                                             </>
                                         )}
@@ -385,10 +393,10 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
                                 </div>
                                 <div className='flex-1'>
                                     <p className='text-lg font-black italic text-dark mb-1'>
-                                        {statusBar === "loading" ? "Creating Link" : "Ready to Create"}
+                                        {statusBar === "loading" ? t('creatingLink') : t('readyToCreate')}
                                     </p>
                                     <p className='text-sm text-dark/70'>
-                                        {statusBar === "loading" ? "Please wait while we create your link..." : "Click 'Create Link' to proceed"}
+                                        {statusBar === "loading" ? t('creatingLinkDesc') : t('readyToCreateDesc')}
                                     </p>
                                 </div>
                             </div>
@@ -409,7 +417,7 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
                                             onClose();
                                         }}
                                     >
-                                        Cancel
+                                        {t('cancel')}
                                     </Button>
                                     <Button
                                         variant='solid'
@@ -421,7 +429,7 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
                                             await handleCreateLink();
                                         }}
                                     >
-                                        Create Link
+                                        {t('createLink')}
                                     </Button>
                                 </div>
                             )}
@@ -435,7 +443,7 @@ export default function CreateLinkDrawer({ open, onClose }: CreateLinkDrawerProp
                                         loading={true}
                                         disabled
                                     >
-                                        Creating...
+                                        {t('creating')}
                                     </Button>
                                 </div>
                             )}

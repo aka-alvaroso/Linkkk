@@ -4,6 +4,7 @@ import { TbShieldCheck, TbShieldX, TbRobot, TbUser, TbWifi, TbBrowser, TbLocatio
 import * as motion from 'motion/react-client';
 import Button from '../ui/Button/Button';
 import { useToast } from "@/app/hooks/useToast";
+import { useTranslations } from 'next-intl';
 
 interface Access {
     id: number;
@@ -21,6 +22,7 @@ interface AccessesListProps {
 }
 
 export const AccessesList = ({ shortUrl }: AccessesListProps) => {
+    const t = useTranslations('AccessesList');
     const toast = useToast();
     const [accesses, setAccesses] = useState<Access[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -57,10 +59,10 @@ export const AccessesList = ({ shortUrl }: AccessesListProps) => {
         const diffHours = Math.floor(diffMins / 60);
         const diffDays = Math.floor(diffHours / 24);
 
-        if (diffMins < 1) return 'Just now';
-        if (diffMins < 60) return `${diffMins} min ago`;
-        if (diffHours < 24) return `${diffHours}h ago`;
-        if (diffDays < 7) return `${diffDays}d ago`;
+        if (diffMins < 1) return t('justNow');
+        if (diffMins < 60) return t('minAgo', { count: diffMins });
+        if (diffHours < 24) return t('hoursAgo', { count: diffHours });
+        if (diffDays < 7) return t('daysAgo', { count: diffDays });
 
         return date.toLocaleDateString('en-US', {
             day: '2-digit',
@@ -86,7 +88,7 @@ export const AccessesList = ({ shortUrl }: AccessesListProps) => {
             'Chrome': 'googlechrome',
             'Edge': 'microsoftedge',
         };
-        
+
         // Si tiene mapeo específico, lo usa; si no, convierte a minúsculas
         return slugMap[browserName] || browserName.toLowerCase();
     };
@@ -111,7 +113,7 @@ export const AccessesList = ({ shortUrl }: AccessesListProps) => {
         return (
             <div className="w-full py-12 text-center">
                 <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
-                <p className="mt-4 text-dark/50 font-medium">Loading accesses...</p>
+                <p className="mt-4 text-dark/50 font-medium">{t('loadingAccesses')}</p>
             </div>
         );
     }
@@ -129,20 +131,20 @@ export const AccessesList = ({ shortUrl }: AccessesListProps) => {
                     <div className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 bg-mb-4 ">
                         <TbLocationOff size={32} className="text-secondary" />
                     </div>
-                    <h3 className="text-xl md:text-2xl font-black italic mb-2">No clicks yet</h3>
-                    <p className="text-dark/60 text-sm md:text-base">Share your link and watch the magic happen!</p>
+                    <h3 className="text-xl md:text-2xl font-black italic mb-2">{t('noClicksYet')}</h3>
+                    <p className="text-dark/60 text-sm md:text-base">{t('shareYourLink')}</p>
                     <Button
-                     variant='solid'
-                     size='md'
-                     rounded='2xl'
-                     leftIcon={<TbShare3 size={20} />}
-                     onClick={() => {
-                        navigator.clipboard.writeText(`https://linkkk.dev/r/${shortUrl}`);
-                        toast.success('Link copied to clipboard!');
-                     }}
-                     className='mt-2 hover:bg-primary hover:text-dark'
+                        variant='solid'
+                        size='md'
+                        rounded='2xl'
+                        leftIcon={<TbShare3 size={20} />}
+                        onClick={() => {
+                            navigator.clipboard.writeText(`https://linkkk.dev/r/${shortUrl}`);
+                            toast.success(t('linkCopied'));
+                        }}
+                        className='mt-2 hover:bg-primary hover:text-dark'
                     >
-                        Share Link
+                        {t('shareLink')}
                     </Button>
                 </div>
             </motion.div>
@@ -158,7 +160,7 @@ export const AccessesList = ({ shortUrl }: AccessesListProps) => {
                 className="flex items-center gap-2 mb-4"
             >
                 <TbWifi size={24} className="" />
-                <h3 className="text-xl font-black">Recent Accesses ({accesses.length})</h3>
+                <h3 className="text-xl font-black">{t('recentAccesses')} ({accesses.length})</h3>
             </motion.div>
 
             {/* Table - Scrollable on mobile */}
@@ -167,22 +169,22 @@ export const AccessesList = ({ shortUrl }: AccessesListProps) => {
                     <thead>
                         <tr className="border-b border-dark/15">
                             <th className="px-4 py-3 text-left font-black italic text-md">
-                                Time
+                                {t('time')}
                             </th>
                             <th className="px-4 py-3 text-left font-black italic text-md">
-                                Location
+                                {t('location')}
                             </th>
                             <th className="px-4 py-3 text-left font-black italic text-md">
-                                IP Address
+                                {t('ipAddress')}
                             </th>
                             <th className="px-4 py-3 text-left font-black italic text-md">
-                                Browser
+                                {t('browser')}
                             </th>
                             <th className="px-4 py-3 text-center font-black italic text-md">
-                                VPN
+                                {t('vpn')}
                             </th>
                             <th className="px-4 py-3 text-center font-black italic text-md">
-                                Bot
+                                {t('bot')}
                             </th>
                         </tr>
                     </thead>
@@ -219,8 +221,8 @@ export const AccessesList = ({ shortUrl }: AccessesListProps) => {
                                     <td className="px-4 py-4">
                                         <div className="flex items-center gap-2">
                                             {getBrowserLogoUrl(browser) ? (
-                                                <Image 
-                                                    src={getBrowserLogoUrl(browser)!} 
+                                                <Image
+                                                    src={getBrowserLogoUrl(browser)!}
                                                     alt={browser}
                                                     width={20}
                                                     height={20}
@@ -238,12 +240,12 @@ export const AccessesList = ({ shortUrl }: AccessesListProps) => {
                                             {access.isVPN ? (
                                                 <div className="px-3 py-1.5 bg-danger text-light rounded-lg flex items-center gap-1.5">
                                                     <TbShieldX size={14} className="text-light" />
-                                                    <span className="text-xs font-black">Yes</span>
+                                                    <span className="text-xs font-black">{t('yes')}</span>
                                                 </div>
                                             ) : (
                                                 <div className="px-3 py-1.5 bg-success rounded-lg flex items-center gap-1.5">
                                                     <TbShieldCheck size={14} className="text-dark" />
-                                                    <span className="text-xs font-black">No</span>
+                                                    <span className="text-xs font-black">{t('no')}</span>
                                                 </div>
                                             )}
                                         </div>
@@ -253,12 +255,12 @@ export const AccessesList = ({ shortUrl }: AccessesListProps) => {
                                             {access.isBot ? (
                                                 <div className="px-3 py-1.5 bg-danger text-light rounded-lg flex items-center gap-1.5">
                                                     <TbRobot size={14} className="text-light" />
-                                                    <span className="text-xs font-black">Yes</span>
+                                                    <span className="text-xs font-black">{t('yes')}</span>
                                                 </div>
                                             ) : (
                                                 <div className="px-3 py-1.5 bg-success rounded-lg flex items-center gap-1.5">
                                                     <TbUser size={14} className="text-dark" />
-                                                    <span className="text-xs font-black">No</span>
+                                                    <span className="text-xs font-black">{t('no')}</span>
                                                 </div>
                                             )}
                                         </div>

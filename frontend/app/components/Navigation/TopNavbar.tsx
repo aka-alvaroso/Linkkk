@@ -8,6 +8,7 @@ import { TbPlus, TbLogin, TbExternalLink } from "react-icons/tb";
 import * as motion from "motion/react-client";
 import { AnimatePresence } from "motion/react";
 import Button from "../ui/Button/Button";
+import { useTranslations } from 'next-intl';
 
 interface TopNavbarProps {
   showCreate?: boolean;
@@ -17,6 +18,7 @@ export default function TopNavbar({ showCreate = false }: TopNavbarProps) {
   const { user } = useAuth();
   const pathname = usePathname();
   const [createLinkDrawer, setCreateLinkDrawer] = useState(false);
+  const t = useTranslations('Navigation');
 
   return (
     <>
@@ -40,12 +42,12 @@ export default function TopNavbar({ showCreate = false }: TopNavbarProps) {
           <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1 rounded-2xl px-3 py-1.5 border border-dark shadow-[4px_4px_0_var(--color-dark)] bg-light">
             <NavItem
               href="/"
-              label="Home"
+              label={t('home')}
               active={pathname === "/"}
             />
             <NavItem
               href="/dashboard"
-              label="Dashboard"
+              label={t('dashboard')}
               active={pathname.startsWith("/dashboard")}
             />
 
@@ -68,7 +70,7 @@ export default function TopNavbar({ showCreate = false }: TopNavbarProps) {
                     onClick={() => setCreateLinkDrawer(true)}
                     className="ml-1 bg-primary text-dark hover:shadow-[_4px_4px_0_var(--color-dark)] p-2 leading-4"
                   >
-                    Create
+                    {t('create')}
                   </Button>
                 </motion.div>
               )}
@@ -100,7 +102,7 @@ export default function TopNavbar({ showCreate = false }: TopNavbarProps) {
                 expandOnHover="icon"
                 className="hover:bg-warning hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)] leading-5"
               >
-                Login
+                {t('login')}
               </Button>
             </Link>
           )}

@@ -6,6 +6,7 @@ import { TbPlus } from 'react-icons/tb';
 import CreateLinkDrawer from '../Drawer/CreateLinkDrawer';
 import * as motion from 'motion/react-client';
 import { AnimatePresence } from 'motion/react';
+import { useTranslations } from 'next-intl';
 
 
 interface LinkDetailsProps {
@@ -13,6 +14,7 @@ interface LinkDetailsProps {
 }
 
 const LinkDetails: React.FC<LinkDetailsProps> = ({ links }) => {
+  const t = useTranslations('Dashboard');
   const [createLinkDrawer, setCreateLinkDrawer] = useState(false);
   const initialLoadRef = useRef(true);
   const prevLinksCountRef = useRef(links.length);
@@ -33,9 +35,9 @@ const LinkDetails: React.FC<LinkDetailsProps> = ({ links }) => {
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, duration: 0.4, ease: "backInOut" }} 
+                transition={{ delay: 0.4, duration: 0.4, ease: "backInOut" }}
                 className='text-center text-gray-500'>
-                No links found
+                {t('noLinksFound')}
               </motion.p>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -52,7 +54,7 @@ const LinkDetails: React.FC<LinkDetailsProps> = ({ links }) => {
                     setCreateLinkDrawer(true);
                   }}
                   >
-                  Create link
+                  {t('createLink')}
                 </Button>
               </motion.div>
             </div>

@@ -16,6 +16,7 @@ import {
   ActionType,
   ActionSettings
 } from '@/app/types/linkRules';
+import { useTranslations } from 'next-intl';
 
 interface LinkRuleProps {
   rule: LinkRuleType;
@@ -28,6 +29,7 @@ interface LinkRuleProps {
 }
 
 export function LinkRule({ rule, priority, onChange, onDelete, dragHandleProps, maxConditions }: LinkRuleProps) {
+  const t = useTranslations('LinkRule');
   const [showElseAction, setShowElseAction] = useState(!!rule.elseActionType);
 
   // Handle match type change
@@ -112,14 +114,14 @@ export function LinkRule({ rule, priority, onChange, onDelete, dragHandleProps, 
           <button {...dragHandleProps} className="cursor-grab active:cursor-grabbing text-dark/30 hover:text-dark/50 transition-colors">
             <TbGripVertical size={20} />
           </button>
-          <span className="font-black italic">Rule {priority}</span>
+          <span className="font-black italic">{t('rule')} {priority}</span>
         </div>
         <motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
           onClick={onDelete}
           className="p-1 text-dark/30 hover:text-danger transition-colors rounded-md hover:bg-danger/10 hover:cursor-pointer"
-          title="Delete rule"
+          title={t('deleteRule')}
         >
           <TbX size={20} />
         </motion.button>
@@ -131,7 +133,7 @@ export function LinkRule({ rule, priority, onChange, onDelete, dragHandleProps, 
 
         {/* Mobile IF and AND/OR selector */}
         <div className="flex sm:hidden items-start gap-2">
-          <span className="text-sm font-black italic text-dark uppercase tracking-wide">If</span>
+          <span className="text-sm font-black italic text-dark uppercase tracking-wide">{t('if')}</span>
           {
             rule.conditions.length > 1 && (
               <Select
@@ -163,13 +165,13 @@ export function LinkRule({ rule, priority, onChange, onDelete, dragHandleProps, 
               >
                 {/* First condition shows "If", rest show AND/OR */}
                 {index === 0 ? (
-                  <span className={`hidden sm:block text-sm font-black italic text-dark uppercase tracking-wide text-right ${rule.conditions.length > 1 ? 'w-16' : ''}`}>If</span>
+                  <span className={`hidden sm:block text-sm font-black italic text-dark uppercase tracking-wide text-right ${rule.conditions.length > 1 ? 'w-16' : ''}`}>{t('if')}</span>
                 ) : index === 1 ? (
                   // Second condition has editable AND/OR selector
                   <Select
                     options={[
-                      { label: 'And', value: 'AND' },
-                      { label: 'Or', value: 'OR' }
+                      { label: t('and'), value: 'AND' },
+                      { label: t('or'), value: 'OR' }
                     ]}
                     value={rule.match}
                     onChange={(value) => handleMatchChange(value as MatchType)}
@@ -200,10 +202,10 @@ export function LinkRule({ rule, priority, onChange, onDelete, dragHandleProps, 
               onClick={handleAddCondition}
               disabled={rule.conditions.length >= maxConditions}
               className="inline-flex items-center gap-1 px-12 py-1 text-sm text-dark/40 hover:text-dark/70 border border-dashed border-dark/20 rounded-lg hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:bg-dark/5 transition-colors"
-              title={rule.conditions.length >= maxConditions ? `Maximum ${maxConditions} ${maxConditions === 1 ? 'condition' : 'conditions'} allowed` : ''}
+              title={rule.conditions.length >= maxConditions ? t('maxConditionsTitle', { count: maxConditions, plural: maxConditions === 1 ? t('condition') : t('conditions') }) : ''}
             >
               <TbPlus size={12} />
-              <span>Add</span>
+              <span>{t('add')}</span>
             </button>
           </div>
         </div>
@@ -211,7 +213,7 @@ export function LinkRule({ rule, priority, onChange, onDelete, dragHandleProps, 
         {/* Main Action */}
         <div className="flex items-center gap-2 flex-wrap">
           <span className={`text-xs font-black italic text-dark uppercase tracking-wide text-right ${rule.conditions.length > 1 ? 'w-16' : ''}`}>
-            Then
+            {t('then')}
           </span>
           <RuleAction
             actionType={rule.actionType}
@@ -232,7 +234,7 @@ export function LinkRule({ rule, priority, onChange, onDelete, dragHandleProps, 
               className="flex items-center gap-2 flex-wrap"
             >
               <span className={`text-xs font-black italic text-dark uppercase tracking-wide text-right ${rule.conditions.length > 1 ? 'w-16' : ''}`}>
-                Else
+                {t('else')}
               </span>
               <RuleAction
                 actionType={rule.elseActionType || 'redirect'}
@@ -242,7 +244,7 @@ export function LinkRule({ rule, priority, onChange, onDelete, dragHandleProps, 
               <button
                 onClick={handleRemoveElseAction}
                 className="p-1 text-dark/30 hover:text-danger transition-colors rounded-md hover:bg-danger/10"
-                title="Remove otherwise action"
+                title={t('removeElseAction')}
               >
                 <TbTrash size={18} />
               </button>
@@ -258,7 +260,7 @@ export function LinkRule({ rule, priority, onChange, onDelete, dragHandleProps, 
               className="inline-flex items-center gap-1 px-2 py-1 text-sm text-dark/40 hover:text-dark/70 border border-dashed border-dark/20 rounded-lg hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:bg-dark/5 transition-colors"
             >
               <TbPlus size={12} />
-              <span>Add &quot;Else&quot; action</span>
+              <span>{t('addElseAction')}</span>
             </motion.button>
           )}
         </AnimatePresence>

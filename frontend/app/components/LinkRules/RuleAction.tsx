@@ -14,6 +14,7 @@ import {
   PasswordGateSettings,
   NotifySettings
 } from '@/app/types/linkRules';
+import { useTranslations } from 'next-intl';
 
 interface RuleActionProps {
   actionType: ActionType;
@@ -21,19 +22,21 @@ interface RuleActionProps {
   onChange: (actionType: ActionType, actionSettings: ActionSettings) => void;
 }
 
-// Action type options
-const ACTION_TYPE_OPTIONS = [
-  { label: 'Redirect', value: 'redirect' },
-  { label: 'Block Access', value: 'block_access' },
-  { label: 'Password Gate', value: 'password_gate' },
-  { label: 'Notify', value: 'notify' },
-];
-
 export function RuleAction({
   actionType,
   actionSettings,
   onChange
 }: RuleActionProps) {
+  const t = useTranslations('RuleAction');
+
+  // Action type options
+  const ACTION_TYPE_OPTIONS = [
+    { label: t('actionRedirect'), value: 'redirect' },
+    { label: t('actionBlockAccess'), value: 'block_access' },
+    { label: t('actionPasswordGate'), value: 'password_gate' },
+    { label: t('actionNotify'), value: 'notify' },
+  ];
+
   const handleTypeChange = (newType: React.SetStateAction<string | number | null>) => {
     // Handle both direct values and functions (SetStateAction)
     const resolvedType = typeof newType === 'function'
@@ -76,9 +79,9 @@ export function RuleAction({
         const redirectSettings = actionSettings as RedirectSettings;
         return (
           <div className="flex items-center gap-2">
-            <span className="text-xs text-dark/50">to</span>
+            <span className="text-xs text-dark/50">{t('to')}</span>
             <Input
-              placeholder="https://example.com or {{longUrl}}"
+              placeholder={t('redirectPlaceholder')}
               value={redirectSettings.url || ''}
               onChange={(e) => handleSettingChange('url', e.target.value)}
               size="sm"
@@ -93,7 +96,7 @@ export function RuleAction({
         return (
           <div className="flex items-center gap-2">
             <Input
-              placeholder="Block reason (optional)"
+              placeholder={t('blockReasonPlaceholder')}
               value={blockSettings.reason || ''}
               onChange={(e) => handleSettingChange('reason', e.target.value)}
               size="sm"
@@ -108,7 +111,7 @@ export function RuleAction({
         return (
           <div className="flex items-center gap-2">
             <Input
-              placeholder="Password"
+              placeholder={t('passwordPlaceholder')}
               value={passwordSettings.passwordHash || ''}
               onChange={(e) => handleSettingChange('passwordHash', e.target.value)}
               size="sm"
@@ -116,7 +119,7 @@ export function RuleAction({
               className='bg-light border border-dark/10 px-2 py-1 rounded-lg hover:border-dark/20'
             />
             <Input
-              placeholder="Hint (optional)"
+              placeholder={t('hintPlaceholder')}
               value={passwordSettings.hint || ''}
               onChange={(e) => handleSettingChange('hint', e.target.value)}
               size="sm"
@@ -131,7 +134,7 @@ export function RuleAction({
         return (
           <div className="flex items-center gap-2">
             <Input
-              placeholder="Webhook URL (optional)"
+              placeholder={t('webhookPlaceholder')}
               value={notifySettings.webhookUrl || ''}
               onChange={(e) => handleSettingChange('webhookUrl', e.target.value)}
               size="sm"
@@ -139,7 +142,7 @@ export function RuleAction({
               className='bg-light border border-dark/10 px-2 py-1 rounded-lg hover:border-dark/20'
             />
             <Input
-              placeholder="Message (optional)"
+              placeholder={t('messagePlaceholder')}
               value={notifySettings.message || ''}
               onChange={(e) => handleSettingChange('message', e.target.value)}
               size="sm"

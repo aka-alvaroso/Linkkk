@@ -12,6 +12,7 @@ import * as motion from 'motion/react-client';
 import { AnimatePresence } from 'motion/react';
 import { RulesManager } from '../LinkRules/RulesManager';
 import AnimatedText, { AnimatedTextRef } from '../ui/AnimatedText';
+import { useTranslations } from 'next-intl';
 
 interface EditiLinkDrawerProps {
     open: boolean;
@@ -20,11 +21,12 @@ interface EditiLinkDrawerProps {
 }
 
 export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawerProps) {
+    const t = useTranslations('EditLinkDrawer');
     const { updateLink, fetchLinks } = useLinks();
     const toast = useToast();
     const [tab, setTab] = useState('settings');
     const [statusBar, setShowStatusBar] = useState("none");
-    const [newLink, setNewLink] = useState({...link});
+    const [newLink, setNewLink] = useState({ ...link });
     const [showCopyShortUrlButton, setShowCopyShortUrlButton] = useState(false);
     const [showCopyLongUrlButton, setShowCopyLongUrlButton] = useState(false);
 
@@ -42,7 +44,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
 
     // Sincronizar estado local cuando el prop link cambia
     useEffect(() => {
-        setNewLink({...link});
+        setNewLink({ ...link });
     }, [link]);
 
     // Handle rules changes callback from RulesManager
@@ -57,55 +59,55 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
     }, []);
 
     const handleUpdateLink = useCallback(async () => {
-            try {
-                // Save link
-                const response = await updateLink(link.shortUrl, {
-                    longUrl: newLink.longUrl,
-                    status: newLink.status,
-                });
+        try {
+            // Save link
+            const response = await updateLink(link.shortUrl, {
+                longUrl: newLink.longUrl,
+                status: newLink.status,
+            });
 
-                if (!response.success) {
-                    // Error handling with specific messages
-                    if (response.errorCode === 'LINK_NOT_FOUND') {
-                        toast.error('Link not found', {
-                            description: 'This link no longer exists.',
-                        });
-                    } else if (response.errorCode === 'LINK_ACCESS_DENIED') {
-                        toast.error('Access denied', {
-                            description: 'You don\'t have permission to edit this link.',
-                        });
-                    } else if (response.errorCode === 'UNAUTHORIZED') {
-                        toast.error('Session expired', {
-                            description: 'Please login again to continue.',
-                        });
-                    } else {
-                        toast.error('Failed to update link', {
-                            description: response.error || 'An unexpected error occurred.',
-                        });
-                    }
-                    setShowStatusBar("none");
-                    return;
+            if (!response.success) {
+                // Error handling with specific messages
+                if (response.errorCode === 'LINK_NOT_FOUND') {
+                    toast.error(t('toastLinkNotFound'), {
+                        description: t('toastLinkNotFoundDesc'),
+                    });
+                } else if (response.errorCode === 'LINK_ACCESS_DENIED') {
+                    toast.error(t('toastAccessDenied'), {
+                        description: t('toastAccessDeniedDesc'),
+                    });
+                } else if (response.errorCode === 'UNAUTHORIZED') {
+                    toast.error(t('toastSessionExpired'), {
+                        description: t('toastSessionExpiredDesc'),
+                    });
+                } else {
+                    toast.error(t('toastUpdateFailed'), {
+                        description: response.error || t('toastUnexpectedError'),
+                    });
                 }
-
-                // Save rules if there are changes
-                if (hasRulesChanges && saveRulesRef.current) {
-                    await saveRulesRef.current();
-                }
-
-                toast.success('Link and rules updated successfully!');
                 setShowStatusBar("none");
-                onClose();
-                await fetchLinks();
-            } catch (err) {
-                console.error('Failed to save:', err);
-                const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred.';
-                toast.error('Failed to save changes', {
-                    description: errorMessage,
-                });
-                setShowStatusBar("none");
+                return;
             }
+
+            // Save rules if there are changes
+            if (hasRulesChanges && saveRulesRef.current) {
+                await saveRulesRef.current();
+            }
+
+            toast.success(t('toastUpdateSuccess'));
+            setShowStatusBar("none");
+            onClose();
+            await fetchLinks();
+        } catch (err) {
+            console.error('Failed to save:', err);
+            const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred.';
+            toast.error(t('toastSaveFailed'), {
+                description: errorMessage,
+            });
+            setShowStatusBar("none");
+        }
     }, [link, newLink, updateLink, fetchLinks, onClose, hasRulesChanges, toast]);
-    
+
     useEffect(() => {
         if (!open) return;
 
@@ -178,7 +180,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4, ease: "backInOut" }}
-                        
+
                     >
                         <Button
                             variant='ghost'
@@ -187,15 +189,15 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                             leftIcon={<TbSettings size={20} />}
                             className={`rounded-2xl ${tab === 'settings' ? 'bg-dark text-light hover:bg-dark/90' : 'bg-dark/5 text-dark/50'}`}
                             onClick={() => setTab('settings')}
-                            >
-                            Settings
+                        >
+                            {t('tabSettings')}
                         </Button>
                     </motion.div>
                     <motion.div
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.05,  duration: 0.4, ease: "backInOut" }}
-                        
+                        transition={{ delay: 0.05, duration: 0.4, ease: "backInOut" }}
+
                     >
                         <Button
                             variant='ghost'
@@ -205,11 +207,11 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                             className={`rounded-2xl ${tab === 'analytics' ? 'bg-dark text-light hover:bg-dark/90' : 'bg-dark/5 text-dark/50'}`}
                             onClick={() => setTab('analytics')}
                         >
-                            Analytics
+                            {t('tabAnalytics')}
                         </Button>
                     </motion.div>
                 </div>
- 
+
 
                 <header className='w-full flex flex-col md:flex-row items-start'>
                     <div className='w-full flex-1 flex flex-col gap-1'>
@@ -221,12 +223,12 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                             <motion.h1
                                 initial={{ opacity: 0, x: 20 }}
                                 animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: 0.1,  duration: 0.4, ease: "backInOut" }}
+                                transition={{ delay: 0.1, duration: 0.4, ease: "backInOut" }}
                                 className='text-2xl md:text-3xl italic font-black'
                                 onMouseDown={(e) => {
                                     e.preventDefault();
                                     navigator.clipboard.writeText(`https://linkkk.dev/r/${newLink.shortUrl}`);
-                                    shortUrlTextRef.current?.setText('Copied!');
+                                    shortUrlTextRef.current?.setText(t('copied'));
                                     setTimeout(() => {
                                         shortUrlTextRef.current?.reset();
                                     }, 2000);
@@ -258,7 +260,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                             onMouseDown={(e) => {
                                                 e.preventDefault();
                                                 navigator.clipboard.writeText(`https://linkkk.dev/r/${newLink.shortUrl}`);
-                                                shortUrlTextRef.current?.setText('Copied!');
+                                                shortUrlTextRef.current?.setText(t('copied'));
                                                 setTimeout(() => {
                                                     shortUrlTextRef.current?.reset();
                                                 }, 2000);
@@ -281,7 +283,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                 className='text-sm md:text-lg overflow-hidden text-ellipsis whitespace-nowrap p-1 flex-1 min-w-0 cursor-pointer text-dark/50'
                                 onMouseDown={() => {
                                     navigator.clipboard.writeText(newLink.longUrl);
-                                    longUrlTextRef.current?.setText('Copied!');
+                                    longUrlTextRef.current?.setText(t('copied'));
                                     setTimeout(() => {
                                         longUrlTextRef.current?.reset();
                                     }, 2000);
@@ -298,31 +300,31 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
 
 
                             <AnimatePresence>
-                                    {showCopyLongUrlButton && (
-                                        <motion.div
-                                            initial={{ opacity: 0, scale: 0.8, x: -10 }}
-                                            animate={{ opacity: 1, scale: 1, x: 0 }}
-                                            exit={{ opacity: 0, scale: 0.8, x: -10 }}
-                                            transition={{ duration: 0.2, ease: "backOut" }}
+                                {showCopyLongUrlButton && (
+                                    <motion.div
+                                        initial={{ opacity: 0, scale: 0.8, x: -10 }}
+                                        animate={{ opacity: 1, scale: 1, x: 0 }}
+                                        exit={{ opacity: 0, scale: 0.8, x: -10 }}
+                                        transition={{ duration: 0.2, ease: "backOut" }}
+                                    >
+                                        <Button
+                                            iconOnly
+                                            leftIcon={<TbCopy size={20} />}
+                                            variant='solid'
+                                            size='sm'
+                                            rounded='xl'
+                                            className="bg-primary text-dark flex-shrink-0 inline-flex items-center justify-center"
+                                            onMouseDown={(e) => {
+                                                e.preventDefault();
+                                                navigator.clipboard.writeText(newLink.longUrl);
+                                                longUrlTextRef.current?.setText(t('copied'));
+                                                setTimeout(() => {
+                                                    longUrlTextRef.current?.reset();
+                                                }, 2000);
+                                            }}
                                         >
-                                            <Button
-                                                iconOnly
-                                                leftIcon={<TbCopy size={20} />}
-                                                variant='solid'
-                                                size='sm'
-                                                rounded='xl'
-                                                className="bg-primary text-dark flex-shrink-0 inline-flex items-center justify-center"
-                                                onMouseDown={(e) => {
-                                                    e.preventDefault();
-                                                    navigator.clipboard.writeText(newLink.longUrl);
-                                                    longUrlTextRef.current?.setText('Copied!');
-                                                    setTimeout(() => {
-                                                        longUrlTextRef.current?.reset();
-                                                    }, 2000);
-                                                }}
-                                            >
-                                                <TbCopy size={12} />
-                                            </Button>
+                                            <TbCopy size={12} />
+                                        </Button>
                                     </motion.div>
                                 )}
                             </AnimatePresence>
@@ -333,14 +335,14 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                 {/* Main Content */}
                 {/* Resume */}
                 {tab === 'resume' && (
-                <div className='w-full flex flex-col gap-2 items-center p-4'>         
-                </div>
+                    <div className='w-full flex flex-col gap-2 items-center p-4'>
+                    </div>
                 )}
 
                 {/* Settings */}
                 {tab === 'settings' && (
                     <div className='w-full h-full flex flex-col items-center gap-1'>
-                        
+
                         {/* <motion.p 
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -353,11 +355,11 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                         {/* Link status */}
                         <div className='w-full flex flex-col md:flex-row items-start md:items-center gap-1'>
                             <motion.p
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.25, duration: 0.3, ease: "backOut" }} 
-                            className='text-lg font-black italic'>
-                                Status
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: 0.25, duration: 0.3, ease: "backOut" }}
+                                className='text-lg font-black italic'>
+                                {t('status')}
                             </motion.p>
                             <motion.div
                                 initial={{ opacity: 0, x: 20 }}
@@ -371,14 +373,14 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                     leftIcon={newLink.status ? <TbCircleDashedCheck size={20} /> : <TbCircleDashed size={20} />}
                                     className={`${newLink.status ? 'bg-success text-dark' : 'bg-danger text-light'}`}
                                     onClick={() => {
-                                        statusButtonTextRef.current?.setText(newLink.status ? 'Inactive' : 'Active');
+                                        statusButtonTextRef.current?.setText(newLink.status ? t('inactive') : t('active'));
                                         setNewLink({ ...newLink, status: !newLink.status })
 
                                     }}
                                 >
                                     <AnimatedText
                                         ref={statusButtonTextRef}
-                                        initialText={newLink.status ? 'Active' : 'Inactive'}
+                                        initialText={newLink.status ? t('active') : t('inactive')}
                                         animationType="slide"
                                         triggerMode='none'
                                         className='cursor-pointer'
@@ -388,12 +390,12 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                         </div>
                         {/* URLs */}
                         <div className='w-full flex flex-col md:flex-row items-start md:items-center gap-4'>
-                            <motion.p 
+                            <motion.p
                                 initial={{ opacity: 0, x: 20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: 0.3, duration: 0.3, ease: "backOut" }}
                                 className='text-lg font-black italic'>
-                                    Long URL
+                                {t('longUrl')}
                             </motion.p>
                             <motion.div
                                 initial={{ opacity: 0, x: 20 }}
@@ -415,7 +417,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                             }
                                         }
                                     }}
-                                    placeholder='https://example.com'
+                                    placeholder={t('urlPlaceholder')}
                                     size='md'
                                     rounded='2xl'
                                     className='w-full max-w-md'
@@ -442,11 +444,11 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
 
                 {/* Analytics */}
                 {tab === 'analytics' && (
-                <div className='w-full flex flex-col gap-2 items-center p-4'>
-                    {
-                        <AccessesList shortUrl={link.shortUrl} />
-                    }
-                </div>
+                    <div className='w-full flex flex-col gap-2 items-center p-4'>
+                        {
+                            <AccessesList shortUrl={link.shortUrl} />
+                        }
+                    </div>
                 )}
 
             </div>
@@ -468,10 +470,10 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                 </div>
                                 <div className='flex-1'>
                                     <p className='text-lg font-black italic text-dark mb-1'>
-                                        Unsaved Changes
+                                        {t('unsavedChanges')}
                                     </p>
                                     <p className='text-sm text-dark/70'>
-                                        You have changes that haven&apos;t been saved yet
+                                        {t('unsavedChangesDesc')}
                                     </p>
                                 </div>
                             </div>
@@ -484,14 +486,14 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                     disabled={statusBar === "loading"}
                                     onClick={() => {
                                         setShowStatusBar("none");
-                                        setNewLink({...link});
+                                        setNewLink({ ...link });
                                         // Cancel rules changes if any
                                         if (cancelRulesRef.current) {
                                             cancelRulesRef.current();
                                         }
                                     }}
                                 >
-                                    Discard
+                                    {t('discard')}
                                 </Button>
                                 <Button
                                     variant='solid'
@@ -504,7 +506,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                         await handleUpdateLink();
                                     }}
                                 >
-                                    Save Changes
+                                    {t('saveChanges')}
                                 </Button>
                             </div>
                         </div>

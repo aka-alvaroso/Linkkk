@@ -18,6 +18,7 @@ import {
   TbEyeOff,
 } from "react-icons/tb";
 import { csrfService } from "@/app/services/api/csrfService";
+import { useTranslations } from 'next-intl';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -36,9 +37,17 @@ const settingsTabs: SettingsTabConfig[] = [
 ];
 
 export default function SettingsPage() {
+  const t = useTranslations('SettingsPage');
   const { user, logout } = useAuth();
   const { setUser } = useAuthStore();
   const toast = useToast();
+
+  // Settings tabs with translations
+  const settingsTabs: SettingsTabConfig[] = [
+    { id: "account", label: t('tabAccount'), icon: TbUser },
+    { id: "security", label: t('tabSecurity'), icon: TbLock },
+    { id: "danger", label: t('tabDangerZone'), icon: TbAlertTriangle },
+  ];
 
   const [activeTab, setActiveTab] = useState<SettingsTab>("account");
   const [loading, setLoading] = useState(false);
@@ -55,7 +64,7 @@ export default function SettingsPage() {
 
   const handleUpdateUsername = async () => {
     if (!username.trim()) {
-      toast.error("Username cannot be empty");
+      toast.error(t('toastUsernameEmpty'));
       return;
     }
 
@@ -80,12 +89,12 @@ export default function SettingsPage() {
           ...user!,
           ...data.data,
         });
-        toast.success("Username updated successfully");
+        toast.success(t('toastUsernameUpdated'));
       } else {
-        toast.error(data.message || "Failed to update username");
+        toast.error(data.message || t('toastUsernameUpdateFailed'));
       }
     } catch (error) {
-      toast.error("An error occurred");
+      toast.error(t('toastError'));
     } finally {
       setLoading(false);
     }
@@ -93,7 +102,7 @@ export default function SettingsPage() {
 
   const handleUpdateEmail = async () => {
     if (!email.trim()) {
-      toast.error("Email cannot be empty");
+      toast.error(t('toastEmailEmpty'));
       return;
     }
 
@@ -118,12 +127,12 @@ export default function SettingsPage() {
           ...user!,
           ...data.data,
         });
-        toast.success("Email updated successfully");
+        toast.success(t('toastEmailUpdated'));
       } else {
-        toast.error(data.message || "Failed to update email");
+        toast.error(data.message || t('toastEmailUpdateFailed'));
       }
     } catch (error) {
-      toast.error("An error occurred");
+      toast.error(t('toastError'));
     } finally {
       setLoading(false);
     }
@@ -131,12 +140,12 @@ export default function SettingsPage() {
 
   const handleUpdatePassword = async () => {
     if (!newPassword || !confirmPassword) {
-      toast.error("Password fields are required");
+      toast.error(t('toastPasswordRequired'));
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      toast.error("New passwords do not match");
+      toast.error(t('toastPasswordMismatch'));
       return;
     }
 
@@ -156,15 +165,15 @@ export default function SettingsPage() {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        toast.success("Password updated successfully");
+        toast.success(t('toastPasswordUpdated'));
         setNewPassword("");
         setConfirmPassword("");
         // No need to update user state for password change
       } else {
-        toast.error(data.message || "Failed to update password");
+        toast.error(data.message || t('toastPasswordUpdateFailed'));
       }
     } catch (error) {
-      toast.error("An error occurred");
+      toast.error(t('toastError'));
     } finally {
       setLoading(false);
     }
@@ -175,7 +184,7 @@ export default function SettingsPage() {
   };
 
   const handleDeleteAllLinks = async () => {
-    if (!confirm("Are you sure you want to delete all your links? This action cannot be undone.")) {
+    if (!confirm(t('confirmDeleteLinks'))) {
       return;
     }
 
@@ -191,20 +200,20 @@ export default function SettingsPage() {
       });
 
       if (response.ok) {
-        toast.success("All links deleted successfully");
+        toast.success(t('toastLinksDeleted'));
       } else {
         const data = await response.json();
-        toast.error(data.message || "Failed to delete links");
+        toast.error(data.message || t('toastLinksDeleteFailed'));
       }
     } catch (error) {
-      toast.error("An error occurred");
+      toast.error(t('toastError'));
     } finally {
       setLoading(false);
     }
   };
 
   const handleDeleteAccount = async () => {
-    if (!confirm("Are you sure you want to delete your account? This action cannot be undone and will delete all your data.")) {
+    if (!confirm(t('confirmDeleteAccount'))) {
       return;
     }
 
@@ -220,14 +229,14 @@ export default function SettingsPage() {
       });
 
       if (response.ok) {
-        toast.success("Account deleted successfully");
+        toast.success(t('toastAccountDeleted'));
         logout();
       } else {
         const data = await response.json();
-        toast.error(data.message || "Failed to delete account");
+        toast.error(data.message || t('toastAccountDeleteFailed'));
       }
     } catch (error) {
-      toast.error("An error occurred");
+      toast.error(t('toastError'));
     } finally {
       setLoading(false);
     }
@@ -245,7 +254,7 @@ export default function SettingsPage() {
             transition={{ delay: 0.05, duration: 0.4, ease: "backInOut" }}
             className="text-4xl font-black mb-2 italic"
           >
-            Settings
+            {t('title')}
           </motion.h1>
 
           {/* Mobile Tab Selector - Above content on mobile */}
@@ -275,9 +284,8 @@ export default function SettingsPage() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-xl font-bold whitespace-nowrap transition-all ${
-                    isActive ? activeColor : bgColor
-                  }`}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-xl font-bold whitespace-nowrap transition-all ${isActive ? activeColor : bgColor
+                    }`}
                 >
                   <Icon size={20} />
                   <span className="text-sm">{tab.label}</span>
@@ -314,9 +322,8 @@ export default function SettingsPage() {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-2 px-4 py-3 rounded-xl font-bold transition-all ${
-                      isActive ? activeColor : bgColor
-                    }`}
+                    className={`flex items-center gap-2 px-4 py-3 rounded-xl font-bold transition-all ${isActive ? activeColor : bgColor
+                      }`}
                   >
                     <Icon size={20} />
                     <span>{tab.label}</span>
@@ -339,13 +346,13 @@ export default function SettingsPage() {
                   <div className="p-4 bg-dark/5 rounded-2xl border-2 border-dashed border-transparent focus-within:border-dark transition-colors">
                     <div className="flex items-center gap-2 mb-3">
                       <TbUser size={20} />
-                      <h3 className="text-xl font-bold">Username</h3>
+                      <h3 className="text-xl font-bold">{t('username')}</h3>
                     </div>
                     <input
                       type="text"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
-                      placeholder="Enter username"
+                      placeholder={t('usernamePlaceholder')}
                       className="w-full p-3 bg-dark/5 rounded-xl border-2 border-dashed border-transparent focus:border-dark outline-none transition-colors"
                     />
                     <Button
@@ -356,7 +363,7 @@ export default function SettingsPage() {
                       disabled={loading}
                       className="mt-3 bg-dark hover:bg-primary hover:text-dark border border-dark"
                     >
-                      Update Username
+                      {t('updateUsername')}
                     </Button>
                   </div>
 
@@ -364,13 +371,13 @@ export default function SettingsPage() {
                   <div className="p-4 bg-dark/5 rounded-2xl border-2 border-dashed border-transparent focus-within:border-dark transition-colors">
                     <div className="flex items-center gap-2 mb-3">
                       <TbMail size={20} />
-                      <h3 className="text-xl font-bold">Email</h3>
+                      <h3 className="text-xl font-bold">{t('email')}</h3>
                     </div>
                     <input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Enter email"
+                      placeholder={t('emailPlaceholder')}
                       className="w-full p-3 bg-dark/5 rounded-xl border-2 border-dashed border-transparent focus:border-dark outline-none transition-colors"
                     />
                     <Button
@@ -381,7 +388,7 @@ export default function SettingsPage() {
                       disabled={loading}
                       className="mt-3 bg-dark hover:bg-secondary hover:text-light border border-dark"
                     >
-                      Update Email
+                      {t('updateEmail')}
                     </Button>
                   </div>
 
@@ -389,10 +396,10 @@ export default function SettingsPage() {
                   <div className="p-4 bg-dark/5 rounded-2xl">
                     <div className="flex items-center gap-2 mb-3">
                       <TbLogout size={20} />
-                      <h3 className="text-xl font-bold">Sign Out</h3>
+                      <h3 className="text-xl font-bold">{t('signOut')}</h3>
                     </div>
                     <p className="text-sm text-dark/60 mb-3">
-                      Sign out of your account on this device
+                      {t('signOutDescription')}
                     </p>
                     <Button
                       variant="outline"
@@ -402,7 +409,7 @@ export default function SettingsPage() {
                       onClick={handleLogout}
                       className="mt-3 bg-dark text-light hover:bg-danger hover:text-light border border-dark"
                     >
-                      Logout
+                      {t('logout')}
                     </Button>
                   </div>
                 </div>
@@ -414,7 +421,7 @@ export default function SettingsPage() {
                   <div className="p-4 bg-dark/5 rounded-2xl">
                     <div className="flex items-center gap-2 mb-3">
                       <TbLock size={20} />
-                      <h3 className="text-xl font-bold">Change Password</h3>
+                      <h3 className="text-xl font-bold">{t('changePassword')}</h3>
                     </div>
 
                     <div className="space-y-3">
@@ -424,7 +431,7 @@ export default function SettingsPage() {
                           type={showNewPassword ? "text" : "password"}
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
-                          placeholder="New password"
+                          placeholder={t('newPassword')}
                           className="w-full p-3 pr-12 bg-dark/5 rounded-xl border-2 border-dashed border-transparent focus:border-dark outline-none transition-colors"
                         />
                         <button
@@ -442,7 +449,7 @@ export default function SettingsPage() {
                           type={showConfirmPassword ? "text" : "password"}
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
-                          placeholder="Confirm new password"
+                          placeholder={t('confirmNewPassword')}
                           className="w-full p-3 pr-12 bg-dark/5 rounded-xl border-2 border-dashed border-transparent focus:border-dark outline-none transition-colors"
                         />
                         <button
@@ -462,7 +469,7 @@ export default function SettingsPage() {
                         disabled={loading}
                         className="bg-dark hover:bg-secondary hover:text-light border border-dark"
                       >
-                        Update Password
+                        {t('updatePassword')}
                       </Button>
                     </div>
                   </div>
@@ -475,10 +482,10 @@ export default function SettingsPage() {
                   <div className="p-4 bg-danger/5 rounded-2xl border border-danger shadow-[4px_4px_0_var(--color-danger)]">
                     <div className="flex items-center gap-2 mb-3">
                       <TbTrash size={20} className="text-dark" />
-                      <h3 className="text-xl font-bold text-dark">Delete All Links</h3>
+                      <h3 className="text-xl font-bold text-dark">{t('deleteAllLinks')}</h3>
                     </div>
                     <p className="text-sm text-dark/70 mb-3">
-                      This will permanently delete all your links. This action cannot be undone.
+                      {t('deleteAllLinksDescription')}
                     </p>
                     <Button
                       variant="solid"
@@ -489,7 +496,7 @@ export default function SettingsPage() {
                       disabled={loading}
                       className="mt-3 bg-danger hover:text-light border border-dark"
                     >
-                      Delete All Links
+                      {t('deleteAllLinks')}
                     </Button>
                   </div>
 
@@ -497,10 +504,10 @@ export default function SettingsPage() {
                   <div className="p-4 bg-danger/5 rounded-2xl border border-danger shadow-[4px_4px_0_var(--color-danger)]">
                     <div className="flex items-center gap-2 mb-3">
                       <TbAlertTriangle size={20} className="text-dark" />
-                      <h3 className="text-xl font-bold text-dark">Delete Account</h3>
+                      <h3 className="text-xl font-bold text-dark">{t('deleteAccount')}</h3>
                     </div>
                     <p className="text-sm text-dark/70 mb-3">
-                      This will permanently delete your account and all associated data. This action cannot be undone.
+                      {t('deleteAccountDescription')}
                     </p>
                     <Button
                       variant="solid"
@@ -511,7 +518,7 @@ export default function SettingsPage() {
                       disabled={loading}
                       className="mt-3 bg-danger hover:text-light border border-dark"
                     >
-                      Delete Account
+                      {t('deleteAccount')}
                     </Button>
                   </div>
                 </div>

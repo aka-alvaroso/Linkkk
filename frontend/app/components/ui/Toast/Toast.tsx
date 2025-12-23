@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import * as motion from 'motion/react-client';
 import { ToastData, ToastType } from './types';
 import { TbX, TbCircleCheck, TbCircleX, TbAlertTriangle, TbInfoCircle } from 'react-icons/tb';
+import { useTranslations } from 'next-intl';
 
 interface ToastProps {
   toast: ToastData;
@@ -10,6 +11,7 @@ interface ToastProps {
 }
 
 const Toast: React.FC<ToastProps> = ({ toast, onRemove }) => {
+  const t = useTranslations('Common');
   const [progress, setProgress] = useState(100);
   const duration = toast.duration || 4000;
 
@@ -120,7 +122,7 @@ const Toast: React.FC<ToastProps> = ({ toast, onRemove }) => {
             onRemove(toast.id);
           }}
           className={`flex-shrink-0 transition-colors ${styles.text}`}
-          aria-label="Close toast"
+          aria-label={t('closeToast')}
         >
           <TbX size={20} />
         </button>

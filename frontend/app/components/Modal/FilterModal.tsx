@@ -6,6 +6,7 @@ import Button from '@/app/components/ui/Button/Button';
 import { TbSearch, TbCircleDashedCheck, TbCircleDashed, TbFilterOff, TbCircleFilled } from 'react-icons/tb';
 import * as motion from 'motion/react-client';
 import { AnimatePresence } from 'motion/react';
+import { useTranslations } from 'next-intl';
 
 export interface LinkFilters {
   search: string;
@@ -30,6 +31,7 @@ export default function FilterModal({
   onApplyFilters,
   initialFilters = defaultFilters
 }: FilterModalProps) {
+  const t = useTranslations('FilterModal');
   const [filters, setFilters] = useState<LinkFilters>(initialFilters);
 
   const handleApply = () => {
@@ -60,7 +62,7 @@ export default function FilterModal({
 
   const hasActiveFilters = () => {
     return filters.search !== '' ||
-           filters.status !== 'all'
+      filters.status !== 'all'
   };
 
   return (
@@ -80,7 +82,7 @@ export default function FilterModal({
             animate={{ opacity: 1, x: 0 }}
             transition={{ ease: "backInOut" }}
             className="text-3xl font-black italic">
-            Filter Links
+            {t('title')}
           </motion.h2>
           <AnimatePresence>
             {hasActiveFilters() && (
@@ -98,8 +100,8 @@ export default function FilterModal({
                   leftIcon={<TbFilterOff size={18} />}
                   onClick={handleReset}
                   className=" text-danger hover:bg-danger/10"
-                  >
-                  Clear all
+                >
+                  {t('clearAll')}
                 </Button>
               </motion.div>
             )}
@@ -108,15 +110,15 @@ export default function FilterModal({
 
         {/* Search */}
         <div className="flex flex-col gap-2">
-          <motion.label 
+          <motion.label
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.05, ease: "backInOut" }}
             className="text-lg font-semibold"
           >
-            Search
+            {t('searchLabel')}
           </motion.label>
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1, ease: "backInOut" }}
@@ -124,19 +126,19 @@ export default function FilterModal({
             <Input
               value={filters.search}
               onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-              placeholder="Search by short URL or long URL..."
+              placeholder={t('searchPlaceholder')}
               size="md"
               rounded="2xl"
               leftIcon={<TbSearch size={20} className="text-info" />}
               className="w-full"
             />
           </motion.div>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1, ease: "backInOut" }}
             className="text-sm text-dark/50">
-            Search in both short URLs and long URLs
+            {t('searchHint')}
           </motion.p>
         </div>
 
@@ -147,7 +149,7 @@ export default function FilterModal({
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.15, ease: "backInOut" }}
             className="text-lg font-semibold">
-              Status
+            {t('statusLabel')}
           </motion.label>
 
           <motion.div
@@ -159,17 +161,17 @@ export default function FilterModal({
             <InlineSelect
               options={[
                 {
-                  label: 'All',
+                  label: t('statusAll'),
                   value: 'all',
                   leftIcon: <TbCircleFilled size={16} />,
                 },
                 {
-                  label: 'Active',
+                  label: t('statusActive'),
                   value: 'active',
                   leftIcon: <TbCircleDashedCheck size={16} />,
                 },
                 {
-                  label: 'Inactive',
+                  label: t('statusInactive'),
                   value: 'inactive',
                   leftIcon: <TbCircleDashed size={16} />,
                 },
@@ -197,7 +199,7 @@ export default function FilterModal({
             className='w-full rounded-xl hover:bg-primary hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)]'
             onClick={handleApply}
           >
-            Apply Filters
+            {t('applyFilters')}
           </Button>
         </motion.div>
       </div>

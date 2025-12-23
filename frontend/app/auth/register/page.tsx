@@ -8,8 +8,11 @@ import { useToast } from "@/app/hooks/useToast";
 import Button from "@/app/components/ui/Button/Button";
 import * as motion from "motion/react-client";
 import { TbArrowUpRight, TbX, TbEye, TbEyeOff, TbRefresh, TbPlus } from "react-icons/tb";
+import { useTranslations } from 'next-intl';
 
 export default function Register() {
+  const t = useTranslations('Auth');
+  const tSignup = useTranslations('Auth.Signup');
   const { register } = useAuth();
   const router = useRouter();
   const toast = useToast();
@@ -43,8 +46,8 @@ export default function Register() {
 
     setPassword(newPassword);
     setShowPassword(true);
-    toast.success("Password generated", {
-      description: "A secure password has been generated for you"
+    toast.success(tSignup('passwordGenerated'), {
+      description: tSignup('securePasswordGenerated')
     });
   };
 
@@ -52,28 +55,28 @@ export default function Register() {
     e.preventDefault();
 
     if (!email || !username || !password) {
-      toast.error("Required fields", {
-        description: "Please fill in all fields",
+      toast.error(tSignup('requiredFields'), {
+        description: tSignup('pleaseFillAllFields'),
       });
       return;
     }
 
     if (password.length < 8) {
-      toast.error("Password too short", {
-        description: "Password must be at least 8 characters",
+      toast.error(tSignup('passwordTooShort'), {
+        description: tSignup('passwordMinLength'),
       });
       return;
     }
 
     const result = await register({ email, username, password });
     if (result.success) {
-      toast.success("Account created successfully!", {
-        description: "Welcome to Linkkk",
+      toast.success(tSignup('accountCreated'), {
+        description: tSignup('welcomeToLinkkk'),
       });
       router.push("/dashboard");
     } else {
-      toast.error("Registration failed", {
-        description: result.error || "Could not create account",
+      toast.error(tSignup('registrationFailed'), {
+        description: result.error || tSignup("couldNotCreateAccount"),
       });
     }
   };
@@ -97,7 +100,7 @@ export default function Register() {
                 expandOnHover="text"
                 className="bg-dark/5 hover:bg-dark/10 p-2 leading-5"
             >
-              Home
+              {t('home')}
             </Button>
             </Link>
         </motion.div>
@@ -127,7 +130,7 @@ export default function Register() {
                 type="email"
                 name="email"
                 id="email"
-                placeholder="Email"
+                placeholder={tSignup('emailPlaceholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full transition bg-dark/5 border-2 border-transparent text-dark rounded-xl p-2 px-3 hover:outline-none focus:outline-none focus:border-2 focus:border-dark focus:border-dashed"
@@ -144,7 +147,7 @@ export default function Register() {
                 type="text"
                 name="username"
                 id="username"
-                placeholder="Username"
+                placeholder={tSignup('usernamePlaceholder')}
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="w-full transition bg-dark/5 border-2 border-transparent text-dark rounded-xl p-2 px-3 hover:outline-none focus:outline-none focus:border-2 focus:border-dark focus:border-dashed"
@@ -161,7 +164,7 @@ export default function Register() {
                 type={showPassword ? "text" : "password"}
                 name="password"
                 id="password"
-                placeholder="Password"
+                placeholder={tSignup('passwordPlaceholder')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full transition bg-dark/5 border-2 border-transparent text-dark rounded-xl p-2 px-3 pr-24 hover:outline-none focus:outline-none focus:border-2 focus:border-dark focus:border-dashed"
@@ -171,7 +174,7 @@ export default function Register() {
                   type="button"
                   onClick={generatePassword}
                   className="text-dark/50 hover:text-secondary transition-colors hover:cursor-pointer"
-                  title="Generate password"
+                  title={tSignup('generatePasswordTitle')}
                 >
                   <TbRefresh size={20} />
                 </button>
@@ -179,7 +182,7 @@ export default function Register() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="text-dark/50 hover:text-info transition-colors hover:cursor-pointer"
-                  title="Toggle password visibility"
+                  title={tSignup('togglePasswordTitle')}
                 >
                   {showPassword ? <TbEyeOff size={20} /> : <TbEye size={20} />}
                 </button>
@@ -201,7 +204,7 @@ export default function Register() {
                 expandOnHover="icon"
                 className="w-full mt-4 transition-all duration-300 ease-in-out hover:bg-primary hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)]"
               >
-                <p className="text-xl font-black italic">Sign Up</p>
+                <p className="text-xl font-black italic">{tSignup('signUpButton')}</p>
               </Button>
             </motion.div>
           </form>
@@ -215,8 +218,8 @@ export default function Register() {
             <Link href="/auth/login" className="relative group">
               <div className="absolute top-0 left-0 w-0 h-full bg-warning z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
               <p className="font-black italic z-20 relative inline-flex flex-col md:flex-row items-center">
-                Already have an account?
-                <span className="underline ml-2 flex items-center">Log In
+                {tSignup('alreadyHaveAccount')}
+                <span className="underline ml-2 flex items-center">{tSignup('logIn')}
                 <TbArrowUpRight size={18} className="ml-2" />
                 </span>
               </p>

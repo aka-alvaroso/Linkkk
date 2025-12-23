@@ -8,6 +8,7 @@ import Select from '../ui/Select/Select';
 import Input from '../ui/Input/Input';
 import { TbTrash } from 'react-icons/tb';
 import { RuleCondition as RuleConditionType, FieldType, OperatorType, DeviceType, ConditionValue } from '@/app/types/linkRules';
+import { useTranslations } from 'next-intl';
 
 interface RuleConditionProps {
   condition: RuleConditionType;
@@ -15,60 +16,62 @@ interface RuleConditionProps {
   onDelete?: () => void;
 }
 
-// Field options
-const FIELD_OPTIONS = [
-  { label: 'Always', value: 'always' },
-  { label: 'Country', value: 'country' },
-  { label: 'Device', value: 'device' },
-  { label: 'IP Address', value: 'ip' },
-  { label: 'Is Bot', value: 'is_bot' },
-  { label: 'Is VPN', value: 'is_vpn' },
-  { label: 'Date', value: 'date' },
-  { label: 'Access Count', value: 'access_count' },
-];
-
-// Operator options per field type
-const OPERATOR_OPTIONS: Record<FieldType, { label: string; value: OperatorType }[]> = {
-  always: [{ label: '', value: 'equals' }], // No operator for "always"
-  country: [
-    { label: 'is one of', value: 'in' },
-    { label: 'is not one of', value: 'not_in' },
-  ],
-  device: [
-    { label: 'equals', value: 'equals' },
-    { label: 'not equals', value: 'not_equals' },
-  ],
-  ip: [
-    { label: 'equals', value: 'equals' },
-    { label: 'not equals', value: 'not_equals' },
-  ],
-  is_bot: [{ label: 'equals', value: 'equals' }],
-  is_vpn: [{ label: 'equals', value: 'equals' }],
-  date: [
-    { label: 'before', value: 'before' },
-    { label: 'after', value: 'after' },
-  ],
-  access_count: [
-    { label: 'equals', value: 'equals' },
-    { label: 'greater than', value: 'greater_than' },
-    { label: 'less than', value: 'less_than' },
-  ],
-};
-
-// Device options
-const DEVICE_OPTIONS = [
-  { label: 'Mobile', value: 'mobile' },
-  { label: 'Tablet', value: 'tablet' },
-  { label: 'Desktop', value: 'desktop' },
-];
-
-// Boolean options
-const BOOLEAN_OPTIONS = [
-  { label: 'Yes', value: 'true' },
-  { label: 'No', value: 'false' },
-];
-
 export function RuleCondition({ condition, onChange, onDelete }: RuleConditionProps) {
+  const t = useTranslations('RuleCondition');
+
+  // Field options
+  const FIELD_OPTIONS = [
+    { label: t('fieldAlways'), value: 'always' },
+    { label: t('fieldCountry'), value: 'country' },
+    { label: t('fieldDevice'), value: 'device' },
+    { label: t('fieldIp'), value: 'ip' },
+    { label: t('fieldIsBot'), value: 'is_bot' },
+    { label: t('fieldIsVpn'), value: 'is_vpn' },
+    { label: t('fieldDate'), value: 'date' },
+    { label: t('fieldAccessCount'), value: 'access_count' },
+  ];
+
+  // Operator options per field type
+  const OPERATOR_OPTIONS: Record<FieldType, { label: string; value: OperatorType }[]> = {
+    always: [{ label: '', value: 'equals' }],
+    country: [
+      { label: t('operatorIn'), value: 'in' },
+      { label: t('operatorNotIn'), value: 'not_in' },
+    ],
+    device: [
+      { label: t('operatorEquals'), value: 'equals' },
+      { label: t('operatorNotEquals'), value: 'not_equals' },
+    ],
+    ip: [
+      { label: t('operatorEquals'), value: 'equals' },
+      { label: t('operatorNotEquals'), value: 'not_equals' },
+    ],
+    is_bot: [{ label: t('operatorEquals'), value: 'equals' }],
+    is_vpn: [{ label: t('operatorEquals'), value: 'equals' }],
+    date: [
+      { label: t('operatorBefore'), value: 'before' },
+      { label: t('operatorAfter'), value: 'after' },
+    ],
+    access_count: [
+      { label: t('operatorEquals'), value: 'equals' },
+      { label: t('operatorGreaterThan'), value: 'greater_than' },
+      { label: t('operatorLessThan'), value: 'less_than' },
+    ],
+  };
+
+  // Device options
+  const DEVICE_OPTIONS = [
+    { label: t('deviceMobile'), value: 'mobile' },
+    { label: t('deviceTablet'), value: 'tablet' },
+    { label: t('deviceDesktop'), value: 'desktop' },
+  ];
+
+  // Boolean options
+  const BOOLEAN_OPTIONS = [
+    { label: t('yes'), value: 'true' },
+    { label: t('no'), value: 'false' },
+  ];
+
   const handleFieldChange = (newField: React.SetStateAction<string | number | null>) => {
     // Handle both direct values and functions (SetStateAction)
     const resolvedField = typeof newField === 'function'
@@ -124,14 +127,14 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
       case 'always':
         return (
           <p className="w-auto text-xs text-dark/50 italic whitespace-nowrap">
-            (no conditions required)
+            {t('noConditionsRequired')}
           </p>
         );
 
       case 'country':
         return (
           <Input
-            placeholder="ES, US, FR"
+            placeholder={t('countryPlaceholder')}
             value={condition.value as string || ''}
             onChange={(e) => {
               handleValueChange(e.target.value.toUpperCase());
@@ -196,7 +199,7 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
       case 'ip':
         return (
           <Input
-            placeholder="192.168.1.1"
+            placeholder={t('ipPlaceholder')}
             value={condition.value as string}
             onChange={(e) => handleValueChange(e.target.value)}
             size="sm"
@@ -242,7 +245,7 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
         <button
           onClick={onDelete}
           className="p-1 text-dark/30 hover:text-danger transition-colors rounded-md hover:bg-danger/10"
-          title="Delete condition"
+          title={t('deleteCondition')}
         >
           <TbTrash size={14} />
         </button>

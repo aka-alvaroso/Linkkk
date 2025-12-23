@@ -5,26 +5,28 @@ import { TbLayoutDashboard, TbLogin, TbPlus, TbSettings } from "react-icons/tb";
 import * as motion from "motion/react-client";
 import CreateLinkDrawer from "../Drawer/CreateLinkDrawer";
 import { useAuth } from "@/app/hooks";
+import { useTranslations } from 'next-intl';
 
 export default function BottomNavbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { isAuthenticated } = useAuth();
   const [createLinkDrawer, setCreateLinkDrawer] = useState(false);
+  const t = useTranslations('Navigation');
 
   // Simple navigation based on authentication
   const navigationItems = isAuthenticated
     ? [
         // Authenticated users
-        { id: "dashboard", label: "Dashboard", icon: TbLayoutDashboard, href: "/dashboard" },
-        { id: "settings", label: "Settings", icon: TbSettings, href: "/settings" },
-        { id: "create", label: "Create", icon: TbPlus, action: "create", isFAB: true },
+        { id: "dashboard", label: t('dashboard'), icon: TbLayoutDashboard, href: "/dashboard" },
+        { id: "settings", label: t('settings'), icon: TbSettings, href: "/settings" },
+        { id: "create", label: t('create'), icon: TbPlus, action: "create", isFAB: true },
       ]
     : [
         // Guest users
-        { id: "dashboard", label: "Dashboard", icon: TbLayoutDashboard, href: "/dashboard" },
-        { id: "login", label: "Login", icon: TbLogin, href: "/auth/login" },
-        { id: "create", label: "Create", icon: TbPlus, action: "create", isFAB: true },
+        { id: "dashboard", label: t('dashboard'), icon: TbLayoutDashboard, href: "/dashboard" },
+        { id: "login", label: t('login'), icon: TbLogin, href: "/auth/login" },
+        { id: "create", label: t('create'), icon: TbPlus, action: "create", isFAB: true },
       ];
 
   const handleClick = (item: typeof navigationItems[0]) => {

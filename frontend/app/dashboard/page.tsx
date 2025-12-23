@@ -15,6 +15,7 @@ import Alert from "@/app/components/ui/Alert/Alert";
 import * as motion from 'motion/react-client';
 import { useMotionValue, animate } from 'motion/react';
 import AnimatedText, { AnimatedTextRef } from "@/app/components/ui/AnimatedText";
+import { useTranslations } from 'next-intl';
 
 function AnimatedCounter({ value, delay = 0 }: { value: number; delay?: number }) {
   const count = useMotionValue(0);
@@ -50,6 +51,7 @@ function AnimatedCounter({ value, delay = 0 }: { value: number; delay?: number }
 }
 
 export default function Dashboard() {
+  const t = useTranslations('Dashboard');
   const { filteredLinks, filters, fetchLinks, updateFilters } = useLinks();
   const { totalLinks, activeLinks, totalClicks } = useStats();
   const { isAuthenticated, isGuest } = useAuth();
@@ -80,7 +82,7 @@ export default function Dashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05, duration: 0.4, ease: "backInOut" }}
             className="text-4xl font-black mb-2 italic">
-            Dashboard
+            {t('title')}
           </motion.h1>
 
           {/* Guest User Alert */}
@@ -89,7 +91,7 @@ export default function Dashboard() {
               id="guest-link-expiration"
               type="warning"
               // title="Guest Account"
-              message="Your links will be automatically deleted after 7 days. Create an account to keep your links forever and unlock more features!"
+              message={t('guestAlert')}
               dismissible={true}
               persistent={false}
               className="p-2"
@@ -97,13 +99,13 @@ export default function Dashboard() {
           )}
 
           {/* Widgets */}
-          <div className='flex items-center gap-1 overflow-x-auto scrollbar-hide lg:grid lg:gap-2 lg:grid-cols-4'>
+          <div className='flex items-center gap-1 py-1 overflow-x-auto scrollbar-hide lg:grid lg:gap-2 lg:grid-cols-4'>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.05, duration: 0.4, ease: "backInOut" }}
               className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
-              <h2 className='text-md'>Total links</h2>
+              <h2 className='text-md'>{t('totalLinks')}</h2>
               <p className='text-end text-5xl font-black italic'>
                 <AnimatedCounter value={totalLinks} delay={0.15} />
               </p>
@@ -113,7 +115,7 @@ export default function Dashboard() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1, duration: 0.4, ease: "backInOut" }}
               className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
-              <h2 className='text-md'>Total clicks</h2>
+              <h2 className='text-md'>{t('totalClicks')}</h2>
               <p className='text-end text-5xl font-black italic'>
                 <AnimatedCounter value={totalClicks} delay={0.15} />
               </p>
@@ -122,8 +124,8 @@ export default function Dashboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15, duration: 0.4, ease: "backInOut" }}
-              className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
-              <h2 className='text-md'>Active links</h2>
+              className='p-2 max-w-48 min-w-48 bg-dark/5 rounded-2xl md:max-w-full'>
+              <h2 className='text-md'>{t('activeLinks')}</h2>
               <p className='text-end text-5xl font-black italic'>
                 <AnimatedCounter value={activeLinks} delay={0.15} />
               </p>
@@ -145,7 +147,7 @@ export default function Dashboard() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.4, ease: "backInOut" }}
                 className='text-3xl font-black italic'>
-                My links
+                {t('myLinks')}
               </motion.h3>
 
               {/* Filter Button */}
@@ -162,7 +164,7 @@ export default function Dashboard() {
                   onClick={() => setFilterModalOpen(true)}
                   className={hasActiveFilters() ? 'text-info' : ''}
                 >
-                  <span>{hasActiveFilters() ? 'Filters active' : 'Filters'}</span>
+                  <span>{hasActiveFilters() ? t('filtersActive') : t('filters')}</span>
                 </Button>
               </motion.div>
             </div>
@@ -176,7 +178,7 @@ export default function Dashboard() {
                 <Button variant='solid' size='sm' rounded='xl' leftIcon={<TbPlus size={20} />} onClick={() => setCreateLinkDrawerOpen(true)}
                   className="hover:bg-primary hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)]"
                 >
-                  New link
+                  {t('newLink')}
                 </Button>
               </motion.div>
             </div>
