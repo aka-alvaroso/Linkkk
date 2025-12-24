@@ -15,7 +15,10 @@ interface BaseInputProps {
 }
 
 type InputProps = BaseInputProps &
-  (InputHTMLAttributes<HTMLInputElement> | TextareaHTMLAttributes<HTMLTextAreaElement>);
+  (
+    | ({ textarea?: false } & InputHTMLAttributes<HTMLInputElement>)
+    | ({ textarea: true } & TextareaHTMLAttributes<HTMLTextAreaElement>)
+  );
 
 const sizeStyles = {
   sm: 'text-sm py-1 px-2',

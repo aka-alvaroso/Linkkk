@@ -1,9 +1,9 @@
 'use client';
 
-import { RiLoader5Fill } from "react-icons/ri";
 import { useAuth } from "@/app/hooks";
 import { useEffect } from "react";
 import { csrfService } from "@/app/services/api/csrfService";
+import Loader from "./ui/Loader/Loader";
 
 export default function SessionProvider({ children }: { children: React.ReactNode }) {
   const { checkSession, isLoading, sessionChecked } = useAuth();
@@ -18,15 +18,9 @@ export default function SessionProvider({ children }: { children: React.ReactNod
 
   if (isLoading && !sessionChecked) {
     return (
-      <div style={{ 
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh' 
-      }}>
-        <RiLoader5Fill size={32} className="animate-spin"/>
-        <p>Cargando...</p>
+      <div className="flex flex-col justify-center items-center h-screen bg-gradient-to-br from-primary/10 to-secondary/10">
+        <Loader size="xl" />
+        <p className="font-black italic">Loading data...</p>
       </div>
     );
   }

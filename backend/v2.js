@@ -15,6 +15,7 @@ const authRouter = require("./v2/routers/auth");
 const linkRouter = require("./v2/routers/link");
 const accessesRouter = require("./v2/routers/accesses");
 const userRouter = require("./v2/routers/user");
+const waitlistRouter = require("./v2/routers/waitlist");
 
 // Controllers
 const { redirectLink } = require("./v2/controllers/link");
@@ -153,6 +154,7 @@ app.use("/auth", csrfProtection, authRouter);
 app.use("/link", csrfProtection, linkRouter);
 app.use("/accesses", accessesRouter); // GET only, no CSRF needed
 app.use("/user", csrfProtection, userRouter);
+app.use("/waitlist", csrfProtection, waitlistRouter);
 
 // Public redirect endpoint (LAST - catches everything else)
 app.get("/r/:shortUrl", redirectLink);

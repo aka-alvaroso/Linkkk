@@ -28,6 +28,7 @@
     "jsonwebtoken": "^9.0.2",
     "node-cache": "^5.1.2",
     "node-cron": "^3.0.3",
+    "nodemailer": "^7.0.12",
     "pg": "^8.14.0",
     "qrcode": "^1.5.4",
     "stripe": "^18.2.1",
