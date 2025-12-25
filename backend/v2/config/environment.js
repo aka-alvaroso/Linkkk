@@ -69,14 +69,14 @@ const config = {
       authSecretPrevious: process.env.V2_AUTH_SECRET_KEY_PREVIOUS,
       guestSecretPrevious: process.env.V2_GUEST_SECRET_KEY_PREVIOUS,
       authExpiresIn: '7d',
-      guestExpiresIn: '30d',
+      guestExpiresIn: '7d',
     },
     cookies: {
       httpOnly: true,
       secure: isProduction,
       sameSite: isProduction ? 'strict' : 'lax',
       authMaxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
-      guestMaxAge: 30 * 24 * 60 * 60 * 1000, // 30 days in milliseconds
+      guestMaxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
     },
     csrf: {
       enabled: !isTest,
