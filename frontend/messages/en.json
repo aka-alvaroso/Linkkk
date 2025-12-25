@@ -137,8 +137,16 @@
       "productLink1": "Get started",
       "productLink2": "Dashboard",
       "resourcesHeading": "Resources",
-      "copyright": "Made with 💚 by"
+      "copyright": "Made with 💚 by",
+      "legalHeading": "Legal",
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service",
+      "cookiePolicy": "Cookie Policy",
+      "legalNotice": "Legal Notice"
     }
+  },
+  "Legal": {
+    "backToHome": "Back to Home"
   },
   "Dashboard": {
     "title": "Dashboard",

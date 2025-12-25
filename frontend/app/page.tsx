@@ -94,7 +94,7 @@ const FeatureCard = ({
       className="absolute inset-0"
     >
       <div
-        className={`h-full p-4 md:p-8 ${bgColor} rounded-3xl border-4 border-dark shadow-[4px_4px_0_var(--color-dark)]`}
+        className={`h-full p-4 md:p-8 ${bgColor} rounded-3xl border-3 border-dark shadow-[4px_4px_0_var(--color-dark)]`}
       >
         <div className="flex flex-col h-full justify-start gap-4 md:justify-between">
           <div>
@@ -994,7 +994,7 @@ export default function Landing() {
                 transition={{ delay: 0.2 }}
                 className="relative overflow-hidden flex flex-col p-8 bg-dark/5 rounded-3xl transition-all duration-200 border-2 border-transparent hover:border-dark hover:shadow-[6px_6px_0_var(--color-dark)]"
               >
-                <div className="absolute -right-7 top-6 rotate-45 bg-secondary/50 text-dark text-xs font-black px-6 py-1">
+                <div className={`absolute ${currentLocale === "es" ? "-right-8 top-8" : "-right-7 top-7"} rotate-45 bg-secondary/50 text-dark text-xs font-black px-6 py-1`}>
                   {tGettingStarted('premiumBadge')}
                 </div>
 
@@ -1046,13 +1046,9 @@ export default function Landing() {
         </section>
 
         {/* Final CTA with creative separator */}
-        <section className="relative">
+        <section className="min-h-[60dvh] relative bg-primary flex items-center justify-center ">
           {/* Creative wavy separator */}
-          <div className="absolute top-0 left-0 right-0 h-20 bg-primary" style={{
-            clipPath: "polygon(0 50%, 100% 0, 100% 100%, 0 100%)"
-          }} />
-
-          <div className="bg-primary pt-32 pb-20 px-4">
+          <div className="px-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
@@ -1158,13 +1154,16 @@ export default function Landing() {
               </div>
 
               {/* Legal */}
-              {/* <div>
-                <h4 className="font-black italic mb-4">Legal</h4>
+              {/* Legal */}
+              <div>
+                <h4 className="font-black italic mb-4">{tFooter('legalHeading')}</h4>
                 <ul className="space-y-2 text-sm text-light/60">
-                  <li><Link href="#" className="hover:text-primary transition-colors">Privacy Policy</Link></li>
-                  <li><Link href="#" className="hover:text-primary transition-colors">Terms of Service</Link></li>
+                  <li><Link href="/legal/privacy-policy" className="hover:text-primary transition-colors">{tFooter('privacyPolicy')}</Link></li>
+                  <li><Link href="/legal/terms-of-service" className="hover:text-primary transition-colors">{tFooter('termsOfService')}</Link></li>
+                  <li><Link href="/legal/cookies" className="hover:text-primary transition-colors">{tFooter('cookiePolicy')}</Link></li>
+                  <li><Link href="/legal/legal-notice" className="hover:text-primary transition-colors">{tFooter('legalNotice')}</Link></li>
                 </ul>
-              </div> */}
+              </div>
             </div>
 
             <div className="border-t border-light/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">

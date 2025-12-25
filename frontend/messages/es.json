@@ -137,8 +137,16 @@
       "productLink1": "Comenzar",
       "productLink2": "Panel",
       "resourcesHeading": "Recursos",
-      "copyright": "Hecho con 💚 por"
+      "copyright": "Hecho con 💚 por",
+      "legalHeading": "Legal",
+      "privacyPolicy": "Política de Privacidad",
+      "termsOfService": "Términos y Condiciones",
+      "cookiePolicy": "Política de Cookies",
+      "legalNotice": "Aviso Legal"
     }
+  },
+  "Legal": {
+    "backToHome": "Volver a Inicio"
   },
   "Dashboard": {
     "title": "Panel",
