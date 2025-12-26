@@ -1,355 +1,293 @@
 <div align="center">
 
-![Linkkk Logo](frontend/public/favicon.svg)
+<img src="frontend/public/favicon.svg" alt="Linkkk Logo" width="100" />
 
 # **Linkkk**
 
-### _Enlaces inteligentes que se adaptan a tu audiencia_
+### _El motor de redirección que toma decisiones por ti._
 
-[![Live Demo](https://img.shields.io/badge/🚀_Demo-linkkk.dev-88FA1E?style=for-the-badge)](https://linkkk.dev)
+[![Live Demo](https://img.shields.io/badge/🚀_Probar_Ahora-linkkk.dev-88FA1E?style=for-the-badge&labelColor=1a1a1a)](https://linkkk.dev)
+[![Status](https://img.shields.io/badge/Status-Beta_V2-blue?style=for-the-badge&labelColor=1a1a1a)](https://github.com/aka-alvaroso/Linkkk)
+[![License](https://img.shields.io/badge/License-Source_Available-orange?style=for-the-badge&labelColor=1a1a1a)](https://github.com/aka-alvaroso/Linkkk)
 
-**[Prueba Gratis](https://linkkk.dev)** • **[Ver Demo](https://linkkk.dev)** • **[Contacto](#-contacto)**
+<p align="center">
+  Linkkk transforma enlaces estáticos en puertas de enlace inteligentes.<br>
+  Redirige, bloquea o segmenta tu tráfico basándote en reglas lógicas en tiempo real.
+</p>
 
----
+**[Documentación](#-instalación-y-desarrollo)** • **[Características](#-capacidades-del-motor)** • **[Stack](#️-stack-tecnológico)** • **[Roadmap](#-roadmap)**
 
 </div>
 
-## 🎯 **¿Qué es Linkkk?**
-
-**Linkkk no es solo un acortador de URLs.** Es un **motor de redirección inteligente** que te permite crear enlaces que piensan por sí mismos y se adaptan automáticamente a cada visitante.
-
-### **Imagina poder hacer esto:**
-
-- 🌍 **Dirigir a españoles a `/es` y a británicos a `/en`** → Sin configurar nada manualmente
-- 📱 **Enviar usuarios móviles a la app y usuarios de escritorio a la web** → Automáticamente
-- 🤖 **Bloquear bots o redirigirlos a una página especial** → Con un clic
-- 🔐 **Proteger enlaces sensibles con contraseña** → Con pistas opcionales
-- 🚫 **Detectar y bloquear tráfico VPN** → Para contenido exclusivo
-- 📊 **Evitar accesos tras N clics** → Lanzamientos limitados
-- 🕒 **Activar enlaces solo en fechas/horas específicas** → Campañas programadas
-- 🚀 **Y más que se irán añadiendo con el tiempo**
-
-**Todo esto sin escribir una sola línea de código.**
-
 ---
 
-## ✨ **Características Principales**
+## ⚡ **¿Qué hace Linkkk diferente?**
 
-<table>
-<tr>
-<td width="50%">
+La mayoría de acortadores son "tontos": entrada A ➡ salida B.
+**Linkkk es un enrutador lógico.** Antes de redirigir, analiza el contexto del visitante en milisegundos y decide el mejor destino.
 
-### 🔗 **Gestión Inteligente de Enlaces**
+<div align="center">
 
-- Crea URLs cortas y memorables al instante
-- Activa/desactiva enlaces con un toggle
-- Rastrea cada clic con analíticas detalladas
-- Filtra y busca entre tus enlaces
-- Reorganiza reglas con drag & drop
-- Edición inline súper rápida
+|       🎯 **Inteligente**       |      🚀 **Rápido**      |   🔒 **Seguro**   |    📊 **Analítico**     |
+| :----------------------------: | :---------------------: | :---------------: | :---------------------: |
+| Reglas condicionales complejas |   Redirecciones <50ms   | Auth JWT + bcrypt | Métricas en tiempo real |
+|     Geo-routing automático     | Edge-ready architecture | Detección bot/VPN |  Datos por dispositivo  |
+|     Multi-device targeting     |   Optimizado para CDN   |  GDPR compliant   |  Exportación de datos   |
 
-</td>
-<td width="50%">
+</div>
 
-### 🧠 **Reglas Condicionales Avanzadas**
+### **Capacidades del Motor:**
 
-- **7 tipos de condiciones**: País, dispositivo, IP, VPN, bot, fecha, contador
-- **4 tipos de acciones**: Redirección, bloqueo, contraseña, webhooks
-- **Lógica AND/OR** para escenarios complejos
-- **Acciones ELSE** para comportamiento alternativo
-- **Sistema de prioridades** configurable
+- 🌍 **Geo-Routing:** Detecta el país y redirige a versiones localizadas (`/es`, `/en`, `/fr`).
+- 📱 **Device Targeting:** Envía iOS a la App Store y Desktop a la Web.
+- 🛡️ **Escudo de Tráfico:** Bloquea bots, scrapers y conexiones vía VPN/Proxy automáticamente.
+- 🔐 **Acceso Condicional:** Protege enlaces con contraseña, pistas o límites de caducidad.
+- 📊 **Deep Analytics:** No solo cuenta clics; entiende el comportamiento (SO, Navegador, Origen).
 
-</td>
-</tr>
-<tr>
-<td width="50%">
-
-### 📊 **Analíticas en Tiempo Real**
-
-- Seguimiento de clics en vivo
-- Distribución geográfica (detección de país)
-- Desglose por dispositivo (móvil/tablet/escritorio)
-- Detección de VPN y bots
-- Historial completo con registro de IPs
-- Exporta tus datos cuando quieras
-
-</td>
-<td width="50%">
-
-### 🎨 **Interfaz Moderna y Fluida**
-
-- Diseño neo-brutalista único
-- Animaciones suaves (Framer Motion)
-- 100% responsive (mobile-first)
-- Navegación inferior en móvil
-- Modo oscuro elegante
-- Experiencia de usuario premium
-
-</td>
-</tr>
-<tr>
-<td width="50%">
-
-### 🔐 **Acceso Flexible**
-
-- **Modo invitado**: Prueba sin registrarte (sesiones de 1 hora)
-- **Cuentas de usuario**: Analíticas completas y límites más altos
-- **Migración automática** de enlaces de invitado a usuario
-- **API keys** para integración programática
-
-</td>
-<td width="50%">
-
-### 🛡️ **Seguridad desde el inicio**
-
-- Protección CSRF y XSS
-- Prevención de inyección SQL
-- Rate limiting por endpoint
-- Encriptación de contraseñas (bcrypt)
-- Validación de URLs (anti-SSRF)
-- Cookies httpOnly seguras
-
-</td>
-</tr>
-</table>
-
----
-
-## 🚀 **Casos de Uso Reales**
-
-### **1. Marketing Multiregional**
+### **Ejemplos de Uso:**
 
 ```
-SI país EN [ES, MX, AR] Y dispositivo = móvil
-  → Redirigir a https://tuapp.com/mobile-es
-SINO
-  → Redirigir a https://tuapp.com/en
-```
+linkkk.dev/download
+├─ 🍎 iOS → App Store
+├─ 🤖 Android → Google Play
+└─ 💻 Desktop → Página web
 
-**Perfecto para:** Campañas internacionales, landing pages localizadas, apps con versiones regionales.
+linkkk.dev/promo
+├─ 🇪🇸 España → /es/promo
+├─ 🇺🇸 USA → /en/promo
+└─ 🤖 Bot → ❌ Bloqueado
 
----
-
-### **2. Lanzamientos Exclusivos**
-
-```
-SI contador_accesos < 100
-  → Requiere contraseña "early2025"
-SINO
-  → Bloquear acceso (cupo agotado)
-```
-
-**Perfecto para:** Acceso anticipado, beta testing, eventos con aforo limitado.
-
----
-
-### **3. Protección Anti-Bot**
-
-```
-SI es_bot = true O es_vpn = true
-  → Bloquear acceso
-SINO
-  → Redirigir a contenido original
-```
-
-**Perfecto para:** Proteger contenido premium, evitar scraping, filtrar tráfico sospechoso.
-
----
-
-### **4. Campañas Temporales**
-
-```
-SI fecha ENTRE "2025-12-01" Y "2025-12-25"
-  → Redirigir a https://tutienda.com/navidad
-SINO
-  → Redirigir a https://tutienda.com
-```
-
-**Perfecto para:** Promociones estacionales, eventos limitados, ofertas flash.
-
----
-
-### **5. Optimización Móvil**
-
-```
-SI dispositivo = móvil
-  → Redirigir a app store (iOS/Android)
-SINO
-  → Redirigir a sitio web
-```
-
-**Perfecto para:** Aumentar descargas de apps, mejorar conversión móvil, deep linking.
-
----
-
-## 🎨 **Diseño que Enamora**
-
-Linkkk no solo funciona bien, **se ve increíble**. Nuestro diseño neo-brutalista combina:
-
-- **Colores vibrantes** → Verde lima (#88FA1E) como color principal
-- **Sombras audaces** → `8px 8px 0 #1B1B1B` para ese look único
-- **Animaciones fluidas** → Transiciones suaves con Framer Motion
-- **Tipografía moderna** → Fuentes optimizadas para legibilidad
-- **Componentes personalizados** → Botones, modales, drawers, toasts y más
-
-### **Componentes Disponibles:**
-
-| Componente | Características |
-|------------|-----------------|
-| **Button** | 4 variantes, 5 tamaños, estados de carga, iconos |
-| **Input** | Texto, textarea, password, con iconos, mensajes de error |
-| **Modal** | 6 tamaños, 3 posiciones, cierre con ESC |
-| **Drawer** | 8 posiciones (lados + esquinas), múltiples tamaños |
-| **Toast** | 4 tipos (success, error, warning, info), auto-dismiss |
-| **Switch** | Toggle animado y suave |
-| **Chip** | Tags/badges con variantes e iconos |
-
----
-
-## 📊 **Planes y Límites**
-
-| Característica | Invitado | Usuario Registrado |
-|----------------|----------|-------------------|
-| **Enlaces máximos** | 10 | 50 |
-| **Duración de enlaces** | 7 días | Ilimitado |
-| **Reglas por enlace** | 1 | 5 |
-| **Condiciones por regla** | 1 | 3 |
-| **Analíticas detalladas** | ❌ | ✅ |
-| **API Key** | ❌ | ✅ |
-| **Exportar datos** | ❌ | ✅ |
-
-> **¿Necesitas más?** Contáctanos para planes empresariales o ampliados personalizados.
-
----
-
-## 🧪 **Motor de Reglas: El Cerebro de Linkkk**
-
-### **Tipos de Condiciones**
-
-| Campo | Operadores | Valores de Ejemplo |
-|-------|-----------|-------------------|
-| `country` | `in`, `not_in` | `["ES", "US", "MX"]` |
-| `device` | `equals`, `not_equals` | `"mobile"`, `"tablet"`, `"desktop"` |
-| `ip` | `equals`, `not_equals` | `"192.168.1.1"` |
-| `is_vpn` | `equals` | `true`, `false` |
-| `is_bot` | `equals` | `true`, `false` |
-| `date` | `before`, `after`, `equals` | `"2025-12-31T23:59:59Z"` |
-| `access_count` | `equals`, `greater_than`, `less_than` | `100` |
-
-### **Tipos de Acciones**
-
-1. **`redirect`** → Envía usuarios a una URL diferente
-   - Soporta variables: `{{longUrl}}`, `{{shortUrl}}`
-   - Protección anti-SSRF integrada
-
-2. **`block_access`** → Muestra un mensaje personalizado y bloquea el acceso
-   - Ideal para restricciones geográficas o de contenido
-
-3. **`password_gate`** → Requiere contraseña para continuar
-   - Con pistas opcionales para ayudar a los usuarios
-
-4. **`notify`** → Dispara un webhook al acceder al enlace
-   - Perfecto para integraciones con Slack, Discord, Zapier, etc.
-
-### **Flujo de Evaluación**
-
-1. Las reglas se ordenan por **prioridad** (menor = primero)
-2. Las condiciones se evalúan según **tipo de match** (AND/OR)
-3. Si las condiciones coinciden → se ejecuta la **acción principal**
-4. Si no coinciden → se ejecuta la **acción ELSE** (si está definida)
-5. La primera regla que coincide gana (la evaluación se detiene)
-
----
-
-## 🌟 **¿Por Qué Elegir Linkkk?**
-
-### **vs. Acortadores Tradicionales (bit.ly, TinyURL)**
-
-| Característica | Linkkk | Otros |
-|----------------|--------|-------|
-| Redirección condicional | ✅ | ❌ |
-| Detección de país/dispositivo | ✅ | ❌ |
-| Protección con contraseña | ✅ | ❌ |
-| Detección de VPN/bots | ✅ | ❌ |
-| Enlaces autodestructivos | ✅ | ❌ |
-| Webhooks integrados | ✅ | ❌ |
-| Diseño moderno | ✅ | ⚠️ |
-| Modo invitado sin registro | ✅ | ❌ |
-
----
-
-## 🔗 **Empieza Ahora**
-
-### **1. Modo Invitado (Sin Registro)**
-
-1. Ve a [linkkk.dev](https://linkkk.dev)
-2. Haz clic en "Continuar como invitado"
-3. Crea tu primer enlace inteligente
-4. ¡Listo! Tienes 10 enlaces durante 7 días
-
-### **2. Cuenta Completa (Gratis)**
-
-1. Regístrate en [linkkk.dev](https://linkkk.dev)
-2. Verifica tu email
-3. Disfruta de 50 enlaces ilimitados
-4. Accede a analíticas completas y API
-
-### **3. Integración API**
-
-```bash
-# Genera tu API key desde el panel
-curl -X POST https://api.linkkk.dev/link \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "longUrl": "https://example.com",
-    "status": true
-  }'
+linkkk.dev/beta
+├─ 🔐 Sin contraseña → Acceso denegado
+└─ ✅ Con contraseña → Página beta
 ```
 
 ---
 
 ## 🛠️ **Stack Tecnológico**
 
-Construido con las mejores tecnologías modernas:
+Construido con una arquitectura moderna enfocada en rendimiento y escalabilidad.
 
-| Capa | Tecnología |
-|------|-----------|
-| **Frontend** | Next.js 15, React 19, TypeScript, Tailwind CSS 4 |
-| **Backend** | Node.js, Express.js, Prisma ORM |
-| **Base de Datos** | PostgreSQL |
-| **Seguridad** | JWT, bcrypt, Helmet, Rate Limiting |
-| **Animaciones** | Framer Motion |
-| **Validación** | Zod |
-| **Drag & Drop** | @dnd-kit |
+<div align="center">
+
+![Next.js](https://img.shields.io/badge/Next.js_15-000000?style=for-the-badge&logo=next.js&logoColor=white)
+![React](https://img.shields.io/badge/React_19-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white)
+![Express](https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwind-css&logoColor=white)
+
+</div>
+
+| Área              | Tecnología                  | Por qué lo elegí                               |
+| :---------------- | :-------------------------- | :--------------------------------------------- |
+| **Frontend**      | **Next.js 15 (App Router)** | Server Components y SEO optimizado.            |
+| **Backend**       | **Node.js + Express**       | Flexibilidad y control total de los endpoints. |
+| **Base de Datos** | **PostgreSQL**              | Integridad relacional y robustez.              |
+| **ORM**           | **Prisma**                  | Type-safety de extremo a extremo.              |
+| **Estilos**       | **Tailwind CSS 4**          | Diseño rápido y consistente (Neo-Brutalism).   |
+| **Validación**    | **Zod**                     | Validación de esquemas en tiempo de ejecución. |
+| **Autenticación** | **JWT + bcryptjs**          | Seguridad sin dependencias externas.           |
+| **Cron Jobs**     | **node-cron**               | Limpieza automática de datos expirados.        |
 
 ---
 
-## 📧 **Contacto**
+## 🧩 **Arquitectura del Proyecto**
 
-¿Tienes preguntas? ¿Necesitas un plan empresarial? ¿Quieres colaborar?
+El repositorio funciona como un **Monorepo** dividido en dos aplicaciones principales:
 
-**Álvaro** - [@aka-alvaroso](https://github.com/aka-alvaroso)
+```
+linkkk/
+├── frontend/          # Next.js 15 App Router
+│   ├── app/           # Rutas y páginas
+│   ├── components/    # Componentes reutilizables
+│   ├── lib/           # Utilidades y helpers
+│   └── messages/      # Traducciones i18n (EN/ES)
+│
+├── backend/           # Node.js + Express API
+│   ├── v2/            # API V2 actual
+│   │   ├── controllers/   # Lógica de controladores
+│   │   ├── middlewares/   # Auth, validación, CORS
+│   │   ├── routes/        # Definición de rutas
+│   │   ├── jobs/          # Cron jobs (cleanup)
+│   │   ├── prisma/        # Schema y client
+│   │   └── utils/         # Helpers y constantes
+│   └── v2.js          # Entry point
+```
 
-**Proyecto:** [github.com/aka-alvaroso/Linkkk](https://github.com/aka-alvaroso/Linkkk)
+### **Flujo de una redirección:**
 
-**Demo en Vivo:** [linkkk.dev](https://linkkk.dev)
+1. Usuario visita `linkkk.dev/r/abc123`
+2. Backend captura IP, User-Agent, geolocalización
+3. Evalúa reglas configuradas (país, dispositivo, bot, VPN)
+4. Registra analíticas en PostgreSQL
+5. Redirige al destino apropiado o bloquea acceso
+
+---
+
+## 💻 **Instalación y Desarrollo**
+
+Este código es público para fines educativos y de portafolio. Si eres desarrollador, puedes inspeccionarlo o ejecutarlo localmente.
+
+<details>
+<summary><strong>👇 Desplegar instrucciones de instalación local</strong></summary>
+
+### Prerrequisitos
+
+- Node.js 18+
+- PostgreSQL (Local o Docker)
+- Git
+
+### 1. Clonar el repositorio
+
+```bash
+git clone https://github.com/aka-alvaroso/Linkkk.git
+cd Linkkk
+```
+
+### 2. Configurar Backend
+
+```bash
+cd backend
+npm install
+```
+
+Crea un archivo `.env` en `/backend` con las siguientes variables:
+
+```env
+# Database
+DATABASE_URL="postgresql://user:password@localhost:5432/linkkk"
+
+# JWT Secrets (genera claves aleatorias seguras)
+V2_AUTH_SECRET_KEY="tu-clave-secreta-auth"
+V2_GUEST_SECRET_KEY="tu-clave-secreta-guest"
+
+# Environment
+NODE_ENV="development"
+PORT=3000
+
+# Frontend URL (para CORS)
+FRONTEND_URL="http://localhost:3001"
+
+# Email (opcional, para lista de espera)
+RESEND_API_KEY="tu-api-key-de-resend"
+```
+
+Ejecuta las migraciones de base de datos:
+
+```bash
+npx prisma generate
+npx prisma db push
+npm run dev
+```
+
+### 3. Configurar Frontend
+
+```bash
+cd ../frontend
+npm install
+```
+
+Crea un archivo `.env.local` en `/frontend`:
+
+```env
+NEXT_PUBLIC_API_URL="http://localhost:3000"
+```
+
+Ejecuta el frontend:
+
+```bash
+npm run dev
+```
+
+### 4. Acceso
+
+- **Frontend:** http://localhost:3001
+- **Backend API:** http://localhost:3000
+- **Prisma Studio:** `npx prisma studio` (desde `/backend`)
+
+</details>
+
+---
+
+## 🔐 **Seguridad y Privacidad**
+
+Linkkk toma la seguridad y privacidad en serio:
+
+- 🔒 **Contraseñas hasheadas** con bcryptjs (12 salt rounds, OWASP compliant)
+- 🔑 **JWT con secretos rotativos** para autenticación segura
+- 🛡️ **CORS configurado** para evitar ataques cross-origin
+- 🍪 **Cookies HttpOnly + SameSite** para prevenir XSS/CSRF
+- 🌍 **GDPR compliant** - Datos alojados en Canadá (decisión de adecuación UE)
+- 🗑️ **Limpieza automática** de datos expirados (guest sessions: 7 días)
+- 📄 **Documentación legal completa** (Privacidad, Cookies, Términos)
+
+**No almacenamos:**
+
+- Contraseñas en texto plano (solo hashes bcrypt)
+- IPs completas indefinidamente (anonimización programada)
+
+---
+
+## 🗺️ **Roadmap**
+
+### ✅ **Completado (V2 Beta)**
+
+- [x] Sistema de reglas condicionales avanzadas
+- [x] Autenticación JWT con sesiones guest (7 días)
+- [x] Analíticas detalladas con geolocalización
+- [x] Detección de bots y VPN/Proxy
+- [x] Internacionalización (ES/EN)
+- [x] Páginas legales (Privacidad, Cookies, Términos)
+- [x] Sistema de limpieza automática de sesiones expiradas
+
+### 🚧 **En Desarrollo**
+
+- [ ] Sistema de planes premium (Stripe)
+- [ ] API para developers
+- [ ] Gráficos detallados para analíticas
+- [ ] Exportación de analíticas (CSV/JSON)
+- [ ] A/B Testing integrado
+
+### 💡 **Futuro**
+
+- [ ] Webhooks personalizados
+- [ ] Integraciones con aplicaciones externas
+- [ ] QR Codes para enlaces
+- [ ] Custom domains
+- [ ] Más condiciones y acciones en el motor de reglas
+
+---
+
+## 🤝 **Contribuir**
+
+Este proyecto está abierto a contribuciones. Si encuentras un bug o tienes una idea:
+
+1. Abre un [Issue](https://github.com/aka-alvaroso/Linkkk/issues)
+2. Haz un Fork del repositorio
+3. Crea una rama: `git checkout -b feature/nueva-funcionalidad`
+4. Commitea tus cambios: `git commit -m 'feat: añadir nueva funcionalidad'`
+5. Push a la rama: `git push origin feature/nueva-funcionalidad`
+6. Abre un Pull Request
 
 ---
 
 ## 📄 **Licencia**
 
-Este proyecto está licenciado bajo la **Licencia ISC**.
+Este proyecto está licenciado bajo la **GNU Affero General Public License v3.0 (AGPL-3.0)**.
+
+Esto asegura que el código se mantenga libre y abierto. Si utilizas este código para ofrecer un servicio a través de una red (SaaS), también debes liberar el código fuente de tu versión modificada.
+
+Consulta el archivo [LICENSE](LICENSE) para más detalles.
 
 ---
 
 <div align="center">
 
-**Hecho con ❤️ y mucho ☕**
+**Hecho con 💚 por [Álvaro](https://github.com/aka-alvaroso)**
 
-_Linkkk - Enlaces inteligentes para gente inteligente._
-
-[![GitHub stars](https://img.shields.io/github/stars/aka-alvaroso/Linkkk?style=social)](https://github.com/aka-alvaroso/Linkkk)
-[![Twitter Follow](https://img.shields.io/twitter/follow/aka_alvaroso?style=social)](https://twitter.com/aka_alvaroso)
+[linkkk.dev](https://linkkk.dev) • [Reportar Bug](https://github.com/aka-alvaroso/Linkkk/issues) • [Solicitar Feature](https://github.com/aka-alvaroso/Linkkk/issues)
 
 </div>
