@@ -9,20 +9,42 @@ datasource db {
 
 // Models
 model User {
-  id         Int     @id @default(autoincrement())
-  username   String  @unique
-  email      String  @unique
-  password   String
-  avatarUrl  String?
-  apiKey     String? @unique
-  createdAt  DateTime @default(now())
-  links      Link[]
+  id           Int           @id @default(autoincrement())
+  username     String        @unique
+  email        String        @unique
+  password     String
+  role         Role          @default(STANDARD)
+  createdAt    DateTime      @default(now())
+  links        Link[]
+  subscription Subscription?
 }
 
 model GuestSession {
   id         Int     @id @default(autoincrement())
   createdAt  DateTime @default(now())
   links      Link[]
+}
+
+model Subscription {
+  id                   Int                @id @default(autoincrement())
+  userId               Int                @unique
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Stripe data (optional, filled when Stripe is integrated)
+  stripeCustomerId     String?            @unique
+  stripeSubscriptionId String?            @unique
+  stripePriceId        String?
+
+  // Status
+  status               SubscriptionStatus @default(INACTIVE)
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean            @default(false)
+
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  @@index([userId])
+  @@index([stripeCustomerId])
 }
 
 model Link {
@@ -126,4 +148,17 @@ enum ActionType {
   block_access
   notify
   password_gate
+}
+
+enum Role {
+  STANDARD
+  PRO
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+  INACTIVE
+  TRIALING
 }
