@@ -42,6 +42,7 @@ const auth = async (req, res, next) => {
           id: true,
           username: true,
           email: true,
+          role: true,
           createdAt: true,
         },
       });
@@ -193,6 +194,7 @@ const optionalAuth = async (req, res, next) => {
           id: true,
           username: true,
           email: true,
+          role: true,
           createdAt: true,
         },
       });

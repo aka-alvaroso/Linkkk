@@ -6,6 +6,7 @@ const rateLimit = require("express-rate-limit");
 const { errorResponse } = require("./v2/utils/response");
 const ERRORS = require("./v2/constants/errorCodes");
 const AppError = require("./v2/utils/AppError");
+const planLimits = require("./v2/utils/limits");
 
 // Load centralized configuration
 const config = require("./v2/config/environment");
@@ -15,7 +16,7 @@ const authRouter = require("./v2/routers/auth");
 const linkRouter = require("./v2/routers/link");
 const accessesRouter = require("./v2/routers/accesses");
 const userRouter = require("./v2/routers/user");
-const waitlistRouter = require("./v2/routers/waitlist");
+const subscriptionRouter = require("./v2/routers/subscription");
 
 // Controllers
 const { redirectLink } = require("./v2/controllers/link");
@@ -24,7 +25,7 @@ const app = express();
 const PORT = config.server.port;
 
 // Trust proxy - Required when behind nginx reverse proxy
-app.set('trust proxy', true);
+app.set("trust proxy", true);
 
 // Helmet configuration - adjusted for environment
 const helmetConfig = {
@@ -102,7 +103,10 @@ const corsOptions = {
 
     // In development, allow all localhost origins
     if (config.env.isDevelopment) {
-      if (origin.startsWith('http://localhost') || origin.startsWith('http://127.0.0.1')) {
+      if (
+        origin.startsWith("http://localhost") ||
+        origin.startsWith("http://127.0.0.1")
+      ) {
         return callback(null, true);
       }
     }
@@ -113,10 +117,16 @@ const corsOptions = {
     }
 
     // Reject all other origins
-    callback(new Error('Not allowed by CORS'));
+    callback(new Error("Not allowed by CORS"));
   },
   methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization", "guest-token", "X-CSRF-Token", "CSRF-Token"],
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "guest-token",
+    "X-CSRF-Token",
+    "CSRF-Token",
+  ],
   credentials: true,
   exposedHeaders: ["X-Request-ID"],
 };
@@ -131,12 +141,19 @@ const { validateContentType } = require("./v2/middlewares/contentType");
 app.use(validateContentType);
 
 // SECURITY: JSON depth and complexity validation (prevents DoS attacks)
-const { validateJsonDepth, validateJsonKeys } = require("./v2/middlewares/jsonDepthValidator");
+const {
+  validateJsonDepth,
+  validateJsonKeys,
+} = require("./v2/middlewares/jsonDepthValidator");
 app.use(validateJsonDepth(10)); // Max depth: 10 levels
 app.use(validateJsonKeys(1000)); // Max total keys: 1000
 
 // CSRF Protection
-const { csrfTokenGenerator, csrfProtection, getCsrfToken } = require("./v2/middlewares/csrf");
+const {
+  csrfTokenGenerator,
+  csrfProtection,
+  getCsrfToken,
+} = require("./v2/middlewares/csrf");
 
 // Generate CSRF token for all requests
 app.use(csrfTokenGenerator);
@@ -154,7 +171,7 @@ app.use("/auth", csrfProtection, authRouter);
 app.use("/link", csrfProtection, linkRouter);
 app.use("/accesses", accessesRouter); // GET only, no CSRF needed
 app.use("/user", csrfProtection, userRouter);
-app.use("/waitlist", csrfProtection, waitlistRouter);
+app.use("/subscription", csrfProtection, subscriptionRouter);
 
 // Public redirect endpoint (LAST - catches everything else)
 app.get("/r/:shortUrl", redirectLink);
@@ -246,16 +263,30 @@ process.on("uncaughtException", (error) => {
 // Only start server if not in test mode
 if (!config.env.isTest) {
   // Start scheduled jobs
-  const { startCleanupJob } = require('./v2/jobs/cleanupGuestLinks');
+  const { startCleanupJob } = require("./v2/jobs/cleanupGuestLinks");
   startCleanupJob();
 
   app.listen(PORT, () => {
     console.log(`\n🚀 Server running on port ${PORT}`);
     console.log(`📝 Environment: ${config.env.nodeEnv}`);
     console.log(`🌐 Frontend: ${config.frontend.url}`);
-    console.log(`🔒 CORS: ${config.env.isDevelopment ? 'Development (permissive)' : 'Production (strict)'}`);
-    console.log(`⏱️  Rate limits: ${config.env.isDevelopment ? 'Development (relaxed)' : 'Production (strict)'}`);
-    console.log(`🧹 Cleanup job: Guest links (7 days) - Daily at 3:00 AM\n`);
+    console.log(
+      `🔒 CORS: ${
+        config.env.isDevelopment
+          ? "Development (permissive)"
+          : "Production (strict)"
+      }`
+    );
+    console.log(
+      `⏱️  Rate limits: ${
+        config.env.isDevelopment
+          ? "Development (relaxed)"
+          : "Production (strict)"
+      }`
+    );
+    console.log(
+      `🧹 Cleanup job: Guest links (${planLimits.guest.linkExpiration} days) - Daily at 3:00 AM\n`
+    );
   });
 }
 

@@ -132,8 +132,10 @@ const register = async (req, res) => {
       res,
       {
         user: {
+          id: user.id,
           username,
           email,
+          role: user.role,
         },
       },
       201
@@ -201,7 +203,7 @@ const login = async (req, res) => {
         id: user.id,
         username: user.username,
         email: user.email,
-        planId: user.planId,
+        role: user.role,
       },
     });
   } catch (error) {
