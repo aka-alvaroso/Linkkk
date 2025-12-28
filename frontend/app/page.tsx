@@ -6,7 +6,6 @@ import Button from "@/app/components/ui/Button/Button";
 import Input from "@/app/components/ui/Input/Input";
 import RouteGuard from "@/app/components/RouteGuard/RouteGuard";
 import AnimatedText from "@/app/components/ui/AnimatedText/AnimatedText";
-import WaitlistModal from "@/app/components/Modal/WaitlistModal";
 import CreateLinkDrawer from "@/app/components/Drawer/CreateLinkDrawer";
 import InlineSelect from "@/app/components/ui/InlineSelect/InlineSelect";
 import * as motion from "motion/react-client";
@@ -44,6 +43,7 @@ import { useRouter } from "next/navigation";
 import { useLinks } from "@/app/hooks/useLinks";
 import { useToast } from "@/app/hooks/useToast";
 import { useLanguage } from "@/app/hooks/useLanguage";
+import { useAuth } from "@/app/hooks/useAuth";
 import { RiLoader5Fill } from "react-icons/ri";
 import { useTranslations } from 'next-intl';
 
@@ -126,6 +126,7 @@ export default function Landing() {
   const { createLink } = useLinks();
   const toast = useToast();
   const { currentLocale, changeLanguage } = useLanguage();
+  const { isAuthenticated, isGuest } = useAuth();
   const t = useTranslations('Landing.Hero');
   const tDemos = useTranslations('Landing.Demos');
   const tRules = useTranslations('Landing.Rules');
@@ -147,11 +148,11 @@ export default function Landing() {
   // Rules Engine Examples State
   const [activeExampleIndex, setActiveExampleIndex] = useState(0);
 
-  // Waitlist Modal State
-  const [isWaitlistModalOpen, setIsWaitlistModalOpen] = useState(false);
-
   // Create Link Drawer State
   const [isCreateLinkDrawerOpen, setIsCreateLinkDrawerOpen] = useState(false);
+
+  // Billing Period State (monthly/yearly)
+  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
 
   const ruleExamples = [
     {
@@ -266,11 +267,11 @@ export default function Landing() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-4xl md:text-7xl font-black italic mb-4"
+              className="text-5xl md:text-7xl font-black italic mb-4"
             >
               {t('title')}
               <br />
-              <span className="text-shadow-[_6px_6px_0_va4(--4olor-primary)] md:text-shadow-[_10px_10px_0_var(--color-primary)]">
+              <span className="text-shadow-[_4px_4px_0_var(--color-primary)] md:text-shadow-[_8px_8px_0_var(--color-primary)]">
                 {t('titleHighlight')}
               </span>
             </motion.h1>
@@ -876,7 +877,7 @@ export default function Landing() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-center mb-16"
+              className="text-center mb-8"
             >
               <div className="inline-block bg-info text-light px-2 py-1 rounded-full mb-4 text-xs font-black italic uppercase tracking-wide">
                 {tGettingStarted('badge')}
@@ -884,9 +885,37 @@ export default function Landing() {
               <h2 className="text-4xl md:text-6xl font-black italic mb-4">
                 {tGettingStarted('title')} <span className="bg-primary">{tGettingStarted('titleHighlight')}</span>
               </h2>
-              <p className="text-xl text-dark/60">
+              <p className="text-xl text-dark/60 mb-6">
                 {tGettingStarted('subtitle')}
               </p>
+
+              {/* Billing Period Toggle */}
+              <div className="inline-flex gap-1 p-1 bg-dark/5 rounded-2xl">
+                <button
+                  onClick={() => setBillingPeriod('monthly')}
+                  className={`px-4 py-2 rounded-xl italic text-sm transition-all duration-200 ${
+                    billingPeriod === 'monthly'
+                      ? 'bg-dark text-light'
+                      : 'text-dark/60 hover:text-dark hover:cursor-pointer'
+                  }`}
+                >
+                  <p className="font-black">
+                    {tGettingStarted('billingToggleMonthly')}
+                  </p>
+                </button>
+                <button
+                  onClick={() => setBillingPeriod('yearly')}
+                  className={`px-4 py-2 rounded-xl italic text-sm transition-all duration-200 ${
+                    billingPeriod === 'yearly'
+                      ? 'bg-dark text-light'
+                      : 'text-dark/60 hover:text-dark hover:cursor-pointer'
+                  }`}
+                >
+                  <p className="font-black">
+                  {tGettingStarted('billingToggleYearly')}
+                  </p>
+                </button>
+              </div>
             </motion.div>
 
             <div className="grid md:grid-cols-3 gap-6">
@@ -917,6 +946,10 @@ export default function Landing() {
                   <li className="flex items-start gap-2">
                     <TbCheck className="text-success mt-1 flex-shrink-0" />
                     <span>{tGettingStarted('guestFeature4')}</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <TbCheck className="text-success mt-1 flex-shrink-0" />
+                    <span>{tGettingStarted('guestFeature5')}</span>
                   </li>
                 </ul>
 
@@ -968,6 +1001,18 @@ export default function Landing() {
                     <TbCheck className="text-dark mt-1 flex-shrink-0" />
                     <span className="text-dark">{tGettingStarted('freeFeature4')}</span>
                   </li>
+                  <li className="flex items-start gap-2">
+                    <TbCheck className="text-dark mt-1 flex-shrink-0" />
+                    <span className="text-dark">{tGettingStarted('freeFeature5')}</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <TbCheck className="text-dark mt-1 flex-shrink-0" />
+                    <span className="text-dark">{tGettingStarted('freeFeature6')}</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <TbCheck className="text-dark mt-1 flex-shrink-0" />
+                    <span className="text-dark">{tGettingStarted('freeFeature7')}</span>
+                  </li>
                 </ul>
 
                 <Link href="/auth/register" className="mt-auto">
@@ -986,7 +1031,7 @@ export default function Landing() {
                 </Link>
               </motion.div>
 
-              {/* Premium - Coming Soon */}
+              {/* PRO Plan */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -994,52 +1039,85 @@ export default function Landing() {
                 transition={{ delay: 0.2 }}
                 className="relative overflow-hidden flex flex-col p-8 bg-dark/5 rounded-3xl transition-all duration-200 border-2 border-transparent hover:border-dark hover:shadow-[6px_6px_0_var(--color-dark)]"
               >
-                <div className={`absolute ${currentLocale === "es" ? "-right-8 top-8" : "-right-7 top-7"} rotate-45 bg-secondary/50 text-dark text-xs font-black px-6 py-1`}>
-                  {tGettingStarted('premiumBadge')}
-                </div>
-
-                <div className="text-sm font-bold text-dark/60 mb-2">{tGettingStarted('premiumLabel')}</div>
+                <div className="text-sm font-bold text-dark/60 mb-2">{tGettingStarted('proLabel')}</div>
                 <div className="text-4xl font-black mb-2">
-                  <span className="text-secondary">{tGettingStarted('premiumPrice')}</span>
+                  <span className="text-secondary">
+                    <AnimatedText
+                      key={`price-${billingPeriod}`}
+                      initialText={billingPeriod === 'monthly' ? tGettingStarted('proPriceMonthly') : tGettingStarted('proPriceYearly')}
+                      animationType="slide"
+                      slideDirection="up"
+                      duration={0.3}
+                    />
+                  </span>
+                  <span className="text-lg text-dark/60">
+                    <AnimatedText
+                      key={`period-${billingPeriod}`}
+                      initialText={billingPeriod === 'monthly' ? tGettingStarted('proPeriodMonthly') : tGettingStarted('proPeriodYearly')}
+                      animationType="slide"
+                      slideDirection="up"
+                      duration={0.3}
+                    />
+                  </span>
                 </div>
-                <div className="text-dark/60 mb-6">{tGettingStarted('premiumSubtitle')}</div>
+                <div className="text-dark/60 mb-6">{tGettingStarted('proSubtitle')}</div>
 
                 <ul className="space-y-3 mb-8">
                   <li className="flex items-start gap-2">
                     <TbSparkles className="text-secondary mt-1 flex-shrink-0" />
-                    <span>{tGettingStarted('premiumFeature1')}</span>
+                    <span>{tGettingStarted('proFeature1')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <TbSparkles className="text-secondary mt-1 flex-shrink-0" />
-                    <span>{tGettingStarted('premiumFeature2')}</span>
+                    <span>{tGettingStarted('proFeature2')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <TbSparkles className="text-secondary mt-1 flex-shrink-0" />
-                    <span>{tGettingStarted('premiumFeature3')}</span>
+                    <span>{tGettingStarted('proFeature3')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <TbSparkles className="text-secondary mt-1 flex-shrink-0" />
-                    <span>{tGettingStarted('premiumFeature4')}</span>
+                    <span>{tGettingStarted('proFeature4')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <TbSparkles className="text-secondary mt-1 flex-shrink-0" />
-                    <span>{tGettingStarted('premiumFeature5')}</span>
+                    <span>{tGettingStarted('proFeature5')}</span>
                   </li>
                 </ul>
 
-                <Button
-                  variant="solid"
-                  size="lg"
-                  rounded="xl"
-                  rightIcon={<TbChecklist size={24} />}
-                  expandOnHover="icon"
-                  className="w-full bg-dark hover:bg-secondary"
-                  onClick={() => setIsWaitlistModalOpen(true)}
-                >
-                  <p className="font-black italic">
-                    {tGettingStarted('premiumButton')}
-                  </p>
-                </Button>
+                {isAuthenticated && !isGuest ? (
+                  <Button
+                    variant="solid"
+                    size="lg"
+                    rounded="xl"
+                    rightIcon={<TbRocket size={24} />}
+                    expandOnHover="icon"
+                    className="w-full bg-dark hover:bg-secondary mt-auto"
+                    onClick={() => {
+                      // TODO: Navigate to Stripe checkout
+                      toast.info('Stripe integration coming soon!');
+                    }}
+                  >
+                    <p className="font-black italic">
+                      {tGettingStarted('proButton')}
+                    </p>
+                  </Button>
+                ) : (
+                  <Link href="/auth/login" className="mt-auto">
+                    <Button
+                      variant="solid"
+                      size="lg"
+                      rounded="xl"
+                      rightIcon={<TbRocket size={24} />}
+                      expandOnHover="icon"
+                      className="w-full bg-dark hover:bg-secondary"
+                    >
+                      <p className="font-black italic">
+                        {tGettingStarted('proButton')}
+                      </p>
+                    </Button>
+                  </Link>
+                )}
               </motion.div>
             </div>
           </div>
@@ -1158,17 +1236,44 @@ export default function Landing() {
               <div>
                 <h4 className="font-black italic mb-4">{tFooter('legalHeading')}</h4>
                 <ul className="space-y-2 text-sm text-light/60">
-                  <li><Link href="/legal/privacy-policy" className="hover:text-primary transition-colors">{tFooter('privacyPolicy')}</Link></li>
-                  <li><Link href="/legal/terms-of-service" className="hover:text-primary transition-colors">{tFooter('termsOfService')}</Link></li>
-                  <li><Link href="/legal/cookies" className="hover:text-primary transition-colors">{tFooter('cookiePolicy')}</Link></li>
-                  <li><Link href="/legal/legal-notice" className="hover:text-primary transition-colors">{tFooter('legalNotice')}</Link></li>
+                  <li>
+                    <Link href="/legal/privacy-policy" className="relative hover:text-dark transition-colors group">
+                      <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
+                      <p className="text-sm z-20 relative inline-flex flex-col md:flex-row items-center">
+                        {tFooter('privacyPolicy')}
+                      </p>
+                    </Link>
+                  </li>
+                  <li><Link href="/legal/terms-of-service" className="relative hover:text-dark transition-colors group">
+                      <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
+                      <p className="text-sm z-20 relative inline-flex flex-col md:flex-row items-center">
+                        {tFooter('termsOfService')}
+                      </p>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/legal/cookies" className="relative hover:text-dark transition-colors group">
+                      <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
+                      <p className="text-sm z-20 relative inline-flex flex-col md:flex-row items-center">
+                        {tFooter('cookiePolicy')}
+                      </p>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/legal/legal-notice" className="relative hover:text-dark transition-colors group">
+                      <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
+                      <p className="text-sm z-20 relative inline-flex flex-col md:flex-row items-center">
+                        {tFooter('legalNotice')}
+                      </p>
+                    </Link>
+                  </li>
                 </ul>
               </div>
             </div>
 
             <div className="border-t border-light/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
               <p className="text-sm text-light/40">
-                © 2025 Linkkk. {tFooter('copyright')} <a href="https://alvaroso.dev" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">@alvaroso</a>
+                &copy; {new Date().getFullYear()} Linkkk. {tFooter('copyright')} <a href="https://alvaroso.dev" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">@alvaroso</a>
               </p>
               <InlineSelect
                 options={[
@@ -1190,12 +1295,6 @@ export default function Landing() {
           </div>
         </footer>
       </div >
-
-      {/* Waitlist Modal */}
-      <WaitlistModal
-        open={isWaitlistModalOpen}
-        onClose={() => setIsWaitlistModalOpen(false)}
-      />
 
       {/* Create Link Drawer */}
       <CreateLinkDrawer

@@ -149,7 +149,7 @@ export default function PrivacyPolicy() {
             <ul className="list-none space-y-4 pl-0">
                 <li className="bg-white p-4 rounded-xl border border-dark/20">
                     <strong className="text-dark text-lg block mb-1">User Data</strong>
-                    If you register or join the waitlist, we collect your email address, username, and password (hashed).
+                    If you register, we collect your email address, username, and password (hashed).
                 </li>
                 <li className="bg-white p-4 rounded-xl border border-dark/20">
                     <strong className="text-dark text-lg block mb-1">Cookies & Session Data</strong>

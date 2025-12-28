@@ -54,7 +54,17 @@ export default function Dashboard() {
   const t = useTranslations('Dashboard');
   const { filteredLinks, filters, fetchLinks, updateFilters } = useLinks();
   const { totalLinks, activeLinks, totalClicks } = useStats();
-  const { isAuthenticated, isGuest } = useAuth();
+  const { isAuthenticated, isGuest, user } = useAuth();
+
+  // Get link limit based on user role
+  const getLinkLimit = () => {
+    if (isGuest) return 3;
+    if (!user) return 3;
+    if (user.role === 'PRO') return null; // unlimited
+    return 50; // STANDARD
+  };
+
+  const linkLimit = getLinkLimit();
   const [view] = useState('details');
   const [createLinkDrawerOpen, setCreateLinkDrawerOpen] = useState(false);
   const [filterModalOpen, setFilterModalOpen] = useState(false);
@@ -106,8 +116,11 @@ export default function Dashboard() {
               transition={{ delay: 0.05, duration: 0.4, ease: "backInOut" }}
               className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
               <h2 className='text-md'>{t('totalLinks')}</h2>
-              <p className='text-end text-5xl font-black italic'>
+              <p className='text-end text-5xl font-black italic flex items-end justify-end gap-1'>
                 <AnimatedCounter value={totalLinks} delay={0.15} />
+                {linkLimit !== null && (
+                  <span className='text-lg text-dark/40 font-normal'>/{linkLimit}</span>
+                )}
               </p>
             </motion.div>
             <motion.div
