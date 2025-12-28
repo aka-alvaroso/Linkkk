@@ -237,7 +237,7 @@ const createLinkRuleSchema = z.object({
   enabled: z.boolean().default(true),
   match: MatchTypeEnum.default("AND"),
 
-  conditions: z.array(ruleConditionSchema).min(0).max(5),
+  conditions: z.array(ruleConditionSchema).min(0).max(10),
 
   action: actionSchema,
   elseAction: actionSchema.optional(),
@@ -251,7 +251,7 @@ const updateLinkRuleSchema = z.object({
   priority: z.number().int().min(0).max(999).optional(),
   enabled: z.boolean().optional(),
   match: MatchTypeEnum.optional(),
-  conditions: z.array(ruleConditionSchema).min(0).max(5).optional(),
+  conditions: z.array(ruleConditionSchema).min(0).max(10).optional(),
   action: actionSchema.optional(),
   elseAction: actionSchema.nullable().optional(), // Allow null to remove elseAction
 });

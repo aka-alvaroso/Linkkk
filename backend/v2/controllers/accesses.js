@@ -25,10 +25,26 @@ const getLinkAccesses = async (req, res) => {
       return errorResponse(res, ERRORS.UNAUTHORIZED);
     }
 
+    // GUESTS don't have access to analytics
+    if (guest) {
+      return errorResponse(res, ERRORS.LINK_ACCESS_DENIED);
+    }
+
+    // Determine access limit based on user role
+    let limit = null; // null = unlimited (PRO)
+    if (user.role === 'STANDARD') {
+      limit = 20;
+    }
+
+    // Query accesses with role-based limit
     const accesses = await prisma.access.findMany({
       where: {
         linkId: link.id,
       },
+      orderBy: {
+        createdAt: 'desc', // Most recent first
+      },
+      ...(limit && { take: limit }), // Apply limit only if not null
     });
 
     return successResponse(res, accesses);

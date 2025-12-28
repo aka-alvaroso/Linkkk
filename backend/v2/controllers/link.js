@@ -2,7 +2,7 @@ const prisma = require("../prisma/client");
 const { createLinkSchema, updateLinkSchema } = require("../validators/link");
 const { isbot } = require("isbot");
 
-const planLimits = require("../utils/limits");
+const { getLimitsForUser } = require("../utils/limits");
 const { successResponse, errorResponse } = require("../utils/response");
 const ERRORS = require("../constants/errorCodes");
 const logger = require("../utils/logger");
@@ -17,7 +17,7 @@ const createLink = async (req, res) => {
   const user = req.user;
   const guest = req.guest;
   const isGuest = !!guest;
-  const limits = isGuest ? planLimits.guest : planLimits.user;
+  const limits = getLimitsForUser(user, guest);
 
   const { longUrl, status } = req.body;
 
@@ -34,26 +34,28 @@ const createLink = async (req, res) => {
     return errorResponse(res, ERRORS.INVALID_DATA, issues);
   }
 
-  // Check link limit
-  if (isGuest) {
-    const count = await prisma.link.count({
-      where: {
-        guestSessionId: guest.guestSessionId,
-      },
-    });
+  // Check link limit (skip if unlimited - null)
+  if (limits.links !== null) {
+    if (isGuest) {
+      const count = await prisma.link.count({
+        where: {
+          guestSessionId: guest.guestSessionId,
+        },
+      });
 
-    if (count >= limits.links) {
-      return errorResponse(res, ERRORS.LINK_LIMIT_EXCEEDED);
-    }
-  } else {
-    const count = await prisma.link.count({
-      where: {
-        userId: user.id,
-      },
-    });
+      if (count >= limits.links) {
+        return errorResponse(res, ERRORS.LINK_LIMIT_EXCEEDED);
+      }
+    } else {
+      const count = await prisma.link.count({
+        where: {
+          userId: user.id,
+        },
+      });
 
-    if (count >= limits.links) {
-      return errorResponse(res, ERRORS.LINK_LIMIT_EXCEEDED);
+      if (count >= limits.links) {
+        return errorResponse(res, ERRORS.LINK_LIMIT_EXCEEDED);
+      }
     }
   }
 

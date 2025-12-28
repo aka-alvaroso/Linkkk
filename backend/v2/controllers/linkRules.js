@@ -6,7 +6,7 @@ const {
 } = require("../validators/linkRules");
 const { successResponse, errorResponse } = require("../utils/response");
 const ERRORS = require("../constants/errorCodes");
-const planLimits = require("../utils/limits");
+const { getLimitsForUser } = require("../utils/limits");
 const { hashPassword } = require("../utils/password");
 
 // Helper: Check link access
@@ -69,19 +69,21 @@ const createLinkRule = async (req, res) => {
   const { priority, enabled, match, conditions, action, elseAction } = validate.data;
 
   // Check limits based on user type
-  const limits = user ? planLimits.user : planLimits.guest;
+  const limits = getLimitsForUser(user, guest);
 
-  // Check rule count limit
-  const existingRulesCount = await prisma.linkRule.count({
-    where: { linkId: link.id }
-  });
+  // Check rule count limit (skip if limit is null/unlimited)
+  if (limits.rulesPerLink !== null) {
+    const existingRulesCount = await prisma.linkRule.count({
+      where: { linkId: link.id }
+    });
 
-  if (existingRulesCount >= limits.rulesPerLink) {
-    return errorResponse(res, ERRORS.RULE_LIMIT_EXCEEDED);
+    if (existingRulesCount >= limits.rulesPerLink) {
+      return errorResponse(res, ERRORS.RULE_LIMIT_EXCEEDED);
+    }
   }
 
-  // Check conditions count limit
-  if (conditions && conditions.length > limits.conditionsPerRule) {
+  // Check conditions count limit (skip if limit is null/unlimited)
+  if (limits.conditionsPerRule !== null && conditions && conditions.length > limits.conditionsPerRule) {
     return errorResponse(res, ERRORS.CONDITION_LIMIT_EXCEEDED);
   }
 
@@ -234,10 +236,10 @@ const updateLinkRule = async (req, res) => {
   const { conditions } = validate.data;
 
   // Check limits based on user type
-  const limits = user ? planLimits.user : planLimits.guest;
+  const limits = getLimitsForUser(user, guest);
 
-  // Check conditions count limit if conditions are being updated
-  if (conditions && conditions.length > limits.conditionsPerRule) {
+  // Check conditions count limit if conditions are being updated (skip if limit is null/unlimited)
+  if (limits.conditionsPerRule !== null && conditions && conditions.length > limits.conditionsPerRule) {
     return errorResponse(res, ERRORS.CONDITION_LIMIT_EXCEEDED);
   }
 
