@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Drawer from '@/app/components/ui/Drawer/Drawer';
 import { FiCornerDownRight } from 'react-icons/fi';
-import { TbChartBar, TbCircleDashed, TbCircleDashedCheck, TbCopy, TbSettings } from 'react-icons/tb';
+import { TbChartBar, TbCircleDashed, TbCircleDashedCheck, TbCopy, TbList, TbSettings } from 'react-icons/tb';
 import Button from '../ui/Button/Button';
 import Input from '../ui/Input/Input';
-import { useLinks } from '@/app/hooks';
+import { useLinks, useAuth } from '@/app/hooks';
 import type { Link } from '@/app/types';
 import { AccessesList } from '../Accesses/accessesList';
 import { useToast } from '@/app/hooks/useToast';
@@ -23,6 +23,7 @@ interface EditiLinkDrawerProps {
 export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawerProps) {
     const t = useTranslations('EditLinkDrawer');
     const { updateLink, fetchLinks } = useLinks();
+    const { isGuest, user } = useAuth();
     const toast = useToast();
     const [tab, setTab] = useState('settings');
     const [statusBar, setShowStatusBar] = useState("none");
@@ -193,21 +194,22 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                             {t('tabSettings')}
                         </Button>
                     </motion.div>
+                    {/* Analytics tab - Disabled for guests */}
                     <motion.div
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.05, duration: 0.4, ease: "backInOut" }}
-
                     >
                         <Button
                             variant='ghost'
                             size='sm'
                             rounded='2xl'
-                            leftIcon={<TbChartBar size={20} />}
+                            leftIcon={<TbList size={20} />}
                             className={`rounded-2xl ${tab === 'analytics' ? 'bg-dark text-light hover:bg-dark/90' : 'bg-dark/5 text-dark/50'}`}
                             onClick={() => setTab('analytics')}
+                            disabled={isGuest}
                         >
-                            {t('tabAnalytics')}
+                            {t('tabHistory')}
                         </Button>
                     </motion.div>
                 </div>
@@ -444,10 +446,16 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
 
                 {/* Analytics */}
                 {tab === 'analytics' && (
-                    <div className='w-full flex flex-col gap-2 items-center p-4'>
-                        {
-                            <AccessesList shortUrl={link.shortUrl} />
-                        }
+                    <div className='w-full flex flex-col gap-4 items-center p-4'>
+                        {user && user.role === 'STANDARD' && (
+                            <div className='w-full bg-dark/5 border border-dark/10 rounded-xl p-2.5'>
+                                <p className='text-xs text-dark/60'>
+                                    <span className='font-semibold'>{t('limitedViewTitle')}</span> {t('limitedViewMessage')}
+                                    <span className='text-dark/50'> {t('limitedViewUpgrade')}</span>
+                                </p>
+                            </div>
+                        )}
+                        <AccessesList shortUrl={link.shortUrl} />
                     </div>
                 )}
 

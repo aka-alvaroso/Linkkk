@@ -25,7 +25,7 @@ interface LinkRuleProps {
   onDelete: () => void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dragHandleProps?: any; // For drag & drop (from dnd-kit, needs to be flexible)
-  maxConditions: number; // Max conditions allowed per rule
+  maxConditions: number | null; // Max conditions allowed per rule (null = unlimited)
 }
 
 export function LinkRule({ rule, priority, onChange, onDelete, dragHandleProps, maxConditions }: LinkRuleProps) {
@@ -200,9 +200,9 @@ export function LinkRule({ rule, priority, onChange, onDelete, dragHandleProps, 
             <span className={`hidden sm:block ${rule.conditions.length > 1 ? 'w-16 ml-2' : 'hidden'}`}></span>
             <button
               onClick={handleAddCondition}
-              disabled={rule.conditions.length >= maxConditions}
+              disabled={maxConditions !== null && rule.conditions.length >= maxConditions}
               className="inline-flex items-center gap-1 px-12 py-1 text-sm text-dark/40 hover:text-dark/70 border border-dashed border-dark/20 rounded-lg hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:bg-dark/5 transition-colors"
-              title={rule.conditions.length >= maxConditions ? t('maxConditionsTitle', { count: maxConditions, plural: maxConditions === 1 ? t('condition') : t('conditions') }) : ''}
+              title={maxConditions !== null && rule.conditions.length >= maxConditions ? t('maxConditionsTitle', { count: maxConditions, plural: maxConditions === 1 ? t('condition') : t('conditions') }) : ''}
             >
               <TbPlus size={12} />
               <span>{t('add')}</span>

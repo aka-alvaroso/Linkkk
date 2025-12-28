@@ -12,6 +12,10 @@ export const PLAN_LIMITS = {
     rulesPerLink: 3,
     conditionsPerRule: 2,
   },
+  pro: {
+    rulesPerLink: null, // unlimited
+    conditionsPerRule: null, // unlimited
+  },
 } as const;
 
 export type PlanType = keyof typeof PLAN_LIMITS;

@@ -25,7 +25,7 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
     const t = useTranslations('CreateLinkDrawer');
     const { createLink } = useLinks();
     const { createRule } = useLinkRules();
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, isGuest, user } = useAuth();
     const toast = useToast();
     const [statusBar, setShowStatusBar] = useState("none");
     const [newLink, setNewLink] = useState({
@@ -40,7 +40,11 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
     // Ref for animated text
     const statusButtonTextRef = useRef<AnimatedTextRef>(null);
 
-    const limits = isAuthenticated ? PLAN_LIMITS.user : PLAN_LIMITS.guest;
+    const limits = isGuest
+        ? PLAN_LIMITS.guest
+        : user?.role === 'PRO'
+            ? PLAN_LIMITS.pro
+            : PLAN_LIMITS.user;
 
     useEffect(() => {
         const hasChanges = newLink.longUrl !== '';
@@ -292,7 +296,7 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
                                 <TbRocket size={20} />
                                 <span className='font-black italic'>{t('linkRules')}</span>
                                 <span className='text-xs text-dark/50'>
-                                    ({localRules.length}/{limits.rulesPerLink})
+                                    ({localRules.length}/{limits.rulesPerLink ?? '∞'})
                                 </span>
                             </div>
                             <motion.div
@@ -338,9 +342,9 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
                                                     rounded="2xl"
                                                     leftIcon={<TbPlus size={20} />}
                                                     onClick={handleAddRule}
-                                                    disabled={localRules.length >= limits.rulesPerLink}
+                                                    disabled={limits.rulesPerLink !== null && localRules.length >= limits.rulesPerLink}
                                                     className='bg-primary text-dark hover:bg-primary hover:shadow-[4px_4px_0_var(--color-dark)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none'
-                                                    title={localRules.length >= limits.rulesPerLink ? t('maxRulesTitle', { count: limits.rulesPerLink, plural: limits.rulesPerLink === 1 ? t('rule') : t('rules') }) : ''}
+                                                    title={limits.rulesPerLink !== null && localRules.length >= limits.rulesPerLink ? t('maxRulesTitle', { count: limits.rulesPerLink, plural: limits.rulesPerLink === 1 ? t('rule') : t('rules') }) : ''}
                                                 >
                                                     {t('addRule')}
                                                 </Button>

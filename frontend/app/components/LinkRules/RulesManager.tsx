@@ -77,14 +77,18 @@ function SortableLinkRule(props: {
 export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
   const t = useTranslations('RulesManager');
   const { rules: fetchedRules, isLoading, error, fetchRules, createRule, updateRule, deleteRule, reorderRules } = useLinkRules();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isGuest, user } = useAuth();
 
   const [originalRules, setOriginalRules] = useState<LinkRuleType[]>([]);
   const [localRules, setLocalRules] = useState<LinkRuleType[]>([]);
   const [showRules, setShowRules] = useState(false);
 
   // Get limits based on user type
-  const limits = isAuthenticated ? PLAN_LIMITS.user : PLAN_LIMITS.guest;
+  const limits = isGuest
+    ? PLAN_LIMITS.guest
+    : user?.role === 'PRO'
+      ? PLAN_LIMITS.pro
+      : PLAN_LIMITS.user;
 
   // Drag & drop sensors
   const sensors = useSensors(
@@ -194,7 +198,7 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
   const saveRules = useCallback(async () => {
     try {
       // Validate limits
-      if (localRules.length > limits.rulesPerLink) {
+      if (limits.rulesPerLink !== null && localRules.length > limits.rulesPerLink) {
         throw new Error(t('errorMaxRules', { count: limits.rulesPerLink, plural: limits.rulesPerLink === 1 ? t('rule') : t('rules') }));
       }
 
@@ -203,7 +207,7 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
         const rule = localRules[i];
 
         // Validate conditions limit
-        if (rule.conditions.length > limits.conditionsPerRule) {
+        if (limits.conditionsPerRule !== null && rule.conditions.length > limits.conditionsPerRule) {
           throw new Error(t('errorMaxConditions', { ruleNumber: i + 1, count: limits.conditionsPerRule, plural: limits.conditionsPerRule === 1 ? t('condition') : t('conditions') }));
         }
 
@@ -360,7 +364,7 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
           <TbRocket size={20} />
           <span className='font-black italic'>{t('linkRules')}</span>
           <span className='text-xs text-dark/50'>
-            ({localRules.length}/{limits.rulesPerLink})
+            ({localRules.length}/{limits.rulesPerLink ?? '∞'})
           </span>
         </div>
         <motion.div
@@ -433,9 +437,9 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
                     rounded="2xl"
                     leftIcon={<TbPlus size={20} />}
                     onClick={handleAddRule}
-                    disabled={localRules.length >= limits.rulesPerLink}
+                    disabled={limits.rulesPerLink !== null && localRules.length >= limits.rulesPerLink}
                     className="bg-primary text-dark hover:bg-primary hover:shadow-[4px_4px_0_var(--color-dark)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
-                    title={localRules.length >= limits.rulesPerLink ? t('maxRulesTitle', { count: limits.rulesPerLink, plural: limits.rulesPerLink === 1 ? t('rule') : t('rules') }) : ''}
+                    title={limits.rulesPerLink !== null && localRules.length >= limits.rulesPerLink ? t('maxRulesTitle', { count: limits.rulesPerLink, plural: limits.rulesPerLink === 1 ? t('rule') : t('rules') }) : ''}
                   >
                     {t('addRule')}
                   </Button>
