@@ -82,53 +82,6 @@ async function sendEmail({ to, subject, text, html }) {
   }
 }
 
-/**
- * Send waitlist notification to admin
- * @param {string} userEmail - User's email who joined the waitlist
- * @returns {Promise<Object>} Send result
- */
-async function sendWaitlistNotification(userEmail) {
-  const adminEmail = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
-
-  const subject = 'New Waitlist Signup - Linkkk Premium';
-
-  const text = `
-New waitlist signup!
-
-Email: ${userEmail}
-Date: ${new Date().toLocaleString()}
-
-This user is interested in Linkkk Premium features.
-  `.trim();
-
-  const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2 style="color: #333;">🎉 New Waitlist Signup!</h2>
-
-      <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
-        <p><strong>Email:</strong> ${userEmail}</p>
-        <p><strong>Date:</strong> ${new Date().toLocaleString()}</p>
-      </div>
-
-      <p style="color: #666;">This user is interested in Linkkk Premium features.</p>
-
-      <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
-
-      <p style="color: #999; font-size: 12px;">
-        Sent from Linkkk Waitlist System
-      </p>
-    </div>
-  `.trim();
-
-  return await sendEmail({
-    to: adminEmail,
-    subject,
-    text,
-    html,
-  });
-}
-
 module.exports = {
   sendEmail,
-  sendWaitlistNotification,
 };
