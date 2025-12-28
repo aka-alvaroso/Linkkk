@@ -105,8 +105,8 @@ describe('Error Handling', () => {
 
       const cookies = guestResponse.headers['set-cookie'];
 
-      // Create 10 links (guest limit)
-      for (let i = 0; i < 10; i++) {
+      // Create 3 links (guest limit)
+      for (let i = 0; i < 3; i++) {
         await request(app)
           .post('/link')
           .set('Cookie', cookies)
@@ -114,7 +114,7 @@ describe('Error Handling', () => {
           .expect(201);
       }
 
-      // Try to create 11th link
+      // Try to create 4th link
       const response = await request(app)
         .post('/link')
         .set('Cookie', cookies)

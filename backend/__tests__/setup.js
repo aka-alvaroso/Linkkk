@@ -3,6 +3,9 @@
  * Runs before all tests
  */
 
+// Load environment variables for tests
+require('dotenv').config();
+
 // Mock external geolocation API (must be before any imports that use it)
 jest.mock('../v2/utils/access', () => ({
   defineCountry: async () => 'US',
