@@ -1,27 +1,37 @@
 "use client"
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { TbLayoutDashboard, TbLogin, TbPlus, TbSettings } from "react-icons/tb";
+import { TbLayoutDashboard, TbLogin, TbPlus, TbSettings, TbSparkles } from "react-icons/tb";
 import * as motion from "motion/react-client";
 import CreateLinkDrawer from "../Drawer/CreateLinkDrawer";
 import { useAuth } from "@/app/hooks";
+import { useToast } from "@/app/hooks/useToast";
 import { useTranslations } from 'next-intl';
 
 export default function BottomNavbar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const [createLinkDrawer, setCreateLinkDrawer] = useState(false);
+  const toast = useToast();
   const t = useTranslations('Navigation');
 
-  // Simple navigation based on authentication
+  // Simple navigation based on authentication and user role
   const navigationItems = isAuthenticated
-    ? [
-        // Authenticated users
-        { id: "dashboard", label: t('dashboard'), icon: TbLayoutDashboard, href: "/dashboard" },
-        { id: "settings", label: t('settings'), icon: TbSettings, href: "/settings" },
-        { id: "create", label: t('create'), icon: TbPlus, action: "create", isFAB: true },
-      ]
+    ? user && user.role === 'STANDARD'
+      ? [
+          // STANDARD users - show upgrade button
+          { id: "dashboard", label: t('dashboard'), icon: TbLayoutDashboard, href: "/dashboard" },
+          { id: "settings", label: t('settings'), icon: TbSettings, href: "/settings" },
+          { id: "upgrade", label: t('upgradeToPro'), icon: TbSparkles, action: "upgrade", isUpgrade: true },
+          { id: "create", label: t('create'), icon: TbPlus, action: "create", isFAB: true },
+        ]
+      : [
+          // PRO users - show settings
+          { id: "dashboard", label: t('dashboard'), icon: TbLayoutDashboard, href: "/dashboard" },
+          { id: "settings", label: t('settings'), icon: TbSettings, href: "/settings" },
+          { id: "create", label: t('create'), icon: TbPlus, action: "create", isFAB: true },
+        ]
     : [
         // Guest users
         { id: "dashboard", label: t('dashboard'), icon: TbLayoutDashboard, href: "/dashboard" },
@@ -32,6 +42,9 @@ export default function BottomNavbar() {
   const handleClick = (item: typeof navigationItems[0]) => {
     if (item.action === "create") {
       setCreateLinkDrawer(true);
+    } else if (item.action === "upgrade") {
+      // TODO: Navigate to Stripe checkout
+      toast.info('Stripe integration coming soon!');
     } else if (item.href) {
       router.push(item.href);
     }
@@ -66,6 +79,7 @@ export default function BottomNavbar() {
               label={item.label}
               active={isActive(item)}
               isFAB={item.isFAB}
+              isUpgrade={item.isUpgrade}
               onClick={() => handleClick(item)}
             />
           ))}
@@ -89,10 +103,11 @@ interface NavButtonProps {
   label: string;
   active: boolean;
   isFAB?: boolean;
+  isUpgrade?: boolean;
   onClick: () => void;
 }
 
-function NavButton({ icon: Icon, label, active, isFAB, onClick }: NavButtonProps) {
+function NavButton({ icon: Icon, label, active, isFAB, isUpgrade, onClick }: NavButtonProps) {
   return (
     <motion.button
       whileTap={{ scale: 0.9 }}
@@ -103,14 +118,16 @@ function NavButton({ icon: Icon, label, active, isFAB, onClick }: NavButtonProps
         transition-all duration-200
         ${isFAB
           ? "bg-primary text-dark"
-          : active
-            ? "bg-light text-dark"
-            : "text-light/90 hover:text-light hover:bg-light/10"
+          : isUpgrade
+            ? "bg-info text-light"
+            : active
+              ? "bg-light text-dark"
+              : "text-light/90 hover:text-light hover:bg-light/10"
         }
       `}
       aria-label={label}
     >
-      <Icon size={22} strokeWidth={active || isFAB ? 2.5 : 2} />
+      <Icon size={22} strokeWidth={active || isFAB || isUpgrade ? 2.5 : 2} />
     </motion.button>
   );
 }

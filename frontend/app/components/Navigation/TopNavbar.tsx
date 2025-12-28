@@ -4,7 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import CreateLinkDrawer from "../Drawer/CreateLinkDrawer";
 import { useAuth } from "@/app/hooks";
-import { TbPlus, TbLogin, TbExternalLink } from "react-icons/tb";
+import { useToast } from "@/app/hooks/useToast";
+import { TbPlus, TbLogin, TbExternalLink, TbSparkles } from "react-icons/tb";
 import * as motion from "motion/react-client";
 import { AnimatePresence } from "motion/react";
 import Button from "../ui/Button/Button";
@@ -18,6 +19,7 @@ export default function TopNavbar({ showCreate = false }: TopNavbarProps) {
   const { user } = useAuth();
   const pathname = usePathname();
   const [createLinkDrawer, setCreateLinkDrawer] = useState(false);
+  const toast = useToast();
   const t = useTranslations('Navigation');
 
   return (
@@ -77,8 +79,29 @@ export default function TopNavbar({ showCreate = false }: TopNavbarProps) {
             </AnimatePresence>
           </div>
 
-          {/* Right Section - User/Login Button */}
-          <div className="ml-auto z-10">
+          {/* Right Section - Upgrade Button (if STANDARD) + User/Login Button */}
+          <div className="ml-auto z-10 flex items-center gap-2">
+          {/* Upgrade to PRO button - only for STANDARD users */}
+          {user && user.role === 'STANDARD' && (
+            <Button
+              variant='solid'
+              size='md'
+              rounded='xl'
+              leftIcon={<TbSparkles size={20} />}
+              expandOnHover="icon"
+              className="bg-primary text-dark hover:bg-info hover:text-light hover:shadow-[_4px_4px_0_var(--color-dark)] leading-5"
+              onClick={() => {
+                // TODO: Navigate to Stripe checkout
+                toast.info('Stripe integration coming soon!');
+              }}
+            >
+              <p className="font-black italic">
+              {t('upgradeToPro')}
+              </p>
+            </Button>
+          )}
+
+          {/* User or Login button */}
           {user ? (
             <Link href="/settings">
               <Button
@@ -87,7 +110,9 @@ export default function TopNavbar({ showCreate = false }: TopNavbarProps) {
                 rounded='xl'
                 rightIcon={<TbExternalLink size={20} />}
                 expandOnHover="icon"
-                className="hover:bg-warning hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)] leading-5"
+                className={`hover:bg-warning hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)] leading-5 ${
+                  user.role === 'PRO' ? 'bg-secondary text-light' : ''
+                }`}
               >
                 {user.username}
               </Button>
