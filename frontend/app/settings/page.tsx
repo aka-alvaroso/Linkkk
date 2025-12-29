@@ -1,9 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import RouteGuard from "@/app/components/RouteGuard/RouteGuard";
 import Navigation from "@/app/components/Navigation/Navigation";
 import { useAuth } from "@/app/hooks";
-import { useAuthStore } from "@/app/stores/authStore";
+import { useAuthStore, Subscription } from "@/app/stores/authStore";
 import { useToast } from "@/app/hooks/useToast";
 import Button from "@/app/components/ui/Button/Button";
 import * as motion from "motion/react-client";
@@ -16,9 +16,12 @@ import {
   TbAlertTriangle,
   TbEye,
   TbEyeOff,
+  TbStar,
+  TbSparkles,
 } from "react-icons/tb";
 import { csrfService } from "@/app/services/api/csrfService";
 import { useTranslations } from 'next-intl';
+import CancelSubscriptionModal from "@/app/components/Modal/CancelSubscriptionModal";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -61,6 +64,40 @@ export default function SettingsPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Cancel subscription modal
+  const [showCancelModal, setShowCancelModal] = useState(false);
+
+  // Subscription state
+  const [subscriptionInfo, setSubscriptionInfo] = useState<Subscription | null>(null);
+
+  // Fetch subscription status on component mount
+  useEffect(() => {
+    const fetchSubscriptionStatus = async () => {
+      if (user?.role === "PRO") {
+        try {
+          const csrfToken = await csrfService.getToken();
+          const response = await fetch(`${API_BASE_URL}/subscription/status`, {
+            method: "GET",
+            headers: {
+              "X-CSRF-Token": csrfToken,
+            },
+            credentials: "include",
+          });
+
+          const data = await response.json();
+
+          if (response.ok && data.success && data.data?.subscription) {
+            setSubscriptionInfo(data.data.subscription);
+          }
+        } catch (error) {
+          console.error("Error fetching subscription status:", error);
+        }
+      }
+    };
+
+    fetchSubscriptionStatus();
+  }, [user?.role]);
 
   const handleUpdateUsername = async () => {
     if (!username.trim()) {
@@ -242,6 +279,73 @@ export default function SettingsPage() {
     }
   };
 
+  const handleUpgradeToPro = async () => {
+    setLoading(true);
+    try {
+      const csrfToken = await csrfService.getToken();
+      const response = await fetch(`${API_BASE_URL}/subscription/dev/simulate-upgrade`, {
+        method: "POST",
+        headers: {
+          "X-CSRF-Token": csrfToken,
+        },
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        // Update user role in auth store
+        setUser({
+          ...user!,
+          role: "PRO",
+        });
+        toast.success(t('toastUpgradeSuccess'));
+      } else {
+        toast.error(data.message || t('toastUpgradeFailed'));
+      }
+    } catch (error) {
+      toast.error(t('toastError'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCancelSubscription = () => {
+    setShowCancelModal(true);
+  };
+
+  const confirmCancelSubscription = async () => {
+    setLoading(true);
+    try {
+      const csrfToken = await csrfService.getToken();
+      const response = await fetch(`${API_BASE_URL}/subscription/cancel`, {
+        method: "POST",
+        headers: {
+          "X-CSRF-Token": csrfToken,
+        },
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        // Update user role in auth store
+        setUser({
+          ...user!,
+          role: "STANDARD",
+        });
+        toast.success(t('toastCancelSuccess'));
+        setShowCancelModal(false);
+      } else {
+        toast.error(data.message || t('toastCancelFailed'));
+      }
+    } catch (error) {
+      toast.error(t('toastError'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <RouteGuard type="user-only" title="Settings - Linkkk">
       <Navigation showCreate={false} />
@@ -392,6 +496,69 @@ export default function SettingsPage() {
                     </Button>
                   </div>
 
+                  {/* Plan Section */}
+                  <div className={`p-4 rounded-2xl border-2 ${user?.role === 'PRO' ? 'bg-secondary/10 border-secondary' : 'bg-dark/5 border-dashed border-transparent'}`}>
+                    <div className="flex items-center gap-2 mb-3">
+                      {user?.role === 'PRO' ? <TbSparkles size={20} /> : <TbStar size={20} />}
+                      <h3 className="text-xl font-bold">{t('plan')}</h3>
+                      <span className={`px-2.5 py-1 rounded-lg text-xs font-bold ${user?.role === 'PRO' ? 'bg-secondary text-light' : 'bg-dark/10 text-dark'}`}>
+                        {user?.role === 'PRO' ? 'PRO' : 'STANDARD'}
+                      </span>
+                    </div>
+                    {user?.role === 'STANDARD' ? (
+                      <Button
+                        variant="solid"
+                        size="md"
+                        rounded="xl"
+                        leftIcon={<TbSparkles size={20} />}
+                        onClick={handleUpgradeToPro}
+                        disabled={loading}
+                        className="bg-warning hover:bg-warning/90 text-dark border border-dark hover:shadow-[4px_4px_0_var(--color-dark)] font-bold"
+                      >
+                        <p className="font-black italic">
+                          {t('upgradeToPro')}
+                        </p>
+                      </Button>
+                    ) : (
+                      <div className="space-y-4">
+                        {/* PRO Description */}
+                        <p className="text-sm text-dark/70">{t('proDescription')}</p>
+
+                        {/* Renewal Information */}
+                        {subscriptionInfo?.currentPeriodEnd && (
+                          <div>
+                            <p className="text-sm font-bold text-dark/70 mb-1">
+                              {t('renewsOn')}
+                            </p>
+                            <p className="text-base font-bold">
+                              {new Date(subscriptionInfo.currentPeriodEnd).toLocaleDateString()}
+                            </p>
+                            <p className="text-sm text-dark/60 mt-1">
+                              {t('daysUntilRenewal', {
+                                days: Math.ceil(
+                                  (new Date(subscriptionInfo.currentPeriodEnd).getTime() - Date.now()) /
+                                    (1000 * 60 * 60 * 24)
+                                ),
+                              })}
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Cancel Subscription Button */}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          rounded="xl"
+                          onClick={handleCancelSubscription}
+                          disabled={loading}
+                          className="bg-transparent hover:bg-danger hover:text-light border border-dark"
+                        >
+                          {t('cancelSubscription')}
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+
                   {/* Logout Button */}
                   <div className="p-4 bg-dark/5 rounded-2xl">
                     <div className="flex items-center gap-2 mb-3">
@@ -527,6 +694,14 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
+
+      {/* Cancel Subscription Modal */}
+      <CancelSubscriptionModal
+        open={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+        onConfirm={confirmCancelSubscription}
+        loading={loading}
+      />
     </RouteGuard>
   );
 }

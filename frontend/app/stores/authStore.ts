@@ -5,14 +5,21 @@
 
 import { create } from "zustand";
 
+export interface Subscription {
+  status: "ACTIVE" | "CANCELED" | "PAST_DUE" | "INACTIVE" | "TRIALING";
+  currentPeriodEnd: string | null;
+  cancelAtPeriodEnd: boolean;
+}
+
 export interface User {
   id: string;
   email: string;
   username?: string;
   avatarUrl?: string | null;
-  role: "user" | "guest";
+  role: "STANDARD" | "PRO";
   isEmailVerified: boolean;
   createdAt: string;
+  subscription?: Subscription | null;
 }
 
 export interface GuestSession {
