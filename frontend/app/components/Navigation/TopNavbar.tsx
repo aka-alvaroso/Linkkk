@@ -92,6 +92,7 @@ export default function TopNavbar({ showCreate = false }: TopNavbarProps) {
               className="bg-primary text-dark hover:bg-info hover:text-light hover:shadow-[_4px_4px_0_var(--color-dark)] leading-5"
               onClick={() => {
                 // TODO: Navigate to Stripe checkout
+
                 toast.info('Stripe integration coming soon!');
               }}
             >
@@ -103,19 +104,22 @@ export default function TopNavbar({ showCreate = false }: TopNavbarProps) {
 
           {/* User or Login button */}
           {user ? (
-            <Link href="/settings">
+            <Link href="/settings" className="relative">
               <Button
                 variant='solid'
                 size='md'
                 rounded='xl'
                 rightIcon={<TbExternalLink size={20} />}
                 expandOnHover="icon"
-                className={`hover:bg-warning hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)] leading-5 ${
-                  user.role === 'PRO' ? 'bg-secondary text-light' : ''
-                }`}
+                className="hover:bg-warning hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)] leading-5"
               >
                 {user.username}
               </Button>
+              {user.role === 'PRO' && (
+                <span className="absolute -top-3 -right-6 px-2 py-0.5 bg-secondary text-light text-xs font-black italic rounded-full border border-dark shadow-[2px_2px_0_var(--color-dark)]">
+                  PRO
+                </span>
+              )}
             </Link>
           ) : (
             <Link href="/auth/login">

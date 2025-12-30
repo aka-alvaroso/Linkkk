@@ -133,20 +133,49 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(cookieParser());
-app.use(express.json({ limit: "1mb" }));
+
+// Stripe webhook needs raw body for signature verification
+// Apply raw body parser for webhook endpoint ONLY
+app.use(
+  "/subscription/webhook",
+  express.raw({ type: "application/json" })
+);
+
+// Apply JSON parser for all OTHER routes (skip webhook)
+app.use((req, res, next) => {
+  if (req.path === "/subscription/webhook") {
+    return next();
+  }
+  return express.json({ limit: "1mb" })(req, res, next);
+});
+
 app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 
 // SECURITY: Content-Type validation (VUL-009 fix)
 const { validateContentType } = require("./v2/middlewares/contentType");
-app.use(validateContentType);
+// Skip validation for Stripe webhook (needs raw body)
+app.use((req, res, next) => {
+  if (req.path === "/subscription/webhook") {
+    return next();
+  }
+  return validateContentType(req, res, next);
+});
 
 // SECURITY: JSON depth and complexity validation (prevents DoS attacks)
 const {
   validateJsonDepth,
   validateJsonKeys,
 } = require("./v2/middlewares/jsonDepthValidator");
-app.use(validateJsonDepth(10)); // Max depth: 10 levels
-app.use(validateJsonKeys(1000)); // Max total keys: 1000
+// Skip JSON validation for Stripe webhook (needs raw body)
+app.use((req, res, next) => {
+  if (req.path === "/subscription/webhook") {
+    return next();
+  }
+  validateJsonDepth(10)(req, res, (err) => {
+    if (err) return next(err);
+    validateJsonKeys(1000)(req, res, next);
+  });
+});
 
 // CSRF Protection
 const {
@@ -171,7 +200,15 @@ app.use("/auth", csrfProtection, authRouter);
 app.use("/link", csrfProtection, linkRouter);
 app.use("/accesses", accessesRouter); // GET only, no CSRF needed
 app.use("/user", csrfProtection, userRouter);
-app.use("/subscription", csrfProtection, subscriptionRouter);
+
+// Subscription routes - CSRF applied conditionally (webhook excluded in router)
+app.use("/subscription", (req, res, next) => {
+  // Skip CSRF for webhook endpoint (Stripe calls this)
+  if (req.path === "/webhook") {
+    return next();
+  }
+  return csrfProtection(req, res, next);
+}, subscriptionRouter);
 
 // Public redirect endpoint (LAST - catches everything else)
 app.get("/r/:shortUrl", redirectLink);

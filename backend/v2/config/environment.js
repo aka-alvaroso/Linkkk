@@ -20,6 +20,9 @@ const requiredEnvVars = [
 
 if (isProduction) {
   requiredEnvVars.push('FRONTEND_URL');
+  requiredEnvVars.push('STRIPE_SECRET_KEY');
+  requiredEnvVars.push('STRIPE_WEBHOOK_SECRET');
+  requiredEnvVars.push('STRIPE_PRO_PRICE_ID');
 }
 
 const missingEnvVars = requiredEnvVars.filter(
@@ -83,6 +86,13 @@ const config = {
     },
   },
 
+  // Stripe
+  stripe: {
+    secretKey: process.env.STRIPE_SECRET_KEY,
+    webhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
+    proPriceId: process.env.STRIPE_PRO_PRICE_ID,
+  },
+
 };
 
 // Log configuration on startup (hide sensitive data)
@@ -94,6 +104,9 @@ if (!isTest) {
   console.log(`   CORS Origins: ${config.frontend.allowedOrigins.join(', ')}`);
   console.log(`   JWT Auth Secret: ${config.security.jwt.authSecret ? '✓ Set' : '✗ Missing'}`);
   console.log(`   JWT Guest Secret: ${config.security.jwt.guestSecret ? '✓ Set' : '✗ Missing'}`);
+  console.log(`   Stripe Secret Key: ${config.stripe.secretKey ? '✓ Set' : '✗ Missing'}`);
+  console.log(`   Stripe Webhook Secret: ${config.stripe.webhookSecret ? '✓ Set' : '✗ Missing (configure with Stripe CLI)'}`);
+  console.log(`   Stripe Pro Price ID: ${config.stripe.proPriceId ? '✓ Set' : '✗ Missing'}`);
 }
 
 module.exports = config;

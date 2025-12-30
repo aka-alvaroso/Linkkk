@@ -20,6 +20,7 @@ import {
   TbSparkles,
 } from "react-icons/tb";
 import { csrfService } from "@/app/services/api/csrfService";
+import { subscriptionService } from "@/app/services/api/subscriptionService";
 import { useTranslations } from 'next-intl';
 import CancelSubscriptionModal from "@/app/components/Modal/CancelSubscriptionModal";
 
@@ -282,30 +283,25 @@ export default function SettingsPage() {
   const handleUpgradeToPro = async () => {
     setLoading(true);
     try {
-      const csrfToken = await csrfService.getToken();
-      const response = await fetch(`${API_BASE_URL}/subscription/dev/simulate-upgrade`, {
-        method: "POST",
-        headers: {
-          "X-CSRF-Token": csrfToken,
-        },
-        credentials: "include",
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        // Update user role in auth store
-        setUser({
-          ...user!,
-          role: "PRO",
-        });
-        toast.success(t('toastUpgradeSuccess'));
-      } else {
-        toast.error(data.message || t('toastUpgradeFailed'));
-      }
+      // Create Stripe Checkout Session and redirect to payment page
+      await subscriptionService.createCheckoutSession();
+      // Note: User will be redirected to Stripe, so loading state doesn't need to be reset
     } catch (error) {
+      console.error("Error creating checkout session:", error);
+      toast.error(t('toastUpgradeFailed'));
+      setLoading(false);
+    }
+  };
+
+  const handleManageSubscription = async () => {
+    setLoading(true);
+    try {
+      // Redirect to Stripe Customer Portal for subscription management
+      await subscriptionService.createPortalSession();
+      // Note: User will be redirected to Stripe, so loading state doesn't need to be reset
+    } catch (error) {
+      console.error("Error creating portal session:", error);
       toast.error(t('toastError'));
-    } finally {
       setLoading(false);
     }
   };
@@ -317,30 +313,16 @@ export default function SettingsPage() {
   const confirmCancelSubscription = async () => {
     setLoading(true);
     try {
-      const csrfToken = await csrfService.getToken();
-      const response = await fetch(`${API_BASE_URL}/subscription/cancel`, {
-        method: "POST",
-        headers: {
-          "X-CSRF-Token": csrfToken,
-        },
-        credentials: "include",
-      });
+      await subscriptionService.cancelSubscription();
 
-      const data = await response.json();
+      // Refresh user data
+      await refreshUser();
 
-      if (response.ok && data.success) {
-        // Update user role in auth store
-        setUser({
-          ...user!,
-          role: "STANDARD",
-        });
-        toast.success(t('toastCancelSuccess'));
-        setShowCancelModal(false);
-      } else {
-        toast.error(data.message || t('toastCancelFailed'));
-      }
+      toast.success(t('toastCancelSuccess'));
+      setShowCancelModal(false);
     } catch (error) {
-      toast.error(t('toastError'));
+      console.error("Error cancelling subscription:", error);
+      toast.error(t('toastCancelFailed'));
     } finally {
       setLoading(false);
     }
@@ -544,16 +526,16 @@ export default function SettingsPage() {
                           </div>
                         )}
 
-                        {/* Cancel Subscription Button */}
+                        {/* Manage Subscription Button */}
                         <Button
                           variant="outline"
                           size="sm"
                           rounded="xl"
-                          onClick={handleCancelSubscription}
+                          onClick={handleManageSubscription}
                           disabled={loading}
-                          className="bg-transparent hover:bg-danger hover:text-light border border-dark"
+                          className="bg-transparent hover:bg-primary hover:text-light border border-dark"
                         >
-                          {t('cancelSubscription')}
+                          Manage Subscription
                         </Button>
                       </div>
                     )}

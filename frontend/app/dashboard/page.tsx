@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { TbFilterPlus, TbPlus, TbArrowLeft } from "react-icons/tb";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { useLinks, useStats, useAuth } from "@/app/hooks";
 
@@ -11,6 +12,7 @@ import LinkDetails from "@/app/components/LinkList/LinkDetails";
 import Navigation from "@/app/components/Navigation/Navigation";
 import CreateLinkDrawer from "@/app/components/Drawer/CreateLinkDrawer";
 import FilterModal from "@/app/components/Modal/FilterModal";
+import SubscriptionSuccessModal from "@/app/components/Modal/SubscriptionSuccessModal";
 import Alert from "@/app/components/ui/Alert/Alert";
 import * as motion from 'motion/react-client';
 import { useMotionValue, animate } from 'motion/react';
@@ -52,9 +54,11 @@ function AnimatedCounter({ value, delay = 0 }: { value: number; delay?: number }
 
 export default function Dashboard() {
   const t = useTranslations('Dashboard');
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { filteredLinks, filters, fetchLinks, updateFilters } = useLinks();
   const { totalLinks, activeLinks, totalClicks } = useStats();
-  const { isAuthenticated, isGuest, user } = useAuth();
+  const { isAuthenticated, isGuest, user, checkSession } = useAuth();
 
   // Get link limit based on user role
   const getLinkLimit = () => {
@@ -68,12 +72,26 @@ export default function Dashboard() {
   const [view] = useState('details');
   const [createLinkDrawerOpen, setCreateLinkDrawerOpen] = useState(false);
   const [filterModalOpen, setFilterModalOpen] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated || isGuest) {
       fetchLinks();
     }
   }, [fetchLinks, isAuthenticated, isGuest]);
+
+  // Detect payment success from URL
+  useEffect(() => {
+    const paymentSuccess = searchParams.get('payment_success');
+    if (paymentSuccess === 'true') {
+      // Refresh user data to get updated subscription
+      checkSession();
+      // Show success modal
+      setShowSuccessModal(true);
+      // Clean URL
+      router.replace('/dashboard');
+    }
+  }, [searchParams, checkSession, router]);
 
   const hasActiveFilters = () => {
     return filters.search !== '' ||
@@ -205,6 +223,10 @@ export default function Dashboard() {
             onClose={() => setFilterModalOpen(false)}
             onApplyFilters={updateFilters}
             initialFilters={filters}
+          />
+          <SubscriptionSuccessModal
+            open={showSuccessModal}
+            onClose={() => setShowSuccessModal(false)}
           />
         </div>
       </div>
