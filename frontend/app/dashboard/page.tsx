@@ -73,12 +73,34 @@ export default function Dashboard() {
   const [createLinkDrawerOpen, setCreateLinkDrawerOpen] = useState(false);
   const [filterModalOpen, setFilterModalOpen] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [subscriptionInfo, setSubscriptionInfo] = useState<any>(null);
 
   useEffect(() => {
     if (isAuthenticated || isGuest) {
       fetchLinks();
     }
   }, [fetchLinks, isAuthenticated, isGuest]);
+
+  // Fetch subscription info for PRO users
+  useEffect(() => {
+    const fetchSubscriptionInfo = async () => {
+      if (user?.role === 'PRO') {
+        try {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/subscription/status`, {
+            method: 'GET',
+            credentials: 'include',
+          });
+          const data = await response.json();
+          if (data.success && data.data?.subscription) {
+            setSubscriptionInfo(data.data.subscription);
+          }
+        } catch (error) {
+          console.error('Error fetching subscription info:', error);
+        }
+      }
+    };
+    fetchSubscriptionInfo();
+  }, [user?.role]);
 
   // Detect payment success from URL
   useEffect(() => {
@@ -118,8 +140,25 @@ export default function Dashboard() {
             <Alert
               id="guest-link-expiration"
               type="warning"
-              // title="Guest Account"
               message={t('guestAlert')}
+              dismissible={true}
+              persistent={false}
+              className="p-2"
+            />
+          )}
+
+          {/* Subscription Cancellation Alert */}
+          {user?.role === 'PRO' && subscriptionInfo?.cancelAtPeriodEnd && subscriptionInfo?.currentPeriodEnd && (
+            <Alert
+              id="subscription-cancellation"
+              type="warning"
+              message={t('subscriptionCancelAlert', {
+                date: new Date(subscriptionInfo.currentPeriodEnd).toLocaleDateString(),
+                days: Math.ceil(
+                  (new Date(subscriptionInfo.currentPeriodEnd).getTime() - Date.now()) /
+                    (1000 * 60 * 60 * 24)
+                ),
+              })}
               dismissible={true}
               persistent={false}
               className="p-2"

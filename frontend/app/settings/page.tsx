@@ -42,7 +42,7 @@ const settingsTabs: SettingsTabConfig[] = [
 
 export default function SettingsPage() {
   const t = useTranslations('SettingsPage');
-  const { user, logout } = useAuth();
+  const { user, logout, checkSession } = useAuth();
   const { setUser } = useAuthStore();
   const toast = useToast();
 
@@ -316,7 +316,22 @@ export default function SettingsPage() {
       await subscriptionService.cancelSubscription();
 
       // Refresh user data
-      await refreshUser();
+      await checkSession();
+
+      // Refetch subscription status to show updated cancelAtPeriodEnd
+      const csrfToken = await csrfService.getToken();
+      const response = await fetch(`${API_BASE_URL}/subscription/status`, {
+        method: "GET",
+        headers: {
+          "X-CSRF-Token": csrfToken,
+        },
+        credentials: "include",
+      });
+
+      const data = await response.json();
+      if (response.ok && data.success && data.data?.subscription) {
+        setSubscriptionInfo(data.data.subscription);
+      }
 
       toast.success(t('toastCancelSuccess'));
       setShowCancelModal(false);
@@ -479,11 +494,11 @@ export default function SettingsPage() {
                   </div>
 
                   {/* Plan Section */}
-                  <div className={`p-4 rounded-2xl border-2 ${user?.role === 'PRO' ? 'bg-secondary/10 border-secondary' : 'bg-dark/5 border-dashed border-transparent'}`}>
+                  <div className={`p-4 rounded-2xl border-2 ${user?.role === 'PRO' ? 'border-secondary shadow-[4px_4px_0_var(--color-secondary)]' : 'bg-dark/5 border-dashed border-transparent'}`}>
                     <div className="flex items-center gap-2 mb-3">
                       {user?.role === 'PRO' ? <TbSparkles size={20} /> : <TbStar size={20} />}
                       <h3 className="text-xl font-bold">{t('plan')}</h3>
-                      <span className={`px-2.5 py-1 rounded-lg text-xs font-bold ${user?.role === 'PRO' ? 'bg-secondary text-light' : 'bg-dark/10 text-dark'}`}>
+                      <span className={`px-2 py-0.5 text-xs font-black italic rounded-full border border-dark shadow-[2px_2px_0_var(--color-dark)] ${user?.role === 'PRO' ? 'bg-secondary text-light' : 'bg-dark/10 text-dark'}`}>
                         {user?.role === 'PRO' ? 'PRO' : 'STANDARD'}
                       </span>
                     </div>
@@ -503,26 +518,60 @@ export default function SettingsPage() {
                       </Button>
                     ) : (
                       <div className="space-y-4">
-                        {/* PRO Description */}
-                        <p className="text-sm text-dark/70">{t('proDescription')}</p>
+                        {/* Subscription Status */}
+                        {subscriptionInfo && (
+                          <div className="space-y-3">
+                            {/* Status Badge */}
+                            <div>
+                              <p className="text-sm font-bold text-dark/70 mb-2">{t('subscriptionStatus')}</p>
+                              <span className={`inline-block px-2 py-0.5 text-xs font-black italic rounded-full border border-dark shadow-[2px_2px_0_var(--color-dark)] ${
+                                subscriptionInfo.status === 'ACTIVE' ? 'bg-primary text-dark' :
+                                subscriptionInfo.status === 'TRIALING' ? 'bg-info text-light' :
+                                subscriptionInfo.status === 'PAST_DUE' ? 'bg-warning text-dark' :
+                                subscriptionInfo.status === 'CANCELED' ? 'bg-danger text-light' :
+                                'bg-dark/10 text-dark'
+                              }`}>
+                                {subscriptionInfo.status}
+                              </span>
+                            </div>
 
-                        {/* Renewal Information */}
-                        {subscriptionInfo?.currentPeriodEnd && (
-                          <div>
-                            <p className="text-sm font-bold text-dark/70 mb-1">
-                              {t('renewsOn')}
-                            </p>
-                            <p className="text-base font-bold">
-                              {new Date(subscriptionInfo.currentPeriodEnd).toLocaleDateString()}
-                            </p>
-                            <p className="text-sm text-dark/60 mt-1">
-                              {t('daysUntilRenewal', {
-                                days: Math.ceil(
-                                  (new Date(subscriptionInfo.currentPeriodEnd).getTime() - Date.now()) /
-                                    (1000 * 60 * 60 * 24)
-                                ),
-                              })}
-                            </p>
+                            {/* Warning for PAST_DUE */}
+                            {subscriptionInfo.status === 'PAST_DUE' && (
+                              <p className="text-sm text-dark/70">
+                                ⚠️ {t('paymentIssue')}
+                              </p>
+                            )}
+
+                            {/* Cancellation Notice */}
+                            {subscriptionInfo.cancelAtPeriodEnd && subscriptionInfo.currentPeriodEnd && (
+                              <p className="text-sm text-dark/70">
+                                {t('cancellationNoticeBefore')}{' '}
+                                <span className="underline decoration-2 underline-offset-2">
+                                  {new Date(subscriptionInfo.currentPeriodEnd).toLocaleDateString()}
+                                </span>
+                                {t('cancellationNoticeAfter')}
+                              </p>
+                            )}
+
+                            {/* Renewal Information */}
+                            {subscriptionInfo.currentPeriodEnd && !subscriptionInfo.cancelAtPeriodEnd && subscriptionInfo.status === 'ACTIVE' && (
+                              <div>
+                                <p className="text-sm font-bold text-dark/70 mb-1">
+                                  {t('renewsOn')}
+                                </p>
+                                <p className="text-base font-bold">
+                                  {new Date(subscriptionInfo.currentPeriodEnd).toLocaleDateString()}
+                                </p>
+                                <p className="text-sm text-dark/60 mt-1">
+                                  {t('daysUntilRenewal', {
+                                    days: Math.ceil(
+                                      (new Date(subscriptionInfo.currentPeriodEnd).getTime() - Date.now()) /
+                                        (1000 * 60 * 60 * 24)
+                                    ),
+                                  })}
+                                </p>
+                              </div>
+                            )}
                           </div>
                         )}
 
@@ -533,9 +582,9 @@ export default function SettingsPage() {
                           rounded="xl"
                           onClick={handleManageSubscription}
                           disabled={loading}
-                          className="bg-transparent hover:bg-primary hover:text-light border border-dark"
+                          className="bg-transparent hover:bg-danger hover:text-light border border-dark"
                         >
-                          Manage Subscription
+                          {t('manageSubscription')}
                         </Button>
                       </div>
                     )}
