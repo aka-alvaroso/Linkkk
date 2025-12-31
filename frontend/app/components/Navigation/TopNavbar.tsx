@@ -10,6 +10,7 @@ import * as motion from "motion/react-client";
 import { AnimatePresence } from "motion/react";
 import Button from "../ui/Button/Button";
 import { useTranslations } from 'next-intl';
+import { subscriptionService } from "@/app/services/api/subscriptionService";
 
 interface TopNavbarProps {
   showCreate?: boolean;
@@ -90,10 +91,13 @@ export default function TopNavbar({ showCreate = false }: TopNavbarProps) {
               leftIcon={<TbSparkles size={20} />}
               expandOnHover="icon"
               className="bg-primary text-dark hover:bg-info hover:text-light hover:shadow-[_4px_4px_0_var(--color-dark)] leading-5"
-              onClick={() => {
-                // TODO: Navigate to Stripe checkout
-
-                toast.info('Stripe integration coming soon!');
+              onClick={async () => {
+                try {
+                  await subscriptionService.createCheckoutSession();
+                } catch (error) {
+                  console.error('Error creating checkout session:', error);
+                  toast.error('Failed to start checkout. Please try again.');
+                }
               }}
             >
               <p className="font-black italic">

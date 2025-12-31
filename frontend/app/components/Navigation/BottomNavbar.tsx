@@ -7,6 +7,7 @@ import CreateLinkDrawer from "../Drawer/CreateLinkDrawer";
 import { useAuth } from "@/app/hooks";
 import { useToast } from "@/app/hooks/useToast";
 import { useTranslations } from 'next-intl';
+import { subscriptionService } from "@/app/services/api/subscriptionService";
 
 export default function BottomNavbar() {
   const pathname = usePathname();
@@ -39,12 +40,16 @@ export default function BottomNavbar() {
         { id: "create", label: t('create'), icon: TbPlus, action: "create", isFAB: true },
       ];
 
-  const handleClick = (item: typeof navigationItems[0]) => {
+  const handleClick = async (item: typeof navigationItems[0]) => {
     if (item.action === "create") {
       setCreateLinkDrawer(true);
     } else if (item.action === "upgrade") {
-      // TODO: Navigate to Stripe checkout
-      toast.info('Stripe integration coming soon!');
+      try {
+        await subscriptionService.createCheckoutSession();
+      } catch (error) {
+        console.error('Error creating checkout session:', error);
+        toast.error('Failed to start checkout. Please try again.');
+      }
     } else if (item.href) {
       router.push(item.href);
     }
