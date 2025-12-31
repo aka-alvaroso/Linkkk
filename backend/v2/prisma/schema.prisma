@@ -17,6 +17,7 @@ model User {
   createdAt    DateTime      @default(now())
   links        Link[]
   subscription Subscription?
+  auditLogs    AuditLog[]
 }
 
 model GuestSession {
@@ -161,4 +162,29 @@ enum SubscriptionStatus {
   PAST_DUE
   INACTIVE
   TRIALING
+}
+
+enum AuditEventType {
+  SUBSCRIPTION_CREATED
+  SUBSCRIPTION_UPGRADED
+  SUBSCRIPTION_DOWNGRADED
+  SUBSCRIPTION_CANCELED
+  PAYMENT_FAILED
+}
+
+// Audit Log for critical subscription events
+model AuditLog {
+  id        Int            @id @default(autoincrement())
+  userId    Int
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  eventType AuditEventType
+  eventData Json           // Details specific to the event
+  metadata  Json?          // Additional info (IP, webhookId, etc.)
+
+  createdAt DateTime       @default(now())
+
+  @@index([userId])
+  @@index([eventType])
+  @@index([createdAt])
 }

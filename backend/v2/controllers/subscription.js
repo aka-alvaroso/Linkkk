@@ -4,6 +4,7 @@ const ERRORS = require("../constants/errorCodes");
 const planLimits = require("../utils/limits");
 const config = require("../config/environment");
 const stripeService = require("../services/stripe");
+const auditLog = require("../services/auditLog");
 
 const getStatus = async (req, res) => {
   try {
@@ -176,6 +177,14 @@ const cancelSubscription = async (req, res) => {
     if (config.env.isDevelopment) {
       await executeDowngrade(userId);
 
+      // Log cancellation with immediate downgrade
+      await auditLog.logSubscriptionCanceled(userId, {
+        cancelAtPeriodEnd: false,
+        immediateDowngrade: true,
+        source: 'user_action',
+        stripeSubscriptionId: user.subscription.stripeSubscriptionId,
+      });
+
       return successResponse(res, {
         message:
           "Subscription canceled and downgraded immediately (development mode)",
@@ -191,6 +200,14 @@ const cancelSubscription = async (req, res) => {
         cancelAtPeriodEnd: true,
         updatedAt: new Date(),
       },
+    });
+
+    // Log cancellation request
+    await auditLog.logSubscriptionCanceled(userId, {
+      cancelAtPeriodEnd: true,
+      currentPeriodEnd: user.subscription.currentPeriodEnd,
+      source: 'user_action',
+      stripeSubscriptionId: user.subscription.stripeSubscriptionId,
     });
 
     return successResponse(res, {
@@ -210,6 +227,14 @@ const executeDowngrade = async (userId) => {
   const STANDARD_LIMITS = planLimits.user;
   const ACCESS_RETENTION_DAYS =
     STANDARD_LIMITS.linkAnalytics.linkAccessesDuration;
+
+  // Track statistics for audit log
+  let stats = {
+    linksDeleted: 0,
+    rulesDeleted: 0,
+    conditionsDeleted: 0,
+    accessesDeleted: 0,
+  };
 
   // Start transaction for atomic operations
   await prisma.$transaction(async (tx) => {
@@ -233,12 +258,13 @@ const executeDowngrade = async (userId) => {
 
     const userLinkIds = userLinks.map((link) => link.id);
 
-    await tx.access.deleteMany({
+    const deletedAccesses = await tx.access.deleteMany({
       where: {
         linkId: { in: userLinkIds },
         createdAt: { lt: accessExpirationDate },
       },
     });
+    stats.accessesDeleted = deletedAccesses.count;
 
     // 3. Handle links over limit (50) - DELETE oldest links
     if (userLinks.length > STANDARD_LIMITS.links) {
@@ -249,6 +275,7 @@ const executeDowngrade = async (userId) => {
       await tx.link.deleteMany({
         where: { id: { in: linkIdsToDelete } },
       });
+      stats.linksDeleted = linksToDelete.length;
     }
 
     // 4. Get remaining links after deletion
@@ -268,6 +295,7 @@ const executeDowngrade = async (userId) => {
         await tx.linkRule.deleteMany({
           where: { id: { in: ruleIdsToDelete } },
         });
+        stats.rulesDeleted += rulesToDelete.length;
       }
 
       // 6. Handle conditions over limit - DELETE extra conditions
@@ -286,6 +314,7 @@ const executeDowngrade = async (userId) => {
           await tx.ruleCondition.deleteMany({
             where: { id: { in: conditionIdsToDelete } },
           });
+          stats.conditionsDeleted += conditionsToDelete.length;
         }
       }
     }
@@ -305,6 +334,15 @@ const executeDowngrade = async (userId) => {
         updatedAt: new Date(),
       },
     });
+  });
+
+  // Log the downgrade with statistics
+  await auditLog.logSubscriptionDowngraded(userId, {
+    reason: 'subscription_canceled',
+    linksDeleted: stats.linksDeleted,
+    rulesDeleted: stats.rulesDeleted,
+    conditionsDeleted: stats.conditionsDeleted,
+    accessesDeleted: stats.accessesDeleted,
   });
 
   console.log(`✅ User ${userId} successfully downgraded to STANDARD`);
@@ -453,6 +491,12 @@ const handleCheckoutSessionCompleted = async (session) => {
   const priceId = subscription.items.data[0].price.id;
   const currentPeriodEnd = new Date(subscription.current_period_end * 1000);
 
+  // Check if subscription exists (to determine if upgrade or new)
+  const existingSubscription = await prisma.subscription.findUnique({
+    where: { userId },
+  });
+  const isUpgrade = !!existingSubscription;
+
   // Update user to PRO and create/update subscription
   await prisma.$transaction(async (tx) => {
     // Update user role to PRO
@@ -462,10 +506,6 @@ const handleCheckoutSessionCompleted = async (session) => {
     });
 
     // Create or update subscription
-    const existingSubscription = await tx.subscription.findUnique({
-      where: { userId },
-    });
-
     if (existingSubscription) {
       await tx.subscription.update({
         where: { userId },
@@ -493,6 +533,21 @@ const handleCheckoutSessionCompleted = async (session) => {
       });
     }
   });
+
+  // Log subscription creation or upgrade
+  const logData = {
+    stripeSessionId: session.id,
+    stripeSubscriptionId: subscriptionId,
+    currentPeriodEnd: currentPeriodEnd,
+    source: 'stripe_webhook',
+    webhookEventId: session.id,
+  };
+
+  if (isUpgrade) {
+    await auditLog.logSubscriptionUpgraded(userId, logData);
+  } else {
+    await auditLog.logSubscriptionCreated(userId, logData);
+  }
 
   console.log(`✅ User ${userId} upgraded to PRO`);
 };
@@ -617,6 +672,16 @@ const handlePaymentFailed = async (invoice) => {
       status: "PAST_DUE",
       updatedAt: new Date(),
     },
+  });
+
+  // Log payment failure
+  await auditLog.logPaymentFailed(existingSubscription.userId, {
+    stripeInvoiceId: invoice.id,
+    amount: invoice.amount_due,
+    currency: invoice.currency,
+    attemptCount: invoice.attempt_count,
+    webhookEventId: invoice.id,
+    failureMessage: invoice.last_finalization_error?.message || 'Payment failed',
   });
 
   console.log(`⚠️ Subscription ${subscriptionId} marked as PAST_DUE`);
