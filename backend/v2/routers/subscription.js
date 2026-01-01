@@ -10,6 +10,10 @@ const {
   simulateCancel,
 } = require("../controllers/subscription");
 const { auth, authUser } = require("../middlewares/auth");
+const {
+  subscriptionRateLimiter,
+  subscriptionStatusRateLimiter
+} = require("../middlewares/rateLimiter");
 
 // Webhook endpoint (NO auth - Stripe calls this)
 // This must be registered BEFORE body parsing middleware
@@ -20,10 +24,13 @@ router.post("/webhook", handleWebhook);
 router.use(auth);
 router.use(authUser);
 
-router.get("/status", getStatus);
-router.post("/cancel", cancelSubscription);
-router.post("/create-checkout-session", createCheckoutSession);
-router.post("/create-portal-session", createPortalSession);
+// Status endpoint - lighter rate limit
+router.get("/status", subscriptionStatusRateLimiter, getStatus);
+
+// Critical payment endpoints - strict rate limiting
+router.post("/cancel", subscriptionRateLimiter, cancelSubscription);
+router.post("/create-checkout-session", subscriptionRateLimiter, createCheckoutSession);
+router.post("/create-portal-session", subscriptionRateLimiter, createPortalSession);
 
 // TODO: Remove before production
 router.post("/dev/simulate-upgrade", simulateUpgrade);
