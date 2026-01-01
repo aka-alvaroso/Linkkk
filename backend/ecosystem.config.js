@@ -21,20 +21,11 @@ module.exports = {
         NODE_ENV: "production",
       },
 
-      // Log configuration - CRITICAL FOR LOG MANAGEMENT
+      // Log configuration
       error_file: "~/.pm2/logs/v2-error.log",
       out_file: "~/.pm2/logs/v2-out.log",
       log_date_format: "YYYY-MM-DD HH:mm:ss Z",
-
-      // Log rotation settings
-      max_size: "10M", // Rotate when log reaches 10MB
-      max_files: 5, // Keep only last 5 log files
-      compress: true, // Compress rotated logs (saves space)
-
-      // Merge logs into single file per type
       merge_logs: true,
-
-      // Don't create new logs on restart
       time: false,
     },
   ],
