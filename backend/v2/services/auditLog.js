@@ -121,6 +121,28 @@ const logPaymentFailed = async (userId, data) => {
 };
 
 /**
+ * Log payment success (especially after a failure)
+ */
+const logPaymentSucceeded = async (userId, data) => {
+  await prisma.auditLog.create({
+    data: {
+      userId,
+      eventType: 'PAYMENT_SUCCEEDED',
+      eventData: {
+        stripeInvoiceId: data.stripeInvoiceId,
+        amount: data.amount,
+        currency: data.currency,
+        previousStatus: data.previousStatus,
+      },
+      metadata: {
+        source: 'stripe_webhook',
+        webhookEventId: data.webhookEventId,
+      },
+    },
+  });
+};
+
+/**
  * Clean up old audit logs (retention policy: 2 years)
  * Should be run periodically (e.g., monthly cron job)
  */
@@ -146,5 +168,6 @@ module.exports = {
   logSubscriptionDowngraded,
   logSubscriptionCanceled,
   logPaymentFailed,
+  logPaymentSucceeded,
   cleanupOldLogs,
 };

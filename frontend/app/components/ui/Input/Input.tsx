@@ -16,7 +16,7 @@ interface BaseInputProps {
 
 type InputProps = BaseInputProps &
   (
-    | ({ textarea?: false } & InputHTMLAttributes<HTMLInputElement>)
+    | ({ textarea?: false } & Omit<InputHTMLAttributes<HTMLInputElement>, 'size'>)
     | ({ textarea: true } & TextareaHTMLAttributes<HTMLTextAreaElement>)
   );
 

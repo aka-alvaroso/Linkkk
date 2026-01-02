@@ -181,7 +181,7 @@ const cancelSubscription = async (req, res) => {
       await auditLog.logSubscriptionCanceled(userId, {
         cancelAtPeriodEnd: false,
         immediateDowngrade: true,
-        source: 'user_action',
+        source: "user_action",
         stripeSubscriptionId: user.subscription.stripeSubscriptionId,
       });
 
@@ -206,7 +206,7 @@ const cancelSubscription = async (req, res) => {
     await auditLog.logSubscriptionCanceled(userId, {
       cancelAtPeriodEnd: true,
       currentPeriodEnd: user.subscription.currentPeriodEnd,
-      source: 'user_action',
+      source: "user_action",
       stripeSubscriptionId: user.subscription.stripeSubscriptionId,
     });
 
@@ -268,7 +268,10 @@ const executeDowngrade = async (userId) => {
 
     // 3. Handle links over limit (50) - DELETE oldest links
     if (userLinks.length > STANDARD_LIMITS.links) {
-      const linksToDelete = userLinks.slice(0, userLinks.length - STANDARD_LIMITS.links);
+      const linksToDelete = userLinks.slice(
+        0,
+        userLinks.length - STANDARD_LIMITS.links
+      );
       const linkIdsToDelete = linksToDelete.map((link) => link.id);
 
       // Delete oldest links over limit (cascade will delete rules, conditions, and accesses)
@@ -279,7 +282,9 @@ const executeDowngrade = async (userId) => {
     }
 
     // 4. Get remaining links after deletion
-    const remainingLinks = userLinks.slice(Math.max(0, userLinks.length - STANDARD_LIMITS.links));
+    const remainingLinks = userLinks.slice(
+      Math.max(0, userLinks.length - STANDARD_LIMITS.links)
+    );
 
     // 5. Handle rules over limit - DELETE extra rules
     for (const link of remainingLinks) {
@@ -338,7 +343,7 @@ const executeDowngrade = async (userId) => {
 
   // Log the downgrade with statistics
   await auditLog.logSubscriptionDowngraded(userId, {
-    reason: 'subscription_canceled',
+    reason: "subscription_canceled",
     linksDeleted: stats.linksDeleted,
     rulesDeleted: stats.rulesDeleted,
     conditionsDeleted: stats.conditionsDeleted,
@@ -439,7 +444,10 @@ const handleWebhook = async (req, res) => {
     console.error("❌ Webhook signature verification failed:", error.message);
     console.error("   Body type:", typeof req.body);
     console.error("   Body is Buffer:", Buffer.isBuffer(req.body));
-    console.error("   Webhook secret configured:", !!config.stripe.webhookSecret);
+    console.error(
+      "   Webhook secret configured:",
+      !!config.stripe.webhookSecret
+    );
     return res.status(400).send(`Webhook Error: ${error.message}`);
   }
 
@@ -461,6 +469,10 @@ const handleWebhook = async (req, res) => {
 
       case "invoice.payment_failed":
         await handlePaymentFailed(event.data.object);
+        break;
+
+      case "invoice.payment_succeeded":
+        await handlePaymentSucceeded(event.data.object);
         break;
 
       default:
@@ -486,7 +498,9 @@ const handleCheckoutSessionCompleted = async (session) => {
 
   // Get subscription details from Stripe to get price ID and period end
   const stripeInstance = stripeService.initializeStripe();
-  const subscription = await stripeInstance.subscriptions.retrieve(subscriptionId);
+  const subscription = await stripeInstance.subscriptions.retrieve(
+    subscriptionId
+  );
 
   const priceId = subscription.items.data[0].price.id;
   const currentPeriodEnd = new Date(subscription.current_period_end * 1000);
@@ -539,7 +553,7 @@ const handleCheckoutSessionCompleted = async (session) => {
     stripeSessionId: session.id,
     stripeSubscriptionId: subscriptionId,
     currentPeriodEnd: currentPeriodEnd,
-    source: 'stripe_webhook',
+    source: "stripe_webhook",
     webhookEventId: session.id,
   };
 
@@ -571,7 +585,9 @@ const handleSubscriptionUpdated = async (subscription) => {
   if (!existingSubscription) {
     // This can happen if the webhook arrives before checkout.session.completed
     // It's not an error, just means we haven't created the subscription yet
-    console.log(`ℹ️  Subscription not found yet for Stripe ID: ${subscriptionId} (may be processed by checkout.session.completed)`);
+    console.log(
+      `ℹ️  Subscription not found yet for Stripe ID: ${subscriptionId} (may be processed by checkout.session.completed)`
+    );
     return;
   }
 
@@ -604,16 +620,22 @@ const handleSubscriptionUpdated = async (subscription) => {
       },
     });
 
-    console.log(`✅ Subscription ${subscriptionId} updated to status: ${status}, cancelAtPeriodEnd: ${cancelAtPeriodEnd}`);
+    console.log(
+      `✅ Subscription ${subscriptionId} updated to status: ${status}, cancelAtPeriodEnd: ${cancelAtPeriodEnd}`
+    );
 
     // If subscription is being canceled (cancel_at_period_end = true),
     // optionally downgrade immediately instead of waiting for period end
     if (cancelAtPeriodEnd && !config.env.isDevelopment) {
       // In production, wait for period end (Stripe will send subscription.deleted webhook)
-      console.log(`ℹ️  Subscription will cancel at ${currentPeriodEnd?.toISOString()}`);
+      console.log(
+        `ℹ️  Subscription will cancel at ${currentPeriodEnd?.toISOString()}`
+      );
     } else if (cancelAtPeriodEnd && config.env.isDevelopment) {
       // In development, downgrade immediately for testing
-      console.log(`⚠️  Development mode: Downgrading user ${existingSubscription.userId} immediately`);
+      console.log(
+        `⚠️  Development mode: Downgrading user ${existingSubscription.userId} immediately`
+      );
       try {
         await executeDowngrade(existingSubscription.userId);
       } catch (downgradeError) {
@@ -681,10 +703,85 @@ const handlePaymentFailed = async (invoice) => {
     currency: invoice.currency,
     attemptCount: invoice.attempt_count,
     webhookEventId: invoice.id,
-    failureMessage: invoice.last_finalization_error?.message || 'Payment failed',
+    failureMessage:
+      invoice.last_finalization_error?.message || "Payment failed",
   });
 
   console.log(`⚠️ Subscription ${subscriptionId} marked as PAST_DUE`);
+};
+
+const handlePaymentSucceeded = async (invoice) => {
+  const customerId = invoice.customer;
+  const subscriptionId = invoice.subscription;
+
+  console.log(`✅ Payment succeeded for subscription: ${subscriptionId}`);
+
+  // Find subscription by Stripe subscription ID
+  const existingSubscription = await prisma.subscription.findFirst({
+    where: { stripeSubscriptionId: subscriptionId },
+    include: { user: true },
+  });
+
+  if (!existingSubscription) {
+    console.log(`ℹ️  Subscription not found for Stripe ID: ${subscriptionId}`);
+    return;
+  }
+
+  // If subscription was PAST_DUE, reactivate it
+  if (existingSubscription.status === "PAST_DUE") {
+    // Get subscription details from Stripe to get current period end
+    const stripeInstance = stripeService.initializeStripe();
+    const subscription = await stripeInstance.subscriptions.retrieve(
+      subscriptionId
+    );
+
+    const currentPeriodEnd = subscription.current_period_end
+      ? new Date(subscription.current_period_end * 1000)
+      : existingSubscription.currentPeriodEnd;
+
+    // Reactivate subscription
+    await prisma.subscription.update({
+      where: { id: existingSubscription.id },
+      data: {
+        status: "ACTIVE",
+        currentPeriodEnd: currentPeriodEnd,
+        updatedAt: new Date(),
+      },
+    });
+
+    // Log payment success after failure
+    await auditLog.logPaymentSucceeded(existingSubscription.userId, {
+      stripeInvoiceId: invoice.id,
+      amount: invoice.amount_paid,
+      currency: invoice.currency,
+      webhookEventId: invoice.id,
+      previousStatus: "PAST_DUE",
+    });
+
+    console.log(
+      `✅ Subscription ${subscriptionId} reactivated from PAST_DUE to ACTIVE`
+    );
+  } else {
+    // Just update the period end if subscription is already active
+    const stripeInstance = stripeService.initializeStripe();
+    const subscription = await stripeInstance.subscriptions.retrieve(
+      subscriptionId
+    );
+
+    if (subscription.current_period_end) {
+      const currentPeriodEnd = new Date(subscription.current_period_end * 1000);
+
+      await prisma.subscription.update({
+        where: { id: existingSubscription.id },
+        data: {
+          currentPeriodEnd: currentPeriodEnd,
+          updatedAt: new Date(),
+        },
+      });
+
+      console.log(`✅ Updated period end for subscription ${subscriptionId}`);
+    }
+  }
 };
 
 module.exports = {

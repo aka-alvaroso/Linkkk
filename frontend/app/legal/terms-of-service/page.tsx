@@ -30,7 +30,7 @@ export default function TermsOfService() {
                 </h2>
                 <p>
                     Linkkk es una herramienta que permite acortar URLs y aplicar reglas condicionales (geolocalización, tipo de dispositivo, etc.)
-                    para redirigir el tráfico. El servicio se proporciona "tal cual" y "según disponibilidad".
+                    para redirigir el tráfico. El servicio se proporciona &quot;tal cual&quot; y &quot;según disponibilidad&quot;.
                 </p>
 
                 <h2 className="text-2xl font-black italic mt-12 mb-6 flex items-baseline gap-3">
@@ -102,7 +102,7 @@ export default function TermsOfService() {
             </h2>
             <p>
                 Linkkk is a tool that allows you to shorten URLs and apply conditional rules (geolocation, device type, etc.)
-                to redirect traffic. The service is provided "as is" and "as available".
+                to redirect traffic. The service is provided &quot;as is&quot; and &quot;as available&quot;.
             </p>
 
             <h2 className="text-2xl font-black italic mt-12 mb-6 flex items-baseline gap-3">

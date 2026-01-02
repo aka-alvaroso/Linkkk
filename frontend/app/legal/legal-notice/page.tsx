@@ -43,7 +43,7 @@ export default function LegalNotice() {
                     Uso del Portal
                 </h2>
                 <p>
-                    Linkkk proporciona el acceso a multitud de informaciones, servicios, programas o datos (en adelante, "los contenidos") en Internet pertenecientes a Linkkk o a sus licenciantes a los que el USUARIO pueda tener acceso.
+                    Linkkk proporciona el acceso a multitud de informaciones, servicios, programas o datos (en adelante, &quot;los contenidos&quot;) en Internet pertenecientes a Linkkk o a sus licenciantes a los que el USUARIO pueda tener acceso.
                 </p>
                 <div className="bg-light p-6 rounded-2xl border border-dark/10">
                     <p className="font-bold mb-2">El USUARIO asume la responsabilidad del uso del portal:</p>
@@ -102,7 +102,7 @@ export default function LegalNotice() {
                 Use of the Portal
             </h2>
             <p>
-                Linkkk provides access to a multitude of information, services, programs, or data (hereinafter, "the contents") on the Internet belonging to Linkkk or its licensors to which the USER may have access.
+                Linkkk provides access to a multitude of information, services, programs, or data (hereinafter, &quot;the contents&quot;) on the Internet belonging to Linkkk or its licensors to which the USER may have access.
             </p>
             <div className="bg-light p-6 rounded-2xl border border-dark/10">
                 <p className="font-bold mb-2">The USER assumes responsibility for the use of the portal:</p>

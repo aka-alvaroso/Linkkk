@@ -116,7 +116,7 @@ export default function CookiePolicy() {
                     <tbody className="bg-white">
                         <tr className="border-b border-dashed border-dark/10 hover:bg-light/50 transition-colors">
                             <td className="p-4 font-mono font-bold text-dark">NEXT_LOCALE</td>
-                            <td className="p-4">Stores the user's language preference.</td>
+                            <td className="p-4">Stores the user&apos;s language preference.</td>
                             <td className="p-4 text-center bg-gray-50 font-bold text-dark/60">1 year</td>
                         </tr>
                         <tr className="border-b border-dashed border-dark/10 hover:bg-light/50 transition-colors">

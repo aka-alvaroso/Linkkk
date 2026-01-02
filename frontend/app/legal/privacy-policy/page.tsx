@@ -26,7 +26,7 @@ export default function PrivacyPolicy() {
                     </p>
                     <div className="bg-white p-6 rounded-2xl border-2 border-dark shadow-[4px_4px_0_var(--color-dark)]">
                         <ul className="list-none pl-0 space-y-2 m-0">
-                            <li><strong>Titular:</strong> Álvaro Barbero Roldán (en adelante, "el Titular")</li>
+                            <li><strong>Titular:</strong> Álvaro Barbero Roldán (en adelante, &quot;el Titular&quot;)</li>
                             <li><strong>Domicilio:</strong> Córdoba, España</li>
                             <li><strong>Email de contacto:</strong> <a href="mailto:help@linkkk.dev" className="font-bold hover:text-primary transition-colors">help@linkkk.dev</a></li>
                         </ul>
@@ -134,7 +134,7 @@ export default function PrivacyPolicy() {
                 </p>
                 <div className="bg-white p-6 rounded-2xl border-2 border-dark shadow-[4px_4px_0_var(--color-dark)]">
                     <ul className="list-none pl-0 space-y-2 m-0">
-                        <li><strong>Owner:</strong> Álvaro Barbero Roldán (hereinafter, "the Owner")</li>
+                        <li><strong>Owner:</strong> Álvaro Barbero Roldán (hereinafter, &quot;the Owner&quot;)</li>
                         <li><strong>Location:</strong> Córdoba, Spain</li>
                         <li><strong>Contact Email:</strong> <a href="mailto:help@linkkk.dev" className="font-bold hover:text-primary transition-colors">help@linkkk.dev</a></li>
                     </ul>

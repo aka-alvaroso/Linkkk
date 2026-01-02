@@ -5,11 +5,11 @@ import Navigation from "@/app/components/Navigation/Navigation";
 import Button from "@/app/components/ui/Button/Button";
 import Input from "@/app/components/ui/Input/Input";
 import RouteGuard from "@/app/components/RouteGuard/RouteGuard";
-import AnimatedText from "@/app/components/ui/AnimatedText/AnimatedText";
+import AnimatedText, { AnimatedTextRef } from "@/app/components/ui/AnimatedText/AnimatedText";
 import CreateLinkDrawer from "@/app/components/Drawer/CreateLinkDrawer";
 import InlineSelect from "@/app/components/ui/InlineSelect/InlineSelect";
 import * as motion from "motion/react-client";
-import { useScroll, useTransform } from "motion/react";
+import { useScroll, useTransform, MotionValue } from "motion/react";
 import {
   TbWorld,
   TbDeviceMobile,
@@ -61,10 +61,10 @@ const FeatureCard = ({
   tags,
   textLight = false
 }: {
-  scrollProgress: any;
+  scrollProgress: MotionValue<number>;
   index: number;
   total: number;
-  icon: any;
+  icon: React.ComponentType<{ size?: number; className?: string }>;
   iconColor: string;
   title: string;
   description: string;
@@ -562,7 +562,7 @@ export default function Landing() {
                   { icon: TbCalendar, label: tRules('conditionDateTime'), color: "bg-success" },
                   { icon: TbChartBar, label: tRules('conditionAccessCount'), color: "bg-info" },
                 ].map((item, i) => {
-                  const textRef = React.useRef<any>(null);
+                  const textRef = { current: null as AnimatedTextRef | null };
                   const isActive = ruleExamples[activeExampleIndex].conditions.includes(item.label);
                   return (
                     <motion.div
@@ -612,7 +612,7 @@ export default function Landing() {
                   { icon: TbLock, label: tRules('actionPassword'), color: "bg-warning" },
                   { icon: TbWebhook, label: tRules('actionWebhook'), color: "bg-info" },
                 ].map((item, i) => {
-                  const textRef = React.useRef<any>(null);
+                  const textRef = { current: null as AnimatedTextRef | null };
                   const isActive = ruleExamples[activeExampleIndex].actions.includes(item.label);
                   return (
                     <motion.div

@@ -422,7 +422,7 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
                               priority={index + 1}
                               onChange={(updatedRule) => handleRuleChange(rule.id, updatedRule)}
                               onDelete={() => handleDeleteRule(rule.id)}
-                              maxConditions={limits.conditionsPerRule}
+                              maxConditions={limits.conditionsPerRule ?? 999}
                             />
                           ))}
                         </AnimatePresence>

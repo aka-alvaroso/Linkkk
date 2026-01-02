@@ -35,7 +35,7 @@ export default function SubscriptionSuccessModal({
           zIndex: 9999,
         };
 
-        function fire(particleRatio: number, opts: any) {
+        function fire(particleRatio: number, opts: Record<string, unknown>) {
           confetti({
             ...defaults,
             ...opts,
