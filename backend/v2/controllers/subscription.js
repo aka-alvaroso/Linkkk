@@ -605,7 +605,11 @@ const handleCheckoutSessionCompleted = async (session) => {
   });
 
   if (user) {
-    await emailService.sendUpgradeToProEmail(user.email, user.username, user.locale);
+    await emailService.sendUpgradeToProEmail(
+      user.email,
+      user.username,
+      user.locale
+    );
 
     // Send Telegram notification to admin
     await telegramService.notifyNewSubscription(
@@ -697,7 +701,7 @@ const handleSubscriptionUpdated = async (subscription) => {
           existingSubscription.user.email,
           existingSubscription.user.username,
           currentPeriodEnd,
-          'user_action'
+          "user_action"
         );
       }
     } else if (cancelAtPeriodEnd && config.env.isDevelopment) {
@@ -799,7 +803,19 @@ const handlePaymentFailed = async (invoice) => {
 
 const handlePaymentSucceeded = async (invoice) => {
   const customerId = invoice.customer;
-  const subscriptionId = invoice.subscription;
+  // Handle both expanded object and string ID cases
+  const subscriptionId =
+    typeof invoice.subscription === "string"
+      ? invoice.subscription
+      : invoice.subscription?.id || invoice.subscription;
+
+  // Skip if invoice is not associated with a subscription (one-time payments)
+  if (!subscriptionId || typeof subscriptionId !== "string") {
+    console.log(
+      `ℹ️  Invoice ${invoice.id} is not associated with a subscription (one-time payment), skipping`
+    );
+    return;
+  }
 
   console.log(`✅ Payment succeeded for subscription: ${subscriptionId}`);
 

@@ -37,7 +37,9 @@ class UserService {
         data.code || 'UNKNOWN_ERROR',
         data.message || response.statusText,
         response.status >= 500,
-        data.details
+        Array.isArray(data.details) 
+          ? data.details as Array<{ field: string; message: string }>
+          : undefined
       );
     }
 
