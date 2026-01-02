@@ -5,6 +5,8 @@ const planLimits = require("../utils/limits");
 const config = require("../config/environment");
 const stripeService = require("../services/stripe");
 const auditLog = require("../services/auditLog");
+const emailService = require("../services/emailService");
+const telegramService = require("../services/telegramService");
 
 const getStatus = async (req, res) => {
   try {
@@ -140,6 +142,37 @@ const simulateCancel = async (req, res) => {
     });
   } catch (error) {
     console.error("Error simulating cancel:", error);
+    return errorResponse(res, ERRORS.INTERNAL_ERROR);
+  }
+};
+
+// TODO: Remove
+const testTelegram = async (req, res) => {
+  if (config.env.isProduction) {
+    return errorResponse(res, {
+      code: "FORBIDDEN",
+      message: "This endpoint is only available in development",
+      statusCode: 403,
+    });
+  }
+
+  try {
+    const result = await telegramService.sendTestNotification();
+
+    if (result.success) {
+      return successResponse(res, {
+        message: "Telegram test notification sent successfully",
+        messageId: result.messageId,
+      });
+    } else {
+      return errorResponse(res, {
+        code: "TELEGRAM_ERROR",
+        message: result.error || "Failed to send Telegram notification",
+        statusCode: 500,
+      });
+    }
+  } catch (error) {
+    console.error("Error testing Telegram:", error);
     return errorResponse(res, ERRORS.INTERNAL_ERROR);
   }
 };
@@ -564,6 +597,24 @@ const handleCheckoutSessionCompleted = async (session) => {
   }
 
   console.log(`✅ User ${userId} upgraded to PRO`);
+
+  // Send welcome email to user
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { email: true, username: true, locale: true },
+  });
+
+  if (user) {
+    await emailService.sendUpgradeToProEmail(user.email, user.username, user.locale);
+
+    // Send Telegram notification to admin
+    await telegramService.notifyNewSubscription(
+      user.email,
+      user.username,
+      subscription.items.data[0].price.unit_amount || 0,
+      currentPeriodEnd
+    );
+  }
 };
 
 const handleSubscriptionUpdated = async (subscription) => {
@@ -631,6 +682,24 @@ const handleSubscriptionUpdated = async (subscription) => {
       console.log(
         `ℹ️  Subscription will cancel at ${currentPeriodEnd?.toISOString()}`
       );
+
+      // Send cancellation email to user
+      if (existingSubscription.user) {
+        await emailService.sendSubscriptionCancelledEmail(
+          existingSubscription.user.email,
+          existingSubscription.user.username,
+          currentPeriodEnd,
+          existingSubscription.user.locale
+        );
+
+        // Send Telegram notification to admin
+        await telegramService.notifyCancellation(
+          existingSubscription.user.email,
+          existingSubscription.user.username,
+          currentPeriodEnd,
+          'user_action'
+        );
+      }
     } else if (cancelAtPeriodEnd && config.env.isDevelopment) {
       // In development, downgrade immediately for testing
       console.log(
@@ -680,6 +749,7 @@ const handlePaymentFailed = async (invoice) => {
   // Find subscription by Stripe subscription ID
   const existingSubscription = await prisma.subscription.findFirst({
     where: { stripeSubscriptionId: subscriptionId },
+    include: { user: true },
   });
 
   if (!existingSubscription) {
@@ -708,6 +778,23 @@ const handlePaymentFailed = async (invoice) => {
   });
 
   console.log(`⚠️ Subscription ${subscriptionId} marked as PAST_DUE`);
+
+  // Send payment failed email to user
+  if (existingSubscription.user) {
+    await emailService.sendPaymentFailedEmail(
+      existingSubscription.user.email,
+      existingSubscription.user.username,
+      existingSubscription.user.locale
+    );
+
+    // Send Telegram notification to admin
+    await telegramService.notifyPaymentFailed(
+      existingSubscription.user.email,
+      existingSubscription.user.username,
+      invoice.amount_due || 0,
+      invoice.attempt_count || 1
+    );
+  }
 };
 
 const handlePaymentSucceeded = async (invoice) => {
@@ -761,6 +848,25 @@ const handlePaymentSucceeded = async (invoice) => {
     console.log(
       `✅ Subscription ${subscriptionId} reactivated from PAST_DUE to ACTIVE`
     );
+
+    // Send renewal success email (after recovery from PAST_DUE)
+    if (existingSubscription.user) {
+      const amount = (invoice.amount_paid / 100).toFixed(2); // Convert cents to dollars
+      await emailService.sendRenewalSuccessEmail(
+        existingSubscription.user.email,
+        existingSubscription.user.username,
+        currentPeriodEnd,
+        amount,
+        existingSubscription.user.locale
+      );
+
+      // Send Telegram notification to admin (payment recovered)
+      await telegramService.notifyPaymentRecovered(
+        existingSubscription.user.email,
+        existingSubscription.user.username,
+        invoice.amount_paid
+      );
+    }
   } else {
     // Just update the period end if subscription is already active
     const stripeInstance = stripeService.initializeStripe();
@@ -780,6 +886,26 @@ const handlePaymentSucceeded = async (invoice) => {
       });
 
       console.log(`✅ Updated period end for subscription ${subscriptionId}`);
+
+      // Send renewal success email (regular renewal)
+      if (existingSubscription.user) {
+        const amount = (invoice.amount_paid / 100).toFixed(2); // Convert cents to dollars
+        await emailService.sendRenewalSuccessEmail(
+          existingSubscription.user.email,
+          existingSubscription.user.username,
+          currentPeriodEnd,
+          amount,
+          existingSubscription.user.locale
+        );
+
+        // Send Telegram notification to admin (regular renewal)
+        await telegramService.notifyRenewalSuccess(
+          existingSubscription.user.email,
+          existingSubscription.user.username,
+          invoice.amount_paid,
+          currentPeriodEnd
+        );
+      }
     }
   }
 };
@@ -793,4 +919,5 @@ module.exports = {
   // DEV ONLY - Remove before production
   simulateUpgrade,
   simulateCancel,
+  testTelegram,
 };

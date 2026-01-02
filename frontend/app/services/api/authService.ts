@@ -84,6 +84,7 @@ class AuthService {
 
       if (method !== 'GET') {
         try {
+          await csrfService.ensureToken();
           const csrfToken = await csrfService.getToken();
           (headers as Record<string, string>)['X-CSRF-Token'] = csrfToken;
         } catch (error) {

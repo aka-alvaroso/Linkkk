@@ -7,7 +7,7 @@ const ERRORS = require("../constants/errorCodes");
 
 const updateUser = async (req, res) => {
   const user = req.user;
-  const { email, username, password, avatarUrl } = req.body;
+  const { email, username, password, avatarUrl, locale } = req.body;
 
   const validate = updateUserSchema.safeParse(req.body);
 
@@ -29,6 +29,7 @@ const updateUser = async (req, res) => {
     if (email !== undefined) updateData.email = validate.data.email;
     if (username !== undefined) updateData.username = validate.data.username;
     if (avatarUrl !== undefined) updateData.avatarUrl = validate.data.avatarUrl;
+    if (locale !== undefined) updateData.locale = validate.data.locale;
 
     if (password !== undefined) {
       // SECURITY: Use bcrypt with 12 rounds (OWASP recommendation)
@@ -45,6 +46,7 @@ const updateUser = async (req, res) => {
         username: true,
         email: true,
         avatarUrl: true,
+        locale: true,
         createdAt: true,
         // Don't return password or apiKey
       },

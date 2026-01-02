@@ -8,6 +8,7 @@ const {
   handleWebhook,
   simulateUpgrade,
   simulateCancel,
+  testTelegram,
 } = require("../controllers/subscription");
 const { auth, authUser } = require("../middlewares/auth");
 const {
@@ -35,5 +36,6 @@ router.post("/create-portal-session", subscriptionRateLimiter, createPortalSessi
 // TODO: Remove before production
 router.post("/dev/simulate-upgrade", simulateUpgrade);
 router.post("/dev/simulate-cancel", simulateCancel);
+router.post("/dev/test-telegram", testTelegram);
 
 module.exports = router;

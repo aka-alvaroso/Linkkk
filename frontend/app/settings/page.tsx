@@ -21,8 +21,10 @@ import {
 } from "react-icons/tb";
 import { csrfService } from "@/app/services/api/csrfService";
 import { subscriptionService } from "@/app/services/api/subscriptionService";
+import { userService } from "@/app/services/api/userService";
 import { useTranslations } from 'next-intl';
 import CancelSubscriptionModal from "@/app/components/Modal/CancelSubscriptionModal";
+import { HttpError } from "@/app/utils/errors";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -108,31 +110,20 @@ export default function SettingsPage() {
 
     setLoading(true);
     try {
-      const csrfToken = await csrfService.getToken();
-      const response = await fetch(`${API_BASE_URL}/user`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRF-Token": csrfToken,
-        },
-        credentials: "include",
-        body: JSON.stringify({ username }),
+      const updatedUser = await userService.updateUser({ username });
+
+      // Update the user in the auth store
+      setUser({
+        ...user!,
+        ...updatedUser,
       });
-
-      const data = await response.json();
-
-      if (response.ok && data.success && data.data) {
-        // Update the user in the auth store
-        setUser({
-          ...user!,
-          ...data.data,
-        });
-        toast.success(t('toastUsernameUpdated'));
-      } else {
-        toast.error(data.message || t('toastUsernameUpdateFailed'));
-      }
+      toast.success(t('toastUsernameUpdated'));
     } catch (error) {
-      toast.error(t('toastError'));
+      if (error instanceof HttpError) {
+        toast.error(error.message);
+      } else {
+        toast.error(t('toastError'));
+      }
     } finally {
       setLoading(false);
     }
@@ -146,31 +137,20 @@ export default function SettingsPage() {
 
     setLoading(true);
     try {
-      const csrfToken = await csrfService.getToken();
-      const response = await fetch(`${API_BASE_URL}/user`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRF-Token": csrfToken,
-        },
-        credentials: "include",
-        body: JSON.stringify({ email }),
+      const updatedUser = await userService.updateUser({ email });
+
+      // Update the user in the auth store
+      setUser({
+        ...user!,
+        ...updatedUser,
       });
-
-      const data = await response.json();
-
-      if (response.ok && data.success && data.data) {
-        // Update the user in the auth store
-        setUser({
-          ...user!,
-          ...data.data,
-        });
-        toast.success(t('toastEmailUpdated'));
-      } else {
-        toast.error(data.message || t('toastEmailUpdateFailed'));
-      }
+      toast.success(t('toastEmailUpdated'));
     } catch (error) {
-      toast.error(t('toastError'));
+      if (error instanceof HttpError) {
+        toast.error(error.message);
+      } else {
+        toast.error(t('toastError'));
+      }
     } finally {
       setLoading(false);
     }
@@ -189,29 +169,18 @@ export default function SettingsPage() {
 
     setLoading(true);
     try {
-      const csrfToken = await csrfService.getToken();
-      const response = await fetch(`${API_BASE_URL}/user`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRF-Token": csrfToken,
-        },
-        credentials: "include",
-        body: JSON.stringify({ password: newPassword }),
-      });
+      await userService.updateUser({ password: newPassword });
 
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        toast.success(t('toastPasswordUpdated'));
-        setNewPassword("");
-        setConfirmPassword("");
-        // No need to update user state for password change
-      } else {
-        toast.error(data.message || t('toastPasswordUpdateFailed'));
-      }
+      toast.success(t('toastPasswordUpdated'));
+      setNewPassword("");
+      setConfirmPassword("");
+      // No need to update user state for password change
     } catch (error) {
-      toast.error(t('toastError'));
+      if (error instanceof HttpError) {
+        toast.error(error.message);
+      } else {
+        toast.error(t('toastError'));
+      }
     } finally {
       setLoading(false);
     }

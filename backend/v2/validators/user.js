@@ -82,6 +82,7 @@ const updateUserSchema = z.object({
     })
     .optional()
     .nullable(),
+  locale: z.enum(['en', 'es']).optional(),
 });
 
 module.exports = {

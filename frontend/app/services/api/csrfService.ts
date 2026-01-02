@@ -76,6 +76,16 @@ class CsrfService {
     this.clearToken();
     return this.getToken();
   }
+
+  /**
+   * Ensure we have a valid CSRF token
+   * If no token exists, fetch a new one
+   */
+  async ensureToken(): Promise<void> {
+    if (!this.token) {
+      await this.getToken();
+    }
+  }
 }
 
 // Export a singleton instance

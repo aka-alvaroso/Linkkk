@@ -17,6 +17,7 @@ export interface User {
   username?: string;
   avatarUrl?: string | null;
   role: "STANDARD" | "PRO";
+  locale?: "en" | "es";
   isEmailVerified: boolean;
   createdAt: string;
   subscription?: Subscription | null;
