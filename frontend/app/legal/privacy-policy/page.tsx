@@ -84,10 +84,40 @@ export default function PrivacyPolicy() {
                         <span className="font-bold block mb-1">Seguridad</span>
                         Garantizar la seguridad de la plataforma y prevenir abusos (spam, phishing).
                     </div>
+                    <div className="bg-white p-4 rounded-xl border border-dark/10 shadow-sm hover:border-dark/30 transition-colors">
+                        <span className="font-bold block mb-1">Gestión de Pagos</span>
+                        Procesar pagos de suscripciones PRO a través de nuestro procesador de pagos Stripe.
+                    </div>
+                    <div className="bg-white p-4 rounded-xl border border-dark/10 shadow-sm hover:border-dark/30 transition-colors">
+                        <span className="font-bold block mb-1">Obligaciones Legales</span>
+                        Cumplir con obligaciones fiscales y contables (retención de facturas y datos de transacciones).
+                    </div>
                 </div>
 
                 <h2 className="text-2xl font-black italic mt-12 mb-6 flex items-baseline gap-3">
                     <span className="text-4xl text-dark/20">04</span>
+                    Procesamiento de Pagos (Stripe)
+                </h2>
+                <div className="bg-white p-6 rounded-2xl border-2 border-primary/20 mb-8">
+                    <p className="mb-3">
+                        Para el procesamiento de pagos de suscripciones PRO, utilizamos <strong>Stripe</strong>, un procesador de pagos de terceros.
+                    </p>
+                    <p className="mb-3 text-dark/80">
+                        <strong>Datos compartidos con Stripe:</strong> nombre, dirección de correo electrónico, información de facturación y datos de la tarjeta de pago.
+                    </p>
+                    <p className="text-sm italic text-dark/70 bg-light p-3 rounded-lg m-0">
+                        <strong>Importante:</strong> Linkkk <strong>NO almacena</strong> los datos de su tarjeta de crédito/débito. Estos son procesados directamente por Stripe de forma segura y cifrada. Stripe cumple con el estándar PCI DSS.
+                    </p>
+                </div>
+                <p className="mb-2">
+                    Stripe puede transferir sus datos a Estados Unidos. Stripe está certificado bajo el <strong>Data Privacy Framework</strong> (DPF) de la UE-EE.UU., garantizando protecciones adecuadas.
+                </p>
+                <p className="text-sm mb-6">
+                    Puede consultar la política de privacidad de Stripe en: <a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer" className="underline decoration-2 decoration-primary hover:text-primary">stripe.com/privacy</a>
+                </p>
+
+                <h2 className="text-2xl font-black italic mt-12 mb-6 flex items-baseline gap-3">
+                    <span className="text-4xl text-dark/20">05</span>
                     Alojamiento y Transferencias
                 </h2>
                 <div className="bg-white p-6 rounded-2xl border-2 border-dark/20">
@@ -100,7 +130,26 @@ export default function PrivacyPolicy() {
                 </div>
 
                 <h2 className="text-2xl font-black italic mt-12 mb-6 flex items-baseline gap-3">
-                    <span className="text-4xl text-dark/20">05</span>
+                    <span className="text-4xl text-dark/20">06</span>
+                    Retención de Datos
+                </h2>
+                <div className="bg-light p-6 rounded-2xl border-l-4 border-warning/50">
+                    <p className="mb-3">
+                        <strong>Cuentas de usuario:</strong> Los datos se conservan mientras su cuenta esté activa. Puede eliminar su cuenta en cualquier momento desde la configuración.
+                    </p>
+                    <p className="mb-3">
+                        <strong>Sesiones de invitado:</strong> Se eliminan automáticamente después de 7 días de inactividad.
+                    </p>
+                    <p className="mb-3">
+                        <strong>Datos de suscripción y facturación:</strong> Se conservan durante el período legalmente requerido para cumplir obligaciones fiscales y contables (generalmente 6-10 años según la legislación española).
+                    </p>
+                    <p className="m-0">
+                        <strong>Analíticas de enlaces:</strong> Los datos de acceso se anonimizarán tras 12 meses desde su recopilación.
+                    </p>
+                </div>
+
+                <h2 className="text-2xl font-black italic mt-12 mb-6 flex items-baseline gap-3">
+                    <span className="text-4xl text-dark/20">07</span>
                     Sus Derechos
                 </h2>
                 <p className="mb-6">
@@ -192,10 +241,40 @@ export default function PrivacyPolicy() {
                     <span className="font-bold block mb-1">Security</span>
                     To ensure platform security and prevent abuse (spam, phishing).
                 </div>
+                <div className="bg-white p-4 rounded-xl border border-dark/10 shadow-sm hover:border-dark/30 transition-colors">
+                    <span className="font-bold block mb-1">Payment Processing</span>
+                    To process PRO subscription payments through our payment processor Stripe.
+                </div>
+                <div className="bg-white p-4 rounded-xl border border-dark/10 shadow-sm hover:border-dark/30 transition-colors">
+                    <span className="font-bold block mb-1">Legal Obligations</span>
+                    To comply with tax and accounting obligations (retention of invoices and transaction data).
+                </div>
             </div>
 
             <h2 className="text-2xl font-black italic mt-12 mb-6 flex items-baseline gap-3">
                 <span className="text-4xl text-dark/20">04</span>
+                Payment Processing (Stripe)
+            </h2>
+            <div className="bg-white p-6 rounded-2xl border-2 border-primary/20 mb-8">
+                <p className="mb-3">
+                    For processing PRO subscription payments, we use <strong>Stripe</strong>, a third-party payment processor.
+                </p>
+                <p className="mb-3 text-dark/80">
+                    <strong>Data shared with Stripe:</strong> name, email address, billing information, and payment card data.
+                </p>
+                <p className="text-sm italic text-dark/70 bg-light p-3 rounded-lg m-0">
+                    <strong>Important:</strong> Linkkk does <strong>NOT store</strong> your credit/debit card data. These are processed directly by Stripe in a secure and encrypted manner. Stripe complies with PCI DSS standards.
+                </p>
+            </div>
+            <p className="mb-2">
+                Stripe may transfer your data to the United States. Stripe is certified under the <strong>EU-U.S. Data Privacy Framework</strong> (DPF), ensuring adequate protections.
+            </p>
+            <p className="text-sm mb-6">
+                You can review Stripe&apos;s privacy policy at: <a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer" className="underline decoration-2 decoration-primary hover:text-primary">stripe.com/privacy</a>
+            </p>
+
+            <h2 className="text-2xl font-black italic mt-12 mb-6 flex items-baseline gap-3">
+                <span className="text-4xl text-dark/20">05</span>
                 Hosting and Transfers
             </h2>
             <div className="bg-white p-6 rounded-2xl border-2 border-dark/20">
@@ -208,7 +287,26 @@ export default function PrivacyPolicy() {
             </div>
 
             <h2 className="text-2xl font-black italic mt-12 mb-6 flex items-baseline gap-3">
-                <span className="text-4xl text-dark/20">05</span>
+                <span className="text-4xl text-dark/20">06</span>
+                Data Retention
+            </h2>
+            <div className="bg-light p-6 rounded-2xl border-l-4 border-warning/50">
+                <p className="mb-3">
+                    <strong>User accounts:</strong> Data is retained while your account is active. You can delete your account at any time from settings.
+                </p>
+                <p className="mb-3">
+                    <strong>Guest sessions:</strong> Automatically deleted after 7 days of inactivity.
+                </p>
+                <p className="mb-3">
+                    <strong>Subscription and billing data:</strong> Retained for the legally required period to comply with tax and accounting obligations (typically 6-10 years under Spanish legislation).
+                </p>
+                <p className="m-0">
+                    <strong>Link analytics:</strong> Access data will be anonymized after 12 months from collection.
+                </p>
+            </div>
+
+            <h2 className="text-2xl font-black italic mt-12 mb-6 flex items-baseline gap-3">
+                <span className="text-4xl text-dark/20">07</span>
                 Your Rights
             </h2>
             <p className="mb-6">
