@@ -12,7 +12,7 @@
       "logoAlt": "Logo de Linkkk",
       "title": "Tus links,",
       "titleHighlight": "potenciados",
-      "description": "Acortador de URLs inteligente con reglas, analíticas y automatización sin código",
+      "description": "Gestión avanzada de enlaces con control total sobre su comportamiento, reglas personalizables y analíticas detalladas",
       "inputPlaceholder": "Pega tu URL larga aquí...",
       "buttonShorten": "Acortar",
       "buttonCreating": "Creando..."
@@ -74,7 +74,7 @@
     "Features": {
       "badge": "Características",
       "title": "Todo lo que necesitas",
-      "subtitle": "Tres potentes características que hacen de Linkkk el acortador de URLs más inteligente",
+      "subtitle": "Tres potentes características que hacen de Linkkk la plataforma de gestión de enlaces más flexible",
       "card1Title": "Modo Invitado",
       "card1DescriptionShort": "Sáltate el registro. Crea hasta 10 links inteligentes al instante sin verificación de email ni contraseñas.",
       "card1DescriptionLong": "Sáltate el registro. Crea hasta 10 links inteligentes al instante sin verificación de email ni contraseñas. Perfecto para campañas rápidas, pruebas o proyectos puntuales. Tus links permanecen activos durante 7 días con todas las capacidades de reglas.",
@@ -135,13 +135,13 @@
       "billingToggleYearly": "Anual"
     },
     "FinalCTA": {
-      "title": "¿Listo para supercargar tus links?",
-      "subtitle": "Crea links que hacen más que solo redirigir",
+      "title": "¿Listo para tomar el control total de tus links?",
+      "subtitle": "Gestiona el comportamiento de cada enlace con flexibilidad total",
       "button1": "Empezar Gratis",
       "button2": "Crea tu primer link"
     },
     "Footer": {
-      "brandDescription": "Acortador de URLs inteligente con reglas condicionales y seguimiento de visitantes.",
+      "brandDescription": "Plataforma de gestión de enlaces con control total sobre su comportamiento.",
       "productHeading": "Producto",
       "productLink1": "Comenzar",
       "productLink2": "Panel",

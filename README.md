@@ -4,15 +4,15 @@
 
 # **Linkkk**
 
-### _El motor de redirección que toma decisiones por ti._
+### _Plataforma de gestión de enlaces con control total sobre su comportamiento._
 
 [![Live Demo](https://img.shields.io/badge/🚀_Probar_Ahora-linkkk.dev-88FA1E?style=for-the-badge&labelColor=1a1a1a)](https://linkkk.dev)
 [![Status](https://img.shields.io/badge/Status-Beta_V2-blue?style=for-the-badge&labelColor=1a1a1a)](https://github.com/aka-alvaroso/Linkkk)
 [![License](https://img.shields.io/badge/License-Source_Available-orange?style=for-the-badge&labelColor=1a1a1a)](https://github.com/aka-alvaroso/Linkkk)
 
 <p align="center">
-  Linkkk transforma enlaces estáticos en puertas de enlace inteligentes.<br>
-  Redirige, bloquea o segmenta tu tráfico basándote en reglas lógicas en tiempo real.
+  Linkkk te permite controlar exactamente cómo y cuándo funciona cada enlace.<br>
+  A través de un motor de reglas, personaliza el comportamiento de tus enlaces según cualquier condición.
 </p>
 
 **[Documentación](#-instalación-y-desarrollo)** • **[Características](#-capacidades-del-motor)** • **[Stack](#️-stack-tecnológico)** • **[Roadmap](#-roadmap)**
@@ -23,43 +23,49 @@
 
 ## ⚡ **¿Qué hace Linkkk diferente?**
 
-La mayoría de acortadores son "tontos": entrada A ➡ salida B.
-**Linkkk es un enrutador lógico.** Antes de redirigir, analiza el contexto del visitante en milisegundos y decide el mejor destino.
+Los acortadores tradicionales solo redirigen: entrada A ➡ salida B.
+**Linkkk es una plataforma de gestión completa.** Controla el comportamiento de cada enlace con reglas personalizadas, restricciones de acceso, protección por contraseña y analíticas detalladas. Todo sin escribir una línea de código.
 
 <div align="center">
 
-|       🎯 **Inteligente**       |      🚀 **Rápido**      |   🔒 **Seguro**   |    📊 **Analítico**     |
-| :----------------------------: | :---------------------: | :---------------: | :---------------------: |
-| Reglas condicionales complejas |   Redirecciones <50ms   | Auth JWT + bcrypt | Métricas en tiempo real |
-|     Geo-routing automático     | Edge-ready architecture | Detección bot/VPN |  Datos por dispositivo  |
-|     Multi-device targeting     |   Optimizado para CDN   |  GDPR compliant   |  Exportación de datos   |
+|    🎯 **Control Total**     |      🚀 **Rápido**      |   🔒 **Seguro**   |    📊 **Analítico**     |
+| :-------------------------: | :---------------------: | :---------------: | :---------------------: |
+| Motor de reglas flexible |   Redirecciones <50ms   | Auth JWT + bcrypt | Métricas en tiempo real |
+|     Gestión centralizada     | Edge-ready architecture | Detección bot/VPN |  Datos por dispositivo  |
+|     Sin código requerido     |   Optimizado para CDN   |  GDPR compliant   |  Historial completo   |
 
 </div>
 
-### **Capacidades del Motor:**
+### **Capacidades Principales:**
 
-- 🌍 **Geo-Routing:** Detecta el país y redirige a versiones localizadas (`/es`, `/en`, `/fr`).
-- 📱 **Device Targeting:** Envía iOS a la App Store y Desktop a la Web.
-- 🛡️ **Escudo de Tráfico:** Bloquea bots, scrapers y conexiones vía VPN/Proxy automáticamente.
-- 🔐 **Acceso Condicional:** Protege enlaces con contraseña, pistas o límites de caducidad.
-- 📊 **Deep Analytics:** No solo cuenta clics; entiende el comportamiento (SO, Navegador, Origen).
+- 🎯 **Motor de Reglas:** Define el comportamiento exacto de cada enlace con condiciones combinables (país, dispositivo, IP, fecha, VPN, bots).
+- 🔐 **Control de Acceso:** Protege enlaces con contraseñas, restringe por geolocalización, bloquea IPs específicas o detecta VPNs automáticamente.
+- 📱 **Redirección Inteligente:** Un mismo enlace puede llevar a diferentes destinos según quién, cuándo y desde dónde lo visite.
+- 🛠️ **Personalización Total:** Metadata personalizada para redes sociales, sufijos custom, fechas de expiración y organización por etiquetas.
+- 📊 **Analíticas Profundas:** Más allá de contar clics - entiende ubicación, dispositivo, navegador, y detecta tráfico sospechoso.
 
-### **Ejemplos de Uso:**
+### **Ejemplos de Casos de Uso:**
 
 ```
 linkkk.dev/download
 ├─ 🍎 iOS → App Store
 ├─ 🤖 Android → Google Play
-└─ 💻 Desktop → Página web
+└─ 💻 Desktop → Sitio web
 
 linkkk.dev/promo
-├─ 🇪🇸 España → /es/promo
-├─ 🇺🇸 USA → /en/promo
+├─ 🇪🇸 España → Versión en español
+├─ 🇺🇸 USA → Versión en inglés
 └─ 🤖 Bot → ❌ Bloqueado
 
-linkkk.dev/beta
+linkkk.dev/team
 ├─ 🔐 Sin contraseña → Acceso denegado
-└─ ✅ Con contraseña → Página beta
+├─ 🌐 VPN detectada → Bloqueado
+└─ ✅ Acceso válido → Contenido interno
+
+linkkk.dev/campaign
+├─ 📅 Antes del 01/01/2025 → Página de preventa
+├─ 📅 Después del 01/01/2025 → Página de compra
+└─ 🌍 Fuera de EU → Página de lista de espera
 ```
 
 ---
@@ -117,13 +123,14 @@ linkkk/
 │   └── v2.js          # Entry point
 ```
 
-### **Flujo de una redirección:**
+### **Flujo de gestión de un enlace:**
 
 1. Usuario visita `linkkk.dev/r/abc123`
-2. Backend captura IP, User-Agent, geolocalización
-3. Evalúa reglas configuradas (país, dispositivo, bot, VPN)
-4. Registra analíticas en PostgreSQL
-5. Redirige al destino apropiado o bloquea acceso
+2. Backend captura contexto completo (IP, User-Agent, geolocalización, detección de VPN/bots)
+3. Motor de reglas evalúa condiciones configuradas en orden de prioridad
+4. Ejecuta la acción apropiada (redirigir, bloquear, solicitar contraseña, webhook)
+5. Registra analíticas detalladas en PostgreSQL
+6. El usuario puede ver métricas en tiempo real desde el dashboard
 
 ---
 
@@ -245,18 +252,19 @@ Linkkk toma la seguridad y privacidad en serio:
 
 ### 🚧 **En Desarrollo**
 
-- [ ] Sistema de planes premium (Stripe)
-- [ ] API para developers
-- [ ] Gráficos detallados para analíticas
-- [ ] Exportación de analíticas (CSV/JSON)
+- [x] Sistema de planes premium (Stripe) ✓
+- [ ] API pública para developers
+- [ ] Gráficos visuales para analíticas
+- [ ] Exportación de datos (CSV/JSON)
 - [ ] A/B Testing integrado
 
 ### 💡 **Futuro**
 
-- [ ] Webhooks personalizados
-- [ ] Integraciones con aplicaciones externas
-- [ ] QR Codes para enlaces
-- [ ] Custom domains
+- [ ] Webhooks personalizados por regla
+- [ ] Integraciones con Slack, Discord, Telegram
+- [ ] QR Codes dinámicos con analytics
+- [ ] Dominios personalizados
+- [ ] Bio pages (similar a Linktree)
 - [ ] Más condiciones y acciones en el motor de reglas
 
 ---

@@ -12,7 +12,7 @@
       "logoAlt": "Linkkk Logo",
       "title": "Your links,",
       "titleHighlight": "supercharged",
-      "description": "Intelligent URL shortener with rules, analytics, and no-code automation",
+      "description": "Advanced link management platform with total control over behavior, customizable rules, and detailed analytics",
       "inputPlaceholder": "Paste your long URL here...",
       "buttonShorten": "Shorten",
       "buttonCreating": "Creating..."
@@ -74,7 +74,7 @@
     "Features": {
       "badge": "Features",
       "title": "Everything you need",
-      "subtitle": "Three powerful features that make Linkkk the smartest URL shortener",
+      "subtitle": "Three powerful features that make Linkkk the most flexible link management platform",
       "card1Title": "Guest Mode",
       "card1DescriptionShort": "Skip the signup friction. Create up to 10 smart links instantly without email verification or passwords.",
       "card1DescriptionLong": "Skip the signup friction. Create up to 10 smart links instantly without email verification or passwords. Perfect for quick campaigns, testing, or one-off projects. Your links stay active for 7 days with full rule capabilities.",
@@ -135,13 +135,13 @@
       "billingToggleYearly": "Yearly"
     },
     "FinalCTA": {
-      "title": "Ready to supercharge your links?",
-      "subtitle": "Create links that do more than just redirect",
+      "title": "Ready to take full control of your links?",
+      "subtitle": "Manage each link's behavior with total flexibility",
       "button1": "Start Free Now",
       "button2": "Create your first link"
     },
     "Footer": {
-      "brandDescription": "Smart URL shortener with conditional rules and visitor tracking.",
+      "brandDescription": "Link management platform with total control over link behavior.",
       "productHeading": "Product",
       "productLink1": "Get started",
       "productLink2": "Dashboard",
