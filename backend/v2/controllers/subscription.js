@@ -5,7 +5,6 @@ const planLimits = require("../utils/limits");
 const config = require("../config/environment");
 const stripeService = require("../services/stripe");
 const auditLog = require("../services/auditLog");
-const emailService = require("../services/emailService");
 const telegramService = require("../services/telegramService");
 
 const getStatus = async (req, res) => {
@@ -177,6 +176,7 @@ const testTelegram = async (req, res) => {
   }
 };
 
+// TODO: Remove
 const cancelSubscription = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -605,12 +605,6 @@ const handleCheckoutSessionCompleted = async (session) => {
   });
 
   if (user) {
-    await emailService.sendUpgradeToProEmail(
-      user.email,
-      user.username,
-      user.locale
-    );
-
     // Send Telegram notification to admin
     await telegramService.notifyNewSubscription(
       user.email,
@@ -687,16 +681,8 @@ const handleSubscriptionUpdated = async (subscription) => {
         `ℹ️  Subscription will cancel at ${currentPeriodEnd?.toISOString()}`
       );
 
-      // Send cancellation email to user
+      // Send Telegram notification to admin
       if (existingSubscription.user) {
-        await emailService.sendSubscriptionCancelledEmail(
-          existingSubscription.user.email,
-          existingSubscription.user.username,
-          currentPeriodEnd,
-          existingSubscription.user.locale
-        );
-
-        // Send Telegram notification to admin
         await telegramService.notifyCancellation(
           existingSubscription.user.email,
           existingSubscription.user.username,
@@ -783,15 +769,8 @@ const handlePaymentFailed = async (invoice) => {
 
   console.log(`⚠️ Subscription ${subscriptionId} marked as PAST_DUE`);
 
-  // Send payment failed email to user
+  // Send Telegram notification to admin
   if (existingSubscription.user) {
-    await emailService.sendPaymentFailedEmail(
-      existingSubscription.user.email,
-      existingSubscription.user.username,
-      existingSubscription.user.locale
-    );
-
-    // Send Telegram notification to admin
     await telegramService.notifyPaymentFailed(
       existingSubscription.user.email,
       existingSubscription.user.username,
@@ -865,18 +844,8 @@ const handlePaymentSucceeded = async (invoice) => {
       `✅ Subscription ${subscriptionId} reactivated from PAST_DUE to ACTIVE`
     );
 
-    // Send renewal success email (after recovery from PAST_DUE)
+    // Send Telegram notification to admin (payment recovered)
     if (existingSubscription.user) {
-      const amount = (invoice.amount_paid / 100).toFixed(2); // Convert cents to dollars
-      await emailService.sendRenewalSuccessEmail(
-        existingSubscription.user.email,
-        existingSubscription.user.username,
-        currentPeriodEnd,
-        amount,
-        existingSubscription.user.locale
-      );
-
-      // Send Telegram notification to admin (payment recovered)
       await telegramService.notifyPaymentRecovered(
         existingSubscription.user.email,
         existingSubscription.user.username,
@@ -903,18 +872,8 @@ const handlePaymentSucceeded = async (invoice) => {
 
       console.log(`✅ Updated period end for subscription ${subscriptionId}`);
 
-      // Send renewal success email (regular renewal)
+      // Send Telegram notification to admin (regular renewal)
       if (existingSubscription.user) {
-        const amount = (invoice.amount_paid / 100).toFixed(2); // Convert cents to dollars
-        await emailService.sendRenewalSuccessEmail(
-          existingSubscription.user.email,
-          existingSubscription.user.username,
-          currentPeriodEnd,
-          amount,
-          existingSubscription.user.locale
-        );
-
-        // Send Telegram notification to admin (regular renewal)
         await telegramService.notifyRenewalSuccess(
           existingSubscription.user.email,
           existingSubscription.user.username,

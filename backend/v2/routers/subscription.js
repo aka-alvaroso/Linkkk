@@ -20,6 +20,11 @@ const {
 // This must be registered BEFORE body parsing middleware
 router.post("/webhook", handleWebhook);
 
+// TODO: Remove before production - Development testing endpoints (NO auth required)
+router.post("/dev/simulate-upgrade", auth, authUser, simulateUpgrade);
+router.post("/dev/simulate-cancel", auth, authUser, simulateCancel);
+router.post("/dev/test-telegram", testTelegram);
+
 // All other subscription routes require user authentication (not guest)
 // First apply auth (sets req.user from JWT), then authUser (verifies it's a user not guest)
 router.use(auth);
@@ -32,10 +37,5 @@ router.get("/status", subscriptionStatusRateLimiter, getStatus);
 router.post("/cancel", subscriptionRateLimiter, cancelSubscription);
 router.post("/create-checkout-session", subscriptionRateLimiter, createCheckoutSession);
 router.post("/create-portal-session", subscriptionRateLimiter, createPortalSession);
-
-// TODO: Remove before production
-router.post("/dev/simulate-upgrade", simulateUpgrade);
-router.post("/dev/simulate-cancel", simulateCancel);
-router.post("/dev/test-telegram", testTelegram);
 
 module.exports = router;
