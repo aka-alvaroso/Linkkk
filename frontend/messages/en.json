@@ -522,7 +522,7 @@
     "yearlyPrice": "€90",
     "monthlyPeriod": "/month",
     "yearlyPeriod": "/year",
-    "saveAmount": "Save €18",
-    "selectButton": "Select Plan"
+    "bestValue": "2 months free",
+    "continueButton": "Continue to Payment"
   }
 }

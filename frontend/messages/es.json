@@ -512,5 +512,17 @@
     "consequence4": "El historial de accesos de más de 30 días se eliminará permanentemente",
     "cancel": "Mantener PRO",
     "confirm": "Confirmar Cambio"
+  },
+  "SelectPlanModal": {
+    "title": "Elige tu plan PRO",
+    "subtitle": "Selecciona el periodo de facturación que mejor te convenga",
+    "monthly": "Mensual",
+    "yearly": "Anual",
+    "monthlyPrice": "€9",
+    "yearlyPrice": "€90",
+    "monthlyPeriod": "/mes",
+    "yearlyPeriod": "/año",
+    "bestValue": "2 meses gratis",
+    "continueButton": "Continuar al Pago"
   }
 }

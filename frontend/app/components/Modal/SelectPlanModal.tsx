@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Modal from '@/app/components/ui/Modal/Modal';
 import Button from '@/app/components/ui/Button/Button';
-import { TbRocket, TbX, TbSparkles } from 'react-icons/tb';
+import { TbRocket, TbX, TbCheck } from 'react-icons/tb';
 import { useTranslations } from 'next-intl';
 import { subscriptionService } from '@/app/services/api/subscriptionService';
 import { useToast } from '@/app/hooks/useToast';
@@ -20,18 +20,16 @@ export default function SelectPlanModal({
   const t = useTranslations('SelectPlanModal');
   const toast = useToast();
   const [loading, setLoading] = useState(false);
-  const [selectedPeriod, setSelectedPeriod] = useState<'monthly' | 'yearly' | null>(null);
+  const [selectedPeriod, setSelectedPeriod] = useState<'monthly' | 'yearly'>('yearly');
 
-  const handleSelectPlan = async (period: 'monthly' | 'yearly') => {
-    setSelectedPeriod(period);
+  const handleContinue = async () => {
     setLoading(true);
     try {
-      await subscriptionService.createCheckoutSession(period);
+      await subscriptionService.createCheckoutSession(selectedPeriod);
     } catch (error) {
       console.error('Error creating checkout session:', error);
       toast.error('Failed to start checkout. Please try again.');
       setLoading(false);
-      setSelectedPeriod(null);
     }
   };
 
@@ -39,7 +37,7 @@ export default function SelectPlanModal({
     <Modal
       open={open}
       onClose={onClose}
-      size="xl"
+      size="lg"
       position="center"
       rounded="3xl"
       closeOnOverlayClick={!loading}
@@ -47,10 +45,10 @@ export default function SelectPlanModal({
     >
       <div className="p-6 space-y-6">
         {/* Header */}
-        <div className="flex items-start justify-between">
+        <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-secondary/20 rounded-2xl">
-              <TbRocket size={32} className="text-secondary" />
+            <div className="hidden md:block p-2.5 bg-secondary/20 rounded-2xl">
+              <TbRocket size={28} className="text-secondary" />
             </div>
             <div>
               <h2 className="text-2xl font-black italic">{t('title')}</h2>
@@ -60,83 +58,115 @@ export default function SelectPlanModal({
           {!loading && (
             <button
               onClick={onClose}
-              className="p-2 rounded-xl hover:bg-dark/5 transition-colors"
+              className="p-2 rounded-xl hover:bg-dark/5 transition-colors flex-shrink-0"
               aria-label="Close modal"
             >
-              <TbX size={24} className="text-dark/70" />
+              <TbX size={20} className="text-dark/70" />
             </button>
           )}
         </div>
 
-        {/* Plan Cards - Responsive Layout */}
-        <div className="flex flex-col md:flex-row gap-4 pt-2">
+        {/* Plan Cards - Checkable Style */}
+        <div className="flex flex-col md:flex-row gap-3">
           {/* Monthly Plan Card */}
-          <div className="flex-1 border-2 border-dark/10 rounded-2xl p-6 hover:border-secondary/50 hover:shadow-lg transition-all duration-200">
-            <div className="space-y-4">
-              <div>
-                <h3 className="text-xl font-black italic text-dark">
-                  {t('monthly')}
-                </h3>
-              </div>
+          <button
+            onClick={() => setSelectedPeriod('monthly')}
+            disabled={loading}
+            className={`flex-1 bg-dark/5 md:max-w-1/2 min-w-0 border rounded-2xl p-5 transition-all duration-200 text-left relative
+              ${selectedPeriod === 'monthly'
+                ? 'border-secondary '
+                : 'border-transparent  hover:border-dark/10'
+              }
+            `}
+          >
+            {/* Check indicator */}
+            <div className={`absolute top-3 right-3 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all
+              ${selectedPeriod === 'monthly'
+                ? 'border-secondary bg-secondary'
+                : 'border-dark/20'
+              }
+            `}>
+              {selectedPeriod === 'monthly' && (
+                <TbCheck size={14} className="text-light" strokeWidth={3} />
+              )}
+            </div>
+
+            <div className="space-y-2 pr-8">
+              <h3 className="text-lg font-black italic text-dark">
+                {t('monthly')}
+              </h3>
               <div className="flex items-baseline gap-1">
-                <span className="text-4xl font-black italic text-dark">
+                <span className="text-3xl font-black italic text-dark">
                   {t('monthlyPrice')}
                 </span>
-                <span className="text-lg text-dark/60">
+                <span className="text-base text-dark/60">
                   {t('monthlyPeriod')}
                 </span>
               </div>
-              <Button
-                variant="outline"
-                size="md"
-                rounded="xl"
-                onClick={() => handleSelectPlan('monthly')}
-                loading={loading && selectedPeriod === 'monthly'}
-                disabled={loading}
-                className="w-full border-dark hover:bg-dark hover:text-light hover:shadow-[4px_4px_0_var(--color-dark)] transition-all"
-              >
-                <span className="font-black italic">{t('selectButton')}</span>
-              </Button>
             </div>
-          </div>
+          </button>
 
           {/* Yearly Plan Card */}
-          <div className="flex-1 border-2 border-secondary rounded-2xl p-6 bg-secondary/5 relative overflow-hidden hover:shadow-xl transition-all duration-200">
-            {/* Save Badge */}
-            <div className="absolute -top-1 -right-1">
-              <div className="bg-warning text-dark px-3 py-1 rounded-bl-2xl rounded-tr-2xl flex items-center gap-1 shadow-lg">
-                <TbSparkles size={16} />
-                <span className="text-xs font-black italic">{t('saveAmount')}</span>
+          <div className="flex-1 md:max-w-1/2 min-w-0 relative">
+            {/* Best Value Pill */}
+            <div className="absolute flex justify-center w-2/3 -top-2 left-1/2 -translate-x-1/2 z-10">
+              <div className="bg-warning text-dark px-3 py-1 rounded-full flex items-center gap-1 border border-dark">
+                <span className="text-xs font-black italic">{t('bestValue')}</span>
               </div>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <h3 className="text-xl font-black italic text-dark">
+            <button
+              onClick={() => setSelectedPeriod('yearly')}
+              disabled={loading}
+              className={`w-full bg-dark/5 border rounded-2xl p-5 transition-all duration-200 text-left relative pt-6
+                ${selectedPeriod === 'yearly'
+                  ? 'border-secondary'
+                : 'border-transparent hover:border-dark/10'
+                }
+              `}
+            >
+              {/* Check indicator */}
+              <div className={`absolute top-3 right-3 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all
+                ${selectedPeriod === 'yearly'
+                  ? 'border-secondary bg-secondary'
+                  : 'border-dark/20'
+                }
+              `}>
+                {selectedPeriod === 'yearly' && (
+                  <TbCheck size={14} className="text-light" strokeWidth={3} />
+                )}
+              </div>
+
+              <div className="space-y-2 pr-8">
+                <h3 className="text-lg font-black italic text-dark">
                   {t('yearly')}
                 </h3>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-3xl font-black italic text-dark">
+                    {t('yearlyPrice')}
+                  </span>
+                  <span className="text-base text-dark/60">
+                    {t('yearlyPeriod')}
+                  </span>
+                </div>
               </div>
-              <div className="flex items-baseline gap-1">
-                <span className="text-4xl font-black italic text-dark">
-                  {t('yearlyPrice')}
-                </span>
-                <span className="text-lg text-dark/60">
-                  {t('yearlyPeriod')}
-                </span>
-              </div>
-              <Button
-                variant="solid"
-                size="md"
-                rounded="xl"
-                onClick={() => handleSelectPlan('yearly')}
-                loading={loading && selectedPeriod === 'yearly'}
-                disabled={loading}
-                className="w-full bg-secondary hover:bg-secondary/90 text-light border border-dark hover:shadow-[4px_4px_0_var(--color-dark)] transition-all"
-              >
-                <span className="font-black italic">{t('selectButton')}</span>
-              </Button>
-            </div>
+            </button>
           </div>
+        </div>
+
+        {/* Continue Button */}
+        <div className="flex justify-center pt-2">
+          <Button
+            variant="solid"
+            size="lg"
+            rounded="2xl"
+            onClick={handleContinue}
+            loading={loading}
+            disabled={loading}
+            className="bg-dark hover:bg-primary hover:text-dark border-dark hover:shadow-[4px_4px_0_var(--color-dark)] transition-all px-12"
+          >
+            <span className="font-black italic">{t('continueButton')}</span>
+          </Button>
         </div>
       </div>
     </Modal>
