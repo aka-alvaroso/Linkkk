@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { TbLayoutDashboard, TbLogin, TbPlus, TbSettings, TbSparkles } from "react-icons/tb";
 import * as motion from "motion/react-client";
 import CreateLinkDrawer from "../Drawer/CreateLinkDrawer";
+import SelectPlanModal from "../Modal/SelectPlanModal";
 import { useAuth } from "@/app/hooks";
 import { useToast } from "@/app/hooks/useToast";
 import { useTranslations } from 'next-intl';
@@ -14,6 +15,7 @@ export default function BottomNavbar() {
   const router = useRouter();
   const { isAuthenticated, user } = useAuth();
   const [createLinkDrawer, setCreateLinkDrawer] = useState(false);
+  const [showSelectPlanModal, setShowSelectPlanModal] = useState(false);
   const toast = useToast();
   const t = useTranslations('Navigation');
 
@@ -44,12 +46,7 @@ export default function BottomNavbar() {
     if (item.action === "create") {
       setCreateLinkDrawer(true);
     } else if (item.action === "upgrade") {
-      try {
-        await subscriptionService.createCheckoutSession();
-      } catch (error) {
-        console.error('Error creating checkout session:', error);
-        toast.error('Failed to start checkout. Please try again.');
-      }
+      setShowSelectPlanModal(true);
     } else if (item.href) {
       router.push(item.href);
     }
@@ -95,6 +92,12 @@ export default function BottomNavbar() {
       <CreateLinkDrawer
         open={createLinkDrawer}
         onClose={() => setCreateLinkDrawer(false)}
+      />
+
+      {/* Select Plan Modal */}
+      <SelectPlanModal
+        open={showSelectPlanModal}
+        onClose={() => setShowSelectPlanModal(false)}
       />
     </>
   );

@@ -389,6 +389,16 @@ const executeDowngrade = async (userId) => {
 const createCheckoutSession = async (req, res) => {
   try {
     const userId = req.user.id;
+    const { billingPeriod = 'monthly' } = req.body;
+
+    // Validate billing period
+    if (!['monthly', 'yearly'].includes(billingPeriod)) {
+      return errorResponse(res, {
+        code: "INVALID_BILLING_PERIOD",
+        message: "Billing period must be 'monthly' or 'yearly'",
+        statusCode: 400,
+      });
+    }
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -408,11 +418,26 @@ const createCheckoutSession = async (req, res) => {
       });
     }
 
+    // Select price ID based on billing period
+    const priceId = billingPeriod === 'yearly'
+      ? config.stripe.proYearlyPriceId
+      : config.stripe.proPriceId;
+
+    // Validate price ID is configured
+    if (!priceId) {
+      console.error(`Missing Stripe price ID for ${billingPeriod} billing`);
+      return errorResponse(res, {
+        code: "PRICE_ID_NOT_CONFIGURED",
+        message: `${billingPeriod} billing is not configured`,
+        statusCode: 500,
+      });
+    }
+
     // Create Stripe checkout session
     const { sessionUrl } = await stripeService.createCheckoutSession(
       userId,
       user.email,
-      config.stripe.proPriceId
+      priceId
     );
 
     return successResponse(res, {

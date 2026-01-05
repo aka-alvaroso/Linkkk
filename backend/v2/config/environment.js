@@ -23,6 +23,7 @@ if (isProduction) {
   requiredEnvVars.push('STRIPE_SECRET_KEY');
   requiredEnvVars.push('STRIPE_WEBHOOK_SECRET');
   requiredEnvVars.push('STRIPE_PRO_PRICE_ID');
+  requiredEnvVars.push('STRIPE_PRO_YEARLY_PRICE_ID');
 }
 
 const missingEnvVars = requiredEnvVars.filter(
@@ -91,6 +92,7 @@ const config = {
     secretKey: process.env.STRIPE_SECRET_KEY,
     webhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
     proPriceId: process.env.STRIPE_PRO_PRICE_ID,
+    proYearlyPriceId: process.env.STRIPE_PRO_YEARLY_PRICE_ID,
   },
 
 };
@@ -106,7 +108,8 @@ if (!isTest) {
   console.log(`   JWT Guest Secret: ${config.security.jwt.guestSecret ? '✓ Set' : '✗ Missing'}`);
   console.log(`   Stripe Secret Key: ${config.stripe.secretKey ? '✓ Set' : '✗ Missing'}`);
   console.log(`   Stripe Webhook Secret: ${config.stripe.webhookSecret ? '✓ Set' : '✗ Missing (configure with Stripe CLI)'}`);
-  console.log(`   Stripe Pro Price ID: ${config.stripe.proPriceId ? '✓ Set' : '✗ Missing'}`);
+  console.log(`   Stripe Pro Price ID (Monthly): ${config.stripe.proPriceId ? '✓ Set' : '✗ Missing'}`);
+  console.log(`   Stripe Pro Price ID (Yearly): ${config.stripe.proYearlyPriceId ? '✓ Set' : '✗ Missing'}`);
 }
 
 module.exports = config;

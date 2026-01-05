@@ -24,6 +24,7 @@ import { subscriptionService } from "@/app/services/api/subscriptionService";
 import { userService } from "@/app/services/api/userService";
 import { useTranslations } from 'next-intl';
 import CancelSubscriptionModal from "@/app/components/Modal/CancelSubscriptionModal";
+import SelectPlanModal from "@/app/components/Modal/SelectPlanModal";
 import { HttpError } from "@/app/utils/errors";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
@@ -70,6 +71,9 @@ export default function SettingsPage() {
 
   // Cancel subscription modal
   const [showCancelModal, setShowCancelModal] = useState(false);
+
+  // Select plan modal
+  const [showSelectPlanModal, setShowSelectPlanModal] = useState(false);
 
   // Subscription state
   const [subscriptionInfo, setSubscriptionInfo] = useState<Subscription | null>(null);
@@ -249,17 +253,8 @@ export default function SettingsPage() {
     }
   };
 
-  const handleUpgradeToPro = async () => {
-    setLoading(true);
-    try {
-      // Create Stripe Checkout Session and redirect to payment page
-      await subscriptionService.createCheckoutSession();
-      // Note: User will be redirected to Stripe, so loading state doesn't need to be reset
-    } catch (error) {
-      console.error("Error creating checkout session:", error);
-      toast.error(t('toastUpgradeFailed'));
-      setLoading(false);
-    }
+  const handleUpgradeToPro = () => {
+    setShowSelectPlanModal(true);
   };
 
   const handleManageSubscription = async () => {
@@ -701,6 +696,12 @@ export default function SettingsPage() {
         onClose={() => setShowCancelModal(false)}
         onConfirm={confirmCancelSubscription}
         loading={loading}
+      />
+
+      {/* Select Plan Modal */}
+      <SelectPlanModal
+        open={showSelectPlanModal}
+        onClose={() => setShowSelectPlanModal(false)}
       />
     </RouteGuard>
   );

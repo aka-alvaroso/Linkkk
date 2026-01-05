@@ -44,6 +44,7 @@ import { useLinks } from "@/app/hooks/useLinks";
 import { useToast } from "@/app/hooks/useToast";
 import { useLanguage } from "@/app/hooks/useLanguage";
 import { useAuth } from "@/app/hooks/useAuth";
+import { subscriptionService } from "@/app/services/api/subscriptionService";
 import { RiLoader5Fill } from "react-icons/ri";
 import { useTranslations } from 'next-intl';
 
@@ -1093,9 +1094,13 @@ export default function Landing() {
                     rightIcon={<TbRocket size={24} />}
                     expandOnHover="icon"
                     className="w-full bg-dark hover:bg-secondary mt-auto"
-                    onClick={() => {
-                      // TODO: Navigate to Stripe checkout
-                      toast.info('Stripe integration coming soon!');
+                    onClick={async () => {
+                      try {
+                        await subscriptionService.createCheckoutSession(billingPeriod);
+                      } catch (error) {
+                        console.error('Error creating checkout session:', error);
+                        toast.error('Failed to start checkout. Please try again.');
+                      }
                     }}
                   >
                     <p className="font-black italic">

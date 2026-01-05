@@ -512,5 +512,17 @@
     "consequence4": "Access history older than 30 days will be permanently deleted",
     "cancel": "Keep PRO",
     "confirm": "Confirm Change"
+  },
+  "SelectPlanModal": {
+    "title": "Choose your PRO plan",
+    "subtitle": "Select the billing period that works best for you",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "monthlyPrice": "€9",
+    "yearlyPrice": "€90",
+    "monthlyPeriod": "/month",
+    "yearlyPeriod": "/year",
+    "saveAmount": "Save €18",
+    "selectButton": "Select Plan"
   }
 }

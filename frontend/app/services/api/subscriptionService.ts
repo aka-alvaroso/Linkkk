@@ -84,7 +84,7 @@ class SubscriptionService {
   /**
    * Create a Stripe Checkout Session and redirect to payment page
    */
-  async createCheckoutSession(): Promise<void> {
+  async createCheckoutSession(billingPeriod: 'monthly' | 'yearly' = 'monthly'): Promise<void> {
     const csrfToken = await csrfService.getToken();
 
     const response = await fetch(`${this.baseUrl}/create-checkout-session`, {
@@ -95,6 +95,7 @@ class SubscriptionService {
         ...defaultFetchOptions.headers,
         "X-CSRF-Token": csrfToken,
       },
+      body: JSON.stringify({ billingPeriod }),
     });
 
     const data = await this.handleResponse<CheckoutSessionResponse>(response);

@@ -3,6 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import CreateLinkDrawer from "../Drawer/CreateLinkDrawer";
+import SelectPlanModal from "../Modal/SelectPlanModal";
 import { useAuth } from "@/app/hooks";
 import { useToast } from "@/app/hooks/useToast";
 import { TbPlus, TbLogin, TbExternalLink, TbSparkles } from "react-icons/tb";
@@ -20,6 +21,7 @@ export default function TopNavbar({ showCreate = false }: TopNavbarProps) {
   const { user } = useAuth();
   const pathname = usePathname();
   const [createLinkDrawer, setCreateLinkDrawer] = useState(false);
+  const [showSelectPlanModal, setShowSelectPlanModal] = useState(false);
   const toast = useToast();
   const t = useTranslations('Navigation');
 
@@ -91,14 +93,7 @@ export default function TopNavbar({ showCreate = false }: TopNavbarProps) {
               leftIcon={<TbSparkles size={20} />}
               expandOnHover="icon"
               className="bg-primary text-dark hover:bg-info hover:text-light hover:shadow-[_4px_4px_0_var(--color-dark)] leading-5"
-              onClick={async () => {
-                try {
-                  await subscriptionService.createCheckoutSession();
-                } catch (error) {
-                  console.error('Error creating checkout session:', error);
-                  toast.error('Failed to start checkout. Please try again.');
-                }
-              }}
+              onClick={() => setShowSelectPlanModal(true)}
             >
               <p className="font-black italic">
               {t('upgradeToPro')}
@@ -147,6 +142,12 @@ export default function TopNavbar({ showCreate = false }: TopNavbarProps) {
       <CreateLinkDrawer
         open={createLinkDrawer}
         onClose={() => setCreateLinkDrawer(false)}
+      />
+
+      {/* Select Plan Modal */}
+      <SelectPlanModal
+        open={showSelectPlanModal}
+        onClose={() => setShowSelectPlanModal(false)}
       />
     </>
   );
