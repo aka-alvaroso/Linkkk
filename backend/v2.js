@@ -11,6 +11,10 @@ const planLimits = require("./v2/utils/limits");
 // Load centralized configuration
 const config = require("./v2/config/environment");
 
+// Initialize Sentry FIRST (before any other code)
+const sentryService = require("./v2/services/sentry");
+sentryService.initializeSentry();
+
 // Routers
 const authRouter = require("./v2/routers/auth");
 const linkRouter = require("./v2/routers/link");
@@ -26,6 +30,10 @@ const PORT = config.server.port;
 
 // Trust proxy - Required when behind nginx reverse proxy
 app.set("trust proxy", true);
+
+// Sentry request handler - MUST be first middleware
+app.use(sentryService.requestHandler());
+app.use(sentryService.tracingHandler());
 
 // Helmet configuration - adjusted for environment
 const helmetConfig = {
@@ -226,6 +234,9 @@ app.use((req, res, next) => {
   });
 });
 
+// Sentry error handler - MUST be before other error handlers
+app.use(sentryService.errorHandler());
+
 // Global Error Handler
 app.use((err, req, res, next) => {
   // SECURITY: Sanitize error logs to prevent PII leaks (GDPR compliance)
@@ -301,7 +312,10 @@ process.on("uncaughtException", (error) => {
 if (!config.env.isTest) {
   // Start scheduled jobs
   const { startCleanupJob } = require("./v2/jobs/cleanupGuestLinks");
+  const { startSyncJob } = require("./v2/jobs/syncSubscriptions");
+
   startCleanupJob();
+  startSyncJob();
 
   app.listen(PORT, () => {
     console.log(`\n🚀 Server running on port ${PORT}`);
@@ -322,8 +336,9 @@ if (!config.env.isTest) {
       }`
     );
     console.log(
-      `🧹 Cleanup job: Guest links (${planLimits.guest.linkExpiration} days) - Daily at 3:00 AM\n`
+      `🧹 Cleanup job: Guest links (${planLimits.guest.linkExpiration} days) - Daily at 3:00 AM`
     );
+    console.log(`🔄 Sync job: Subscriptions & Stripe events - Every 30 minutes\n`);
   });
 }
 

@@ -198,12 +198,262 @@ async function sendTestNotification() {
   return sendMessage(message);
 }
 
+// ============================================================================
+// AUTH NOTIFICATIONS
+// ============================================================================
+
+/**
+ * Notify user login
+ */
+async function notifyLogin(userEmail, userName, ip) {
+  const message = `
+🔐 <b>Login</b>
+
+👤 <b>Usuario:</b> ${userName || 'N/A'}
+📧 <b>Email:</b> ${userEmail}
+🌐 <b>IP:</b> ${ip || 'N/A'}
+🕐 ${formatDate(new Date())}
+  `.trim();
+
+  return sendMessage(message);
+}
+
+/**
+ * Notify user registration
+ */
+async function notifyRegistration(userEmail, userName) {
+  const message = `
+🎉 <b>Nuevo Registro</b>
+
+👤 <b>Usuario:</b> ${userName}
+📧 <b>Email:</b> ${userEmail}
+🕐 ${formatDate(new Date())}
+
+🔗 <a href="${config.frontend.url}/admin">Ver panel</a>
+  `.trim();
+
+  return sendMessage(message);
+}
+
+/**
+ * Notify account deletion
+ */
+async function notifyAccountDeletion(userEmail, userName, role) {
+  const message = `
+🗑️ <b>Cuenta Eliminada</b>
+
+👤 <b>Usuario:</b> ${userName || 'N/A'}
+📧 <b>Email:</b> ${userEmail}
+👑 <b>Plan:</b> ${role}
+🕐 ${formatDate(new Date())}
+  `.trim();
+
+  return sendMessage(message);
+}
+
+// ============================================================================
+// WEBHOOK NOTIFICATIONS
+// ============================================================================
+
+/**
+ * Notify webhook received
+ */
+async function notifyWebhookReceived(eventType, eventId) {
+  const message = `
+🔔 <b>Webhook Recibido</b>
+
+📦 <b>Tipo:</b> <code>${eventType}</code>
+🆔 <b>ID:</b> <code>${eventId}</code>
+🕐 ${formatDate(new Date())}
+  `.trim();
+
+  return sendMessage(message);
+}
+
+/**
+ * Notify webhook processed successfully
+ */
+async function notifyWebhookProcessed(eventType, eventId, duration) {
+  const message = `
+✅ <b>Webhook Procesado</b>
+
+📦 <b>Tipo:</b> <code>${eventType}</code>
+🆔 <b>ID:</b> <code>${eventId}</code>
+⚡ <b>Duración:</b> ${duration}ms
+🕐 ${formatDate(new Date())}
+  `.trim();
+
+  return sendMessage(message);
+}
+
+/**
+ * Notify webhook failed
+ */
+async function notifyWebhookFailed(eventType, eventId, error, attempts) {
+  const message = `
+❌ <b>Webhook Fallido</b>
+
+📦 <b>Tipo:</b> <code>${eventType}</code>
+🆔 <b>ID:</b> <code>${eventId}</code>
+🔄 <b>Intentos:</b> ${attempts}/3
+⚠️ <b>Error:</b> ${error}
+🕐 ${formatDate(new Date())}
+  `.trim();
+
+  return sendMessage(message);
+}
+
+// ============================================================================
+// CRON JOB NOTIFICATIONS
+// ============================================================================
+
+/**
+ * Notify cron job started
+ */
+async function notifyCronJobStarted(jobName) {
+  const message = `
+🔄 <b>Cron Job Iniciado</b>
+
+📋 <b>Job:</b> ${jobName}
+🕐 ${formatDate(new Date())}
+  `.trim();
+
+  return sendMessage(message);
+}
+
+/**
+ * Notify cron job completed
+ */
+async function notifyCronJobCompleted(jobName, stats) {
+  const statsText = Object.entries(stats)
+    .map(([key, value]) => `  • ${key}: ${value}`)
+    .join('\n');
+
+  const message = `
+✅ <b>Cron Job Completado</b>
+
+📋 <b>Job:</b> ${jobName}
+📊 <b>Resultados:</b>
+${statsText}
+🕐 ${formatDate(new Date())}
+  `.trim();
+
+  return sendMessage(message);
+}
+
+/**
+ * Notify cron job failed
+ */
+async function notifyCronJobFailed(jobName, error) {
+  const message = `
+❌ <b>Cron Job Fallido</b>
+
+📋 <b>Job:</b> ${jobName}
+⚠️ <b>Error:</b> ${error}
+🕐 ${formatDate(new Date())}
+
+🔧 <b>Acción requerida:</b> Revisar logs del servidor
+  `.trim();
+
+  return sendMessage(message);
+}
+
+// ============================================================================
+// ERROR NOTIFICATIONS
+// ============================================================================
+
+/**
+ * Notify generic error
+ */
+async function notifyError(error, context = {}) {
+  const contextText = Object.entries(context)
+    .filter(([key]) => !['stack', 'error'].includes(key))
+    .map(([key, value]) => `  • ${key}: ${typeof value === 'object' ? JSON.stringify(value) : value}`)
+    .join('\n');
+
+  const message = `
+🚨 <b>Error Capturado</b>
+
+⚠️ <b>Mensaje:</b> ${error.message || error}
+📍 <b>Contexto:</b>
+${contextText || '  Sin contexto adicional'}
+🕐 ${formatDate(new Date())}
+
+🔍 Revisar logs para más detalles
+  `.trim();
+
+  return sendMessage(message);
+}
+
+/**
+ * Notify security event
+ */
+async function notifySecurityEvent(event, details) {
+  const detailsText = Object.entries(details)
+    .map(([key, value]) => `  • ${key}: ${value}`)
+    .join('\n');
+
+  const message = `
+🔒 <b>Evento de Seguridad</b>
+
+⚠️ <b>Evento:</b> ${event}
+📋 <b>Detalles:</b>
+${detailsText}
+🕐 ${formatDate(new Date())}
+  `.trim();
+
+  return sendMessage(message);
+}
+
+/**
+ * Notify dead letter event (failed after max retries)
+ */
+async function notifyDeadLetter(eventType, eventId, error) {
+  const message = `
+☠️ <b>Dead Letter - Requiere Intervención</b>
+
+📦 <b>Tipo:</b> <code>${eventType}</code>
+🆔 <b>ID:</b> <code>${eventId}</code>
+⚠️ <b>Error:</b> ${error}
+🔄 <b>Intentos:</b> 3/3 (máximo alcanzado)
+🕐 ${formatDate(new Date())}
+
+🔧 <b>Acción requerida:</b> Revisar evento en BD y reprocesar manualmente
+  `.trim();
+
+  return sendMessage(message);
+}
+
 module.exports = {
   initializeTelegram,
+
+  // Subscription notifications
   notifyNewSubscription,
   notifyCancellation,
   notifyPaymentFailed,
   notifyRenewalSuccess,
   notifyPaymentRecovered,
+
+  // Auth notifications
+  notifyLogin,
+  notifyRegistration,
+  notifyAccountDeletion,
+
+  // Webhook notifications
+  notifyWebhookReceived,
+  notifyWebhookProcessed,
+  notifyWebhookFailed,
+
+  // Cron job notifications
+  notifyCronJobStarted,
+  notifyCronJobCompleted,
+  notifyCronJobFailed,
+
+  // Error notifications
+  notifyError,
+  notifySecurityEvent,
+  notifyDeadLetter,
+
+  // Test
   sendTestNotification,
 };

@@ -42,11 +42,17 @@ model Subscription {
   currentPeriodEnd     DateTime?
   cancelAtPeriodEnd    Boolean            @default(false)
 
+  // Reconciliation & Sync tracking
+  lastSyncedAt         DateTime?          // Last successful sync with Stripe API
+  lastEventId          String?            // Last Stripe event ID processed for this subscription
+  metadata             Json?              // Additional flexible data
+
   createdAt            DateTime           @default(now())
   updatedAt            DateTime           @updatedAt
 
   @@index([userId])
   @@index([stripeCustomerId])
+  @@index([status, currentPeriodEnd])    // For finding expired subscriptions
 }
 
 model Link {
@@ -173,6 +179,14 @@ enum AuditEventType {
   PAYMENT_FAILED
 }
 
+enum EventStatus {
+  PENDING      // Just received, not processed yet
+  PROCESSING   // Currently being processed
+  PROCESSED    // Successfully processed
+  FAILED       // Failed but will retry
+  DEAD_LETTER  // Failed too many times, manual intervention needed
+}
+
 // Audit Log for critical subscription events
 model AuditLog {
   id        Int            @id @default(autoincrement())
@@ -188,4 +202,27 @@ model AuditLog {
   @@index([userId])
   @@index([eventType])
   @@index([createdAt])
+}
+
+// Stripe Event Sourcing - Every webhook is stored here
+model StripeEvent {
+  id              Int          @id @default(autoincrement())
+  stripeEventId   String       @unique // e.g., "evt_1ABC123..."
+  type            String       // e.g., "customer.subscription.updated"
+  payload         Json         // Full webhook payload from Stripe
+
+  // Processing status
+  status          EventStatus  @default(PENDING)
+  attempts        Int          @default(0)
+  processedAt     DateTime?    // When successfully processed
+  lastAttemptAt   DateTime?    // Last processing attempt
+  error           String?      // Error message if failed
+
+  createdAt       DateTime     @default(now())
+
+  @@index([stripeEventId])
+  @@index([status])
+  @@index([type])
+  @@index([createdAt])
+  @@index([status, lastAttemptAt]) // For finding stuck events
 }

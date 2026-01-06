@@ -1,10 +1,15 @@
 /**
- * Simple Logger Utility
- * Replaces console.log/error/warn with environment-aware logging
+ * Winston Logger Utility
+ * Professional logging with file rotation and structured output
  *
  * SECURITY: Prevents sensitive information leakage in production logs
  * and provides structured logging for better monitoring
  */
+
+const winston = require('winston');
+const DailyRotateFile = require('winston-daily-rotate-file');
+const path = require('path');
+const fs = require('fs');
 
 const ENV = process.env.ENV || 'development';
 const NODE_ENV = process.env.NODE_ENV || 'development';
@@ -13,38 +18,73 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
  * Log levels
  */
 const LogLevel = {
-  ERROR: 'ERROR',
-  WARN: 'WARN',
-  INFO: 'INFO',
-  DEBUG: 'DEBUG',
+  ERROR: 'error',
+  WARN: 'warn',
+  INFO: 'info',
+  DEBUG: 'debug',
 };
 
-/**
- * Format log message with timestamp and level
- * @param {string} level - Log level
- * @param {string} message - Log message
- * @param {Object} meta - Additional metadata
- * @returns {string} - Formatted log message
- */
-const formatLog = (level, message, meta = {}) => {
-  const timestamp = new Date().toISOString();
-  const logObject = {
-    timestamp,
-    level,
-    message,
-    env: ENV,
-    ...meta,
-  };
+// Create logs directory if it doesn't exist
+const logsDir = path.join(__dirname, '../../logs');
+if (!fs.existsSync(logsDir)) {
+  fs.mkdirSync(logsDir, { recursive: true });
+}
 
-  // In production, use JSON format for easier parsing
-  if (ENV === 'production') {
-    return JSON.stringify(logObject);
-  }
+// Custom format for console output (development)
+const consoleFormat = winston.format.combine(
+  winston.format.colorize(),
+  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+  winston.format.printf(({ timestamp, level, message, ...meta }) => {
+    const metaStr = Object.keys(meta).length > 0 ? ` ${JSON.stringify(meta)}` : '';
+    return `[${timestamp}] [${level}] ${message}${metaStr}`;
+  })
+);
 
-  // In development, use human-readable format
-  const metaStr = Object.keys(meta).length > 0 ? ` ${JSON.stringify(meta)}` : '';
-  return `[${timestamp}] [${level}] ${message}${metaStr}`;
-};
+// JSON format for file output (production)
+const jsonFormat = winston.format.combine(
+  winston.format.timestamp(),
+  winston.format.errors({ stack: true }),
+  winston.format.json()
+);
+
+// Create Winston logger instance
+const winstonLogger = winston.createLogger({
+  level: ENV === 'production' ? 'info' : 'debug',
+  format: jsonFormat,
+  defaultMeta: { env: ENV },
+  transports: [
+    // Error logs - separate file
+    new DailyRotateFile({
+      filename: path.join(logsDir, 'error-%DATE%.log'),
+      datePattern: 'YYYY-MM-DD',
+      level: 'error',
+      maxSize: '20m',
+      maxFiles: '14d', // Keep 14 days of error logs
+      zippedArchive: true,
+    }),
+
+    // Combined logs - all levels
+    new DailyRotateFile({
+      filename: path.join(logsDir, 'combined-%DATE%.log'),
+      datePattern: 'YYYY-MM-DD',
+      maxSize: '20m',
+      maxFiles: '7d', // Keep 7 days of combined logs
+      zippedArchive: true,
+    }),
+  ],
+});
+
+// Add console transport in development
+if (ENV !== 'production' || NODE_ENV === 'development') {
+  winstonLogger.add(new winston.transports.Console({
+    format: consoleFormat,
+  }));
+}
+
+// Don't log anything in test environment
+if (NODE_ENV === 'test') {
+  winstonLogger.silent = true;
+}
 
 /**
  * Error logger
@@ -52,8 +92,7 @@ const formatLog = (level, message, meta = {}) => {
  * @param {Object} meta - Additional metadata (error stack, context, etc.)
  */
 const error = (message, meta = {}) => {
-  const formattedLog = formatLog(LogLevel.ERROR, message, meta);
-  console.error(formattedLog);
+  winstonLogger.error(message, meta);
 };
 
 /**
@@ -62,8 +101,7 @@ const error = (message, meta = {}) => {
  * @param {Object} meta - Additional metadata
  */
 const warn = (message, meta = {}) => {
-  const formattedLog = formatLog(LogLevel.WARN, message, meta);
-  console.warn(formattedLog);
+  winstonLogger.warn(message, meta);
 };
 
 /**
@@ -72,11 +110,7 @@ const warn = (message, meta = {}) => {
  * @param {Object} meta - Additional metadata
  */
 const info = (message, meta = {}) => {
-  // Skip info logs in test environment to keep test output clean
-  if (NODE_ENV === 'test') return;
-
-  const formattedLog = formatLog(LogLevel.INFO, message, meta);
-  console.log(formattedLog);
+  winstonLogger.info(message, meta);
 };
 
 /**
@@ -85,11 +119,7 @@ const info = (message, meta = {}) => {
  * @param {Object} meta - Additional metadata
  */
 const debug = (message, meta = {}) => {
-  // Only log debug messages in development
-  if (ENV !== 'development' || NODE_ENV === 'test') return;
-
-  const formattedLog = formatLog(LogLevel.DEBUG, message, meta);
-  console.log(formattedLog);
+  winstonLogger.debug(message, meta);
 };
 
 /**
@@ -99,11 +129,11 @@ const debug = (message, meta = {}) => {
  * @param {Object} meta - Additional metadata
  */
 const security = (message, meta = {}) => {
-  const formattedLog = formatLog('SECURITY', message, {
+  winstonLogger.error(message, {
     ...meta,
     security_event: true,
+    type: 'SECURITY',
   });
-  console.error(formattedLog);
 };
 
 /**
@@ -113,9 +143,6 @@ const security = (message, meta = {}) => {
  * @param {number} duration - Request duration in ms
  */
 const http = (req, res, duration) => {
-  // Skip logging in test environment
-  if (NODE_ENV === 'test') return;
-
   const { sanitizeIp } = require('./logSanitizer');
 
   const logData = {
@@ -125,21 +152,17 @@ const http = (req, res, duration) => {
     duration: `${duration}ms`,
     ip: sanitizeIp(req.ip),
     userAgent: req.headers['user-agent'] || 'unknown',
+    type: 'HTTP',
   };
 
-  const level = res.statusCode >= 500 ? LogLevel.ERROR :
-                res.statusCode >= 400 ? LogLevel.WARN :
-                LogLevel.INFO;
-
   const message = `${req.method} ${req.url} ${res.statusCode} ${duration}ms`;
-  const formattedLog = formatLog(level, message, logData);
 
-  if (level === LogLevel.ERROR) {
-    console.error(formattedLog);
-  } else if (level === LogLevel.WARN) {
-    console.warn(formattedLog);
+  if (res.statusCode >= 500) {
+    winstonLogger.error(message, logData);
+  } else if (res.statusCode >= 400) {
+    winstonLogger.warn(message, logData);
   } else {
-    console.log(formattedLog);
+    winstonLogger.info(message, logData);
   }
 };
 
@@ -151,4 +174,6 @@ module.exports = {
   security,
   http,
   LogLevel,
+  // Expose winston instance for advanced usage if needed
+  winston: winstonLogger,
 };

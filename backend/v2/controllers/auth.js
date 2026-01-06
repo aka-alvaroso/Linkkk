@@ -6,6 +6,9 @@ const { successResponse, errorResponse } = require("../utils/response");
 const ERRORS = require("../constants/errorCodes");
 const { registerSchema, loginSchema } = require("../validators/auth");
 const config = require("../config/environment");
+const telegramService = require("../services/telegramService");
+const logger = require("../utils/logger");
+const sentryService = require("../services/sentry");
 
 const validateSession = (req, res) => {
   const user = req.user;
@@ -128,6 +131,17 @@ const register = async (req, res) => {
       sameSite: config.security.cookies.sameSite,
     });
 
+    // Log registration
+    logger.info("User registered successfully", {
+      type: "AUTH",
+      userId: user.id,
+      username,
+      email,
+    });
+
+    // Notify Telegram (non-blocking)
+    telegramService.notifyRegistration(email, username).catch(() => {});
+
     return successResponse(
       res,
       {
@@ -141,7 +155,14 @@ const register = async (req, res) => {
       201
     );
   } catch (error) {
-    console.error("Error during registration:", error);
+    logger.error("Error during registration", {
+      type: "AUTH",
+      error: error.message,
+      stack: error.stack,
+    });
+    sentryService.captureException(error, {
+      tags: { type: "registration" },
+    });
     return errorResponse(res, ERRORS.INTERNAL_ERROR);
   }
 };
@@ -198,6 +219,18 @@ const login = async (req, res) => {
       sameSite: config.security.cookies.sameSite,
     });
 
+    // Log login
+    logger.info("User logged in successfully", {
+      type: "AUTH",
+      userId: user.id,
+      username: user.username,
+      email: user.email,
+      ip: req.ip,
+    });
+
+    // Notify Telegram (non-blocking)
+    telegramService.notifyLogin(user.email, user.username, req.ip).catch(() => {});
+
     return successResponse(res, {
       user: {
         id: user.id,
@@ -207,7 +240,14 @@ const login = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error during login:", error);
+    logger.error("Error during login", {
+      type: "AUTH",
+      error: error.message,
+      stack: error.stack,
+    });
+    sentryService.captureException(error, {
+      tags: { type: "login" },
+    });
     return errorResponse(res, ERRORS.INTERNAL_ERROR);
   }
 };

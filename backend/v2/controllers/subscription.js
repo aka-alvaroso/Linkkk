@@ -6,6 +6,8 @@ const config = require("../config/environment");
 const stripeService = require("../services/stripe");
 const auditLog = require("../services/auditLog");
 const telegramService = require("../services/telegramService");
+const logger = require("../utils/logger");
+const sentryService = require("../services/sentry");
 
 const getStatus = async (req, res) => {
   try {
@@ -487,9 +489,13 @@ const createPortalSession = async (req, res) => {
 
 const handleWebhook = async (req, res) => {
   const signature = req.headers["stripe-signature"];
+  const startTime = Date.now();
 
   if (!signature) {
-    console.error("❌ No Stripe signature header found");
+    logger.error("Webhook signature header missing", {
+      type: "WEBHOOK",
+      headers: Object.keys(req.headers),
+    });
     return res.status(400).send("Missing stripe-signature header");
   }
 
@@ -499,48 +505,154 @@ const handleWebhook = async (req, res) => {
     // Verify webhook signature and construct event
     event = stripeService.constructWebhookEvent(req.body, signature);
   } catch (error) {
-    console.error("❌ Webhook signature verification failed:", error.message);
-    console.error("   Body type:", typeof req.body);
-    console.error("   Body is Buffer:", Buffer.isBuffer(req.body));
-    console.error(
-      "   Webhook secret configured:",
-      !!config.stripe.webhookSecret
-    );
+    logger.error("Webhook signature verification failed", {
+      type: "WEBHOOK",
+      error: error.message,
+      bodyType: typeof req.body,
+      isBuffer: Buffer.isBuffer(req.body),
+      webhookConfigured: !!config.stripe.webhookSecret,
+    });
+    sentryService.captureException(error, {
+      tags: { type: "webhook_verification" },
+      extra: { bodyType: typeof req.body },
+    });
     return res.status(400).send(`Webhook Error: ${error.message}`);
   }
 
-  console.log(`🔔 Received Stripe webhook: ${event.type}`);
+  logger.info("Webhook received", {
+    type: "WEBHOOK",
+    eventType: event.type,
+    eventId: event.id,
+  });
 
+  // Notify Telegram (non-blocking)
+  telegramService.notifyWebhookReceived(event.type, event.id).catch(() => {});
+
+  // IDEMPOTENCY CHECK: Verify if we've already processed this event
   try {
-    switch (event.type) {
-      case "checkout.session.completed":
-        await handleCheckoutSessionCompleted(event.data.object);
-        break;
+    const existingEvent = await prisma.stripeEvent.findUnique({
+      where: { stripeEventId: event.id },
+    });
 
-      case "customer.subscription.updated":
-        await handleSubscriptionUpdated(event.data.object);
-        break;
-
-      case "customer.subscription.deleted":
-        await handleSubscriptionDeleted(event.data.object);
-        break;
-
-      case "invoice.payment_failed":
-        await handlePaymentFailed(event.data.object);
-        break;
-
-      case "invoice.payment_succeeded":
-        await handlePaymentSucceeded(event.data.object);
-        break;
-
-      default:
-        console.log(`ℹ️  Unhandled event type: ${event.type}`);
+    if (existingEvent) {
+      logger.info("Webhook already processed", {
+        type: "WEBHOOK",
+        eventId: event.id,
+        status: existingEvent.status,
+      });
+      return res.json({ received: true, alreadyProcessed: true });
     }
+  } catch (error) {
+    logger.error("Error checking event idempotency", {
+      type: "WEBHOOK",
+      eventId: event.id,
+      error: error.message,
+    });
+    // Continue processing - don't fail on idempotency check
+  }
+
+  // Save event to database BEFORE processing
+  let savedEvent;
+  try {
+    savedEvent = await prisma.stripeEvent.create({
+      data: {
+        stripeEventId: event.id,
+        type: event.type,
+        payload: event,
+        status: "PENDING",
+        attempts: 0,
+        lastAttemptAt: new Date(),
+      },
+    });
+    logger.info("Webhook event saved to database", {
+      type: "WEBHOOK",
+      eventId: event.id,
+      eventType: event.type,
+    });
+  } catch (error) {
+    logger.error("Error saving webhook event to database", {
+      type: "WEBHOOK",
+      eventId: event.id,
+      error: error.message,
+    });
+    sentryService.captureException(error, {
+      tags: { type: "webhook_save" },
+      extra: { eventId: event.id, eventType: event.type },
+    });
+    // If we can't save the event, still try to process it
+    // This handles edge case where DB is down but webhook must be processed
+  }
+
+  // Process the webhook event
+  try {
+    await processWebhookEvent(event);
+
+    const duration = Date.now() - startTime;
+
+    // Mark event as successfully processed
+    if (savedEvent) {
+      await prisma.stripeEvent.update({
+        where: { id: savedEvent.id },
+        data: {
+          status: "PROCESSED",
+          processedAt: new Date(),
+        },
+      });
+    }
+
+    logger.info("Webhook processed successfully", {
+      type: "WEBHOOK",
+      eventId: event.id,
+      eventType: event.type,
+      duration: `${duration}ms`,
+    });
+
+    // Notify Telegram (non-blocking)
+    telegramService.notifyWebhookProcessed(event.type, event.id, duration).catch(() => {});
 
     // Return 200 to acknowledge receipt
     return res.json({ received: true });
   } catch (error) {
-    console.error(`❌ Error processing webhook ${event.type}:`, error);
+    const duration = Date.now() - startTime;
+
+    logger.error("Error processing webhook", {
+      type: "WEBHOOK",
+      eventId: event.id,
+      eventType: event.type,
+      error: error.message,
+      stack: error.stack,
+      duration: `${duration}ms`,
+    });
+
+    // Mark event as failed
+    if (savedEvent) {
+      await prisma.stripeEvent.update({
+        where: { id: savedEvent.id },
+        data: {
+          status: "FAILED",
+          attempts: 1,
+          lastAttemptAt: new Date(),
+          error: error.message,
+        },
+      });
+    }
+
+    // Notify Telegram (non-blocking)
+    telegramService.notifyWebhookFailed(event.type, event.id, error.message, 1).catch(() => {});
+
+    // Send to Sentry
+    sentryService.captureException(error, {
+      tags: {
+        type: "webhook_processing",
+        eventType: event.type,
+      },
+      extra: {
+        eventId: event.id,
+        duration: `${duration}ms`,
+      },
+    });
+
+    // Return 500 so Stripe will retry
     return res.status(500).json({ error: "Webhook processing failed" });
   }
 };
@@ -910,12 +1022,45 @@ const handlePaymentSucceeded = async (invoice) => {
   }
 };
 
+/**
+ * Process a webhook event (used by both webhook handler and retry jobs)
+ * @param {Object} event - Stripe event object
+ */
+const processWebhookEvent = async (event) => {
+  switch (event.type) {
+    case "checkout.session.completed":
+      await handleCheckoutSessionCompleted(event.data.object);
+      break;
+
+    case "customer.subscription.updated":
+      await handleSubscriptionUpdated(event.data.object);
+      break;
+
+    case "customer.subscription.deleted":
+      await handleSubscriptionDeleted(event.data.object);
+      break;
+
+    case "invoice.payment_failed":
+      await handlePaymentFailed(event.data.object);
+      break;
+
+    case "invoice.payment_succeeded":
+      await handlePaymentSucceeded(event.data.object);
+      break;
+
+    default:
+      console.log(`ℹ️  Unhandled event type: ${event.type}`);
+  }
+};
+
 module.exports = {
   getStatus,
   cancelSubscription,
   createCheckoutSession,
   createPortalSession,
   handleWebhook,
+  processWebhookEvent, // For cron job retry
+  executeDowngrade, // For cron job sync
   // DEV ONLY - Remove before production
   simulateUpgrade,
   simulateCancel,

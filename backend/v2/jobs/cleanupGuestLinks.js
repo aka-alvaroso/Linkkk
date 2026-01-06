@@ -2,6 +2,8 @@ const cron = require("node-cron");
 const prisma = require("../prisma/client");
 const logger = require("../utils/logger");
 const planLimits = require("../utils/limits");
+const telegramService = require("../services/telegramService");
+const sentryService = require("../services/sentry");
 
 /**
  * Cleanup job for expired guest links, sessions, and old access records
@@ -92,6 +94,17 @@ const cleanupExpiredGuestLinks = async () => {
       userAccessExpiration: userAccessExpirationDate.toISOString(),
     });
 
+    // Notify Telegram if there were deletions
+    const totalDeleted = linksResult.count + sessionsResult.count + userAccessesResult.count;
+    if (totalDeleted > 0) {
+      const stats = {
+        "Guest links": linksResult.count,
+        "Guest sessions": sessionsResult.count,
+        "Old accesses": userAccessesResult.count,
+      };
+      telegramService.notifyCronJobCompleted("Guest Cleanup", stats).catch(() => {});
+    }
+
     return {
       links: linksResult.count,
       sessions: sessionsResult.count,
@@ -102,6 +115,15 @@ const cleanupExpiredGuestLinks = async () => {
       error: error.message,
       stack: error.stack,
     });
+
+    // Notify Telegram about failure
+    telegramService.notifyCronJobFailed("Guest Cleanup", error.message).catch(() => {});
+
+    // Send to Sentry
+    sentryService.captureException(error, {
+      tags: { type: "cron_job", job: "guest_cleanup" },
+    });
+
     throw error;
   }
 };
