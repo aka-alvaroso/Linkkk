@@ -33,11 +33,11 @@ const syncExpiredSubscriptions = async () => {
       currentTime: now.toISOString(),
     });
 
-    // Find subscriptions that should have expired but are still active
+    // Si la suscipción está activa y no está cancelada o el pago falló y no está cancelada o unpaid, entonces es expirada.
     const expiredSubscriptions = await prisma.subscription.findMany({
       where: {
         status: {
-          in: ["ACTIVE", "PAST_DUE", "TRIALING"],
+          in: ["ACTIVE", "PAST_DUE"],
         },
         currentPeriodEnd: {
           lt: now,
@@ -97,8 +97,8 @@ const syncExpiredSubscriptions = async () => {
         let newStatus = subscription.status;
 
         switch (stripeStatus) {
+          // Si la suscripción está activa, entonces la actualizamos a ACTIVE
           case "active":
-            // Subscription is still active, update period end
             newStatus = "ACTIVE";
             logger.info("[SYNC] Subscription still active, updating period", {
               userId: subscription.userId,
@@ -125,11 +125,6 @@ const syncExpiredSubscriptions = async () => {
             });
             break;
 
-          case "trialing":
-            // Still in trial
-            newStatus = "TRIALING";
-            break;
-
           default:
             logger.warn("[SYNC] Unknown Stripe status", {
               userId: subscription.userId,
@@ -150,7 +145,7 @@ const syncExpiredSubscriptions = async () => {
 
         syncedCount++;
 
-        // Execute downgrade if needed
+        // Si es necesario el downgrade (Porque la suscripción está cancelada o unpaid) y el usuario sigue siendo PRO
         if (shouldDowngrade && subscription.user.role === "PRO") {
           logger.info("[SYNC] Executing downgrade for user", {
             userId: subscription.userId,
@@ -282,7 +277,8 @@ const retryFailedEvents = async () => {
 
         // Check if we've hit max attempts
         const newAttempts = event.attempts + 1;
-        const newStatus = newAttempts >= MAX_ATTEMPTS ? "DEAD_LETTER" : "FAILED";
+        const newStatus =
+          newAttempts >= MAX_ATTEMPTS ? "DEAD_LETTER" : "FAILED";
 
         await prisma.stripeEvent.update({
           where: { id: event.id },
@@ -330,7 +326,9 @@ const retryFailedEvents = async () => {
 const checkStuckEvents = async () => {
   try {
     const STUCK_THRESHOLD_MINUTES = 30;
-    const stuckTime = new Date(Date.now() - STUCK_THRESHOLD_MINUTES * 60 * 1000);
+    const stuckTime = new Date(
+      Date.now() - STUCK_THRESHOLD_MINUTES * 60 * 1000
+    );
 
     logger.info("[SYNC] Checking for stuck events");
 
@@ -402,23 +400,29 @@ const runSync = async () => {
     // 3. Check for stuck events
     const stuckResults = await checkStuckEvents();
 
-    logger.info("[SYNC] ========== Subscription sync job completed ==========", {
-      expiredSubscriptions: expiredResults,
-      failedEvents: retryResults,
-      stuckEvents: stuckResults,
-    });
+    logger.info(
+      "[SYNC] ========== Subscription sync job completed ==========",
+      {
+        expiredSubscriptions: expiredResults,
+        failedEvents: retryResults,
+        stuckEvents: stuckResults,
+      }
+    );
 
     // Notify Telegram if there were significant actions
-    const totalActions = expiredResults.synced + retryResults.succeeded + stuckResults.stuckEvents;
+    const totalActions =
+      expiredResults.synced + retryResults.succeeded + stuckResults.stuckEvents;
     if (totalActions > 0) {
       const stats = {
         "Expired synced": expiredResults.synced,
-        "Downgraded": expiredResults.downgraded,
+        Downgraded: expiredResults.downgraded,
         "Failed retried": retryResults.retried,
         "Failed succeeded": retryResults.succeeded,
         "Stuck events": stuckResults.stuckEvents,
       };
-      telegramService.notifyCronJobCompleted("Subscription Sync", stats).catch(() => {});
+      telegramService
+        .notifyCronJobCompleted("Subscription Sync", stats)
+        .catch(() => {});
     }
 
     return {
@@ -433,7 +437,9 @@ const runSync = async () => {
     });
 
     // Notify Telegram about failure
-    telegramService.notifyCronJobFailed("Subscription Sync", error.message).catch(() => {});
+    telegramService
+      .notifyCronJobFailed("Subscription Sync", error.message)
+      .catch(() => {});
 
     // Send to Sentry
     sentryService.captureException(error, {
