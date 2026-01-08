@@ -8,8 +8,8 @@ import { cookies } from 'next/headers';
 import { locales, defaultLocale, type Locale } from '@/i18n/request';
 
 export const metadata: Metadata = {
-  title: "Linkkk",
-  description: "Create and manage your short links easily",
+  title: "Linkkk - Smart Link Management Platform",
+  description: "Create short links, track analytics, and manage your URLs with custom rules. Free and open-source link management platform.",
   icons: {
     icon: [
       { url: '/favicon.png', sizes: '32x32', type: 'image/png' }
@@ -17,6 +17,29 @@ export const metadata: Metadata = {
     apple: '/favicon.png',
     shortcut: '/favicon.png',
   },
+  openGraph: {
+    title: "Linkkk - Smart Link Management Platform",
+    description: "Create short links, track analytics, and manage your URLs with custom rules. Free and open-source link management platform.",
+    url: "https://linkkk.dev",
+    siteName: "Linkkk",
+    images: [
+      {
+        url: "https://linkkk.dev/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Linkkk - Smart Link Management Platform",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Linkkk - Smart Link Management Platform",
+    description: "Create short links, track analytics, and manage your URLs with custom rules. Free and open-source link management platform.",
+    images: ["https://linkkk.dev/og-image.png"],
+  },
+  metadataBase: new URL("https://linkkk.dev"),
   viewport: {
     width: 'device-width',
     initialScale: 1,
