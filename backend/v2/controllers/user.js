@@ -7,7 +7,7 @@ const ERRORS = require("../constants/errorCodes");
 
 const updateUser = async (req, res) => {
   const user = req.user;
-  const { email, username, password, avatarUrl, locale } = req.body;
+  const { email, username, password, locale } = req.body;
 
   const validate = updateUserSchema.safeParse(req.body);
 
@@ -28,7 +28,6 @@ const updateUser = async (req, res) => {
 
     if (email !== undefined) updateData.email = validate.data.email;
     if (username !== undefined) updateData.username = validate.data.username;
-    if (avatarUrl !== undefined) updateData.avatarUrl = validate.data.avatarUrl;
     if (locale !== undefined) updateData.locale = validate.data.locale;
 
     if (password !== undefined) {
@@ -45,7 +44,6 @@ const updateUser = async (req, res) => {
         id: true,
         username: true,
         email: true,
-        avatarUrl: true,
         locale: true,
         createdAt: true,
         // Don't return password or apiKey
@@ -53,7 +51,7 @@ const updateUser = async (req, res) => {
     });
 
     return successResponse(res, updatedUser);
-  } catch {
+  } catch (error) {
     return errorResponse(res, ERRORS.INTERNAL_ERROR);
   }
 };
