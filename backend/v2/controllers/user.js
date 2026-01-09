@@ -71,6 +71,7 @@ const deleteUserData = async (req, res) => {
 
     return res.status(200).json({
       success: true,
+      data: {},
       message: "All user data deleted successfully",
     });
   } catch (error) {
@@ -101,6 +102,7 @@ const deleteUser = async (req, res) => {
 
     return res.status(200).json({
       success: true,
+      data: {},
       message: "User account deleted successfully",
     });
   } catch (error) {
