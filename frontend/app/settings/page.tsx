@@ -201,27 +201,19 @@ export default function SettingsPage() {
 
     setLoading(true);
     try {
-      const csrfToken = await csrfService.getToken();
-      const response = await fetch(`${API_BASE_URL}/user/data`, {
-        method: "DELETE",
-        headers: {
-          "X-CSRF-Token": csrfToken,
-        },
-        credentials: "include",
-      });
-
-      if (response.ok) {
-        toast.success(t('toastLinksDeleted'));
-      } else {
-        const data = await response.json();
-        toast.error(data.message || t('toastLinksDeleteFailed'));
-      }
+      await userService.deleteUserData();
+      toast.success(t('toastLinksDeleted'));
     } catch (error) {
-      toast.error(t('toastError'));
+      if (error instanceof HttpError) {
+        toast.error(error.message);
+      } else {
+        toast.error(t('toastError'));
+      }
     } finally {
       setLoading(false);
     }
   };
+
 
   const handleDeleteAccount = async () => {
     if (!confirm(t('confirmDeleteAccount'))) {
@@ -230,24 +222,17 @@ export default function SettingsPage() {
 
     setLoading(true);
     try {
-      const csrfToken = await csrfService.getToken();
-      const response = await fetch(`${API_BASE_URL}/user`, {
-        method: "DELETE",
-        headers: {
-          "X-CSRF-Token": csrfToken,
-        },
-        credentials: "include",
-      });
-
-      if (response.ok) {
+      await userService.deleteUserAccount();
         toast.success(t('toastAccountDeleted'));
         logout();
-      } else {
-        const data = await response.json();
-        toast.error(data.message || t('toastAccountDeleteFailed'));
-      }
+
     } catch (error) {
-      toast.error(t('toastError'));
+
+      if (error instanceof HttpError) {
+        toast.error(error.message);
+      } else {
+        toast.error(t('toastError'));
+      }
     } finally {
       setLoading(false);
     }

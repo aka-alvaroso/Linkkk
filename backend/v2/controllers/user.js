@@ -108,57 +108,8 @@ const deleteUser = async (req, res) => {
   }
 };
 
-const generateApiKey = async (req, res) => {
-  const user = req.user;
-
-  try {
-    // Generate a random API key
-    const crypto = require("crypto");
-    const apiKey = crypto.randomBytes(32).toString("hex");
-
-    // Update user with new API key
-    const updatedUser = await prisma.user.update({
-      where: {
-        id: user.id,
-      },
-      data: {
-        apiKey: apiKey,
-      },
-    });
-
-    return successResponse(res, { apiKey: updatedUser.apiKey });
-  } catch (error) {
-    return errorResponse(res, ERRORS.INTERNAL_ERROR);
-  }
-};
-
-const resetApiKey = async (req, res) => {
-  const user = req.user;
-
-  try {
-    // Reset API key to null
-    await prisma.user.update({
-      where: {
-        id: user.id,
-      },
-      data: {
-        apiKey: null,
-      },
-    });
-
-    return res.status(200).json({
-      success: true,
-      message: "API key reset successfully",
-    });
-  } catch (error) {
-    return errorResponse(res, ERRORS.INTERNAL_ERROR);
-  }
-};
-
 module.exports = {
   updateUser,
   deleteUserData,
   deleteUser,
-  generateApiKey,
-  resetApiKey,
 };

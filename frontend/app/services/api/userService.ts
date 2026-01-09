@@ -8,7 +8,7 @@ interface UpdateUserDTO {
   email?: string;
   username?: string;
   password?: string;
-  locale?: 'en' | 'es';
+  locale?: "en" | "es";
 }
 
 class UserService {
@@ -25,8 +25,8 @@ class UserService {
     } catch (error) {
       throw new HttpError(
         response.status,
-        'INVALID_RESPONSE',
-        'Invalid response from server',
+        "INVALID_RESPONSE",
+        "Invalid response from server",
         false
       );
     }
@@ -34,11 +34,11 @@ class UserService {
     if (!response.ok) {
       throw new HttpError(
         response.status,
-        data.code || 'UNKNOWN_ERROR',
+        data.code || "UNKNOWN_ERROR",
         data.message || response.statusText,
         response.status >= 500,
-        Array.isArray(data.details) 
-          ? data.details as Array<{ field: string; message: string }>
+        Array.isArray(data.details)
+          ? (data.details as Array<{ field: string; message: string }>)
           : undefined
       );
     }
@@ -46,8 +46,8 @@ class UserService {
     if (!data.success || !data.data) {
       throw new HttpError(
         response.status,
-        'INVALID_RESPONSE',
-        'Invalid response structure',
+        "INVALID_RESPONSE",
+        "Invalid response structure",
         false
       );
     }
@@ -60,20 +60,66 @@ class UserService {
    */
   async updateUser(updates: UpdateUserDTO): Promise<User> {
     await csrfService.ensureToken();
+    const csrfToken = await csrfService.getToken();
+    const headers = {
+      ...defaultFetchOptions.headers,
+      "X-CSRF-Token": csrfToken,
+    };
 
     const response = await fetch(`${this.baseUrl}`, {
       ...defaultFetchOptions,
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(updates),
+      headers,
     });
 
     return this.handleResponse<User>(response);
   }
 
   /**
+   * Delete user data
+   */
+  async deleteUserData(): Promise<object> {
+    await csrfService.ensureToken();
+    const csrfToken = await csrfService.getToken();
+    const headers = {
+      ...defaultFetchOptions.headers,
+      "X-CSRF-Token": csrfToken,
+    };
+
+    const response = await fetch(`${this.baseUrl}/data`, {
+      ...defaultFetchOptions,
+      method: "DELETE",
+      headers,
+    });
+
+    return this.handleResponse<object>(response);
+  }
+
+  /**
+   * Delete user account
+   */
+  async deleteUserAccount(): Promise<void> {
+    await csrfService.ensureToken();
+    const csrfToken = await csrfService.getToken();
+    const headers = {
+      ...defaultFetchOptions.headers,
+      "X-CSRF-Token": csrfToken,
+    };
+
+    const response = await fetch(`${this.baseUrl}`, {
+      ...defaultFetchOptions,
+      method: "DELETE",
+      headers,
+    });
+
+    return this.handleResponse<void>(response);
+  }
+
+  /**
    * Update user locale preference
    */
-  async updateLocale(locale: 'en' | 'es'): Promise<User> {
+  async updateLocale(locale: "en" | "es"): Promise<User> {
     return this.updateUser({ locale });
   }
 }
