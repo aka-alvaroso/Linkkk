@@ -242,7 +242,7 @@ export default function Landing() {
   };
 
   return (
-    <RouteGuard type="public" title="Linkkk - Smart URL Shortener">
+    <RouteGuard type="public" title="Linkkk - Smart Link Management Platform">
       <Navigation />
 
       <div className="min-h-screen md:pb-0">
