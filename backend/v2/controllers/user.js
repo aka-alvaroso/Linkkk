@@ -52,6 +52,9 @@ const updateUser = async (req, res) => {
 
     return successResponse(res, updatedUser);
   } catch (error) {
+    if (error.code === "P2002") {
+      return errorResponse(res, ERRORS.EMAIL_EXISTS);
+    }
     return errorResponse(res, ERRORS.INTERNAL_ERROR);
   }
 };

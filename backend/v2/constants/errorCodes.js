@@ -45,6 +45,13 @@ const ERRORS = {
     statusCode: 400,
     retryable: false,
   },
+  EMAIL_EXISTS: {
+    code: "EMAIL_EXISTS",
+    message: "Email already exists",
+    userMessage: "A user with this username or email already exists",
+    statusCode: 400,
+    retryable: false,
+  },
   INVALID_DATA: {
     code: "INVALID_DATA",
     message: "Invalid data",
@@ -98,7 +105,8 @@ const ERRORS = {
   LINK_LIMIT_EXCEEDED: {
     code: "LINK_LIMIT_EXCEEDED",
     message: "Link limit exceeded",
-    userMessage: "You've reached your link limit. Upgrade your plan to create more links",
+    userMessage:
+      "You've reached your link limit. Upgrade your plan to create more links",
     statusCode: 400,
     retryable: false,
   },
@@ -144,7 +152,8 @@ const ERRORS = {
   CONDITION_LIMIT_EXCEEDED: {
     code: "CONDITION_LIMIT_EXCEEDED",
     message: "Condition limit exceeded",
-    userMessage: "You've reached the maximum number of conditions for this rule",
+    userMessage:
+      "You've reached the maximum number of conditions for this rule",
     statusCode: 403,
     retryable: false,
   },
@@ -191,12 +200,20 @@ ERRORS.isRetryable = (code) => {
  * Error categories for analytics and filtering
  */
 ERRORS.categories = {
-  AUTH: ['UNAUTHORIZED', 'INVALID_CREDENTIALS', 'USER_NOT_FOUND'],
-  USER: ['USER_EXISTS', 'INVALID_DATA'],
-  GUEST: ['GUEST_SESSION_EXISTS', 'GUEST_SESSION_NOT_FOUND'],
-  LINK: ['LINK_NOT_FOUND', 'LINK_ACCESS_DENIED', 'SHORT_URL_EXISTS', 'LINK_LIMIT_EXCEEDED', 'LINK_NO_PASSWORD', 'LINK_DISABLED', 'LINK_EXPIRED'],
-  RATE_LIMIT: ['RATE_LIMIT_EXCEEDED'],
-  SYSTEM: ['INTERNAL_ERROR', 'DATABASE_ERROR']
+  AUTH: ["UNAUTHORIZED", "INVALID_CREDENTIALS", "USER_NOT_FOUND"],
+  USER: ["USER_EXISTS", "INVALID_DATA"],
+  GUEST: ["GUEST_SESSION_EXISTS", "GUEST_SESSION_NOT_FOUND"],
+  LINK: [
+    "LINK_NOT_FOUND",
+    "LINK_ACCESS_DENIED",
+    "SHORT_URL_EXISTS",
+    "LINK_LIMIT_EXCEEDED",
+    "LINK_NO_PASSWORD",
+    "LINK_DISABLED",
+    "LINK_EXPIRED",
+  ],
+  RATE_LIMIT: ["RATE_LIMIT_EXCEEDED"],
+  SYSTEM: ["INTERNAL_ERROR", "DATABASE_ERROR"],
 };
 
 module.exports = ERRORS;
