@@ -175,6 +175,28 @@
   },
   "Auth": {
     "home": "Inicio",
+    "OAuth": {
+      "signInWithGoogle": "Iniciar sesión con Google",
+      "signUpWithGoogle": "Registrarse con Google",
+      "or": "o"
+    },
+    "LinkAccount": {
+      "title": "Vincular tu Cuenta de Google",
+      "accountExists": "Esta cuenta de Google ya está asociada a una cuenta existente de Linkkk.",
+      "emailLabel": "Email:",
+      "confirmationMessage": "Para vincular tu cuenta de Google y poder iniciar sesión con contraseña o con Google, confirma tu contraseña actual.",
+      "passwordPlaceholder": "Ingresa tu contraseña actual",
+      "togglePasswordTitle": "Mostrar/ocultar contraseña",
+      "linkButton": "Vincular Cuentas",
+      "cancelButton": "Cancelar",
+      "securityNote": "Seguridad: Necesitamos verificar tu contraseña para asegurar que eres el dueño de esta cuenta.",
+      "passwordRequired": "La contraseña es requerida",
+      "linkingFailed": "Error al vincular cuentas",
+      "linkingSuccess": "¡Cuentas vinculadas exitosamente!",
+      "canNowUseGoogle": "Ahora puedes iniciar sesión con Google o con tu contraseña",
+      "invalidToken": "Token de vinculación inválido o expirado",
+      "pleaseRetry": "Por favor intenta el flujo OAuth nuevamente"
+    },
     "Login": {
       "emailPlaceholder": "Email o nombre de usuario",
       "passwordPlaceholder": "Contraseña",

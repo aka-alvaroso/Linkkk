@@ -133,6 +133,20 @@ const getLinkAccessesLimiter = rateLimit({
   handler: rateLimitHandler,
 });
 
+// SECURITY: OAuth-specific rate limiter
+// More permissive than authLimiter because:
+// - Users may click OAuth button multiple times (UX)
+// - Google may retry callbacks on timeout
+// - No brute force risk (Google handles authentication)
+const oauthLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: config.env.isDevelopment ? 1000 : 30, // 30 OAuth attempts per 15 min
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => req.ip,
+  handler: rateLimitHandler,
+});
+
 // Rule CRUD operation limiters
 const createRuleLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
@@ -166,6 +180,7 @@ module.exports = {
   loginLimiter,
   registerLimiter,
   guestLimiter,
+  oauthLimiter,
   createLinkLimiter,
   updateLinkLimiter,
   getLinksLimiter,

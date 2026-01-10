@@ -3,7 +3,7 @@
  * Sends real-time notifications about subscription events
  */
 
-const config = require('../config/environment');
+const config = require("../config/environment");
 
 let telegramConfig = {
   botToken: null,
@@ -18,12 +18,16 @@ function initializeTelegram() {
   telegramConfig.chatId = process.env.TELEGRAM_CHAT_ID;
 
   if (!telegramConfig.botToken || !telegramConfig.chatId) {
-    console.warn('⚠️  Telegram not configured. Admin notifications will be skipped.');
-    console.warn('   Set TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID in .env to enable.');
+    console.warn(
+      "⚠️  Telegram not configured. Admin notifications will be skipped."
+    );
+    console.warn(
+      "   Set TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID in .env to enable."
+    );
     return false;
   }
 
-  console.log('✅ Telegram service initialized');
+  console.log("✅ Telegram service initialized");
   return true;
 }
 
@@ -33,7 +37,7 @@ function initializeTelegram() {
 async function sendMessage(message) {
   if (!telegramConfig.botToken || !telegramConfig.chatId) {
     if (!initializeTelegram()) {
-      return { success: false, message: 'Telegram not configured' };
+      return { success: false, message: "Telegram not configured" };
     }
   }
 
@@ -41,14 +45,14 @@ async function sendMessage(message) {
     const url = `https://api.telegram.org/bot${telegramConfig.botToken}/sendMessage`;
 
     const response = await fetch(url, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         chat_id: telegramConfig.chatId,
         text: message,
-        parse_mode: 'HTML',
+        parse_mode: "HTML",
         disable_web_page_preview: true,
       }),
     });
@@ -56,14 +60,14 @@ async function sendMessage(message) {
     const data = await response.json();
 
     if (!response.ok || !data.ok) {
-      console.error('❌ Telegram API error:', data);
-      return { success: false, error: data.description || 'Unknown error' };
+      console.error("❌ Telegram API error:", data);
+      return { success: false, error: data.description || "Unknown error" };
     }
 
-    console.log('✅ Telegram notification sent');
+    console.log("✅ Telegram notification sent");
     return { success: true, messageId: data.result.message_id };
   } catch (error) {
-    console.error('❌ Error sending Telegram message:', error.message);
+    console.error("❌ Error sending Telegram message:", error.message);
     return { success: false, error: error.message };
   }
 }
@@ -71,9 +75,9 @@ async function sendMessage(message) {
 /**
  * Format currency
  */
-function formatCurrency(amount, currency = 'USD') {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
+function formatCurrency(amount, currency = "USD") {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
     currency: currency,
   }).format(amount);
 }
@@ -82,9 +86,9 @@ function formatCurrency(amount, currency = 'USD') {
  * Format date
  */
 function formatDate(date) {
-  return new Date(date).toLocaleString('es-ES', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
+  return new Date(date).toLocaleString("es-ES", {
+    dateStyle: "medium",
+    timeStyle: "short",
   });
 }
 
@@ -95,7 +99,7 @@ async function notifyNewSubscription(userEmail, userName, amount, periodEnd) {
   const message = `
 🎉 <b>Nueva Suscripción PRO</b>
 
-👤 <b>Usuario:</b> ${userName || 'N/A'}
+👤 <b>Usuario:</b> ${userName || "N/A"}
 📧 <b>Email:</b> ${userEmail}
 💰 <b>Monto:</b> ${formatCurrency(amount / 100)}
 📅 <b>Próximo cobro:</b> ${formatDate(periodEnd)}
@@ -109,13 +113,19 @@ async function notifyNewSubscription(userEmail, userName, amount, periodEnd) {
 /**
  * Send notification when a subscription is cancelled
  */
-async function notifyCancellation(userEmail, userName, periodEnd, reason = 'user_action') {
-  const reasonText = reason === 'user_action' ? 'Usuario canceló' : 'Cancelación automática';
+async function notifyCancellation(
+  userEmail,
+  userName,
+  periodEnd,
+  reason = "user_action"
+) {
+  const reasonText =
+    reason === "user_action" ? "Usuario canceló" : "Cancelación automática";
 
   const message = `
 ❌ <b>Suscripción Cancelada</b>
 
-👤 <b>Usuario:</b> ${userName || 'N/A'}
+👤 <b>Usuario:</b> ${userName || "N/A"}
 📧 <b>Email:</b> ${userEmail}
 ⚠️ <b>Motivo:</b> ${reasonText}
 📅 <b>Acceso hasta:</b> ${formatDate(periodEnd)}
@@ -133,7 +143,7 @@ async function notifyPaymentFailed(userEmail, userName, amount, attemptCount) {
   const message = `
 ⚠️ <b>Pago Fallido</b>
 
-👤 <b>Usuario:</b> ${userName || 'N/A'}
+👤 <b>Usuario:</b> ${userName || "N/A"}
 📧 <b>Email:</b> ${userEmail}
 💰 <b>Monto:</b> ${formatCurrency(amount / 100)}
 🔄 <b>Intento:</b> ${attemptCount}
@@ -149,11 +159,16 @@ async function notifyPaymentFailed(userEmail, userName, amount, attemptCount) {
 /**
  * Send notification when a subscription is renewed successfully
  */
-async function notifyRenewalSuccess(userEmail, userName, amount, nextBillingDate) {
+async function notifyRenewalSuccess(
+  userEmail,
+  userName,
+  amount,
+  nextBillingDate
+) {
   const message = `
 ✅ <b>Renovación Exitosa</b>
 
-👤 <b>Usuario:</b> ${userName || 'N/A'}
+👤 <b>Usuario:</b> ${userName || "N/A"}
 📧 <b>Email:</b> ${userEmail}
 💰 <b>Monto:</b> ${formatCurrency(amount / 100)}
 📅 <b>Próximo cobro:</b> ${formatDate(nextBillingDate)}
@@ -171,7 +186,7 @@ async function notifyPaymentRecovered(userEmail, userName, amount) {
   const message = `
 🎉 <b>Pago Recuperado</b>
 
-👤 <b>Usuario:</b> ${userName || 'N/A'}
+👤 <b>Usuario:</b> ${userName || "N/A"}
 📧 <b>Email:</b> ${userEmail}
 💰 <b>Monto:</b> ${formatCurrency(amount / 100)}
 
@@ -205,13 +220,13 @@ async function sendTestNotification() {
 /**
  * Notify user login
  */
-async function notifyLogin(userEmail, userName, ip) {
+async function notifyLogin(userEmail, userName, context) {
   const message = `
 🔐 <b>Login</b>
 
-👤 <b>Usuario:</b> ${userName || 'N/A'}
+👤 <b>Usuario:</b> ${userName || "N/A"}
 📧 <b>Email:</b> ${userEmail}
-🌐 <b>IP:</b> ${ip || 'N/A'}
+👍 <b>Contexto:</b> ${context || "N/A"}
 🕐 ${formatDate(new Date())}
   `.trim();
 
@@ -242,7 +257,7 @@ async function notifyAccountDeletion(userEmail, userName, role) {
   const message = `
 🗑️ <b>Cuenta Eliminada</b>
 
-👤 <b>Usuario:</b> ${userName || 'N/A'}
+👤 <b>Usuario:</b> ${userName || "N/A"}
 📧 <b>Email:</b> ${userEmail}
 👑 <b>Plan:</b> ${role}
 🕐 ${formatDate(new Date())}
@@ -327,7 +342,7 @@ async function notifyCronJobStarted(jobName) {
 async function notifyCronJobCompleted(jobName, stats) {
   const statsText = Object.entries(stats)
     .map(([key, value]) => `  • ${key}: ${value}`)
-    .join('\n');
+    .join("\n");
 
   const message = `
 ✅ <b>Cron Job Completado</b>
@@ -367,16 +382,21 @@ async function notifyCronJobFailed(jobName, error) {
  */
 async function notifyError(error, context = {}) {
   const contextText = Object.entries(context)
-    .filter(([key]) => !['stack', 'error'].includes(key))
-    .map(([key, value]) => `  • ${key}: ${typeof value === 'object' ? JSON.stringify(value) : value}`)
-    .join('\n');
+    .filter(([key]) => !["stack", "error"].includes(key))
+    .map(
+      ([key, value]) =>
+        `  • ${key}: ${
+          typeof value === "object" ? JSON.stringify(value) : value
+        }`
+    )
+    .join("\n");
 
   const message = `
 🚨 <b>Error Capturado</b>
 
 ⚠️ <b>Mensaje:</b> ${error.message || error}
 📍 <b>Contexto:</b>
-${contextText || '  Sin contexto adicional'}
+${contextText || "  Sin contexto adicional"}
 🕐 ${formatDate(new Date())}
 
 🔍 Revisar logs para más detalles
@@ -391,7 +411,7 @@ ${contextText || '  Sin contexto adicional'}
 async function notifySecurityEvent(event, details) {
   const detailsText = Object.entries(details)
     .map(([key, value]) => `  • ${key}: ${value}`)
-    .join('\n');
+    .join("\n");
 
   const message = `
 🔒 <b>Evento de Seguridad</b>

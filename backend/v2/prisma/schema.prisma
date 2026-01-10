@@ -12,13 +12,17 @@ model User {
   id           Int           @id @default(autoincrement())
   username     String        @unique
   email        String        @unique
-  password     String
+  password     String?
   role         Role          @default(STANDARD)
   locale       String        @default("en") // "en" or "es"
   createdAt    DateTime      @default(now())
   links        Link[]
   subscription Subscription?
   auditLogs    AuditLog[]
+  oauthProvider String?
+  oauthId       String?
+
+  @@unique([oauthProvider, oauthId])
 }
 
 model GuestSession {

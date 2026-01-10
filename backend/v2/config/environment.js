@@ -95,6 +95,15 @@ const config = {
     proYearlyPriceId: process.env.STRIPE_PRO_YEARLY_PRICE_ID,
   },
 
+  // OAuth
+  oauth: {
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      redirectUri: process.env.GOOGLE_REDIRECT_URI,
+    },
+  },
+
 };
 
 // Log configuration on startup (hide sensitive data)
@@ -110,6 +119,8 @@ if (!isTest) {
   console.log(`   Stripe Webhook Secret: ${config.stripe.webhookSecret ? '✓ Set' : '✗ Missing (configure with Stripe CLI)'}`);
   console.log(`   Stripe Pro Price ID (Monthly): ${config.stripe.proPriceId ? '✓ Set' : '✗ Missing'}`);
   console.log(`   Stripe Pro Price ID (Yearly): ${config.stripe.proYearlyPriceId ? '✓ Set' : '✗ Missing'}`);
+  console.log(`   Google OAuth Client ID: ${config.oauth.google.clientId ? '✓ Set' : '✗ Missing'}`);
+  console.log(`   Google OAuth Client Secret: ${config.oauth.google.clientSecret ? '✓ Set' : '✗ Missing'}`);
 }
 
 module.exports = config;

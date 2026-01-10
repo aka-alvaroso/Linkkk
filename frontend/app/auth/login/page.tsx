@@ -6,6 +6,8 @@ import { useAuth } from "@/app/hooks";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/app/hooks/useToast";
 import Button from "@/app/components/ui/Button/Button";
+import GoogleOAuthButton from "@/app/components/auth/GoogleOAuthButton";
+import OAuthDivider from "@/app/components/auth/OAuthDivider";
 import * as motion from "motion/react-client";
 import { TbArrowUpRight, TbX, TbEye, TbEyeOff, TbLogin } from "react-icons/tb";
 import { useTranslations } from 'next-intl';
@@ -66,7 +68,7 @@ export default function Login() {
                 </motion.div>
 
                 <div className="text-dark bg-light p-6 md:p-8 w-11/12 md:w-3/4 max-w-xl mx-auto rounded-3xl">
-                        <motion.h1 
+                        <motion.h1
                             initial={{ opacity: 0, y: -20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ ease: "backInOut" }}
@@ -77,6 +79,24 @@ export default function Login() {
                         ">
                             Linkkk.
                         </motion.h1>
+
+                        {/* OAuth Buttons */}
+                        <motion.div
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.05, ease: "backInOut" }}
+                            className="w-full"
+                        >
+                            <GoogleOAuthButton variant="login" />
+                        </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.075, ease: "backInOut" }}
+                        >
+                            <OAuthDivider />
+                        </motion.div>
 
                         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                             <motion.div

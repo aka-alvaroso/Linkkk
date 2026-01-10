@@ -175,6 +175,28 @@
   },
   "Auth": {
     "home": "Home",
+    "OAuth": {
+      "signInWithGoogle": "Sign in with Google",
+      "signUpWithGoogle": "Sign up with Google",
+      "or": "or"
+    },
+    "LinkAccount": {
+      "title": "Link Your Google Account",
+      "accountExists": "This Google account is already associated with an existing Linkkk account.",
+      "emailLabel": "Email:",
+      "confirmationMessage": "To link your Google account and enable sign-in with both password and Google, please confirm your current password.",
+      "passwordPlaceholder": "Enter your current password",
+      "togglePasswordTitle": "Toggle password visibility",
+      "linkButton": "Link Accounts",
+      "cancelButton": "Cancel",
+      "securityNote": "Security: We need to verify your password to ensure you own this account.",
+      "passwordRequired": "Password is required",
+      "linkingFailed": "Failed to link accounts",
+      "linkingSuccess": "Accounts linked successfully!",
+      "canNowUseGoogle": "You can now sign in with Google or your password",
+      "invalidToken": "Invalid or expired linking token",
+      "pleaseRetry": "Please try the OAuth flow again"
+    },
     "Login": {
       "emailPlaceholder": "Email or username",
       "passwordPlaceholder": "Password",

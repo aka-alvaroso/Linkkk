@@ -166,6 +166,16 @@ class AuthService {
       method: "POST",
     });
   }
+
+  /**
+   * Link OAuth account to existing account
+   */
+  async linkOAuthAccount(password: string): Promise<{ user: User }> {
+    return this.request<{ user: User }>(`${this.baseUrl}/link-oauth`, {
+      method: "POST",
+      body: JSON.stringify({ password }),
+    });
+  }
 }
 
 export const authService = new AuthService();
