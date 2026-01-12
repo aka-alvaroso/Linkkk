@@ -16,6 +16,8 @@ const {
   logout,
   googleAuth,
   googleCallback,
+  githubAuth,
+  githubCallback,
   linkOAuthAccount,
 } = require("../controllers/auth");
 
@@ -29,6 +31,8 @@ router.post("/login", loginLimiter, optionalGuest, login);
 // OAuth routes
 router.get("/oauth/google", oauthLimiter, googleAuth);
 router.get("/callback/google", oauthLimiter, optionalGuest, googleCallback);
+router.get("/oauth/github", oauthLimiter, githubAuth);
+router.get("/callback/github", oauthLimiter, optionalGuest, githubCallback);
 router.post("/link-oauth", loginLimiter, optionalGuest, linkOAuthAccount);
 
 module.exports = router;

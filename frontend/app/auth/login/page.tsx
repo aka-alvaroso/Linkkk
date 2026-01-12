@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/app/hooks/useToast";
 import Button from "@/app/components/ui/Button/Button";
 import GoogleOAuthButton from "@/app/components/auth/GoogleOAuthButton";
+import GitHubOAuthButton from "@/app/components/auth/GitHubOAuthButton";
 import OAuthDivider from "@/app/components/auth/OAuthDivider";
 import * as motion from "motion/react-client";
 import { TbArrowUpRight, TbX, TbEye, TbEyeOff, TbLogin } from "react-icons/tb";
@@ -88,6 +89,15 @@ export default function Login() {
                             className="w-full"
                         >
                             <GoogleOAuthButton variant="login" />
+                        </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.06, ease: "backInOut" }}
+                            className="w-full mt-3"
+                        >
+                            <GitHubOAuthButton variant="login" />
                         </motion.div>
 
                         <motion.div

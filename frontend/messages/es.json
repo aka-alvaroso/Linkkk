@@ -178,6 +178,8 @@
     "OAuth": {
       "signInWithGoogle": "Iniciar sesión con Google",
       "signUpWithGoogle": "Registrarse con Google",
+      "signInWithGitHub": "Iniciar sesión con GitHub",
+      "signUpWithGitHub": "Registrarse con GitHub",
       "or": "o"
     },
     "LinkAccount": {
@@ -193,7 +195,7 @@
       "passwordRequired": "La contraseña es requerida",
       "linkingFailed": "Error al vincular cuentas",
       "linkingSuccess": "¡Cuentas vinculadas exitosamente!",
-      "canNowUseGoogle": "Ahora puedes iniciar sesión con Google o con tu contraseña",
+      "canNowUse": "Ahora puedes iniciar sesión con",
       "invalidToken": "Token de vinculación inválido o expirado",
       "pleaseRetry": "Por favor intenta el flujo OAuth nuevamente"
     },

@@ -11,6 +11,7 @@ import Button from "@/app/components/ui/Button/Button";
 import * as motion from "motion/react-client";
 import { TbX, TbEye, TbEyeOff, TbLink, TbAlertCircle, TbShieldLock } from "react-icons/tb";
 import { FcGoogle } from "react-icons/fc";
+import { FaGithub } from "react-icons/fa";
 import { useTranslations } from 'next-intl';
 
 export default function LinkAccount() {
@@ -26,6 +27,23 @@ export default function LinkAccount() {
   const [isLinking, setIsLinking] = useState(false);
   const [email, setEmail] = useState<string | null>(null);
   const [provider, setProvider] = useState<string | null>(null);
+
+  // Helper function to get provider icon
+  const getProviderIcon = () => {
+    if (provider === "google") {
+      return <FcGoogle size={32} />;
+    } else if (provider === "github") {
+      return <FaGithub size={32} />;
+    }
+    return null;
+  };
+
+  // Helper function to get provider display name
+  const getProviderName = () => {
+    if (provider === "google") return "Google";
+    if (provider === "github") return "GitHub";
+    return provider;
+  };
 
   useEffect(() => {
     const emailParam = searchParams.get('email');
@@ -60,7 +78,7 @@ export default function LinkAccount() {
       setUser(user);
 
       toast.success(tLink('linkingSuccess'), {
-        description: tLink('canNowUseGoogle')
+        description: `${tLink('canNowUse')} ${getProviderName()}`
       });
 
       router.push('/dashboard');
@@ -125,7 +143,7 @@ export default function LinkAccount() {
             transition={{ delay: 0.05, ease: "backInOut" }}
             className="flex items-center justify-center gap-2 mb-6"
           >
-            <FcGoogle size={32} />
+            {getProviderIcon()}
             <span className="font-bold text-lg">{email}</span>
           </motion.div>
 

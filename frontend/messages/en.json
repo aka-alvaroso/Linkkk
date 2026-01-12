@@ -178,6 +178,8 @@
     "OAuth": {
       "signInWithGoogle": "Sign in with Google",
       "signUpWithGoogle": "Sign up with Google",
+      "signInWithGitHub": "Sign in with GitHub",
+      "signUpWithGitHub": "Sign up with GitHub",
       "or": "or"
     },
     "LinkAccount": {
@@ -193,7 +195,7 @@
       "passwordRequired": "Password is required",
       "linkingFailed": "Failed to link accounts",
       "linkingSuccess": "Accounts linked successfully!",
-      "canNowUseGoogle": "You can now sign in with Google or your password",
+      "canNowUse": "You can now sign in with",
       "invalidToken": "Invalid or expired linking token",
       "pleaseRetry": "Please try the OAuth flow again"
     },

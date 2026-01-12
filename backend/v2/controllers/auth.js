@@ -11,6 +11,7 @@ const telegramService = require("../services/telegramService");
 const logger = require("../utils/logger");
 const sentryService = require("../services/sentry");
 const googleOAuthService = require("../services/googleOAuth");
+const githubOAuthService = require("../services/githubOAuth");
 
 const validateSession = (req, res) => {
   const user = req.user;
@@ -400,7 +401,8 @@ const googleCallback = async (req, res) => {
         // Store pending OAuth data in a temporary cookie for linking
         const linkingToken = jwt.sign(
           {
-            googleId,
+            provider: "google",
+            oauthId: googleId,
             email,
             name,
             type: "oauth_link",
@@ -517,6 +519,221 @@ const googleCallback = async (req, res) => {
   }
 };
 
+// Redirect user to GitHub's authorization page
+const githubAuth = async (req, res) => {
+  try {
+    // Generate CSRF state token
+    const state = crypto.randomBytes(32).toString("hex");
+
+    // Store state in cookie for verification in callback
+    res.cookie("oauth_state", state, {
+      maxAge: 10 * 60 * 1000, // 10 minutes
+      httpOnly: true,
+      secure: config.security.cookies.secure,
+      sameSite: config.security.cookies.sameSite,
+    });
+
+    // Generate GitHub authorization URL
+    const authUrl = githubOAuthService.getAuthorizationUrl(state);
+
+    // Redirect to GitHub
+    res.redirect(authUrl);
+  } catch (error) {
+    logger.error("Error initiating GitHub OAuth", {
+      type: "OAUTH",
+      error: error.message,
+      stack: error.stack,
+    });
+    sentryService.captureException(error, {
+      tags: { type: "oauth-init" },
+    });
+    return errorResponse(res, ERRORS.INTERNAL_ERROR);
+  }
+};
+
+// Processes the OAuth callback from GitHub
+const githubCallback = async (req, res) => {
+  try {
+    const { code, state } = req.query;
+    const storedState = req.cookies.oauth_state;
+
+    // Verify state parameter (CSRF protection)
+    if (!state || !storedState || state !== storedState) {
+      logger.warn("OAuth state mismatch", {
+        type: "OAUTH",
+        receivedState: state,
+        storedState: storedState,
+      });
+      return res.redirect(`${config.frontend.url}/login?error=oauth_failed`);
+    }
+
+    // Clear state cookie
+    res.clearCookie("oauth_state");
+
+    if (!code) {
+      logger.warn("OAuth callback missing authorization code", {
+        type: "OAUTH",
+      });
+      return res.redirect(`${config.frontend.url}/login?error=oauth_failed`);
+    }
+
+    // Exchange code for tokens
+    const tokenData = await githubOAuthService.exchangeCodeForToken(code);
+    const { access_token } = tokenData;
+
+    // Get user info from GitHub
+    const githubUser = await githubOAuthService.getUserInfo(access_token);
+    const { id: githubId, email, name } = githubUser;
+
+    // Check if user already exists with this GitHub account
+    let user = await prisma.user.findFirst({
+      where: {
+        oauthProvider: "github",
+        oauthId: githubId,
+      },
+    });
+
+    if (user) {
+      // User exists with this GitHub account - log them in
+      logger.info("User logged in via GitHub OAuth", {
+        type: "OAUTH",
+        userId: user.id,
+        email: user.email,
+      });
+
+      // Notify Telegram (non-blocking)
+      telegramService
+        .notifyLogin(user.email, user.username, "GitHub OAuth")
+        .catch(() => {});
+    } else {
+      // Check if a user with this email already exists (password-based account)
+      const existingUser = await prisma.user.findUnique({
+        where: { email },
+      });
+
+      if (existingUser) {
+        // Email exists - redirect to account linking confirmation page
+        // Store pending OAuth data in a temporary cookie for linking
+        const linkingToken = jwt.sign(
+          {
+            provider: "github",
+            oauthId: githubId,
+            email,
+            name,
+            type: "oauth_link",
+          },
+          config.security.jwt.authSecret,
+          { expiresIn: "10m" }
+        );
+
+        res.cookie("oauth_link_token", linkingToken, {
+          maxAge: 10 * 60 * 1000, // 10 minutes
+          httpOnly: true,
+          secure: config.security.cookies.secure,
+          sameSite: config.security.cookies.sameSite,
+        });
+
+        logger.info("OAuth account linking required", {
+          type: "OAUTH",
+          email,
+          existingUserId: existingUser.id,
+        });
+
+        return res.redirect(
+          `${
+            config.frontend.url
+          }/auth/link-account?provider=github&email=${encodeURIComponent(
+            email
+          )}`
+        );
+      }
+
+      // New user - create account
+      // Generate unique username from email or name
+      let username = (name || email.split("@")[0])
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "");
+
+      // Ensure username is unique
+      let usernameExists = await prisma.user.findUnique({
+        where: { username },
+      });
+
+      let counter = 1;
+      while (usernameExists) {
+        username = `${username}${counter}`;
+        usernameExists = await prisma.user.findUnique({
+          where: { username },
+        });
+        counter++;
+      }
+
+      user = await prisma.user.create({
+        data: {
+          username,
+          email,
+          password: null, // OAuth users don't have passwords
+          oauthProvider: "github",
+          oauthId: githubId,
+        },
+      });
+
+      logger.info("User registered via GitHub OAuth", {
+        type: "OAUTH",
+        userId: user.id,
+        username,
+        email,
+      });
+
+      // Notify Telegram (non-blocking)
+      telegramService
+        .notifyRegistration(email, username, "GitHub OAuth")
+        .catch(() => {});
+    }
+
+    // Transfer guest links if there's a guest session
+    const guest = req.guest;
+    if (guest && guest.guestSessionId) {
+      await transferLinks(guest.guestSessionId, user.id);
+      await deleteGuestSession(guest.guestSessionId);
+
+      res.clearCookie("guestToken", {
+        httpOnly: config.security.cookies.httpOnly,
+        secure: config.security.cookies.secure,
+        sameSite: config.security.cookies.sameSite,
+      });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign({ id: user.id }, config.security.jwt.authSecret, {
+      expiresIn: config.security.jwt.authExpiresIn,
+      algorithm: "HS256",
+      issuer: "linkkk-api",
+      audience: "linkkk-users",
+    });
+
+    res.cookie("token", token, {
+      maxAge: config.security.cookies.authMaxAge,
+      httpOnly: config.security.cookies.httpOnly,
+      secure: config.security.cookies.secure,
+      sameSite: config.security.cookies.sameSite,
+    });
+
+    // Redirect to frontend
+    res.redirect(`${config.frontend.url}/dashboard`);
+  } catch (error) {
+    logger.error("Error during GitHub OAuth callback", {
+      type: "OAUTH",
+      error: error.message,
+      stack: error.stack,
+    });
+    sentryService.captureException(error, {
+      tags: { type: "oauth-callback" },
+    });
+    return res.redirect(`${config.frontend.url}/login?error=oauth_failed`);
+  }
+};
+
 // Link OAuth account to a existing user
 const linkOAuthAccount = async (req, res) => {
   try {
@@ -554,7 +771,7 @@ const linkOAuthAccount = async (req, res) => {
       return errorResponse(res, ERRORS.UNAUTHORIZED);
     }
 
-    const { googleId, email, name } = tokenData;
+    const { provider, oauthId, email, name } = tokenData;
 
     // Verify password was provided
     if (!password) {
@@ -595,20 +812,21 @@ const linkOAuthAccount = async (req, res) => {
       return errorResponse(res, ERRORS.INVALID_CREDENTIALS);
     }
 
-    // Check if this Google account is already linked to another user
+    // Check if this OAuth account is already linked to another user
     const existingOAuthUser = await prisma.user.findFirst({
       where: {
-        oauthProvider: "google",
-        oauthId: googleId,
+        oauthProvider: provider,
+        oauthId: oauthId,
       },
     });
 
     if (existingOAuthUser && existingOAuthUser.id !== user.id) {
       logger.warn(
-        "OAuth linking: Google account already linked to another user",
+        `OAuth linking: ${provider} account already linked to another user`,
         {
           type: "OAUTH",
-          googleId,
+          provider,
+          oauthId,
           existingUserId: existingOAuthUser.id,
           attemptedUserId: user.id,
         }
@@ -616,8 +834,9 @@ const linkOAuthAccount = async (req, res) => {
       res.clearCookie("oauth_link_token");
       return errorResponse(res, {
         code: "OAUTH_ALREADY_LINKED",
-        message:
-          "This Google account is already linked to another Linkkk account",
+        message: `This ${
+          provider.charAt(0).toUpperCase() + provider.slice(1)
+        } account is already linked to another Linkkk account`,
         statusCode: 409,
       });
     }
@@ -626,8 +845,8 @@ const linkOAuthAccount = async (req, res) => {
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
       data: {
-        oauthProvider: "google",
-        oauthId: googleId,
+        oauthProvider: provider,
+        oauthId: oauthId,
       },
     });
 
@@ -674,7 +893,7 @@ const linkOAuthAccount = async (req, res) => {
       type: "OAUTH",
       userId: updatedUser.id,
       email: updatedUser.email,
-      provider: "google",
+      provider: provider,
     });
 
     // Notify Telegram (non-blocking)
@@ -682,7 +901,7 @@ const linkOAuthAccount = async (req, res) => {
       .notifyLogin(
         updatedUser.email,
         updatedUser.username,
-        "Google OAuth (linked)"
+        `${provider.charAt(0).toUpperCase() + provider.slice(1)} OAuth (linked)`
       )
       .catch(() => {});
 
@@ -715,5 +934,7 @@ module.exports = {
   logout,
   googleAuth,
   googleCallback,
+  githubAuth,
+  githubCallback,
   linkOAuthAccount,
 };

@@ -102,6 +102,11 @@ const config = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       redirectUri: process.env.GOOGLE_REDIRECT_URI,
     },
+    github: {
+      clientId: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+      redirectUri: process.env.GITHUB_REDIRECT_URI,
+    },
   },
 
 };
@@ -121,6 +126,8 @@ if (!isTest) {
   console.log(`   Stripe Pro Price ID (Yearly): ${config.stripe.proYearlyPriceId ? '✓ Set' : '✗ Missing'}`);
   console.log(`   Google OAuth Client ID: ${config.oauth.google.clientId ? '✓ Set' : '✗ Missing'}`);
   console.log(`   Google OAuth Client Secret: ${config.oauth.google.clientSecret ? '✓ Set' : '✗ Missing'}`);
+  console.log(`   GitHub OAuth Client ID: ${config.oauth.github.clientId ? '✓ Set' : '✗ Missing'}`);
+  console.log(`   GitHub OAuth Client Secret: ${config.oauth.github.clientSecret ? '✓ Set' : '✗ Missing'}`);
 }
 
 module.exports = config;
