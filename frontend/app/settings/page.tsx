@@ -27,7 +27,9 @@ import CancelSubscriptionModal from "@/app/components/Modal/CancelSubscriptionMo
 import SelectPlanModal from "@/app/components/Modal/SelectPlanModal";
 import { HttpError } from "@/app/utils/errors";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_CONFIG } from "@/app/config/api";
+
+const API_BASE_URL = API_CONFIG.BASE_URL;
 
 type SettingsTab = "account" | "security" | "danger";
 

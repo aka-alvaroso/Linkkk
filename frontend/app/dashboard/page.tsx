@@ -19,6 +19,9 @@ import { useMotionValue, animate } from 'motion/react';
 import AnimatedText, { AnimatedTextRef } from "@/app/components/ui/AnimatedText";
 import { useTranslations } from 'next-intl';
 
+import { API_CONFIG } from "@/app/config/api";
+
+const API_BASE_URL = API_CONFIG.BASE_URL;
 function AnimatedCounter({ value, delay = 0 }: { value: number; delay?: number }) {
   const count = useMotionValue(0);
   const textRef = useRef<AnimatedTextRef>(null);
@@ -90,7 +93,7 @@ export default function Dashboard() {
     const fetchSubscriptionInfo = async () => {
       if (user?.role === 'PRO') {
         try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/subscription/status`, {
+          const response = await fetch(`${API_BASE_URL}/subscription/status`, {
             method: 'GET',
             credentials: 'include',
           });

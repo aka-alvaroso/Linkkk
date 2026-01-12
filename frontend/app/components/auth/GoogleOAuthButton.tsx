@@ -3,6 +3,10 @@
 import { FcGoogle } from "react-icons/fc";
 import Button from "@/app/components/ui/Button/Button";
 import { useTranslations } from 'next-intl';
+import { API_CONFIG } from "@/app/config/api";
+
+const API_BASE_URL = API_CONFIG.BASE_URL;
+
 
 interface GoogleOAuthButtonProps {
   variant?: "login" | "register";
@@ -13,7 +17,7 @@ export default function GoogleOAuthButton({ variant = "login" }: GoogleOAuthButt
 
   const handleGoogleAuth = () => {
     // Redirect to backend OAuth endpoint
-    window.location.href = 'http://localhost:4444/auth/oauth/google';
+    window.location.href = `${API_BASE_URL}/auth/oauth/google`;
   };
 
   return (
