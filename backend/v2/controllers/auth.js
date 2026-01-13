@@ -315,7 +315,7 @@ const googleAuth = async (req, res) => {
       maxAge: 10 * 60 * 1000, // 10 minutes
       httpOnly: true,
       secure: config.security.cookies.secure,
-      sameSite: config.security.cookies.sameSite,
+      sameSite: "lax", // Must be "lax" for OAuth redirects from Google/GitHub
     });
 
     // Generate Google authorization URL
@@ -349,7 +349,9 @@ const googleCallback = async (req, res) => {
         receivedState: state,
         storedState: storedState,
       });
-      return res.redirect(`${config.frontend.url}/login?error=oauth_failed`);
+      return res.redirect(
+        `${config.frontend.url}/auth/login?error=oauth_failed`
+      );
     }
 
     // Clear state cookie
@@ -359,7 +361,9 @@ const googleCallback = async (req, res) => {
       logger.warn("OAuth callback missing authorization code", {
         type: "OAUTH",
       });
-      return res.redirect(`${config.frontend.url}/login?error=oauth_failed`);
+      return res.redirect(
+        `${config.frontend.url}/auth/login?error=oauth_failed`
+      );
     }
 
     // Exchange code for tokens
@@ -415,7 +419,7 @@ const googleCallback = async (req, res) => {
           maxAge: 10 * 60 * 1000, // 10 minutes
           httpOnly: true,
           secure: config.security.cookies.secure,
-          sameSite: config.security.cookies.sameSite,
+          sameSite: "lax", // Must be "lax" for OAuth redirect to link-account page
         });
 
         logger.info("OAuth account linking required", {
@@ -515,7 +519,7 @@ const googleCallback = async (req, res) => {
     sentryService.captureException(error, {
       tags: { type: "oauth-callback" },
     });
-    return res.redirect(`${config.frontend.url}/login?error=oauth_failed`);
+    return res.redirect(`${config.frontend.url}/auth/login?error=oauth_failed`);
   }
 };
 
@@ -530,7 +534,7 @@ const githubAuth = async (req, res) => {
       maxAge: 10 * 60 * 1000, // 10 minutes
       httpOnly: true,
       secure: config.security.cookies.secure,
-      sameSite: config.security.cookies.sameSite,
+      sameSite: "lax", // Must be "lax" for OAuth redirects from Google/GitHub
     });
 
     // Generate GitHub authorization URL
@@ -564,7 +568,9 @@ const githubCallback = async (req, res) => {
         receivedState: state,
         storedState: storedState,
       });
-      return res.redirect(`${config.frontend.url}/login?error=oauth_failed`);
+      return res.redirect(
+        `${config.frontend.url}/auth/login?error=oauth_failed`
+      );
     }
 
     // Clear state cookie
@@ -574,7 +580,9 @@ const githubCallback = async (req, res) => {
       logger.warn("OAuth callback missing authorization code", {
         type: "OAUTH",
       });
-      return res.redirect(`${config.frontend.url}/login?error=oauth_failed`);
+      return res.redirect(
+        `${config.frontend.url}/auth/login?error=oauth_failed`
+      );
     }
 
     // Exchange code for tokens
@@ -630,7 +638,7 @@ const githubCallback = async (req, res) => {
           maxAge: 10 * 60 * 1000, // 10 minutes
           httpOnly: true,
           secure: config.security.cookies.secure,
-          sameSite: config.security.cookies.sameSite,
+          sameSite: "lax", // Must be "lax" for OAuth redirect to link-account page
         });
 
         logger.info("OAuth account linking required", {
@@ -730,7 +738,7 @@ const githubCallback = async (req, res) => {
     sentryService.captureException(error, {
       tags: { type: "oauth-callback" },
     });
-    return res.redirect(`${config.frontend.url}/login?error=oauth_failed`);
+    return res.redirect(`${config.frontend.url}/auth/login?error=oauth_failed`);
   }
 };
 
