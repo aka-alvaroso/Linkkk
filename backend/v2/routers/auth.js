@@ -24,6 +24,16 @@ const {
 router.get("/validate", authLimiter, optionalAuth, validateSession);
 router.post("/logout", authLimiter, auth, logout);
 
+// DEBUG: Temporary endpoint to check config (REMOVE IN PRODUCTION)
+router.get("/debug/config", (req, res) => {
+  const config = require("../config/environment");
+  res.json({
+    frontendUrl: config.frontend.url,
+    env: config.env.nodeEnv,
+    isProduction: config.env.isProduction,
+  });
+});
+
 router.post("/guest", guestLimiter, createGuestSession);
 router.post("/register", registerLimiter, optionalGuest, register);
 router.post("/login", loginLimiter, optionalGuest, login);
