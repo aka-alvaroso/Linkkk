@@ -176,10 +176,8 @@
   "Auth": {
     "home": "Home",
     "OAuth": {
-      "signInWithGoogle": "Sign in with Google",
-      "signUpWithGoogle": "Sign up with Google",
-      "signInWithGitHub": "Sign in with GitHub",
-      "signUpWithGitHub": "Sign up with GitHub",
+      "google": "Google",
+      "github": "GitHub",
       "or": "or"
     },
     "LinkAccount": {

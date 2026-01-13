@@ -8,11 +8,8 @@ import { API_CONFIG } from "@/app/config/api";
 const API_BASE_URL = API_CONFIG.BASE_URL;
 
 
-interface GoogleOAuthButtonProps {
-  variant?: "login" | "register";
-}
 
-export default function GoogleOAuthButton({ variant = "login" }: GoogleOAuthButtonProps) {
+export default function GoogleOAuthButton() {
   const t = useTranslations('Auth.OAuth');
 
   const handleGoogleAuth = () => {
@@ -27,11 +24,11 @@ export default function GoogleOAuthButton({ variant = "login" }: GoogleOAuthButt
       rounded="xl"
       onClick={handleGoogleAuth}
       leftIcon={<FcGoogle size={24} />}
-      expandOnHover="icon"
-      className="w-full transition-all duration-300 ease-in-out hover:bg-dark/5 border-2 border-dark/20 hover:border-dark hover:shadow-[_2px_2px_0_var(--color-dark)]"
+      expandOnHover="text"
+      className="transition-all duration-300 ease-in-out hover:bg-dark/5 border border-dark/20 hover:border-dark hover:shadow-[_2px_2px_0_var(--color-dark)]"
     >
-      <p className="font-bold">
-        {variant === "login" ? t('signInWithGoogle') : t('signUpWithGoogle')}
+      <p className="leading-5">
+        {t('google')}
       </p>
     </Button>
   );

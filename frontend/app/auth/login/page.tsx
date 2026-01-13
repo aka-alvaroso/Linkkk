@@ -81,32 +81,8 @@ export default function Login() {
                             Linkkk.
                         </motion.h1>
 
-                        {/* OAuth Buttons */}
-                        <motion.div
-                            initial={{ opacity: 0, y: -20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.05, ease: "backInOut" }}
-                            className="w-full"
-                        >
-                            <GoogleOAuthButton variant="login" />
-                        </motion.div>
 
-                        <motion.div
-                            initial={{ opacity: 0, y: -20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.06, ease: "backInOut" }}
-                            className="w-full mt-3"
-                        >
-                            <GitHubOAuthButton variant="login" />
-                        </motion.div>
 
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.075, ease: "backInOut" }}
-                        >
-                            <OAuthDivider />
-                        </motion.div>
 
                         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                             <motion.div
@@ -168,7 +144,27 @@ export default function Login() {
                                     <p className="text-xl font-black italic">{tLogin('loginButton')}</p>
                                 </Button>
                             </motion.div>
-                        </form>
+                        </form>                        
+                        
+                        
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.075, ease: "backInOut" }}
+                        >
+                            <OAuthDivider />
+                        </motion.div>
+
+                        {/* OAuth Buttons */}
+                        <motion.div
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.05, ease: "backInOut" }}
+                            className="w-full flex items justify-center gap-4"
+                        >
+                            <GoogleOAuthButton />
+                            <GitHubOAuthButton />
+                        </motion.div>
 
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
