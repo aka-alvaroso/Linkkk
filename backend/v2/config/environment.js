@@ -51,10 +51,7 @@ const config = {
 
   // Frontend
   frontend: {
-    url:
-      process.env.FRONTEND_URL || isDevelopment
-        ? "http://localhost:3000"
-        : "https://linkkk.dev",
+    url: process.env.FRONTEND_URL || (isDevelopment ? "http://localhost:3000" : "https://linkkk.dev"),
     // In development, allow multiple origins
     allowedOrigins: isDevelopment
       ? [
