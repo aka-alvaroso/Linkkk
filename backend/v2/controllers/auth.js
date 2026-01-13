@@ -431,7 +431,9 @@ const googleCallback = async (req, res) => {
         return res.redirect(
           `${
             config.frontend.url
-          }/link-account?provider=google&email=${encodeURIComponent(email)}`
+          }/auth/link-account?provider=google&email=${encodeURIComponent(
+            email
+          )}`
         );
       }
 
@@ -648,7 +650,9 @@ const githubCallback = async (req, res) => {
         return res.redirect(
           `${
             config.frontend.url
-          }/link-account?provider=github&email=${encodeURIComponent(email)}`
+          }/auth/link-account?provider=github&email=${encodeURIComponent(
+            email
+          )}`
         );
       }
 
