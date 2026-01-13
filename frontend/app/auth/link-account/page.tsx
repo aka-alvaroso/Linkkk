@@ -82,9 +82,10 @@ export default function LinkAccount() {
       });
 
       router.push('/dashboard');
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : tLink('pleaseRetry');
       toast.error(tLink('linkingFailed'), {
-        description: error.message || tLink('pleaseRetry')
+        description: errorMessage
       });
     } finally {
       setIsLinking(false);
