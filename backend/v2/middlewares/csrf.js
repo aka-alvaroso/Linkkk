@@ -26,7 +26,9 @@ const csrfTokenGenerator = (req, res, next) => {
 
     // Set cookie with token
     res.cookie('csrfToken', token, {
-      ...config.security.cookies,
+      httpOnly: config.security.cookies.httpOnly,
+      secure: config.security.cookies.secure,
+      sameSite: 'lax', // Must be 'lax' for cross-site CSRF protection
       maxAge: 1000 * 60 * 60 * 24, // 24 hours
     });
 
