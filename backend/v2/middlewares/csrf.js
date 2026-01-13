@@ -4,15 +4,15 @@
  * More info: https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html
  */
 
-const crypto = require('crypto');
-const { errorResponse } = require('../utils/response');
-const config = require('../config/environment');
+const crypto = require("crypto");
+const { errorResponse } = require("../utils/response");
+const config = require("../config/environment");
 
 /**
  * Generate a cryptographically secure CSRF token
  */
 const generateCsrfToken = () => {
-  return crypto.randomBytes(32).toString('hex');
+  return crypto.randomBytes(32).toString("hex");
 };
 
 /**
@@ -25,10 +25,8 @@ const csrfTokenGenerator = (req, res, next) => {
     const token = generateCsrfToken();
 
     // Set cookie with token
-    res.cookie('csrfToken', token, {
-      httpOnly: config.security.cookies.httpOnly,
-      secure: config.security.cookies.secure,
-      sameSite: 'lax', // Must be 'lax' for cross-site CSRF protection
+    res.cookie("csrfToken", token, {
+      ...config.security.cookies,
       maxAge: 1000 * 60 * 60 * 24, // 24 hours
     });
 
@@ -52,18 +50,18 @@ const csrfProtection = (req, res, next) => {
   }
 
   // Skip CSRF for GET, HEAD, OPTIONS
-  if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
+  if (["GET", "HEAD", "OPTIONS"].includes(req.method)) {
     return next();
   }
 
   const cookieToken = req.cookies.csrfToken;
-  const headerToken = req.headers['x-csrf-token'] || req.headers['csrf-token'];
+  const headerToken = req.headers["x-csrf-token"] || req.headers["csrf-token"];
 
   // Check if both tokens exist
   if (!cookieToken || !headerToken) {
     return errorResponse(res, {
-      code: 'CSRF_TOKEN_MISSING',
-      message: 'CSRF token is missing',
+      code: "CSRF_TOKEN_MISSING",
+      message: "CSRF token is missing",
       statusCode: 403,
     });
   }
@@ -72,25 +70,30 @@ const csrfProtection = (req, res, next) => {
   // First check if lengths match (to avoid crypto.timingSafeEqual error)
   if (cookieToken.length !== headerToken.length) {
     return errorResponse(res, {
-      code: 'CSRF_TOKEN_INVALID',
-      message: 'CSRF token is invalid',
+      code: "CSRF_TOKEN_INVALID",
+      message: "CSRF token is invalid",
       statusCode: 403,
     });
   }
 
   try {
-    if (!crypto.timingSafeEqual(Buffer.from(cookieToken), Buffer.from(headerToken))) {
+    if (
+      !crypto.timingSafeEqual(
+        Buffer.from(cookieToken),
+        Buffer.from(headerToken)
+      )
+    ) {
       return errorResponse(res, {
-        code: 'CSRF_TOKEN_INVALID',
-        message: 'CSRF token is invalid',
+        code: "CSRF_TOKEN_INVALID",
+        message: "CSRF token is invalid",
         statusCode: 403,
       });
     }
   } catch (error) {
     // In case of any error in comparison, reject the token
     return errorResponse(res, {
-      code: 'CSRF_TOKEN_INVALID',
-      message: 'CSRF token is invalid',
+      code: "CSRF_TOKEN_INVALID",
+      message: "CSRF token is invalid",
       statusCode: 403,
     });
   }
