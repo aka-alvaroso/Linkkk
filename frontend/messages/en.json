@@ -140,6 +140,19 @@
       "button1": "Start Free Now",
       "button2": "Create your first link"
     },
+    "FAQ": {
+      "badge": "FAQ",
+      "title": "Frequently Asked",
+      "titleHighlight": "Questions",
+      "question1": "Is Linkkk free?",
+      "answer1": "Linkkk will always have a generous free plan that allows you to create up to 50 links with all essential features. If you need more, the PRO plan is designed to be affordable for everyone.",
+      "question2": "Is my data secure?",
+      "answer2": "Security is our priority. All your data is stored securely and encrypted. We never share your information with third parties.",
+      "question3": "What happens to my guest links when I sign up?",
+      "answer3": "When you register or log in, all the links you created as a guest are automatically transferred to your new account. You won't lose any links or their statistics.",
+      "question4": "How can I delete my data?",
+      "answer4": "You have full control over your data. From the Settings page, you can delete all your links or even your entire account permanently at any time."
+    },
     "Footer": {
       "brandDescription": "Link management platform with total control over link behavior.",
       "productHeading": "Product",

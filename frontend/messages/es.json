@@ -140,6 +140,19 @@
       "button1": "Empezar Gratis",
       "button2": "Crea tu primer link"
     },
+    "FAQ": {
+      "badge": "FAQ",
+      "title": "Preguntas",
+      "titleHighlight": "frecuentes",
+      "question1": "¿Es Linkkk gratis?",
+      "answer1": "Linkkk siempre tendrá un plan gratuito generoso que te permite crear hasta 50 enlaces con todas las funcionalidades esenciales. Si necesitas más, el plan PRO está diseñado para ser accesible para cualquiera.",
+      "question2": "¿Mis datos están seguros?",
+      "answer2": "La seguridad es nuestra prioridad. Todos tus datos se almacenan de forma segura y cifrada. Nunca compartimos tu información con terceros.",
+      "question3": "¿Qué pasa con mis enlaces de invitado al registrarme?",
+      "answer3": "Cuando te registras o inicias sesión, todos los enlaces que creaste como invitado se transfieren automáticamente a tu nueva cuenta. No perderás ningún enlace ni sus estadísticas.",
+      "question4": "¿Cómo puedo eliminar mis datos?",
+      "answer4": "Tienes control total sobre tus datos. Desde la página de Ajustes puedes eliminar todos tus enlaces o incluso tu cuenta completa de forma permanente en cualquier momento."
+    },
     "Footer": {
       "brandDescription": "Plataforma de gestión de enlaces con control total sobre su comportamiento.",
       "productHeading": "Producto",

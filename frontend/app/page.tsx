@@ -37,7 +37,8 @@ import {
   TbNetwork,
   TbWebhook,
   TbChecklist,
-  TbPlus
+  TbPlus,
+  TbChevronDown
 } from "react-icons/tb";
 import { useRouter } from "next/navigation";
 import { useLinks } from "@/app/hooks/useLinks";
@@ -135,6 +136,7 @@ export default function Landing() {
   const tFeatures = useTranslations('Landing.Features');
   const tGettingStarted = useTranslations('Landing.GettingStarted');
   const tFinalCTA = useTranslations('Landing.FinalCTA');
+  const tFAQ = useTranslations('Landing.FAQ');
   const tFooter = useTranslations('Landing.Footer');
   const [url, setUrl] = useState("");
   const [isShortening, setIsShortening] = useState(false);
@@ -154,6 +156,9 @@ export default function Landing() {
 
   // Billing Period State (monthly/yearly)
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
+
+  // FAQ Accordion State
+  const [openFAQ, setOpenFAQ] = useState<number | null>(null);
 
   const ruleExamples = [
     {
@@ -1124,6 +1129,81 @@ export default function Landing() {
                   </Link>
                 )}
               </motion.div>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section className="py-20 px-4">
+          <div className="max-w-4xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <div className="inline-block bg-secondary text-light px-2 py-1 rounded-full mb-4 text-xs font-black italic uppercase tracking-wide">
+                {tFAQ('badge')}
+              </div>
+              <h2 className="text-4xl md:text-6xl font-black italic mb-4">
+                {tFAQ('title')} <span className="bg-warning">{tFAQ('titleHighlight')}</span>
+              </h2>
+            </motion.div>
+
+            <div className="space-y-4">
+              {[
+                { question: tFAQ('question1'), answer: tFAQ('answer1') },
+                { question: tFAQ('question2'), answer: tFAQ('answer2') },
+                { question: tFAQ('question3'), answer: tFAQ('answer3') },
+                { question: tFAQ('question4'), answer: tFAQ('answer4') },
+              ].map((faq, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  className={`rounded-2xl border-2 border-dark overflow-hidden transition-all duration-300 ${
+                    openFAQ === index
+                      ? 'bg-primary shadow-[4px_4px_0_var(--color-dark)]'
+                      : 'bg-light hover:shadow-[4px_4px_0_var(--color-dark)]'
+                  }`}
+                >
+                  <button
+                    onClick={() => setOpenFAQ(openFAQ === index ? null : index)}
+                    className="w-full p-6 flex items-center justify-between text-left cursor-pointer"
+                  >
+                    <span className="text-lg md:text-xl font-black italic pr-4">
+                      {faq.question}
+                    </span>
+                    <motion.div
+                      animate={{ rotate: openFAQ === index ? 180 : 0 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                      className="flex-shrink-0"
+                    >
+                      <TbChevronDown size={24} />
+                    </motion.div>
+                  </button>
+                  <motion.div
+                    initial={false}
+                    animate={{
+                      height: openFAQ === index ? 'auto' : 0,
+                      opacity: openFAQ === index ? 1 : 0
+                    }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 700,
+                      damping: 50,
+                      opacity: { duration: 0.15 }
+                    }}
+                    className="overflow-hidden"
+                  >
+                    <p className="px-6 pb-6 text-dark/80">
+                      {faq.answer}
+                    </p>
+                  </motion.div>
+                </motion.div>
+              ))}
             </div>
           </div>
         </section>
