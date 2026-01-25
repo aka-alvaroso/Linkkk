@@ -20,10 +20,14 @@ const {
 // This must be registered BEFORE body parsing middleware
 router.post("/webhook", handleWebhook);
 
-// TODO: Remove before production - Development testing endpoints (NO auth required)
-router.post("/dev/simulate-upgrade", auth, authUser, simulateUpgrade);
-router.post("/dev/simulate-cancel", auth, authUser, simulateCancel);
-router.post("/dev/test-telegram", testTelegram);
+// Development testing endpoints - ONLY available in non-production
+// Protected with auth + authUser to prevent abuse
+const config = require("../config/environment");
+if (!config.env.isProduction) {
+  router.post("/dev/simulate-upgrade", auth, authUser, simulateUpgrade);
+  router.post("/dev/simulate-cancel", auth, authUser, simulateCancel);
+  router.post("/dev/test-telegram", auth, authUser, testTelegram);
+}
 
 // All other subscription routes require user authentication (not guest)
 // First apply auth (sets req.user from JWT), then authUser (verifies it's a user not guest)

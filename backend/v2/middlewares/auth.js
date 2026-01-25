@@ -181,7 +181,8 @@ const optionalAuth = async (req, res, next) => {
 
   if (token) {
     try {
-      const decoded = jwt.verify(token, config.security.jwt.authSecret, {
+      // SECURITY: Use rotation-aware verification
+      const decoded = verifyWithRotation(token, jwt, 'auth', {
         algorithms: ["HS256"],
         issuer: "linkkk-api",
         audience: "linkkk-users",
