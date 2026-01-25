@@ -21,6 +21,19 @@ const authLimiter = rateLimit({
   handler: rateLimitHandler,
 });
 
+// Separate limiter for session validation - more permissive because:
+// - Called on every page load/navigation
+// - Multiple tabs share the same IP limit
+// - No security risk (just reads session state)
+const validateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: config.env.isDevelopment ? 1000 : 60, // 60 in prod (~4 validations/min)
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => req.ip,
+  handler: rateLimitHandler,
+});
+
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: config.env.isDevelopment ? 1000 : 5,
@@ -187,6 +200,7 @@ const logoUploadLimiter = rateLimit({
 
 module.exports = {
   authLimiter,
+  validateLimiter,
   loginLimiter,
   registerLimiter,
   guestLimiter,

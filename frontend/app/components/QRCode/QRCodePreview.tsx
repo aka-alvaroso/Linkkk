@@ -119,6 +119,57 @@ export default function QRCodePreview({
   );
 }
 
+// Export a function to copy QR code to clipboard as image
+export async function copyQRCodeToClipboard(
+  url: string,
+  config: QRConfig,
+  size: number = 500
+): Promise<void> {
+  const qrCode = new QRCodeStyling({
+    width: size,
+    height: size,
+    data: url,
+    dotsOptions: {
+      color: config.foregroundColor,
+      type: dotsStyleMap[config.dotsStyle],
+    },
+    cornersSquareOptions: {
+      color: config.foregroundColor,
+      type: cornersStyleMap[config.cornersStyle],
+    },
+    cornersDotOptions: {
+      color: config.foregroundColor,
+    },
+    backgroundOptions: {
+      color: config.backgroundColor,
+    },
+    imageOptions: {
+      crossOrigin: 'anonymous',
+      margin: 5,
+      imageSize: config.logoSize,
+    },
+    image: config.logoUrl || undefined,
+    qrOptions: {
+      errorCorrectionLevel: 'H',
+    },
+  });
+
+  const blob = await qrCode.getRawData('png');
+
+  if (!blob) {
+    throw new Error('Failed to generate QR code image');
+  }
+
+  const blobPart = blob as unknown as BlobPart;
+  const imageBlob = blob instanceof Blob ? blob : new Blob([blobPart], { type: 'image/png' });
+
+  await navigator.clipboard.write([
+    new ClipboardItem({
+      'image/png': imageBlob,
+    }),
+  ]);
+}
+
 // Export a function to download the QR code
 export async function downloadQRCode(
   url: string,

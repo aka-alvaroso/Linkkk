@@ -3,6 +3,7 @@ const router = express.Router();
 const { auth, authGuest, optionalGuest, optionalAuth } = require("../middlewares/auth");
 const {
   authLimiter,
+  validateLimiter,
   loginLimiter,
   registerLimiter,
   guestLimiter,
@@ -21,7 +22,7 @@ const {
   linkOAuthAccount,
 } = require("../controllers/auth");
 
-router.get("/validate", authLimiter, optionalAuth, validateSession);
+router.get("/validate", validateLimiter, optionalAuth, validateSession);
 router.post("/logout", authLimiter, auth, logout);
 
 router.post("/guest", guestLimiter, createGuestSession);

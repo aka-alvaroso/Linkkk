@@ -31,8 +31,24 @@ const validateSession = (req, res) => {
 };
 
 const createGuestSession = async (req, res) => {
+  // If guest cookie exists, verify it's still valid before rejecting
   if (req.cookies.guestToken) {
-    return errorResponse(res, ERRORS.GUEST_SESSION_EXISTS);
+    try {
+      jwt.verify(req.cookies.guestToken, config.security.jwt.guestSecret, {
+        algorithms: ["HS256"],
+        issuer: "linkkk-api",
+        audience: "linkkk-guests",
+      });
+      // Token is valid - user already has an active guest session
+      return errorResponse(res, ERRORS.GUEST_SESSION_EXISTS);
+    } catch {
+      // Token is invalid/expired - clear cookie and allow creating new session
+      res.clearCookie("guestToken", {
+        httpOnly: config.security.cookies.httpOnly,
+        secure: config.security.cookies.secure,
+        sameSite: config.security.cookies.sameSite,
+      });
+    }
   }
 
   try {
