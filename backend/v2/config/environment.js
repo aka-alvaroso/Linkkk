@@ -24,6 +24,9 @@ if (isProduction) {
   requiredEnvVars.push("STRIPE_WEBHOOK_SECRET");
   requiredEnvVars.push("STRIPE_PRO_PRICE_ID");
   requiredEnvVars.push("STRIPE_PRO_YEARLY_PRICE_ID");
+  requiredEnvVars.push("CLOUDINARY_CLOUD_NAME");
+  requiredEnvVars.push("CLOUDINARY_API_KEY");
+  requiredEnvVars.push("CLOUDINARY_API_SECRET");
 }
 
 const missingEnvVars = requiredEnvVars.filter((envVar) => !process.env[envVar]);
@@ -106,6 +109,13 @@ const config = {
       redirectUri: process.env.GITHUB_REDIRECT_URI,
     },
   },
+  // Cloudinary
+  cloudinary: {
+    apiKey: process.env.CLOUDINARY_API_KEY,
+    apiSecret: process.env.CLOUDINARY_API_SECRET,
+    cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+    url: process.env.CLOUDINARY_URL
+  }
 };
 
 // Log configuration on startup (hide sensitive data)
@@ -163,6 +173,26 @@ if (!isTest) {
   console.log(
     `   GitHub OAuth Client Secret: ${
       config.oauth.github.clientSecret ? "✓ Set" : "✗ Missing"
+    }`
+  );
+  console.log(
+    `   Cloudinary API Key: ${
+      config.cloudinary.apiKey ? "✓ Set" : "✗ Missing"
+    }`
+  );
+  console.log(
+    `   Cloudinary Secret: ${
+      config.cloudinary.apiSecret ? "✓ Set" : "✗ Missing"
+    }`
+  );
+  console.log(
+    `   Cloudinary Cloud Name: ${
+      config.cloudinary.cloudName ? "✓ Set" : "✗ Missing"
+    }`
+  );
+  console.log(
+    `   Cloudinary URL: ${
+      config.cloudinary.url ? "✓ Set" : "✗ Missing"
     }`
   );
 }

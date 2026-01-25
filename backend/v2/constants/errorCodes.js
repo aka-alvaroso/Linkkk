@@ -170,6 +170,52 @@ const ERRORS = {
   },
 
   // ============================================================================
+  // FILE UPLOAD ERRORS
+  // ============================================================================
+  FILE_REQUIRED: {
+    code: 'FILE_REQUIRED',
+    message: 'No file uploaded',
+    userMessage: 'Please select a file to upload',
+    statusCode: 400,
+    retryable: false,
+  },
+  INVALID_FILE_TYPE: {
+    code: 'INVALID_FILE_TYPE',
+    message: 'Invalid file type',
+    userMessage: 'Only PNG, JPG, GIF, and WEBP files are allowed',
+    statusCode: 400,
+    retryable: false,
+  },
+  FILE_TOO_LARGE: {
+    code: 'FILE_TOO_LARGE',
+    message: 'File exceeds size limit',
+    userMessage: 'File size must be less than 2MB',
+    statusCode: 400,
+    retryable: false,
+  },
+  IMAGE_TOO_SMALL: {
+    code: 'IMAGE_TOO_SMALL',
+    message: 'Image dimensions too small',
+    userMessage: 'Image must be at least 150x150 pixels',
+    statusCode: 400,
+    retryable: false,
+  },
+  IMAGE_TOO_LARGE: {
+    code: 'IMAGE_TOO_LARGE',
+    message: 'Image dimensions too large',
+    userMessage: 'Image dimensions must not exceed 2000x2000 pixels',
+    statusCode: 400,
+    retryable: false,
+  },
+  UPLOAD_FAILED: {
+    code: 'UPLOAD_FAILED',
+    message: 'Upload failed',
+    userMessage: 'Failed to upload file. Please try again',
+    statusCode: 500,
+    retryable: true,
+  },
+
+  // ============================================================================
   // SYSTEM ERRORS
   // ============================================================================
   INTERNAL_ERROR: {

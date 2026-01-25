@@ -73,6 +73,7 @@ model Link {
   guestSession GuestSession? @relation(fields: [guestSessionId], references: [id])
   accesses Access[]
   rules       LinkRule[]
+  qrConfig    QRConfig?
 
   @@index([shortUrl])
 }
@@ -229,4 +230,32 @@ model StripeEvent {
   @@index([type])
   @@index([createdAt])
   @@index([status, lastAttemptAt]) // For finding stuck events
+}
+
+// QR Code configuration for links
+model QRConfig {
+  id              Int           @id @default(autoincrement())
+  linkId          Int           @unique
+  link            Link          @relation(fields: [linkId], references: [id], onDelete: Cascade)
+  foregroundColor String        @default("#000000")
+  backgroundColor String        @default("#FFFFFF")
+  logoUrl         String?
+  logoSize        Float         @default(0.3)
+  dotsStyle       DotsStyle     @default(square)
+  cornersStyle    CornersStyle  @default(square)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([linkId])
+}
+
+enum DotsStyle {
+  square
+  rounded
+  dots
+}
+
+enum CornersStyle {
+  square
+  rounded
 }

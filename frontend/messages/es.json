@@ -290,8 +290,11 @@
     "toastUnexpectedError": "Ocurrió un error inesperado."
   },
   "EditLinkDrawer": {
+    "tabOverview": "Resumen",
     "tabSettings": "Ajustes",
     "tabHistory": "Historial",
+    "tabQRCode": "QR Code",
+    "tabQR": "Código QR",
     "limitedViewTitle": "Vista limitada:",
     "limitedViewMessage": "Mostrando solo los últimos 20 accesos.",
     "limitedViewUpgrade": "Actualiza a PRO para ver el historial completo.",
@@ -314,7 +317,8 @@
     "toastUpdateFailed": "Error al actualizar el link",
     "toastUnexpectedError": "Ocurrió un error inesperado.",
     "toastUpdateSuccess": "¡Link y reglas actualizados exitosamente!",
-    "toastSaveFailed": "Error al guardar los cambios"
+    "toastSaveFailed": "Error al guardar los cambios",
+    "copy": "Copiar"
   },
   "FilterModal": {
     "title": "Filtrar Links",
@@ -559,5 +563,41 @@
     "yearlyPeriod": "/año",
     "bestValue": "2 meses gratis",
     "continueButton": "Continuar al Pago"
+  },
+  "QRCodeEditor": {
+    "foregroundColor": "Color del QR",
+    "backgroundColor": "Color de Fondo",
+    "dotsStyle": "Estilo de Puntos",
+    "cornersStyle": "Estilo de Esquinas",
+    "logoUrl": "Logo",
+    "logoUrlHint": "Introduce una URL a una imagen (solo HTTPS). Deja vacío para no usar logo.",
+    "logoSize": "Tamaño del Logo",
+    "download": "Descargar",
+    "customize": "Personalizar",
+    "hideCustomize": "Ocultar opciones",
+    "resetDefaults": "Restablecer valores",
+    "saveSuccess": "¡Configuración QR guardada!",
+    "saveError": "Error al guardar la configuración QR",
+    "copySuccess": "¡Código QR copiado!",
+    "copyError": "Error al copiar el código QR",
+    "downloadSuccess": "¡Código QR descargado!",
+    "downloadError": "Error al descargar el código QR",
+    "logoUpload": {
+      "tabUpload": "Subir",
+      "tabUrl": "URL",
+      "dragDrop": "Arrastra y suelta tu logo aquí",
+      "or": "o",
+      "browse": "selecciona un archivo",
+      "uploading": "Subiendo...",
+      "success": "¡Logo subido correctamente!",
+      "failed": "Error al subir el logo",
+      "invalidType": "Solo se permiten archivos PNG, JPG, GIF y WEBP",
+      "fileTooLarge": "El archivo debe ser menor a 2MB",
+      "imageTooSmall": "La imagen debe ser de al menos 150x150 píxeles",
+      "httpsRequired": "La URL del logo debe usar HTTPS",
+      "invalidUrl": "Por favor introduce una URL válida",
+      "apply": "Aplicar",
+      "remove": "Eliminar logo"
+    }
   }
 }

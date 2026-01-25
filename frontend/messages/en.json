@@ -290,8 +290,10 @@
     "toastUnexpectedError": "An unexpected error occurred."
   },
   "EditLinkDrawer": {
+    "tabOverview": "Overview",
     "tabSettings": "Settings",
     "tabHistory": "History",
+    "tabQR": "QR Code",
     "limitedViewTitle": "Limited view:",
     "limitedViewMessage": "Showing last 20 accesses only.",
     "limitedViewUpgrade": "Upgrade to PRO for full access history.",
@@ -314,7 +316,8 @@
     "toastUpdateFailed": "Failed to update link",
     "toastUnexpectedError": "An unexpected error occurred.",
     "toastUpdateSuccess": "Link and rules updated successfully!",
-    "toastSaveFailed": "Failed to save changes"
+    "toastSaveFailed": "Failed to save changes",
+    "copy": "Copy"
   },
   "FilterModal": {
     "title": "Filter Links",
@@ -559,5 +562,41 @@
     "yearlyPeriod": "/year",
     "bestValue": "2 months free",
     "continueButton": "Continue to Payment"
+  },
+  "QRCodeEditor": {
+    "foregroundColor": "QR Color",
+    "backgroundColor": "Background Color",
+    "dotsStyle": "Dots Style",
+    "cornersStyle": "Corners Style",
+    "logoUrl": "Logo",
+    "logoUrlHint": "Enter a URL to an image (HTTPS only). Leave empty for no logo.",
+    "logoSize": "Logo Size",
+    "download": "Download",
+    "customize": "Customize",
+    "hideCustomize": "Hide options",
+    "resetDefaults": "Reset to defaults",
+    "saveSuccess": "QR settings saved successfully!",
+    "saveError": "Failed to save QR settings",
+    "copySuccess": "QR code copied!",
+    "copyError": "Failed to copy QR code",
+    "downloadSuccess": "QR code downloaded!",
+    "downloadError": "Failed to download QR code",
+    "logoUpload": {
+      "tabUpload": "Upload",
+      "tabUrl": "URL",
+      "dragDrop": "Drag and drop your logo here",
+      "or": "or",
+      "browse": "browse files",
+      "uploading": "Uploading...",
+      "success": "Logo uploaded successfully!",
+      "failed": "Failed to upload logo",
+      "invalidType": "Only PNG, JPG, GIF, and WEBP files are allowed",
+      "fileTooLarge": "File size must be less than 2MB",
+      "imageTooSmall": "Image must be at least 150x150 pixels",
+      "httpsRequired": "Logo URL must use HTTPS",
+      "invalidUrl": "Please enter a valid URL",
+      "apply": "Apply",
+      "remove": "Remove logo"
+    }
   }
 }
