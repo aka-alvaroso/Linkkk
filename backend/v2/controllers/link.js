@@ -471,45 +471,44 @@ const redirectLink = async (req, res) => {
               webhookUrl: action.webhookUrl,
               shortUrl: link.shortUrl,
             });
-            // Don't send webhook, but continue with redirect
-            break;
-          }
+            // Don't send webhook, but continue with access tracking and redirect below
+          } else {
+            const webhookPayload = {
+              event: "link_accessed",
+              link: {
+                shortUrl: link.shortUrl,
+                longUrl: link.longUrl,
+              },
+              timestamp: new Date().toISOString(),
+              context: {
+                country,
+                device,
+                ip,
+                isBot,
+                isVPN: isVpn,
+                accessCount: link.accessCount,
+              },
+              customMessage: action.message || null,
+            };
 
-          const webhookPayload = {
-            event: "link_accessed",
-            link: {
-              shortUrl: link.shortUrl,
-              longUrl: link.longUrl,
-            },
-            timestamp: new Date().toISOString(),
-            context: {
-              country,
-              device,
-              ip,
-              isBot,
-              isVPN: isVpn,
-              accessCount: link.accessCount,
-            },
-            customMessage: action.message || null,
-          };
-
-          // Send webhook asynchronously (don't await, don't block redirect)
-          fetch(action.webhookUrl, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "User-Agent": "Linkkk-Webhook/1.0",
-            },
-            body: JSON.stringify(webhookPayload),
-            signal: AbortSignal.timeout(5000), // 5 second timeout
-          }).catch((error) => {
-            // Log error but don't fail the request
-            logger.warn('[NOTIFY] Webhook failed', {
-              shortUrl: link.shortUrl,
-              webhookUrl: action.webhookUrl,
-              error: error.message,
+            // Send webhook asynchronously (don't await, don't block redirect)
+            fetch(action.webhookUrl, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "User-Agent": "Linkkk-Webhook/1.0",
+              },
+              body: JSON.stringify(webhookPayload),
+              signal: AbortSignal.timeout(5000), // 5 second timeout
+            }).catch((error) => {
+              // Log error but don't fail the request
+              logger.warn('[NOTIFY] Webhook failed', {
+                shortUrl: link.shortUrl,
+                webhookUrl: action.webhookUrl,
+                error: error.message,
+              });
             });
-          });
+          }
         }
 
         // Continue with normal redirect (notify is non-blocking)
