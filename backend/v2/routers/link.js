@@ -70,12 +70,13 @@ router.delete("/:shortUrl/rules/:ruleId", auth, deleteRuleLimiter, deleteLinkRul
 router.post("/:shortUrl/rules/batch", auth, createRuleLimiter, createMultipleLinkRules);
 
 // QR Code routes (registered users only - guests cannot access QR features)
-router.get("/:shortUrl/qr", authUser, getLinksLimiter, getQRConfig);
-router.put("/:shortUrl/qr", authUser, updateLinkLimiter, updateQRConfig);
+router.get("/:shortUrl/qr", auth, authUser, getLinksLimiter, getQRConfig);
+router.put("/:shortUrl/qr", auth, authUser, updateLinkLimiter, updateQRConfig);
 
 // QR Logo upload route
 router.post(
   "/:shortUrl/qr/logo",
+  auth,
   authUser,
   logoUploadLimiter,
   upload.single("logo"),
@@ -86,6 +87,6 @@ router.post(
 );
 
 // QR Logo delete route
-router.delete("/qr/logo", authUser, deleteRuleLimiter, deleteQRLogo);
+router.delete("/qr/logo", auth, authUser, deleteRuleLimiter, deleteQRLogo);
 
 module.exports = router;
