@@ -417,6 +417,8 @@
     "linkCopied": "¡Link copiado al portapapeles!",
     "recentAccesses": "Accesos Recientes",
     "time": "Hora",
+    "source": "Origen",
+    "direct": "Clic",
     "location": "Ubicación",
     "ipAddress": "Dirección IP",
     "browser": "Navegador",

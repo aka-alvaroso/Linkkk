@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { TbShieldCheck, TbShieldX, TbRobot, TbUser, TbWifi, TbBrowser, TbLocationOff, TbShare3 } from 'react-icons/tb';
+import { TbShieldCheck, TbShieldX, TbRobot, TbUser, TbWifi, TbBrowser, TbLocationOff, TbShare3, TbQrcode, TbClick } from 'react-icons/tb';
 import * as motion from 'motion/react-client';
 import Button from '../ui/Button/Button';
 import { useToast } from "@/app/hooks/useToast";
@@ -15,6 +15,7 @@ interface Access {
     country: string;
     isVPN: boolean;
     isBot: boolean;
+    source: string;
 }
 
 interface AccessesListProps {
@@ -171,6 +172,9 @@ export const AccessesList = ({ shortUrl }: AccessesListProps) => {
                             <th className="px-4 py-3 text-left font-black italic text-md">
                                 {t('time')}
                             </th>
+                            <th className="px-4 py-3 text-center font-black italic text-md">
+                                {t('source')}
+                            </th>
                             <th className="px-4 py-3 text-left font-black italic text-md">
                                 {t('location')}
                             </th>
@@ -205,6 +209,21 @@ export const AccessesList = ({ shortUrl }: AccessesListProps) => {
                                             <span className="text-xs text-dark/50">
                                                 {formatFullDate(access.createdAt)}
                                             </span>
+                                        </div>
+                                    </td>
+                                    <td className="px-4 py-4">
+                                        <div className="flex justify-center">
+                                            {access.source === 'qr' ? (
+                                                <div className="px-3 py-1.5 bg-dark text-light rounded-lg flex items-center gap-1.5">
+                                                    <TbQrcode size={14} />
+                                                    <span className="text-xs font-black">QR</span>
+                                                </div>
+                                            ) : (
+                                                <div className="px-3 py-1.5 bg-dark/10 rounded-lg flex items-center gap-1.5">
+                                                    <TbClick size={14} className="text-dark" />
+                                                    <span className="text-xs font-black text-dark">{t('direct')}</span>
+                                                </div>
+                                            )}
                                         </div>
                                     </td>
                                     <td className="px-4 py-4">

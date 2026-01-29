@@ -416,6 +416,8 @@
     "linkCopied": "Link copied to clipboard!",
     "recentAccesses": "Recent Accesses",
     "time": "Time",
+    "source": "Source",
+    "direct": "Click",
     "location": "Location",
     "ipAddress": "IP Address",
     "browser": "Browser",
