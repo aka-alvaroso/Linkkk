@@ -177,16 +177,19 @@ const getAllLinks = async (req, res) => {
     );
 
     return successResponse(res, {
-      links: links.map((link) => ({
-        shortUrl: link.shortUrl,
-        longUrl: link.longUrl,
-        status: link.status,
-        createdAt: link.createdAt,
-        accessCount: link.accessCount,
-        scanCount: scanCountMap.get(link.id) || 0,
-      })),
+      links: links.map((link) => {
+        const scans = scanCountMap.get(link.id) || 0;
+        return {
+          shortUrl: link.shortUrl,
+          longUrl: link.longUrl,
+          status: link.status,
+          createdAt: link.createdAt,
+          accessCount: link.accessCount - scans,
+          scanCount: scans,
+        };
+      }),
       stats: {
-        totalClicks: totalAccessCount,
+        totalClicks: totalAccessCount - totalScanCount,
         totalScans: totalScanCount,
       },
     });
