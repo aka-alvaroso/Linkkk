@@ -79,7 +79,7 @@ model Link {
 }
 
 model Access {
-  id          Int     @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   linkId      Int
   createdAt   DateTime @default(now())
   userAgent   String
@@ -87,11 +87,13 @@ model Access {
   country     String
   isVPN       Boolean
   isBot       Boolean
+  source      String   @default("direct")
 
   link        Link @relation(fields: [linkId], references: [id], onDelete: Cascade)
 
   @@index([linkId])
   @@index([linkId, createdAt])
+  @@index([linkId, source])
 }
 
 model LinkRule {

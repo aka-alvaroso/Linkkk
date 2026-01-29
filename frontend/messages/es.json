@@ -184,7 +184,8 @@
     "noLinksFound": "No se encontraron links",
     "createLink": "Crear link",
     "active": "Activo",
-    "inactive": "Inactivo"
+    "inactive": "Inactivo",
+    "totalScans": "Escaneos QR"
   },
   "Auth": {
     "home": "Inicio",
@@ -318,7 +319,8 @@
     "toastUnexpectedError": "Ocurrió un error inesperado.",
     "toastUpdateSuccess": "¡Link y reglas actualizados exitosamente!",
     "toastSaveFailed": "Error al guardar los cambios",
-    "copy": "Copiar"
+    "copy": "Copiar",
+    "scans": "escaneos"
   },
   "FilterModal": {
     "title": "Filtrar Links",

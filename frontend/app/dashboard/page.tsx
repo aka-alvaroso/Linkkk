@@ -60,7 +60,7 @@ export default function Dashboard() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { filteredLinks, filters, fetchLinks, updateFilters } = useLinks();
-  const { totalLinks, activeLinks, totalClicks } = useStats();
+  const { totalLinks, activeLinks, totalClicks, totalScans } = useStats();
   const { isAuthenticated, isGuest, user, checkSession } = useAuth();
 
   // Get link limit based on user role
@@ -207,12 +207,16 @@ export default function Dashboard() {
                 <AnimatedCounter value={activeLinks} delay={0.15} />
               </p>
             </motion.div>
-            {/* <div className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
-              <h2 className='text-md'>API usage</h2>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.4, ease: "backInOut" }}
+              className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
+              <h2 className='text-md'>{t('totalScans')}</h2>
               <p className='text-end text-5xl font-black italic'>
-                {filteredLinks.reduce((total, link) => total + link.apiUsage, 0)}
+                <AnimatedCounter value={totalScans} delay={0.15} />
               </p>
-            </div> */}
+            </motion.div>
           </div>
 
 

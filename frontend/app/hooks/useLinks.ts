@@ -19,6 +19,7 @@ export function useLinks() {
     error,
     setLinks,
     setTotalClicks,
+    setTotalScans,
     addLink,
     updateLinkInStore,
     removeLinkFromStore,
@@ -57,6 +58,7 @@ export function useLinks() {
       const data = await linkService.getAll();
       setLinks(data.links);
       setTotalClicks(data.stats.totalClicks);
+      setTotalScans(data.stats.totalScans);
     } catch (err) {
       const message = getErrorMessage(err);
       setError(message);
@@ -64,7 +66,7 @@ export function useLinks() {
     } finally {
       setLoading(false);
     }
-  }, [setLinks, setTotalClicks, setLoading, setError]);
+  }, [setLinks, setTotalClicks, setTotalScans, setLoading, setError]);
 
   /**
    * Create a new link

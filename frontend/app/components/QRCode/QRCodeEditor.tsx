@@ -118,7 +118,7 @@ export default function QRCodeEditor({
   const [orphanedLogoIds, setOrphanedLogoIds] = useState<string[]>([]);
 
   // QR URL
-  const qrUrl = `https://linkkk.dev/r/${shortUrl}`;
+  const qrUrl = `https://linkkk.dev/r/${shortUrl}?src=qr`;
 
   // Load config on mount
   useEffect(() => {

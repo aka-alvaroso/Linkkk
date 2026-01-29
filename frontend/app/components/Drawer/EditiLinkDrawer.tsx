@@ -52,7 +52,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
     const cancelQRRef = useRef<(() => void) | null>(null);
     const tQR = useTranslations('QRCodeEditor');
     const { config: qrConfig, fetchConfig: fetchQRConfig } = useQRConfig(link.shortUrl);
-    const qrUrl = `https://linkkk.dev/r/${link.shortUrl}`;
+    const qrUrl = `https://linkkk.dev/r/${link.shortUrl}?src=qr`;
 
     // Sincronizar estado local cuando el prop link cambia
     useEffect(() => {
@@ -479,6 +479,12 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                 >
                                     <div className='p-2 md:mx-16 bg-white rounded-xl shadow-sm border border-dark/5'>
                                         <QRCodePreview url={qrUrl} config={qrConfig} size={120} />
+                                    </div>
+                                    <div className='flex items-center gap-2 text-dark/60'>
+                                        <TbQrcode size={16} />
+                                        <span className='text-sm font-medium'>
+                                            {link.scanCount ?? 0} {t('scans')}
+                                        </span>
                                     </div>
                                     <div className='flex flex-col md:flex-row gap-2'>
                                         <Button

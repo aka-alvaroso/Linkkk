@@ -8,6 +8,8 @@ export interface Link {
   longUrl: string;
   status: boolean;
   createdAt: string;
+  accessCount?: number;
+  scanCount?: number;
 }
 
 export interface CreateLinkDTO {
@@ -32,6 +34,7 @@ export interface LinkStats {
   activeLinks: number;
   inactiveLinks: number;
   totalClicks: number;
+  totalScans: number;
 }
 
 // API Response types
@@ -55,5 +58,6 @@ export interface GetAllLinksResponse {
   links: Link[];
   stats: {
     totalClicks: number;
+    totalScans: number;
   };
 }

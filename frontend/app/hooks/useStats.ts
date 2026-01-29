@@ -8,7 +8,7 @@ import { useLinkStore } from "@/app/stores/linkStore";
 import type { LinkStats } from "@/app/types";
 
 export function useStats() {
-  const { links, totalClicks } = useLinkStore();
+  const { links, totalClicks, totalScans } = useLinkStore();
 
   /**
    * Calculate stats from current links
@@ -23,16 +23,17 @@ export function useStats() {
       totalLinks,
       activeLinks,
       inactiveLinks,
-      totalClicks, // Now coming from backend
+      totalClicks,
+      totalScans,
     };
-  }, [links, totalClicks]);
+  }, [links, totalClicks, totalScans]);
 
   return {
     stats: calculatedStats,
-    // Individual stats for convenience
     totalLinks: calculatedStats.totalLinks,
     activeLinks: calculatedStats.activeLinks,
     inactiveLinks: calculatedStats.inactiveLinks,
     totalClicks: calculatedStats.totalClicks,
+    totalScans: calculatedStats.totalScans,
   };
 }

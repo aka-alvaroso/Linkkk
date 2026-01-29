@@ -17,6 +17,7 @@ export default function PasswordPage() {
   const router = useRouter();
   const shortUrl = searchParams.get('shortUrl');
   const hint = searchParams.get('hint');
+  const src = searchParams.get('src');
 
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -39,7 +40,7 @@ export default function PasswordPage() {
     setError('');
 
     try {
-      const data = await linkService.verifyPassword(shortUrl, password);
+      const data = await linkService.verifyPassword(shortUrl, password, src);
 
       // Password correct - redirect to the actual URL
       if (data.url) {

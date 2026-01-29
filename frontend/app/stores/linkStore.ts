@@ -17,12 +17,14 @@ interface LinkStore {
   filteredLinks: Link[];
   filters: LinkFilters;
   totalClicks: number;
+  totalScans: number;
   isLoading: boolean;
   error: string | null;
 
   // State mutations only (no API calls)
   setLinks: (links: Link[]) => void;
   setTotalClicks: (totalClicks: number) => void;
+  setTotalScans: (totalScans: number) => void;
   addLink: (link: Link) => void;
   updateLinkInStore: (shortUrl: string, data: Partial<Link>) => void;
   removeLinkFromStore: (shortUrl: string) => void;
@@ -39,6 +41,7 @@ export const useLinkStore = create<LinkStore>((set, get) => ({
   filteredLinks: [],
   filters: defaultFilters,
   totalClicks: 0,
+  totalScans: 0,
   isLoading: false,
   error: null,
 
@@ -49,6 +52,8 @@ export const useLinkStore = create<LinkStore>((set, get) => ({
   },
 
   setTotalClicks: (totalClicks) => set({ totalClicks }),
+
+  setTotalScans: (totalScans) => set({ totalScans }),
 
   addLink: (link) => {
     set((state) => ({

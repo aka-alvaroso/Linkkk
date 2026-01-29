@@ -155,12 +155,26 @@ const getAllLinks = async (req, res) => {
       return errorResponse(res, ERRORS.LINK_NOT_FOUND);
     }
 
-    // Get total access count for all user/guest links
-    const totalAccessCount = await prisma.access.count({
-      where: {
-        link: whereClause,
-      },
-    });
+    // Get total access count and QR scan count in parallel
+    const linkIds = links.map((l) => l.id);
+
+    const [totalAccessCount, totalScanCount, scanCounts] = await Promise.all([
+      prisma.access.count({
+        where: { link: whereClause },
+      }),
+      prisma.access.count({
+        where: { link: whereClause, source: "qr" },
+      }),
+      prisma.access.groupBy({
+        by: ["linkId"],
+        where: { linkId: { in: linkIds }, source: "qr" },
+        _count: { id: true },
+      }),
+    ]);
+
+    const scanCountMap = new Map(
+      scanCounts.map((sc) => [sc.linkId, sc._count.id])
+    );
 
     return successResponse(res, {
       links: links.map((link) => ({
@@ -168,9 +182,12 @@ const getAllLinks = async (req, res) => {
         longUrl: link.longUrl,
         status: link.status,
         createdAt: link.createdAt,
+        accessCount: link.accessCount,
+        scanCount: scanCountMap.get(link.id) || 0,
       })),
       stats: {
         totalClicks: totalAccessCount,
+        totalScans: totalScanCount,
       },
     });
   } catch (error) {
@@ -328,6 +345,7 @@ const redirectLink = async (req, res) => {
   const { shortUrl } = req.params;
   const userAgent = req.headers["user-agent"];
   const ip = req.ip === "::1" ? "127.0.0.1" : req.ip;
+  const source = req.query.src === 'qr' ? 'qr' : 'direct';
 
   try {
     // SECURITY NOTE: Race condition mitigation
@@ -427,6 +445,7 @@ const redirectLink = async (req, res) => {
               country,
               isVPN: isVpn,
               isBot,
+              source,
             },
           });
 
@@ -457,7 +476,7 @@ const redirectLink = async (req, res) => {
         return res.redirect(
           `${config.frontend.url}/password?shortUrl=${shortUrl}${
             action.hint ? `&hint=${encodeURIComponent(action.hint)}` : ""
-          }`
+          }${source === 'qr' ? '&src=qr' : ''}`
         );
 
       case "notify":
@@ -522,6 +541,7 @@ const redirectLink = async (req, res) => {
               country,
               isVPN: isVpn,
               isBot,
+              source,
             },
           });
 
@@ -547,6 +567,7 @@ const redirectLink = async (req, res) => {
               country,
               isVPN: isVpn,
               isBot,
+              source,
             },
           });
 
@@ -570,6 +591,7 @@ const verifyPasswordGate = async (req, res) => {
   const { password } = req.body;
   const userAgent = req.headers["user-agent"];
   const ip = req.ip === "::1" ? "127.0.0.1" : req.ip;
+  const source = req.body.src === 'qr' ? 'qr' : 'direct';
 
   try {
     // Validate input

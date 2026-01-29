@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { auth } = require("../middlewares/auth");
+const { auth, authUser } = require("../middlewares/auth");
 const {
   createLinkLimiter,
   getLinksLimiter,
@@ -69,14 +69,14 @@ router.put("/:shortUrl/rules/:ruleId", auth, updateRuleLimiter, updateLinkRule);
 router.delete("/:shortUrl/rules/:ruleId", auth, deleteRuleLimiter, deleteLinkRule);
 router.post("/:shortUrl/rules/batch", auth, createRuleLimiter, createMultipleLinkRules);
 
-// QR Code routes
-router.get("/:shortUrl/qr", auth, getLinksLimiter, getQRConfig);
-router.put("/:shortUrl/qr", auth, updateLinkLimiter, updateQRConfig);
+// QR Code routes (registered users only - guests cannot access QR features)
+router.get("/:shortUrl/qr", authUser, getLinksLimiter, getQRConfig);
+router.put("/:shortUrl/qr", authUser, updateLinkLimiter, updateQRConfig);
 
 // QR Logo upload route
 router.post(
   "/:shortUrl/qr/logo",
-  auth,
+  authUser,
   logoUploadLimiter,
   upload.single("logo"),
   handleMulterError,
@@ -86,6 +86,6 @@ router.post(
 );
 
 // QR Logo delete route
-router.delete("/qr/logo", auth, deleteRuleLimiter, deleteQRLogo);
+router.delete("/qr/logo", authUser, deleteRuleLimiter, deleteQRLogo);
 
 module.exports = router;
