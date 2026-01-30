@@ -1,11 +1,13 @@
-"use client"
+"use client";
 import React, { useState, useRef } from "react";
 import Link from "next/link";
 import Navigation from "@/app/components/Navigation/Navigation";
 import Button from "@/app/components/ui/Button/Button";
 import Input from "@/app/components/ui/Input/Input";
 import RouteGuard from "@/app/components/RouteGuard/RouteGuard";
-import AnimatedText, { AnimatedTextRef } from "@/app/components/ui/AnimatedText/AnimatedText";
+import AnimatedText, {
+  AnimatedTextRef,
+} from "@/app/components/ui/AnimatedText/AnimatedText";
 import CreateLinkDrawer from "@/app/components/Drawer/CreateLinkDrawer";
 import InlineSelect from "@/app/components/ui/InlineSelect/InlineSelect";
 import * as motion from "motion/react-client";
@@ -38,7 +40,7 @@ import {
   TbWebhook,
   TbChecklist,
   TbPlus,
-  TbChevronDown
+  TbChevronDown,
 } from "react-icons/tb";
 import { useRouter } from "next/navigation";
 import { useLinks } from "@/app/hooks/useLinks";
@@ -47,8 +49,7 @@ import { useLanguage } from "@/app/hooks/useLanguage";
 import { useAuth } from "@/app/hooks/useAuth";
 import { subscriptionService } from "@/app/services/api/subscriptionService";
 import { RiLoader5Fill } from "react-icons/ri";
-import { useTranslations } from 'next-intl';
-
+import { useTranslations } from "next-intl";
 
 // Feature Card Component for stacked animation
 const FeatureCard = ({
@@ -61,7 +62,7 @@ const FeatureCard = ({
   description,
   bgColor,
   tags,
-  textLight = false
+  textLight = false,
 }: {
   scrollProgress: MotionValue<number>;
   index: number;
@@ -83,9 +84,8 @@ const FeatureCard = ({
   const y = useTransform(
     scrollProgress,
     [cardProgress, nextCardProgress],
-    [1200, 0]
+    [1200, 0],
   );
-
 
   return (
     <motion.div
@@ -103,10 +103,14 @@ const FeatureCard = ({
             <div className="size-20 rounded-2xl bg-dark flex items-center justify-center mb-4">
               <Icon size={40} className={iconColor} />
             </div>
-            <h3 className={`text-4xl font-black italic mb-3 ${textLight ? 'text-light' : ''}`}>
+            <h3
+              className={`text-4xl font-black italic mb-3 ${textLight ? "text-light" : ""}`}
+            >
               {title}
             </h3>
-            <p className={`text-sm md:text-lg ${textLight ? 'text-light/90' : 'text-dark/80'}`}>
+            <p
+              className={`text-sm md:text-lg ${textLight ? "text-light/90" : "text-dark/80"}`}
+            >
               {description}
             </p>
           </div>
@@ -129,15 +133,15 @@ export default function Landing() {
   const toast = useToast();
   const { currentLocale, changeLanguage } = useLanguage();
   const { isAuthenticated, isGuest } = useAuth();
-  const t = useTranslations('Landing.Hero');
-  const tDemos = useTranslations('Landing.Demos');
-  const tRules = useTranslations('Landing.Rules');
-  const tCarousel = useTranslations('Landing.Carousel');
-  const tFeatures = useTranslations('Landing.Features');
-  const tGettingStarted = useTranslations('Landing.GettingStarted');
-  const tFinalCTA = useTranslations('Landing.FinalCTA');
-  const tFAQ = useTranslations('Landing.FAQ');
-  const tFooter = useTranslations('Landing.Footer');
+  const t = useTranslations("Landing.Hero");
+  const tDemos = useTranslations("Landing.Demos");
+  const tRules = useTranslations("Landing.Rules");
+  const tCarousel = useTranslations("Landing.Carousel");
+  const tFeatures = useTranslations("Landing.Features");
+  const tGettingStarted = useTranslations("Landing.GettingStarted");
+  const tFinalCTA = useTranslations("Landing.FinalCTA");
+  const tFAQ = useTranslations("Landing.FAQ");
+  const tFooter = useTranslations("Landing.Footer");
   const [url, setUrl] = useState("");
   const [isShortening, setIsShortening] = useState(false);
 
@@ -145,7 +149,7 @@ export default function Landing() {
   const featuresRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: featuresRef,
-    offset: ["start end", "end start"]
+    offset: ["start end", "end start"],
   });
 
   // Rules Engine Examples State
@@ -155,52 +159,54 @@ export default function Landing() {
   const [isCreateLinkDrawerOpen, setIsCreateLinkDrawerOpen] = useState(false);
 
   // Billing Period State (monthly/yearly)
-  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
+  const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">(
+    "monthly",
+  );
 
   // FAQ Accordion State
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
 
   const ruleExamples = [
     {
-      textCondition: tRules('example1Condition'),
-      textAction: tRules('example1Action'),
-      conditions: [tRules('conditionDevice')],
-      actions: [tRules('actionRedirect')],
+      textCondition: tRules("example1Condition"),
+      textAction: tRules("example1Action"),
+      conditions: [tRules("conditionDevice")],
+      actions: [tRules("actionRedirect")],
       color1: "bg-secondary text-light",
-      color2: "bg-primary"
+      color2: "bg-primary",
     },
     {
-      textCondition: tRules('example2Condition'),
-      textAction: tRules('example2Action'),
-      conditions: [tRules('conditionCountry')],
-      actions: [tRules('actionRedirect')],
+      textCondition: tRules("example2Condition"),
+      textAction: tRules("example2Action"),
+      conditions: [tRules("conditionCountry")],
+      actions: [tRules("actionRedirect")],
       color1: "bg-primary",
-      color2: "bg-primary"
+      color2: "bg-primary",
     },
     {
-      textCondition: tRules('example3Condition'),
-      textAction: tRules('example3Action'),
-      conditions: [tRules('conditionVPN')],
-      actions: [tRules('actionBlock')],
+      textCondition: tRules("example3Condition"),
+      textAction: tRules("example3Action"),
+      conditions: [tRules("conditionVPN")],
+      actions: [tRules("actionBlock")],
       color1: "bg-info",
-      color2: "bg-danger"
+      color2: "bg-danger",
     },
     {
-      textCondition: tRules('example4Condition'),
-      textAction: tRules('example4Action'),
-      conditions: [tRules('conditionDevice')],
-      actions: [tRules('actionPassword')],
+      textCondition: tRules("example4Condition"),
+      textAction: tRules("example4Action"),
+      conditions: [tRules("conditionDevice")],
+      actions: [tRules("actionPassword")],
       color1: "bg-secondary text-light",
-      color2: "bg-warning"
+      color2: "bg-warning",
     },
     {
-      textCondition: tRules('example5Condition'),
-      textAction: tRules('example5Action'),
-      conditions: [tRules('conditionBot')],
-      actions: [tRules('actionWebhook')],
+      textCondition: tRules("example5Condition"),
+      textAction: tRules("example5Action"),
+      conditions: [tRules("conditionBot")],
+      actions: [tRules("actionWebhook")],
       color1: "bg-danger",
-      color2: "bg-info"
-    }
+      color2: "bg-info",
+    },
   ];
 
   React.useEffect(() => {
@@ -224,22 +230,23 @@ export default function Landing() {
         router.push("/dashboard");
       }, 400);
     } else {
-      if (response.errorCode === 'LINK_LIMIT_EXCEEDED') {
-        toast.error('Link limit exceeded', {
-          description: 'You\'ve reached your link limit. Upgrade your plan to create more links.',
+      if (response.errorCode === "LINK_LIMIT_EXCEEDED") {
+        toast.error("Link limit exceeded", {
+          description:
+            "You've reached your link limit. Upgrade your plan to create more links.",
           duration: 6000,
         });
-      } else if (response.errorCode === 'UNAUTHORIZED') {
-        toast.error('Session expired', {
-          description: 'Please login again to continue.',
+      } else if (response.errorCode === "UNAUTHORIZED") {
+        toast.error("Session expired", {
+          description: "Please login again to continue.",
         });
-      } else if (response.errorCode === 'INVALID_DATA') {
-        toast.error('Invalid data', {
-          description: 'Please check your input and try again.',
+      } else if (response.errorCode === "INVALID_DATA") {
+        toast.error("Invalid data", {
+          description: "Please check your input and try again.",
         });
       } else {
-        toast.error('Failed to create link', {
-          description: response.error || 'An unexpected error occurred.',
+        toast.error("Failed to create link", {
+          description: response.error || "An unexpected error occurred.",
         });
       }
       setIsShortening(false);
@@ -253,7 +260,6 @@ export default function Landing() {
       <div className="min-h-screen md:pb-0">
         {/* Hero Section - Input First */}
         <section className="relative h-[100dvh] flex items-center justify-center px-4 pt-0 pb-10 overflow-hidden">
-
           <div className="relative z-10 max-w-4xl mx-auto text-center w-full">
             {/* App Icon - Mobile Only */}
             <motion.div
@@ -264,7 +270,7 @@ export default function Landing() {
             >
               <img
                 src="/k-logo-noBg.svg"
-                alt={t('logoAlt')}
+                alt={t("logoAlt")}
                 className="w-8 h-auto"
               />
             </motion.div>
@@ -275,10 +281,10 @@ export default function Landing() {
               transition={{ delay: 0.1 }}
               className="text-5xl md:text-7xl font-black italic mb-4"
             >
-              {t('title')}
+              {t("title")}
               <br />
               <span className="text-shadow-[_4px_4px_0_var(--color-primary)] md:text-shadow-[_8px_8px_0_var(--color-primary)]">
-                {t('titleHighlight')}
+                {t("titleHighlight")}
               </span>
             </motion.h1>
 
@@ -288,7 +294,7 @@ export default function Landing() {
               transition={{ delay: 0.2 }}
               className="text-md md:text-lg text-dark/60 mb-12 max-w-3xl mx-auto"
             >
-              {t('description')}
+              {t("description")}
             </motion.p>
 
             {/* Main Input */}
@@ -303,7 +309,7 @@ export default function Landing() {
                   animate={{
                     opacity: isShortening ? 0 : 1,
                     x: isShortening ? -20 : 0,
-                    paddingRight: url && !isShortening ? "140px" : "0px"
+                    paddingRight: url && !isShortening ? "140px" : "0px",
                   }}
                   transition={{ duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
                   className="flex-1"
@@ -311,11 +317,13 @@ export default function Landing() {
                   <Input
                     autoFocus
                     value={url}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUrl(e.target.value)}
-                    placeholder={t('inputPlaceholder')}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setUrl(e.target.value)
+                    }
+                    placeholder={t("inputPlaceholder")}
                     className="bg-transparent border-none shadow-none focus:ring-0 text-md focus:outline-none"
                     onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                      if (e.key === 'Enter' && url) {
+                      if (e.key === "Enter" && url) {
                         handleShorten();
                       }
                     }}
@@ -325,7 +333,11 @@ export default function Landing() {
                 <motion.div
                   initial={false}
                   animate={{
-                    width: isShortening ? "calc(100% - 1rem)" : url ? "auto" : 0,
+                    width: isShortening
+                      ? "calc(100% - 1rem)"
+                      : url
+                        ? "auto"
+                        : 0,
                     opacity: url || isShortening ? 1 : 0,
                     scale: url || isShortening ? 1 : 0.8,
                   }}
@@ -336,12 +348,18 @@ export default function Landing() {
                     size="lg"
                     rounded="2xl"
                     className="w-full h-full bg-dark hover:bg-primary text-light hover:text-dark whitespace-nowrap hover:shadow-[_0_0_0_var(--color-dark)]"
-                    leftIcon={isShortening ? <RiLoader5Fill size={18} className="animate-spin" /> : <TbBolt size={18} />}
+                    leftIcon={
+                      isShortening ? (
+                        <RiLoader5Fill size={18} className="animate-spin" />
+                      ) : (
+                        <TbBolt size={18} />
+                      )
+                    }
                     onClick={handleShorten}
                     disabled={isShortening}
                   >
                     <p className="font-black italic">
-                      {isShortening ? t('buttonCreating') : t('buttonShorten')}
+                      {isShortening ? t("buttonCreating") : t("buttonShorten")}
                     </p>
                   </Button>
                 </motion.div>
@@ -360,14 +378,17 @@ export default function Landing() {
               className="text-center mb-16"
             >
               <div className="inline-block bg-primary px-2 py-1 rounded-full mb-4 text-xs font-black italic uppercase tracking-wide transition-all hover:shadow-[2px_2px_0_var(--color-dark)]">
-                {tDemos('badge')}
+                {tDemos("badge")}
               </div>
               <h2 className="text-5xl md:text-6xl font-black italic mb-4">
-                {tDemos('title')} <span className="text-light bg-danger text-shadow-[_4px_4px_0_var(--color-dark)]">{tDemos('titleHighlight')}</span>
+                {tDemos("title")}{" "}
+                <span className="text-light bg-danger text-shadow-[_4px_4px_0_var(--color-dark)]">
+                  {tDemos("titleHighlight")}
+                </span>
               </h2>
               <div className="inline text-2xl">
                 <p className="z-20 relative inline-flex flex-col md:flex-row items-center">
-                  {tDemos('subtitle')}
+                  {tDemos("subtitle")}
                 </p>
               </div>
             </motion.div>
@@ -383,18 +404,31 @@ export default function Landing() {
                 {/* <div className="size-20 rounded-2xl bg-dark flex items-center justify-center mb-6">
                   <TbDeviceMobile size={40} className="text-primary" />
                 </div> */}
-                <h3 className="text-3xl md:text-4xl font-black italic mb-3">{tDemos('demo1Title')}</h3>
+                <h3 className="text-3xl md:text-4xl font-black italic mb-3">
+                  {tDemos("demo1Title")}
+                </h3>
                 <p className="text-lg md:text-xl mb-8">
-                  {tDemos('demo1Description')}
+                  {tDemos("demo1Description")}
                 </p>
-                <a href="/r/demo-device" target="_blank" rel="noopener noreferrer">
+                <a
+                  href="/r/demo-device"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <div className="absolute flex flex-col items-center justify-center inset-1 bg-primary rounded-xl origin-right scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out">
-                    <p className="text-4xl text-dark font-black italic">{tDemos('tryDemo')}</p>
+                    <p className="text-4xl text-dark font-black italic">
+                      {tDemos("tryDemo")}
+                    </p>
                     <TbArrowUpRight size={64} />
                   </div>
                 </a>
 
-                <a className="block md:hidden" href="/r/demo-device" target="_blank" rel="noopener noreferrer">
+                <a
+                  className="block md:hidden"
+                  href="/r/demo-device"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <Button
                     size="lg"
                     rounded="2xl"
@@ -402,7 +436,7 @@ export default function Landing() {
                     rightIcon={<TbArrowUpRight size={32} />}
                   >
                     <p className="font-black italic text-xl">
-                      {tDemos('tryDemo')}
+                      {tDemos("tryDemo")}
                     </p>
                   </Button>
                 </a>
@@ -419,18 +453,31 @@ export default function Landing() {
                 {/* <div className="size-20 rounded-2xl bg-dark flex items-center justify-center mb-6">
                   <TbLock size={40} className="text-secondary" />
                 </div> */}
-                <h3 className="text-3xl md:text-4xl font-black italic mb-3">{tDemos('demo2Title')}</h3>
+                <h3 className="text-3xl md:text-4xl font-black italic mb-3">
+                  {tDemos("demo2Title")}
+                </h3>
                 <p className="text-lg md:text-xl mb-8">
-                  {tDemos('demo2Description')}
+                  {tDemos("demo2Description")}
                 </p>
-                <a href="/r/demo-password" target="_blank" rel="noopener noreferrer">
+                <a
+                  href="/r/demo-password"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <div className="absolute flex flex-col items-center justify-center inset-1 bg-secondary rounded-xl origin-right scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out">
-                    <p className="text-4xl text-light font-black italic">{tDemos('tryDemo')}</p>
+                    <p className="text-4xl text-light font-black italic">
+                      {tDemos("tryDemo")}
+                    </p>
                     <TbArrowUpRight size={64} className="text-light" />
                   </div>
                 </a>
 
-                <a className="block md:hidden" href="/r/demo-password" target="_blank" rel="noopener noreferrer">
+                <a
+                  className="block md:hidden"
+                  href="/r/demo-password"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <Button
                     size="lg"
                     rounded="2xl"
@@ -438,7 +485,7 @@ export default function Landing() {
                     rightIcon={<TbArrowUpRight size={32} />}
                   >
                     <p className="font-black italic text-xl">
-                      {tDemos('tryDemo')}
+                      {tDemos("tryDemo")}
                     </p>
                   </Button>
                 </a>
@@ -455,18 +502,31 @@ export default function Landing() {
                 {/* <div className="size-20 rounded-2xl bg-dark flex items-center justify-center mb-6">
                   <TbEye size={40} className="text-warning" />
                 </div> */}
-                <h3 className="text-3xl md:text-4xl font-black italic mb-3">{tDemos('demo3Title')}</h3>
+                <h3 className="text-3xl md:text-4xl font-black italic mb-3">
+                  {tDemos("demo3Title")}
+                </h3>
                 <p className="text-lg md:text-xl mb-8">
-                  {tDemos('demo3Description')}
+                  {tDemos("demo3Description")}
                 </p>
-                <a href="/r/demo-detection" target="_blank" rel="noopener noreferrer">
+                <a
+                  href="/r/demo-detection"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <div className="absolute flex flex-col items-center justify-center inset-1 bg-warning rounded-xl origin-right scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out">
-                    <p className="text-4xl text-dark font-black italic">{tDemos('tryDemo')}</p>
+                    <p className="text-4xl text-dark font-black italic">
+                      {tDemos("tryDemo")}
+                    </p>
                     <TbArrowUpRight size={64} />
                   </div>
                 </a>
 
-                <a className="block md:hidden" href="/r/demo-detection" target="_blank" rel="noopener noreferrer">
+                <a
+                  className="block md:hidden"
+                  href="/r/demo-detection"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <Button
                     size="lg"
                     rounded="2xl"
@@ -474,7 +534,7 @@ export default function Landing() {
                     rightIcon={<TbArrowUpRight size={32} />}
                   >
                     <p className="font-black italic text-xl">
-                      {tDemos('tryDemo')}
+                      {tDemos("tryDemo")}
                     </p>
                   </Button>
                 </a>
@@ -494,16 +554,16 @@ export default function Landing() {
               className="text-center mb-16"
             >
               <div className="inline-block bg-warning px-2 py-1 rounded-full mb-4 text-xs font-black italic uppercase tracking-wide transition-all hover:shadow-[2px_2px_0_var(--color-dark)]">
-                {tRules('badge')}
+                {tRules("badge")}
               </div>
               <h2 className="text-4xl md:text-6xl font-black italic mb-4">
-                {tRules('title')} <span className="text-light bg-info text-shadow-[_4px_4px_0_var(--color-dark)]">{tRules('titleHighlight')}</span>
+                {tRules("title")}{" "}
+                <span className="text-light bg-info text-shadow-[_4px_4px_0_var(--color-dark)]">
+                  {tRules("titleHighlight")}
+                </span>
               </h2>
-              <p className="text-xl text-dark/60">
-                {tRules('subtitle')}
-              </p>
+              <p className="text-xl text-dark/60">{tRules("subtitle")}</p>
             </motion.div>
-
 
             {/* Example Text */}
             <motion.div
@@ -515,11 +575,15 @@ export default function Landing() {
             >
               <div className="inline-block">
                 <div className="flex flex-wrap items-center justify-center gap-2">
-                  <span className="font-black text-lg md:text-xl italic">{tRules('if')}</span>
+                  <span className="font-black text-lg md:text-xl italic">
+                    {tRules("if")}
+                  </span>
                   <div className="inline-block">
                     <AnimatedText
                       key={`condition-${activeExampleIndex}`}
-                      initialText={ruleExamples[activeExampleIndex].textCondition}
+                      initialText={
+                        ruleExamples[activeExampleIndex].textCondition
+                      }
                       triggerMode="none"
                       animationType="slide"
                       slideDirection="up"
@@ -527,7 +591,9 @@ export default function Landing() {
                       className={`font-black text-lg md:text-xl italic ${ruleExamples[activeExampleIndex].color1}`}
                     />
                   </div>
-                  <span className="font-black text-lg md:text-xl italic -ml-">{tRules('then')}</span>
+                  <span className="font-black text-lg md:text-xl italic -ml-">
+                    {tRules("then")}
+                  </span>
                   <div className="inline-block">
                     <AnimatedText
                       key={`action-${activeExampleIndex}`}
@@ -552,7 +618,7 @@ export default function Landing() {
             >
               <div className="flex items-center gap-3 mb-6">
                 <div className="px-4 py-2 bg-dark text-light rounded-xl font-black italic text-sm">
-                  {tRules('conditionsLabel')}
+                  {tRules("conditionsLabel")}
                 </div>
                 <div className="h-px flex-1 bg-dark/20" />
               </div>
@@ -560,16 +626,46 @@ export default function Landing() {
               {/* Conditions Pills */}
               <div className="flex flex-wrap gap-3 justify-center">
                 {[
-                  { icon: TbWorld, label: tRules('conditionCountry'), color: "bg-primary" },
-                  { icon: TbDeviceMobile, label: tRules('conditionDevice'), color: "bg-secondary text-light" },
-                  { icon: TbNetwork, label: tRules('conditionIP'), color: "bg-warning" },
-                  { icon: TbShieldCheck, label: tRules('conditionVPN'), color: "bg-info" },
-                  { icon: TbRobot, label: tRules('conditionBot'), color: "bg-danger" },
-                  { icon: TbCalendar, label: tRules('conditionDateTime'), color: "bg-success" },
-                  { icon: TbChartBar, label: tRules('conditionAccessCount'), color: "bg-info" },
+                  {
+                    icon: TbWorld,
+                    label: tRules("conditionCountry"),
+                    color: "bg-primary",
+                  },
+                  {
+                    icon: TbDeviceMobile,
+                    label: tRules("conditionDevice"),
+                    color: "bg-secondary text-light",
+                  },
+                  {
+                    icon: TbNetwork,
+                    label: tRules("conditionIP"),
+                    color: "bg-warning",
+                  },
+                  {
+                    icon: TbShieldCheck,
+                    label: tRules("conditionVPN"),
+                    color: "bg-info",
+                  },
+                  {
+                    icon: TbRobot,
+                    label: tRules("conditionBot"),
+                    color: "bg-danger",
+                  },
+                  {
+                    icon: TbCalendar,
+                    label: tRules("conditionDateTime"),
+                    color: "bg-success",
+                  },
+                  {
+                    icon: TbChartBar,
+                    label: tRules("conditionAccessCount"),
+                    color: "bg-info",
+                  },
                 ].map((item, i) => {
                   const textRef = { current: null as AnimatedTextRef | null };
-                  const isActive = ruleExamples[activeExampleIndex].conditions.includes(item.label);
+                  const isActive = ruleExamples[
+                    activeExampleIndex
+                  ].conditions.includes(item.label);
                   return (
                     <motion.div
                       key={i}
@@ -605,7 +701,7 @@ export default function Landing() {
             >
               <div className="flex items-center gap-3 mb-6">
                 <div className="px-4 py-2 bg-dark text-light rounded-xl font-black italic text-sm">
-                  {tRules('actionsLabel')}
+                  {tRules("actionsLabel")}
                 </div>
                 <div className="h-px flex-1 bg-dark/20" />
               </div>
@@ -613,13 +709,31 @@ export default function Landing() {
               {/* Actions Pills */}
               <div className="flex flex-wrap gap-3 justify-center">
                 {[
-                  { icon: TbArrowRight, label: tRules('actionRedirect'), color: "bg-primary" },
-                  { icon: TbX, label: tRules('actionBlock'), color: "bg-danger" },
-                  { icon: TbLock, label: tRules('actionPassword'), color: "bg-warning" },
-                  { icon: TbWebhook, label: tRules('actionWebhook'), color: "bg-info" },
+                  {
+                    icon: TbArrowRight,
+                    label: tRules("actionRedirect"),
+                    color: "bg-primary",
+                  },
+                  {
+                    icon: TbX,
+                    label: tRules("actionBlock"),
+                    color: "bg-danger",
+                  },
+                  {
+                    icon: TbLock,
+                    label: tRules("actionPassword"),
+                    color: "bg-warning",
+                  },
+                  {
+                    icon: TbWebhook,
+                    label: tRules("actionWebhook"),
+                    color: "bg-info",
+                  },
                 ].map((item, i) => {
                   const textRef = { current: null as AnimatedTextRef | null };
-                  const isActive = ruleExamples[activeExampleIndex].actions.includes(item.label);
+                  const isActive = ruleExamples[
+                    activeExampleIndex
+                  ].actions.includes(item.label);
                   return (
                     <motion.div
                       key={i}
@@ -645,7 +759,6 @@ export default function Landing() {
                 })}
               </div>
             </motion.div>
-
           </div>
         </section>
 
@@ -667,23 +780,23 @@ export default function Landing() {
               }}
             >
               {[
-                tCarousel('phrase1'),
-                tCarousel('phrase2'),
-                tCarousel('phrase3'),
-                tCarousel('phrase4'),
-                tCarousel('phrase5'),
-                tCarousel('phrase6'),
-                tCarousel('phrase7'),
-                tCarousel('phrase8'),
+                tCarousel("phrase1"),
+                tCarousel("phrase2"),
+                tCarousel("phrase3"),
+                tCarousel("phrase4"),
+                tCarousel("phrase5"),
+                tCarousel("phrase6"),
+                tCarousel("phrase7"),
+                tCarousel("phrase8"),
                 // Duplicate for seamless loop
-                tCarousel('phrase1'),
-                tCarousel('phrase2'),
-                tCarousel('phrase3'),
-                tCarousel('phrase4'),
-                tCarousel('phrase5'),
-                tCarousel('phrase6'),
-                tCarousel('phrase7'),
-                tCarousel('phrase8'),
+                tCarousel("phrase1"),
+                tCarousel("phrase2"),
+                tCarousel("phrase3"),
+                tCarousel("phrase4"),
+                tCarousel("phrase5"),
+                tCarousel("phrase6"),
+                tCarousel("phrase7"),
+                tCarousel("phrase8"),
               ].map((message, i) => (
                 <div
                   key={i}
@@ -705,13 +818,13 @@ export default function Landing() {
                 {/* Left Side - Sticky Text */}
                 <div className="flex flex-col">
                   <div className="inline-block bg-warning px-2 py-1 rounded-full mb-4 text-xs font-black italic uppercase tracking-wide w-fit">
-                    {tFeatures('badge')}
+                    {tFeatures("badge")}
                   </div>
                   <h2 className="text-4xl md:text-6xl font-black italic mb-4">
-                    {tFeatures('title')}
+                    {tFeatures("title")}
                   </h2>
                   <p className="text-xl text-dark/60 mb-6 md:mb-8">
-                    {tFeatures('subtitle')}
+                    {tFeatures("subtitle")}
                   </p>
                   <Button
                     variant="solid"
@@ -723,7 +836,7 @@ export default function Landing() {
                     onClick={() => setIsCreateLinkDrawerOpen(true)}
                   >
                     <p className="font-black italic">
-                      {tFeatures('createLinkButton')}
+                      {tFeatures("createLinkButton")}
                     </p>
                   </Button>
                   <div className="space-y-4 hidden">
@@ -733,7 +846,9 @@ export default function Landing() {
                       </div>
                       <div>
                         <h4 className="font-black text-lg">Guest Mode</h4>
-                        <p className="text-dark/60">Start instantly without signup</p>
+                        <p className="text-dark/60">
+                          Start instantly without signup
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
@@ -742,7 +857,9 @@ export default function Landing() {
                       </div>
                       <div>
                         <h4 className="font-black text-lg">Link Rules</h4>
-                        <p className="text-dark/60">Conditional logic for your links</p>
+                        <p className="text-dark/60">
+                          Conditional logic for your links
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
@@ -751,7 +868,9 @@ export default function Landing() {
                       </div>
                       <div>
                         <h4 className="font-black text-lg">Access tracking</h4>
-                        <p className="text-dark/60">Track every visitor detail</p>
+                        <p className="text-dark/60">
+                          Track every visitor detail
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -761,67 +880,101 @@ export default function Landing() {
 
                 {/* Mobile Version - Horizontal Scroll */}
                 <div className="md:hidden overflow-x-auto snap-x snap-mandatory pb-4 -mx-4 px-4">
-                  <div className="flex gap-4" style={{ width: 'max-content' }}>
+                  <div className="flex gap-4" style={{ width: "max-content" }}>
                     {/* Card 1: Guest Mode */}
-                    <div className="snap-center" style={{ width: '85vw', maxWidth: '400px' }}>
+                    <div
+                      className="snap-center"
+                      style={{ width: "85vw", maxWidth: "400px" }}
+                    >
                       <div className="h-[500px] p-6 bg-primary rounded-3xl border-4 border-dark shadow-[4px_4px_0_var(--color-dark)]">
                         <div className="flex flex-col h-full justify-between">
                           <div>
                             <div className="size-16 md:size-20 rounded-2xl bg-dark flex items-center justify-center mb-4">
                               <TbUserPlus size={40} className="text-primary" />
                             </div>
-                            <h3 className="text-2xl md:text-4xl font-black italic mb-3">{tFeatures('card1Title')}</h3>
+                            <h3 className="text-2xl md:text-4xl font-black italic mb-3">
+                              {tFeatures("card1Title")}
+                            </h3>
                             <p className="text-md md:text-lg text-dark/80">
-                              {tFeatures('card1DescriptionShort')}
+                              {tFeatures("card1DescriptionShort")}
                             </p>
                           </div>
                           <div className="flex flex-wrap gap-3 text-sm font-bold">
-                            <div className="px-4 py-2 bg-dark text-light rounded-xl">{tFeatures('card1Tag1')}</div>
-                            <div className="px-4 py-2 bg-dark text-light rounded-xl">{tFeatures('card1Tag2')}</div>
+                            <div className="px-4 py-2 bg-dark text-light rounded-xl">
+                              {tFeatures("card1Tag1")}
+                            </div>
+                            <div className="px-4 py-2 bg-dark text-light rounded-xl">
+                              {tFeatures("card1Tag2")}
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
 
                     {/* Card 2: Smart Rules */}
-                    <div className="snap-center" style={{ width: '85vw', maxWidth: '400px' }}>
+                    <div
+                      className="snap-center"
+                      style={{ width: "85vw", maxWidth: "400px" }}
+                    >
                       <div className="h-[500px] p-6 bg-warning rounded-3xl border-4 border-dark shadow-[4px_4px_0_var(--color-dark)]">
                         <div className="flex flex-col h-full justify-between">
                           <div>
                             <div className="size-16 md:size-20 rounded-2xl bg-dark flex items-center justify-center mb-4">
                               <TbTarget size={40} className="text-warning" />
                             </div>
-                            <h3 className="text-2xl md:text-4xl font-black italic mb-3">{tFeatures('card2Title')}</h3>
+                            <h3 className="text-2xl md:text-4xl font-black italic mb-3">
+                              {tFeatures("card2Title")}
+                            </h3>
                             <p className="text-md md:text-lg text-dark/80">
-                              {tFeatures('card2DescriptionShort')}
+                              {tFeatures("card2DescriptionShort")}
                             </p>
                           </div>
                           <div className="flex flex-wrap gap-3 text-sm font-bold">
-                            <div className="px-4 py-2 bg-dark text-light rounded-xl">{tFeatures('card2Tag1')}</div>
-                            <div className="px-4 py-2 bg-dark text-light rounded-xl">{tFeatures('card2Tag2')}</div>
-                            <div className="px-4 py-2 bg-dark text-light rounded-xl">{tFeatures('card2Tag3')}</div>
+                            <div className="px-4 py-2 bg-dark text-light rounded-xl">
+                              {tFeatures("card2Tag1")}
+                            </div>
+                            <div className="px-4 py-2 bg-dark text-light rounded-xl">
+                              {tFeatures("card2Tag2")}
+                            </div>
+                            <div className="px-4 py-2 bg-dark text-light rounded-xl">
+                              {tFeatures("card2Tag3")}
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
 
                     {/* Card 3: Analytics */}
-                    <div className="snap-center" style={{ width: '85vw', maxWidth: '400px' }}>
+                    <div
+                      className="snap-center"
+                      style={{ width: "85vw", maxWidth: "400px" }}
+                    >
                       <div className="h-[500px] p-6 bg-secondary rounded-3xl border-4 border-dark shadow-[4px_4px_0_var(--color-dark)]">
                         <div className="flex flex-col h-full justify-between">
                           <div>
                             <div className="size-16 md:size-20 rounded-2xl bg-dark flex items-center justify-center mb-4">
-                              <TbChartBar size={40} className="text-secondary" />
+                              <TbChartBar
+                                size={40}
+                                className="text-secondary"
+                              />
                             </div>
-                            <h3 className="text-2xl md:text-4xl font-black italic mb-3 text-light">{tFeatures('card3Title')}</h3>
+                            <h3 className="text-2xl md:text-4xl font-black italic mb-3 text-light">
+                              {tFeatures("card3Title")}
+                            </h3>
                             <p className="text-md md:text-lg text-light/90">
-                              {tFeatures('card3DescriptionShort')}
+                              {tFeatures("card3DescriptionShort")}
                             </p>
                           </div>
                           <div className="flex flex-wrap gap-3 text-sm font-bold">
-                            <div className="px-4 py-2 bg-dark text-light rounded-xl">{tFeatures('card3Tag1')}</div>
-                            <div className="px-4 py-2 bg-dark text-light rounded-xl">{tFeatures('card3Tag2')}</div>
-                            <div className="px-4 py-2 bg-dark text-light rounded-xl">{tFeatures('card3Tag3')}</div>
+                            <div className="px-4 py-2 bg-dark text-light rounded-xl">
+                              {tFeatures("card3Tag1")}
+                            </div>
+                            <div className="px-4 py-2 bg-dark text-light rounded-xl">
+                              {tFeatures("card3Tag2")}
+                            </div>
+                            <div className="px-4 py-2 bg-dark text-light rounded-xl">
+                              {tFeatures("card3Tag3")}
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -839,9 +992,9 @@ export default function Landing() {
                     icon={TbUserPlus}
                     iconColor="text-primary"
                     bgColor="bg-primary"
-                    title={tFeatures('card1Title')}
-                    description={tFeatures('card1DescriptionLong')}
-                    tags={[tFeatures('card1Tag1'), tFeatures('card1Tag2')]}
+                    title={tFeatures("card1Title")}
+                    description={tFeatures("card1DescriptionLong")}
+                    tags={[tFeatures("card1Tag1"), tFeatures("card1Tag2")]}
                   />
 
                   {/* Card 2: Smart Rules */}
@@ -852,9 +1005,13 @@ export default function Landing() {
                     icon={TbTarget}
                     iconColor="text-warning"
                     bgColor="bg-warning"
-                    title={tFeatures('card2Title')}
-                    description={tFeatures('card2DescriptionLong')}
-                    tags={[tFeatures('card2Tag1'), tFeatures('card2Tag2'), tFeatures('card2Tag3')]}
+                    title={tFeatures("card2Title")}
+                    description={tFeatures("card2DescriptionLong")}
+                    tags={[
+                      tFeatures("card2Tag1"),
+                      tFeatures("card2Tag2"),
+                      tFeatures("card2Tag3"),
+                    ]}
                   />
 
                   {/* Card 3: Analytics */}
@@ -865,9 +1022,13 @@ export default function Landing() {
                     icon={TbChartBar}
                     iconColor="text-secondary"
                     bgColor="bg-secondary"
-                    title={tFeatures('card3Title')}
-                    description={tFeatures('card3DescriptionLong')}
-                    tags={[tFeatures('card3Tag1'), tFeatures('card3Tag2'), tFeatures('card3Tag3')]}
+                    title={tFeatures("card3Title")}
+                    description={tFeatures("card3DescriptionLong")}
+                    tags={[
+                      tFeatures("card3Tag1"),
+                      tFeatures("card3Tag2"),
+                      tFeatures("card3Tag3"),
+                    ]}
                     textLight
                   />
                 </div>
@@ -886,39 +1047,42 @@ export default function Landing() {
               className="text-center mb-8"
             >
               <div className="inline-block bg-info text-light px-2 py-1 rounded-full mb-4 text-xs font-black italic uppercase tracking-wide">
-                {tGettingStarted('badge')}
+                {tGettingStarted("badge")}
               </div>
               <h2 className="text-4xl md:text-6xl font-black italic mb-4">
-                {tGettingStarted('title')} <span className="bg-primary">{tGettingStarted('titleHighlight')}</span>
+                {tGettingStarted("title")}{" "}
+                <span className="bg-primary">
+                  {tGettingStarted("titleHighlight")}
+                </span>
               </h2>
               <p className="text-xl text-dark/60 mb-6">
-                {tGettingStarted('subtitle')}
+                {tGettingStarted("subtitle")}
               </p>
 
               {/* Billing Period Toggle */}
               <div className="inline-flex gap-1 p-1 bg-dark/5 rounded-2xl">
                 <button
-                  onClick={() => setBillingPeriod('monthly')}
+                  onClick={() => setBillingPeriod("monthly")}
                   className={`px-4 py-2 rounded-xl italic text-sm transition-all duration-200 ${
-                    billingPeriod === 'monthly'
-                      ? 'bg-dark text-light'
-                      : 'text-dark/60 hover:text-dark hover:cursor-pointer'
+                    billingPeriod === "monthly"
+                      ? "bg-dark text-light"
+                      : "text-dark/60 hover:text-dark hover:cursor-pointer"
                   }`}
                 >
                   <p className="font-black">
-                    {tGettingStarted('billingToggleMonthly')}
+                    {tGettingStarted("billingToggleMonthly")}
                   </p>
                 </button>
                 <button
-                  onClick={() => setBillingPeriod('yearly')}
+                  onClick={() => setBillingPeriod("yearly")}
                   className={`px-4 py-2 rounded-xl italic text-sm transition-all duration-200 ${
-                    billingPeriod === 'yearly'
-                      ? 'bg-dark text-light'
-                      : 'text-dark/60 hover:text-dark hover:cursor-pointer'
+                    billingPeriod === "yearly"
+                      ? "bg-dark text-light"
+                      : "text-dark/60 hover:text-dark hover:cursor-pointer"
                   }`}
                 >
                   <p className="font-black">
-                  {tGettingStarted('billingToggleYearly')}
+                    {tGettingStarted("billingToggleYearly")}
                   </p>
                 </button>
               </div>
@@ -932,30 +1096,36 @@ export default function Landing() {
                 viewport={{ once: true }}
                 className="flex flex-col p-8 bg-dark/5 rounded-3xl transition-all duration-200 border-2 border-transparent hover:border-dark hover:shadow-[6px_6px_0_var(--color-dark)]"
               >
-                <div className="text-sm font-bold text-dark/60 mb-2">{tGettingStarted('guestLabel')}</div>
-                <div className="text-4xl font-black mb-2">{tGettingStarted('guestPrice')}</div>
-                <div className="text-dark/60 mb-6">{tGettingStarted('guestSubtitle')}</div>
+                <div className="text-sm font-bold text-dark/60 mb-2">
+                  {tGettingStarted("guestLabel")}
+                </div>
+                <div className="text-4xl font-black mb-2">
+                  {tGettingStarted("guestPrice")}
+                </div>
+                <div className="text-dark/60 mb-6">
+                  {tGettingStarted("guestSubtitle")}
+                </div>
 
                 <ul className="space-y-3 mb-8">
                   <li className="flex items-start gap-2">
                     <TbCheck className="text-success mt-1 flex-shrink-0" />
-                    <span>{tGettingStarted('guestFeature1')}</span>
+                    <span>{tGettingStarted("guestFeature1")}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <TbCheck className="text-success mt-1 flex-shrink-0" />
-                    <span>{tGettingStarted('guestFeature2')}</span>
+                    <span>{tGettingStarted("guestFeature2")}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <TbCheck className="text-success mt-1 flex-shrink-0" />
-                    <span>{tGettingStarted('guestFeature3')}</span>
+                    <span>{tGettingStarted("guestFeature3")}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <TbCheck className="text-success mt-1 flex-shrink-0" />
-                    <span>{tGettingStarted('guestFeature4')}</span>
+                    <span>{tGettingStarted("guestFeature4")}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <TbCheck className="text-success mt-1 flex-shrink-0" />
-                    <span>{tGettingStarted('guestFeature5')}</span>
+                    <span>{tGettingStarted("guestFeature5")}</span>
                   </li>
                 </ul>
 
@@ -969,7 +1139,7 @@ export default function Landing() {
                   onClick={() => setIsCreateLinkDrawerOpen(true)}
                 >
                   <p className="font-black italic">
-                    {tGettingStarted('guestButton')}
+                    {tGettingStarted("guestButton")}
                   </p>
                 </Button>
               </motion.div>
@@ -986,38 +1156,62 @@ export default function Landing() {
                   MOST POPULAR
                 </div> */}
 
-                <div className="text-sm font-bold text-dark mb-2">{tGettingStarted('freeLabel')}</div>
-                <div className="text-4xl font-black text-dark mb-2">{tGettingStarted('freePrice')}</div>
-                <div className="text-dark/60 mb-6">{tGettingStarted('freeSubtitle')}</div>
+                <div className="text-sm font-bold text-dark mb-2">
+                  {tGettingStarted("freeLabel")}
+                </div>
+                <div className="text-4xl font-black text-dark mb-2">
+                  {tGettingStarted("freePrice")}
+                </div>
+                <div className="text-dark/60 mb-6">
+                  {tGettingStarted("freeSubtitle")}
+                </div>
 
                 <ul className="space-y-3 mb-8">
                   <li className="flex items-start gap-2">
                     <TbCheck className="text-dark mt-1 flex-shrink-0" />
-                    <span className="text-dark">{tGettingStarted('freeFeature1')}</span>
+                    <span className="text-dark">
+                      {tGettingStarted("freeFeature1")}
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <TbCheck className="text-dark mt-1 flex-shrink-0" />
-                    <span className="text-dark">{tGettingStarted('freeFeature2')}</span>
+                    <span className="text-dark">
+                      {tGettingStarted("freeFeature2")}
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <TbCheck className="text-dark mt-1 flex-shrink-0" />
-                    <span className="text-dark">{tGettingStarted('freeFeature3')}</span>
+                    <span className="text-dark">
+                      {tGettingStarted("freeFeature3")}
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <TbCheck className="text-dark mt-1 flex-shrink-0" />
-                    <span className="text-dark">{tGettingStarted('freeFeature4')}</span>
+                    <span className="text-dark">
+                      {tGettingStarted("freeFeature4")}
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <TbCheck className="text-dark mt-1 flex-shrink-0" />
-                    <span className="text-dark">{tGettingStarted('freeFeature5')}</span>
+                    <span className="text-dark">
+                      {tGettingStarted("freeFeature5")}
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <TbCheck className="text-dark mt-1 flex-shrink-0" />
-                    <span className="text-dark">{tGettingStarted('freeFeature6')}</span>
+                    <span className="text-dark">
+                      {tGettingStarted("freeFeature6")}
+                    </span>
                   </li>
-                  <li className="flex items-start gap-2">
+                  {/* <li className="flex items-start gap-2">
                     <TbCheck className="text-dark mt-1 flex-shrink-0" />
                     <span className="text-dark">{tGettingStarted('freeFeature7')}</span>
+                  </li> */}
+                  <li className="flex items-start gap-2">
+                    <TbCheck className="text-dark mt-1 flex-shrink-0" />
+                    <span className="text-dark">
+                      {tGettingStarted("freeFeature8")}
+                    </span>
                   </li>
                 </ul>
 
@@ -1031,7 +1225,7 @@ export default function Landing() {
                     className="w-full bg-dark hover:text-dark hover:bg-primary"
                   >
                     <p className="font-black italic">
-                      {tGettingStarted('freeButton')}
+                      {tGettingStarted("freeButton")}
                     </p>
                   </Button>
                 </Link>
@@ -1045,12 +1239,18 @@ export default function Landing() {
                 transition={{ delay: 0.2 }}
                 className="relative overflow-hidden flex flex-col p-8 bg-dark/5 rounded-3xl transition-all duration-200 border-2 border-transparent hover:border-dark hover:shadow-[6px_6px_0_var(--color-dark)]"
               >
-                <div className="text-sm font-bold text-dark/60 mb-2">{tGettingStarted('proLabel')}</div>
+                <div className="text-sm font-bold text-dark/60 mb-2">
+                  {tGettingStarted("proLabel")}
+                </div>
                 <div className="text-4xl font-black mb-2">
                   <span className="text-secondary">
                     <AnimatedText
                       key={`price-${billingPeriod}`}
-                      initialText={billingPeriod === 'monthly' ? tGettingStarted('proPriceMonthly') : tGettingStarted('proPriceYearly')}
+                      initialText={
+                        billingPeriod === "monthly"
+                          ? tGettingStarted("proPriceMonthly")
+                          : tGettingStarted("proPriceYearly")
+                      }
                       animationType="slide"
                       slideDirection="up"
                       duration={0.3}
@@ -1059,35 +1259,41 @@ export default function Landing() {
                   <span className="text-lg text-dark/60">
                     <AnimatedText
                       key={`period-${billingPeriod}`}
-                      initialText={billingPeriod === 'monthly' ? tGettingStarted('proPeriodMonthly') : tGettingStarted('proPeriodYearly')}
+                      initialText={
+                        billingPeriod === "monthly"
+                          ? tGettingStarted("proPeriodMonthly")
+                          : tGettingStarted("proPeriodYearly")
+                      }
                       animationType="slide"
                       slideDirection="up"
                       duration={0.3}
                     />
                   </span>
                 </div>
-                <div className="text-dark/60 mb-6">{tGettingStarted('proSubtitle')}</div>
+                <div className="text-dark/60 mb-6">
+                  {tGettingStarted("proSubtitle")}
+                </div>
 
                 <ul className="space-y-3 mb-8">
                   <li className="flex items-start gap-2">
                     <TbSparkles className="text-secondary mt-1 flex-shrink-0" />
-                    <span>{tGettingStarted('proFeature1')}</span>
+                    <span>{tGettingStarted("proFeature1")}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <TbSparkles className="text-secondary mt-1 flex-shrink-0" />
-                    <span>{tGettingStarted('proFeature2')}</span>
+                    <span>{tGettingStarted("proFeature2")}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <TbSparkles className="text-secondary mt-1 flex-shrink-0" />
-                    <span>{tGettingStarted('proFeature3')}</span>
+                    <span>{tGettingStarted("proFeature3")}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <TbSparkles className="text-secondary mt-1 flex-shrink-0" />
-                    <span>{tGettingStarted('proFeature4')}</span>
+                    <span>{tGettingStarted("proFeature5")}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <TbSparkles className="text-secondary mt-1 flex-shrink-0" />
-                    <span>{tGettingStarted('proFeature5')}</span>
+                    <span>{tGettingStarted("proFeature4")}</span>
                   </li>
                 </ul>
 
@@ -1101,15 +1307,22 @@ export default function Landing() {
                     className="w-full bg-dark hover:bg-secondary mt-auto"
                     onClick={async () => {
                       try {
-                        await subscriptionService.createCheckoutSession(billingPeriod);
+                        await subscriptionService.createCheckoutSession(
+                          billingPeriod,
+                        );
                       } catch (error) {
-                        console.error('Error creating checkout session:', error);
-                        toast.error('Failed to start checkout. Please try again.');
+                        console.error(
+                          "Error creating checkout session:",
+                          error,
+                        );
+                        toast.error(
+                          "Failed to start checkout. Please try again.",
+                        );
                       }
                     }}
                   >
                     <p className="font-black italic">
-                      {tGettingStarted('proButton')}
+                      {tGettingStarted("proButton")}
                     </p>
                   </Button>
                 ) : (
@@ -1123,7 +1336,7 @@ export default function Landing() {
                       className="w-full bg-dark hover:bg-secondary"
                     >
                       <p className="font-black italic">
-                        {tGettingStarted('proButton')}
+                        {tGettingStarted("proButton")}
                       </p>
                     </Button>
                   </Link>
@@ -1143,19 +1356,20 @@ export default function Landing() {
               className="text-center mb-12"
             >
               <div className="inline-block bg-secondary text-light px-2 py-1 rounded-full mb-4 text-xs font-black italic uppercase tracking-wide">
-                {tFAQ('badge')}
+                {tFAQ("badge")}
               </div>
               <h2 className="text-4xl md:text-6xl font-black italic mb-4">
-                {tFAQ('title')} <span className="bg-warning">{tFAQ('titleHighlight')}</span>
+                {tFAQ("title")}{" "}
+                <span className="bg-warning">{tFAQ("titleHighlight")}</span>
               </h2>
             </motion.div>
 
             <div className="space-y-4">
               {[
-                { question: tFAQ('question1'), answer: tFAQ('answer1') },
-                { question: tFAQ('question2'), answer: tFAQ('answer2') },
-                { question: tFAQ('question3'), answer: tFAQ('answer3') },
-                { question: tFAQ('question4'), answer: tFAQ('answer4') },
+                { question: tFAQ("question1"), answer: tFAQ("answer1") },
+                { question: tFAQ("question2"), answer: tFAQ("answer2") },
+                { question: tFAQ("question3"), answer: tFAQ("answer3") },
+                { question: tFAQ("question4"), answer: tFAQ("answer4") },
               ].map((faq, index) => (
                 <motion.div
                   key={index}
@@ -1165,8 +1379,8 @@ export default function Landing() {
                   transition={{ delay: index * 0.1 }}
                   className={`rounded-2xl border-2 border-dark overflow-hidden transition-all duration-300 ${
                     openFAQ === index
-                      ? 'bg-primary shadow-[4px_4px_0_var(--color-dark)]'
-                      : 'bg-light hover:shadow-[4px_4px_0_var(--color-dark)]'
+                      ? "bg-primary shadow-[4px_4px_0_var(--color-dark)]"
+                      : "bg-light hover:shadow-[4px_4px_0_var(--color-dark)]"
                   }`}
                 >
                   <button
@@ -1178,7 +1392,11 @@ export default function Landing() {
                     </span>
                     <motion.div
                       animate={{ rotate: openFAQ === index ? 180 : 0 }}
-                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 20,
+                      }}
                       className="flex-shrink-0"
                     >
                       <TbChevronDown size={24} />
@@ -1187,20 +1405,18 @@ export default function Landing() {
                   <motion.div
                     initial={false}
                     animate={{
-                      height: openFAQ === index ? 'auto' : 0,
-                      opacity: openFAQ === index ? 1 : 0
+                      height: openFAQ === index ? "auto" : 0,
+                      opacity: openFAQ === index ? 1 : 0,
                     }}
                     transition={{
                       type: "spring",
                       stiffness: 700,
                       damping: 50,
-                      opacity: { duration: 0.15 }
+                      opacity: { duration: 0.15 },
                     }}
                     className="overflow-hidden"
                   >
-                    <p className="px-6 pb-6 text-dark/80">
-                      {faq.answer}
-                    </p>
+                    <p className="px-6 pb-6 text-dark/80">{faq.answer}</p>
                   </motion.div>
                 </motion.div>
               ))}
@@ -1219,10 +1435,10 @@ export default function Landing() {
               className="max-w-4xl mx-auto text-center"
             >
               <h2 className="text-4xl md:text-6xl font-black italic mb-6">
-                {tFinalCTA('title')}
+                {tFinalCTA("title")}
               </h2>
               <p className="text-xl text-dark/80 mb-8">
-                {tFinalCTA('subtitle')}
+                {tFinalCTA("subtitle")}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/auth/register">
@@ -1234,7 +1450,7 @@ export default function Landing() {
                     expandOnHover="icon"
                     className="bg-dark text-light hover:bg-warning hover:text-dark"
                   >
-                    {tFinalCTA('button1')}
+                    {tFinalCTA("button1")}
                   </Button>
                 </Link>
                 <Button
@@ -1246,7 +1462,7 @@ export default function Landing() {
                   className="bg-primary text-dark hover:bg-secondary hover:text-light"
                   onClick={() => setIsCreateLinkDrawerOpen(true)}
                 >
-                  {tFinalCTA('button2')}
+                  {tFinalCTA("button2")}
                 </Button>
               </div>
             </motion.div>
@@ -1267,27 +1483,35 @@ export default function Landing() {
                   </Link>
                 </div>
                 <p className="text-light/60 text-sm">
-                  {tFooter('brandDescription')}
+                  {tFooter("brandDescription")}
                 </p>
               </div>
 
               {/* Product */}
               <div>
-                <h4 className="font-black italic mb-4">{tFooter('productHeading')}</h4>
+                <h4 className="font-black italic mb-4">
+                  {tFooter("productHeading")}
+                </h4>
                 <ul className="space-y-2 text-sm text-light/60">
                   <li>
-                    <Link href="/" className="relative hover:text-dark transition-colors group">
+                    <Link
+                      href="/"
+                      className="relative hover:text-dark transition-colors group"
+                    >
                       <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
                       <p className="text-sm z-20 relative inline-flex flex-col md:flex-row items-center">
-                        {tFooter('productLink1')}
+                        {tFooter("productLink1")}
                       </p>
                     </Link>
                   </li>
                   <li>
-                    <Link href="/dashboard" className="relative hover:text-dark transition-colors group">
+                    <Link
+                      href="/dashboard"
+                      className="relative hover:text-dark transition-colors group"
+                    >
                       <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
                       <p className="text-sm z-20 relative inline-flex flex-col md:flex-row items-center">
-                        {tFooter('productLink2')}
+                        {tFooter("productLink2")}
                       </p>
                     </Link>
                   </li>
@@ -1296,15 +1520,24 @@ export default function Landing() {
 
               {/* Resources */}
               <div>
-                <h4 className="font-black italic mb-4">{tFooter('resourcesHeading')}</h4>
+                <h4 className="font-black italic mb-4">
+                  {tFooter("resourcesHeading")}
+                </h4>
                 <ul className="space-y-2 text-sm text-light/60">
-                  <li><a href="https://github.com/aka-alvaroso/linkkk" target="_blank" rel="noopener noreferrer" className="
-                  relative group hover:text-dark transition-colors inline-flex items-center">
-                    <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
-                    <p className="text-sm z-20 relative inline-flex flex-col md:flex-row md:gap-1 items-center">
-                      <TbBrandGithub size={16} /> GitHub
-                    </p>
-                  </a></li>
+                  <li>
+                    <a
+                      href="https://github.com/aka-alvaroso/linkkk"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="
+                  relative group hover:text-dark transition-colors inline-flex items-center"
+                    >
+                      <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
+                      <p className="text-sm z-20 relative inline-flex flex-col md:flex-row md:gap-1 items-center">
+                        <TbBrandGithub size={16} /> GitHub
+                      </p>
+                    </a>
+                  </li>
                   {/* <li>
                     <Link href="/features" className="relative hover:text-dark transition-colors group">
                         <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
@@ -1319,36 +1552,51 @@ export default function Landing() {
               {/* Legal */}
               {/* Legal */}
               <div>
-                <h4 className="font-black italic mb-4">{tFooter('legalHeading')}</h4>
+                <h4 className="font-black italic mb-4">
+                  {tFooter("legalHeading")}
+                </h4>
                 <ul className="space-y-2 text-sm text-light/60">
                   <li>
-                    <Link href="/legal/privacy-policy" className="relative hover:text-dark transition-colors group">
+                    <Link
+                      href="/legal/privacy-policy"
+                      className="relative hover:text-dark transition-colors group"
+                    >
                       <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
                       <p className="text-sm z-20 relative inline-flex flex-col md:flex-row items-center">
-                        {tFooter('privacyPolicy')}
-                      </p>
-                    </Link>
-                  </li>
-                  <li><Link href="/legal/terms-of-service" className="relative hover:text-dark transition-colors group">
-                      <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
-                      <p className="text-sm z-20 relative inline-flex flex-col md:flex-row items-center">
-                        {tFooter('termsOfService')}
+                        {tFooter("privacyPolicy")}
                       </p>
                     </Link>
                   </li>
                   <li>
-                    <Link href="/legal/cookies" className="relative hover:text-dark transition-colors group">
+                    <Link
+                      href="/legal/terms-of-service"
+                      className="relative hover:text-dark transition-colors group"
+                    >
                       <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
                       <p className="text-sm z-20 relative inline-flex flex-col md:flex-row items-center">
-                        {tFooter('cookiePolicy')}
+                        {tFooter("termsOfService")}
                       </p>
                     </Link>
                   </li>
                   <li>
-                    <Link href="/legal/legal-notice" className="relative hover:text-dark transition-colors group">
+                    <Link
+                      href="/legal/cookies"
+                      className="relative hover:text-dark transition-colors group"
+                    >
                       <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
                       <p className="text-sm z-20 relative inline-flex flex-col md:flex-row items-center">
-                        {tFooter('legalNotice')}
+                        {tFooter("cookiePolicy")}
+                      </p>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/legal/legal-notice"
+                      className="relative hover:text-dark transition-colors group"
+                    >
+                      <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
+                      <p className="text-sm z-20 relative inline-flex flex-col md:flex-row items-center">
+                        {tFooter("legalNotice")}
                       </p>
                     </Link>
                   </li>
@@ -1358,35 +1606,49 @@ export default function Landing() {
 
             <div className="border-t border-light/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
               <p className="text-sm text-light/40">
-                &copy; {new Date().getFullYear()} Linkkk. {tFooter('copyright')} <a href="https://alvaroso.dev" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">@alvaroso</a>
+                &copy; {new Date().getFullYear()} Linkkk. {tFooter("copyright")}{" "}
+                <a
+                  href="https://alvaroso.dev"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-primary transition-colors"
+                >
+                  @alvaroso
+                </a>
               </p>
               <InlineSelect
                 options={[
                   {
-                    label: 'Español',
-                    value: 'es',
-                    rightIcon: currentLocale === 'es' ? <TbCheck size={16} /> : undefined
+                    label: "Español",
+                    value: "es",
+                    rightIcon:
+                      currentLocale === "es" ? (
+                        <TbCheck size={16} />
+                      ) : undefined,
                   },
                   {
-                    label: 'English',
-                    value: 'en',
-                    rightIcon: currentLocale === 'en' ? <TbCheck size={16} /> : undefined
-                  }
+                    label: "English",
+                    value: "en",
+                    rightIcon:
+                      currentLocale === "en" ? (
+                        <TbCheck size={16} />
+                      ) : undefined,
+                  },
                 ]}
                 value={currentLocale}
-                onChange={(value) => changeLanguage(value as 'es' | 'en')}
+                onChange={(value) => changeLanguage(value as "es" | "en")}
               />
             </div>
           </div>
         </footer>
-      </div >
+      </div>
 
       {/* Create Link Drawer */}
       <CreateLinkDrawer
         open={isCreateLinkDrawerOpen}
         onClose={() => setIsCreateLinkDrawerOpen(false)}
-        onSuccess={() => router.push('/dashboard')}
+        onSuccess={() => router.push("/dashboard")}
       />
-    </RouteGuard >
+    </RouteGuard>
   );
 }
