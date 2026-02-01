@@ -25,8 +25,8 @@ const getLinkAccesses = async (req, res) => {
       return errorResponse(res, ERRORS.UNAUTHORIZED);
     }
 
-    // GUESTS don't have access to analytics
-    if (guest) {
+    // GUESTS don't have access to analytics (but authenticated users with a lingering guest cookie should)
+    if (guest && !user) {
       return errorResponse(res, ERRORS.LINK_ACCESS_DENIED);
     }
 
