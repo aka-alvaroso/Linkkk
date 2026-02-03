@@ -449,7 +449,9 @@ const replaceVariables = (url, link) => {
  * @param {Object} context - Context with user data (country, device, etc.)
  * @returns {Promise<Object>} - { allowed: boolean, action: Object }
  */
-const evaluateLinkRules = async (link, context) => {
+const evaluateLinkRules = async (link, context, options = {}) => {
+  const { skipActionTypes = [] } = options;
+
   // No rules = redirect to longUrl
   if (!link.rules || link.rules.length === 0) {
     return {
@@ -475,6 +477,11 @@ const evaluateLinkRules = async (link, context) => {
     );
 
     if (conditionsMatch) {
+      // Skip if the primary action type is in the skip list (e.g. password_gate already verified)
+      if (skipActionTypes.includes(rule.actionType)) {
+        continue;
+      }
+
       // Conditions match - execute primary action
       const action = {
         type: rule.actionType,
@@ -488,6 +495,11 @@ const evaluateLinkRules = async (link, context) => {
 
       return { allowed, action: result };
     } else if (rule.elseActionType) {
+      // Skip if the else action type is in the skip list
+      if (skipActionTypes.includes(rule.elseActionType)) {
+        continue;
+      }
+
       // Conditions don't match - execute else action if exists
       const elseAction = {
         type: rule.elseActionType,

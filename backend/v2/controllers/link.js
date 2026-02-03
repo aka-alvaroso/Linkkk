@@ -604,18 +604,14 @@ const verifyPasswordGate = async (req, res) => {
       ]);
     }
 
-    // Fetch link with rules
+    // Fetch link with all enabled rules (not just password_gate)
+    // so we can evaluate remaining rules after password verification
     const link = await prisma.link.findUnique({
       where: { shortUrl },
       include: {
         rules: {
-          where: {
-            enabled: true,
-            actionType: "password_gate",
-          },
-          include: {
-            conditions: true,
-          },
+          where: { enabled: true },
+          include: { conditions: true },
           orderBy: { priority: "asc" },
         },
       },
@@ -680,8 +676,63 @@ const verifyPasswordGate = async (req, res) => {
       return errorResponse(res, GENERIC_ACCESS_DENIED);
     }
 
-    // Password is correct - track access AND increment counter atomically
-    // Counter is only incremented on successful authentication to prevent inflated analytics
+    // Password verified - now evaluate remaining rules (skip password_gate)
+    let finalUrl = link.longUrl;
+
+    try {
+      const { allowed, action } = await evaluateLinkRules(link, context, {
+        skipActionTypes: ['password_gate'],
+      });
+
+      switch (action.type) {
+        case "block":
+          finalUrl = `${config.frontend.url}/blocked?url=${shortUrl}&reason=${encodeURIComponent(action.reason || '')}`;
+          break;
+
+        case "notify":
+          // Send webhook notification (non-blocking)
+          if (action.webhookUrl) {
+            const { isValidWebhookUrl } = require("../utils/webhookValidator");
+
+            if (isValidWebhookUrl(action.webhookUrl)) {
+              const webhookPayload = {
+                event: "link_accessed",
+                link: { shortUrl: link.shortUrl, longUrl: link.longUrl },
+                timestamp: new Date().toISOString(),
+                context: { country, device, ip, isBot, isVPN: isVpn, accessCount: link.accessCount },
+                customMessage: action.message || null,
+              };
+
+              fetch(action.webhookUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "User-Agent": "Linkkk-Webhook/1.0" },
+                body: JSON.stringify(webhookPayload),
+                signal: AbortSignal.timeout(5000),
+              }).catch((error) => {
+                logger.warn('[NOTIFY] Webhook failed', { shortUrl: link.shortUrl, webhookUrl: action.webhookUrl, error: error.message });
+              });
+            }
+          }
+          finalUrl = link.longUrl;
+          break;
+
+        case "redirect":
+          finalUrl = action.url || link.longUrl;
+          break;
+
+        default:
+          finalUrl = link.longUrl;
+          break;
+      }
+    } catch (error) {
+      logger.error('Error evaluating remaining rules after password verification', {
+        shortUrl,
+        error: error.message,
+      });
+      // Fallback to longUrl on error
+    }
+
+    // Track access AND increment counter atomically
     await prisma.$transaction(async (tx) => {
       await tx.access.create({
         data: {
@@ -691,6 +742,7 @@ const verifyPasswordGate = async (req, res) => {
           country,
           isVPN: isVpn,
           isBot,
+          source,
         },
       });
 
@@ -702,7 +754,7 @@ const verifyPasswordGate = async (req, res) => {
 
     return successResponse(res, {
       success: true,
-      url: redirectUrl,
+      url: finalUrl,
     });
   } catch (error) {
     logger.error('Password verification error', {

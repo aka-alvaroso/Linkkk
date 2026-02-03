@@ -41,13 +41,16 @@ const planLimits = {
  * @returns {Object} Limits object for the user's plan
  */
 const getLimitsForUser = (user, guest) => {
+  // Authenticated users take priority over lingering guest sessions
+  if (user && user.role) {
+    const role = user.role.toLowerCase();
+    return planLimits[role === "pro" ? "pro" : "user"];
+  }
+
   if (guest) return planLimits.guest;
 
-  // If no user or user has no role, default to guest limits
-  if (!user || !user.role) return planLimits.guest;
-
-  const role = user.role.toLowerCase();
-  return planLimits[role === "pro" ? "pro" : "user"];
+  // If no user or guest, default to guest limits
+  return planLimits.guest;
 };
 
 module.exports = planLimits;
