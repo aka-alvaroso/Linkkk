@@ -226,14 +226,19 @@ const evaluateDateCondition = (operator, value, contextDate) => {
  * Evaluates number condition (access count)
  */
 const evaluateNumberCondition = (operator, value, contextValue) => {
+  const numValue = Number(value);
+  const numContext = Number(contextValue);
+
+  if (isNaN(numValue) || isNaN(numContext)) return false;
+
   if (operator === "equals") {
-    return contextValue === value;
+    return numContext === numValue;
   }
   if (operator === "greater_than") {
-    return contextValue > value;
+    return numContext > numValue;
   }
   if (operator === "less_than") {
-    return contextValue < value;
+    return numContext < numValue;
   }
   return false;
 };
