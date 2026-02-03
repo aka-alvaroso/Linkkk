@@ -461,12 +461,8 @@ const redirectLink = async (req, res) => {
         return res.redirect(302, action.url);
 
       case "block":
-        // Only increment counter (don't track full access for blocked requests)
-        await prisma.link.update({
-          where: { id: link.id },
-          data: { accessCount: { increment: 1 } },
-        });
-
+        // Do NOT increment counter for blocked requests
+        // so access_count conditions remain accurate (e.g. "equals 10 → block" stays blocked)
         return res.redirect(
           `${
             config.frontend.url
@@ -678,11 +674,13 @@ const verifyPasswordGate = async (req, res) => {
 
     // Password verified - now evaluate remaining rules (skip password_gate)
     let finalUrl = link.longUrl;
+    let accessAllowed = true;
 
     try {
       const { allowed, action } = await evaluateLinkRules(link, context, {
         skipActionTypes: ['password_gate'],
       });
+      accessAllowed = allowed;
 
       switch (action.type) {
         case "block":
@@ -732,25 +730,27 @@ const verifyPasswordGate = async (req, res) => {
       // Fallback to longUrl on error
     }
 
-    // Track access AND increment counter atomically
-    await prisma.$transaction(async (tx) => {
-      await tx.access.create({
-        data: {
-          linkId: link.id,
-          userAgent: userAgent || "Unknown",
-          ip,
-          country,
-          isVPN: isVpn,
-          isBot,
-          source,
-        },
-      });
+    // Only track access and increment counter if not blocked
+    if (accessAllowed) {
+      await prisma.$transaction(async (tx) => {
+        await tx.access.create({
+          data: {
+            linkId: link.id,
+            userAgent: userAgent || "Unknown",
+            ip,
+            country,
+            isVPN: isVpn,
+            isBot,
+            source,
+          },
+        });
 
-      await tx.link.update({
-        where: { id: link.id },
-        data: { accessCount: { increment: 1 } },
+        await tx.link.update({
+          where: { id: link.id },
+          data: { accessCount: { increment: 1 } },
+        });
       });
-    });
+    }
 
     return successResponse(res, {
       success: true,
