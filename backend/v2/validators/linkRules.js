@@ -45,7 +45,10 @@ const countryValueSchema = z.array(z.string().length(2).toUpperCase());
 const deviceValueSchema = z.enum(["mobile", "tablet", "desktop"]);
 const ipValueSchema = z.string().ip();
 const booleanValueSchema = z.boolean();
-const dateValueSchema = z.string().datetime();
+const dateValueSchema = z.string().refine(
+  (val) => !isNaN(new Date(val).getTime()),
+  { message: "Invalid date format" }
+);
 const numberValueSchema = z.number().int().min(0);
 
 // ============================================
