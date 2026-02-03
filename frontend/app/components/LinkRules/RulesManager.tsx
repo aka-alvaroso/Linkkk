@@ -116,6 +116,15 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
       if (condition.field === 'country' && Array.isArray(condition.value)) {
         return { ...condition, value: condition.value.join(', ') };
       }
+      if (condition.field === 'date' && typeof condition.value === 'string') {
+        // Convert UTC ISO string to local datetime-local format (YYYY-MM-DDTHH:mm)
+        const d = new Date(condition.value);
+        if (!isNaN(d.getTime())) {
+          const pad = (n: number) => String(n).padStart(2, '0');
+          const local = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+          return { ...condition, value: local };
+        }
+      }
       return condition;
     });
   };
@@ -189,6 +198,10 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
             .map((c: string) => c.trim())
             .filter((c: string) => c.length > 0);
           return { ...condition, value: countries };
+        }
+        if (condition.field === 'date' && typeof condition.value === 'string') {
+          // Convert local datetime-local to UTC ISO string
+          return { ...condition, value: new Date(condition.value).toISOString() };
         }
         return condition;
       });
