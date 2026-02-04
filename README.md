@@ -4,80 +4,81 @@
 
 # **Linkkk**
 
-### _Plataforma de gestión de enlaces con control total sobre su comportamiento._
+### _Link management platform with full control over their behavior._
 
-[![Live Demo](https://img.shields.io/badge/🚀_Probar_Ahora-linkkk.dev-88FA1E?style=for-the-badge&labelColor=1a1a1a)](https://linkkk.dev)
+[![Live Demo](https://img.shields.io/badge/🚀_Try_Now-linkkk.dev-88FA1E?style=for-the-badge&labelColor=1a1a1a)](https://linkkk.dev)
 [![Status](https://img.shields.io/badge/Status-Beta_V2-blue?style=for-the-badge&labelColor=1a1a1a)](https://github.com/aka-alvaroso/Linkkk)
 [![License](https://img.shields.io/badge/License-Source_Available-orange?style=for-the-badge&labelColor=1a1a1a)](https://github.com/aka-alvaroso/Linkkk)
 
 <p align="center">
-  Linkkk te permite controlar exactamente cómo y cuándo funciona cada enlace.<br>
-  A través de un motor de reglas, personaliza el comportamiento de tus enlaces según cualquier condición.
+  Linkkk allows you to precisely control how and when each link works.<br>
+  Through a powerful rule engine, customize your links' behavior based on any condition.
 </p>
 
-**[Documentación](#-instalación-y-desarrollo)** • **[Características](#-capacidades-del-motor)** • **[Stack](#️-stack-tecnológico)** • **[Roadmap](#-roadmap)**
+**[Documentation](#-installation-and-development)** • **[Features](#-engine-capabilities)** • **[Stack](#️-tech-stack)** • **[Roadmap](#-roadmap)**
 
 </div>
 
 ---
 
-## ⚡ **¿Qué hace Linkkk diferente?**
+## ⚡ **What makes Linkkk different?**
 
-Los acortadores tradicionales solo redirigen: entrada A ➡ salida B.
-**Linkkk es una plataforma de gestión completa.** Controla el comportamiento de cada enlace con reglas personalizadas, restricciones de acceso, protección por contraseña y analíticas detalladas. Todo sin escribir una línea de código.
+Traditional shorteners just redirect: input A ➡ output B.
+**Linkkk is a comprehensive link management platform.** Control the behavior of each link with custom rules, access restrictions, password protection, and detailed analytics. All without writing a single line of code.
 
 <div align="center">
 
-|    🎯 **Control Total**     |      🚀 **Rápido**      |   🔒 **Seguro**   |    📊 **Analítico**     |
-| :-------------------------: | :---------------------: | :---------------: | :---------------------: |
-| Motor de reglas flexible |   Redirecciones <50ms   | Auth JWT + bcrypt | Métricas en tiempo real |
-|     Gestión centralizada     | Edge-ready architecture | Detección bot/VPN |  Datos por dispositivo  |
-|     Sin código requerido     |   Optimizado para CDN   |  GDPR compliant   |  Historial completo   |
+|  🎯 **Total Control**  |       🚀 **Fast**       |       🔒 **Secure**        | 📊 **Analytical** |
+| :--------------------: | :---------------------: | :------------------------: | :---------------: |
+|  Flexible Rule Engine  |     Redirects <50ms     | Auth JWT + bcrypt + Google | Real-time metrics |
+| Centralized Management | Edge-ready architecture |     Bot/VPN detection      |  Data per device  |
+|    No Code Required    |    Optimized for CDN    |       GDPR compliant       | Complete history  |
 
 </div>
 
-### **Capacidades Principales:**
+### **Core Capabilities:**
 
-- 🎯 **Motor de Reglas:** Define el comportamiento exacto de cada enlace con condiciones combinables (país, dispositivo, IP, fecha, VPN, bots).
-- 🔐 **Control de Acceso:** Protege enlaces con contraseñas, restringe por geolocalización, bloquea IPs específicas o detecta VPNs automáticamente.
-- 📱 **Redirección Inteligente:** Un mismo enlace puede llevar a diferentes destinos según quién, cuándo y desde dónde lo visite.
-- 🛠️ **Personalización Total:** Metadata personalizada para redes sociales, sufijos custom, fechas de expiración y organización por etiquetas.
-- 📊 **Analíticas Profundas:** Más allá de contar clics - entiende ubicación, dispositivo, navegador, y detecta tráfico sospechoso.
+- 🎯 **Rule Engine:** Define the exact behavior of each link with combinable conditions (country, device, IP, date, VPN, bots).
+- 🔐 **Access Control:** Protect links with passwords, restrict by geolocation, block specific IPs, or automatically detect VPNs. Supports Google OAuth for secure user authentication.
+- 📱 **Smart Redirection:** A single link can lead to different destinations depending on who, when, and from where it is visited.
+- 🔳 **Dynamic QR Codes:** Generate QR codes for your links with built-in analytics, allowing you to track scans and user engagement.
+- 🛠️ **Total Customization:** Custom metadata for social media, custom suffixes, expiration dates, and tag-based organization.
+- 📊 **Deep Analytics:** Beyond click counts - understand location, device, browser, and detect suspicious traffic.
 
-### **Ejemplos de Casos de Uso:**
+### **Use Case Examples:**
 
 ```
 linkkk.dev/download
 ├─ 🍎 iOS → App Store
 ├─ 🤖 Android → Google Play
-└─ 💻 Desktop → Sitio web
+└─ 💻 Desktop → Website
 
 linkkk.dev/promo
-├─ 🇪🇸 España → Versión en español
-├─ 🇺🇸 USA → Versión en inglés
-└─ 🤖 Bot → ❌ Bloqueado
+├─ 🇪🇸 Spain → Spanish version
+├─ 🇺🇸 USA → English version
+└─ 🤖 Bot → ❌ Blocked
 
 linkkk.dev/team
-├─ 🔐 Sin contraseña → Acceso denegado
-├─ 🌐 VPN detectada → Bloqueado
-└─ ✅ Acceso válido → Contenido interno
+├─ 🔐 No password → Access denied
+├─ 🌐 VPN detected → Blocked
+└─ ✅ Valid access → Internal content
 
 linkkk.dev/campaign
-├─ 📅 Antes del 01/01/2025 → Página de preventa
-├─ 📅 Después del 01/01/2025 → Página de compra
-└─ 🌍 Fuera de EU → Página de lista de espera
+├─ 📅 Before 01/01/2025 → Pre-sale page
+├─ 📅 After 01/01/2025 → Purchase page
+└─ 🌍 Outside EU → Waitlist page
 ```
 
 ---
 
-## 🛠️ **Stack Tecnológico**
+## 🛠️ **Tech Stack**
 
-Construido con una arquitectura moderna enfocada en rendimiento y escalabilidad.
+Built with a modern architecture focused on performance and scalability.
 
 <div align="center">
 
-![Next.js](https://img.shields.io/badge/Next.js_15-000000?style=for-the-badge&logo=next.js&logoColor=white)
-![React](https://img.shields.io/badge/React_19-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)
+![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white)
 ![Express](https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white)
@@ -87,215 +88,128 @@ Construido con una arquitectura moderna enfocada en rendimiento y escalabilidad.
 
 </div>
 
-| Área              | Tecnología                  | Por qué lo elegí                               |
-| :---------------- | :-------------------------- | :--------------------------------------------- |
-| **Frontend**      | **Next.js 15 (App Router)** | Server Components y SEO optimizado.            |
-| **Backend**       | **Node.js + Express**       | Flexibilidad y control total de los endpoints. |
-| **Base de Datos** | **PostgreSQL**              | Integridad relacional y robustez.              |
-| **ORM**           | **Prisma**                  | Type-safety de extremo a extremo.              |
-| **Estilos**       | **Tailwind CSS 4**          | Diseño rápido y consistente (Neo-Brutalism).   |
-| **Validación**    | **Zod**                     | Validación de esquemas en tiempo de ejecución. |
-| **Autenticación** | **JWT + bcryptjs**          | Seguridad sin dependencias externas.           |
-| **Cron Jobs**     | **node-cron**               | Limpieza automática de datos expirados.        |
+| Area               | Technology                        | Why I chose it                                       |
+| :----------------- | :-------------------------------- | :--------------------------------------------------- |
+| **Frontend**       | **Next.js (App Router)**          | Server Components and optimized SEO.                 |
+| **Backend**        | **Node.js + Express**             | Flexibility and full control over endpoints.         |
+| **Database**       | **PostgreSQL**                    | Relational integrity and robustness.                 |
+| **ORM**            | **Prisma**                        | End-to-end type-safety.                              |
+| **Styling**        | **Tailwind CSS**                  | Fast and consistent design (Neo-Brutalism).          |
+| **Validation**     | **Zod**                           | Runtime schema validation.                           |
+| **Authentication** | **JWT + bcryptjs + Google OAuth** | Secure authentication without external dependencies. |
+| **Cron Jobs**      | **node-cron**                     | Automatic cleanup of expired data.                   |
 
 ---
 
-## 🧩 **Arquitectura del Proyecto**
+## 🧩 **Project Architecture**
 
-El repositorio funciona como un **Monorepo** dividido en dos aplicaciones principales:
+The repository functions as a **Monorepo** divided into two main applications:
 
 ```
 linkkk/
-├── frontend/          # Next.js 15 App Router
-│   ├── app/           # Rutas y páginas
-│   ├── components/    # Componentes reutilizables
-│   ├── lib/           # Utilidades y helpers
-│   └── messages/      # Traducciones i18n (EN/ES)
+├── frontend/          # Next.js App Router
+│   ├── app/           # Routes and pages
+│   ├── components/    # Reusable components
+│   ├── lib/           # Utilities and helpers
+│   └── messages/      # i18n translations (EN/ES)
 │
 ├── backend/           # Node.js + Express API
-│   ├── v2/            # API V2 actual
-│   │   ├── controllers/   # Lógica de controladores
-│   │   ├── middlewares/   # Auth, validación, CORS
-│   │   ├── routes/        # Definición de rutas
+│   ├── v2/            # Current V2 API
+│   │   ├── controllers/   # Controller logic
+│   │   ├── middlewares/   # Auth, validation, CORS
+│   │   ├── routes/        # Route definitions
 │   │   ├── jobs/          # Cron jobs (cleanup)
-│   │   ├── prisma/        # Schema y client
-│   │   └── utils/         # Helpers y constantes
+│   │   ├── prisma/        # Schema and client
+│   │   └── utils/         # Helpers and constants
 │   └── v2.js          # Entry point
 ```
 
-### **Flujo de gestión de un enlace:**
+### **Link Management Flow:**
 
-1. Usuario visita `linkkk.dev/r/abc123`
-2. Backend captura contexto completo (IP, User-Agent, geolocalización, detección de VPN/bots)
-3. Motor de reglas evalúa condiciones configuradas en orden de prioridad
-4. Ejecuta la acción apropiada (redirigir, bloquear, solicitar contraseña, webhook)
-5. Registra analíticas detalladas en PostgreSQL
-6. El usuario puede ver métricas en tiempo real desde el dashboard
-
----
-
-## 💻 **Instalación y Desarrollo**
-
-Este código es público para fines educativos y de portafolio. Si eres desarrollador, puedes inspeccionarlo o ejecutarlo localmente.
-
-<details>
-<summary><strong>👇 Desplegar instrucciones de instalación local</strong></summary>
-
-### Prerrequisitos
-
-- Node.js 18+
-- PostgreSQL (Local o Docker)
-- Git
-
-### 1. Clonar el repositorio
-
-```bash
-git clone https://github.com/aka-alvaroso/Linkkk.git
-cd Linkkk
-```
-
-### 2. Configurar Backend
-
-```bash
-cd backend
-npm install
-```
-
-Crea un archivo `.env` en `/backend` con las siguientes variables:
-
-```env
-# Database
-DATABASE_URL="postgresql://user:password@localhost:5432/linkkk"
-
-# JWT Secrets (genera claves aleatorias seguras)
-V2_AUTH_SECRET_KEY="tu-clave-secreta-auth"
-V2_GUEST_SECRET_KEY="tu-clave-secreta-guest"
-
-# Environment
-NODE_ENV="development"
-PORT=3000
-
-# Frontend URL (para CORS)
-FRONTEND_URL="http://localhost:3001"
-
-# Email (opcional, para lista de espera)
-RESEND_API_KEY="tu-api-key-de-resend"
-```
-
-Ejecuta las migraciones de base de datos:
-
-```bash
-npx prisma generate
-npx prisma db push
-npm run dev
-```
-
-### 3. Configurar Frontend
-
-```bash
-cd ../frontend
-npm install
-```
-
-Crea un archivo `.env.local` en `/frontend`:
-
-```env
-NEXT_PUBLIC_API_URL="http://localhost:3000"
-```
-
-Ejecuta el frontend:
-
-```bash
-npm run dev
-```
-
-### 4. Acceso
-
-- **Frontend:** http://localhost:3001
-- **Backend API:** http://localhost:3000
-- **Prisma Studio:** `npx prisma studio` (desde `/backend`)
-
-</details>
+1. User visits `linkkk.dev/r/abc123`
+2. Backend captures full context (IP, User-Agent, geolocation, VPN/bot detection)
+3. Rule engine evaluates configured conditions in priority order
+4. Executes the appropriate action (redirect, block, request password, webhook)
+5. Records detailed analytics in PostgreSQL
+6. User can view real-time metrics from the dashboard
 
 ---
 
-## 🔐 **Seguridad y Privacidad**
+## 🔐 **Security and Privacy**
 
-Linkkk toma la seguridad y privacidad en serio:
+Linkkk takes security and privacy seriously:
 
-- 🔒 **Contraseñas hasheadas** con bcryptjs (12 salt rounds, OWASP compliant)
-- 🔑 **JWT con secretos rotativos** para autenticación segura
-- 🛡️ **CORS configurado** para evitar ataques cross-origin
-- 🍪 **Cookies HttpOnly + SameSite** para prevenir XSS/CSRF
-- 🌍 **GDPR compliant** - Datos alojados en Canadá (decisión de adecuación UE)
-- 🗑️ **Limpieza automática** de datos expirados (guest sessions: 7 días)
-- 📄 **Documentación legal completa** (Privacidad, Cookies, Términos)
+- 🔒 **Hashed passwords** with bcryptjs (OWASP compliant)
+- 🔑 **JWT with rotating secrets**
+- 🛡️ **CORS configured** to prevent cross-origin attacks
+- 🍪 **HttpOnly + SameSite cookies** to prevent XSS/CSRF
+- 🌍 **GDPR compliant**
+- 🗑️ **Automatic cleanup** of expired data (guest sessions: 7 days)
 
-**No almacenamos:**
+**We do not store:**
 
-- Contraseñas en texto plano (solo hashes bcrypt)
-- IPs completas indefinidamente (anonimización programada)
+- Passwords in plain text (only bcrypt hashes)
+- Full IPs indefinitely (scheduled anonymization)
+- Payment data (Stripe do it for us)
 
 ---
 
 ## 🗺️ **Roadmap**
 
-### ✅ **Completado (V2 Beta)**
+### ✅ **Completed (V2 Beta)**
 
-- [x] Sistema de reglas condicionales avanzadas
-- [x] Autenticación JWT con sesiones guest (7 días)
-- [x] Analíticas detalladas con geolocalización
-- [x] Detección de bots y VPN/Proxy
-- [x] Internacionalización (ES/EN)
-- [x] Páginas legales (Privacidad, Cookies, Términos)
-- [x] Sistema de limpieza automática de sesiones expiradas
+- [x] Advanced conditional rule system
+- [x] JWT authentication with guest sessions (7 days)
+- [x] Basic analytics with geolocation
+- [x] Internationalization (ES/EN)
+- [x] Automatic cleanup system for expired sessions
+- [x] Premium plan system (Stripe)
+- [x] Google OAuth for user authentication
+- [x] Dynamic QR Codes with analytics
 
-### 🚧 **En Desarrollo**
+### 🚧 **In Development**
 
-- [x] Sistema de planes premium (Stripe) ✓
-- [ ] API pública para developers
-- [ ] Gráficos visuales para analíticas
-- [ ] Exportación de datos (CSV/JSON)
-- [ ] A/B Testing integrado
+- [ ] Detailed link analytics with charts
+- [ ] Public API for developers
+- [ ] Data export (CSV/JSON)
+- [ ] Integrated A/B Testing
 
-### 💡 **Futuro**
+### 💡 **Future**
 
-- [ ] Webhooks personalizados por regla
-- [ ] Integraciones con Slack, Discord, Telegram
-- [ ] QR Codes dinámicos con analytics
-- [ ] Dominios personalizados
-- [ ] Bio pages (similar a Linktree)
-- [ ] Más condiciones y acciones en el motor de reglas
+- [ ] Custom domains
+- [ ] Custom link metadata
+- [ ] More conditions and actions in the rule engine
+- [ ] Groups and tags for link organisation
 
 ---
 
-## 🤝 **Contribuir**
+## 🤝 **Contributing**
 
-Este proyecto está abierto a contribuciones. Si encuentras un bug o tienes una idea:
+This project is open to contributions. If you find a bug or have an idea:
 
-1. Abre un [Issue](https://github.com/aka-alvaroso/Linkkk/issues)
-2. Haz un Fork del repositorio
-3. Crea una rama: `git checkout -b feature/nueva-funcionalidad`
-4. Commitea tus cambios: `git commit -m 'feat: añadir nueva funcionalidad'`
-5. Push a la rama: `git push origin feature/nueva-funcionalidad`
-6. Abre un Pull Request
+1. Open an [Issue](https://github.com/aka-alvaroso/Linkkk/issues)
+2. Fork the repository
+3. Create a branch: `git checkout -b feature/new-feature`
+4. Commit your changes: `git commit -m 'feat: add new feature'`
+5. Push to the branch: `git push origin feature/new-feature`
+6. Open a Pull Request
 
 ---
 
-## 📄 **Licencia**
+## 📄 **License**
 
-Este proyecto está licenciado bajo la **GNU Affero General Public License v3.0 (AGPL-3.0)**.
+This project is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**.
 
-Esto asegura que el código se mantenga libre y abierto. Si utilizas este código para ofrecer un servicio a través de una red (SaaS), también debes liberar el código fuente de tu versión modificada.
+This ensures that the code remains free and open. If you use this code to offer a service over a network (SaaS), you must also release the source code of your modified version.
 
-Consulta el archivo [LICENSE](LICENSE) para más detalles.
+See the [LICENSE](LICENSE) file for more details.
 
 ---
 
 <div align="center">
 
-**Hecho con 💚 por [Álvaro](https://github.com/aka-alvaroso)**
+**Made with 💚 by [Álvaro](https://github.com/aka-alvaroso)**
 
-[linkkk.dev](https://linkkk.dev) • [Reportar Bug](https://github.com/aka-alvaroso/Linkkk/issues) • [Solicitar Feature](https://github.com/aka-alvaroso/Linkkk/issues)
+[linkkk.dev](https://linkkk.dev) • [Report Bug](https://github.com/aka-alvaroso/Linkkk/issues) • [Request Feature](https://github.com/aka-alvaroso/Linkkk/issues)
 
 </div>
