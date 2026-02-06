@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, Dispatch, SetStateAction } from "react";
+import { createPortal } from "react-dom";
 import { cn } from "@/app/utils/cn";
 import { TbChevronDown } from "react-icons/tb";
 import Button from "../Button/Button";
@@ -29,6 +30,7 @@ interface SelectProps {
   optionClassName?: string;
   optionSelectedClassName?: string;
   useFixedPosition?: boolean;
+  maxHeight?: number;
 }
 
 export default function Select({
@@ -46,6 +48,7 @@ export default function Select({
   listClassName,
   optionClassName,
   optionSelectedClassName,
+  maxHeight,
 }: SelectProps) {
   const [open, setOpen] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
@@ -128,65 +131,82 @@ export default function Select({
         )}
       >
         {value !== null && value !== undefined
-          ? options.find((opt) => opt.value === value)?.label
+          ? (() => {
+            const selected = options.find((opt) => opt.value === value);
+            return selected ? (
+              <span className="flex items-center gap-2">
+                {selected.leftIcon && <span className="flex-shrink-0">{selected.leftIcon}</span>}
+                {selected.label}
+              </span>
+            ) : null;
+          })()
           : <span className="text-gray-400">{placeholder}</span>}
         <span className="float-right ml-2 text-gray-500">
           <TbChevronDown size={16} />
         </span>
       </Button>
 
-      {menuVisible && (
-        <ul
-          ref={menuRef}
-          role="listbox"
-          tabIndex={-1}
-          className={cn(
-            useFixedPosition ? "fixed z-50" : "absolute z-10 w-full",
-            "mt-1 bg-white shadow-md border border-gray-200 rounded-md transition-all duration-200 ease-in-out transform origin-top",
-            animateOpen ? "opacity-100 scale-100" : "opacity-0 scale-95",
-            listClassName
-          )}
-          style={useFixedPosition && menuPosition ? {
-            top: `${menuPosition.top}px`,
-            left: `${menuPosition.left}px`,
-            width: `${menuPosition.width}px`,
-          } : undefined}
-        >
-          {options.map((opt) => {
-            const isSelected = value === opt.value || opt.selected;
-            const hasCustomHover = opt.customClassName?.includes('hover:');
-            return (
-              <li
-                key={opt.value}
-                role="option"
-                aria-selected={isSelected}
-                aria-disabled={opt.disabled}
-                onClick={() => handleSelect(opt.value, opt.disabled)}
-                className={cn(
-                  "flex items-center px-4 py-2 select-none transition",
-                  opt.disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer",
-                  !hasCustomHover && !opt.disabled && "hover:bg-blue-50",
-                  optionClassName,
-                  opt.customClassName,
-                  isSelected && (opt.selectedClassName || optionSelectedClassName)
-                )}
-              >
-                {opt.leftIcon && (
-                  <span className="mr-2 flex-shrink-0">
-                    {opt.leftIcon}
-                  </span>
-                )}
-                <span className="flex-1 truncate">{opt.label}</span>
-                {opt.rightIcon && (
-                  <span className="ml-2 flex-shrink-0">
-                    {opt.rightIcon}
-                  </span>
-                )}
-              </li>
-            );
-          })}
-        </ul>
-      )}
+      {menuVisible && (() => {
+        const menu = (
+          <ul
+            ref={menuRef}
+            role="listbox"
+            tabIndex={-1}
+            className={cn(
+              useFixedPosition ? "fixed z-[999999]" : "absolute z-10 w-full",
+              !useFixedPosition && "mt-1",
+              "p-1 bg-white shadow-md border border-gray-200 rounded-md transition-all duration-200 ease-in-out transform origin-top",
+              animateOpen ? "opacity-100 scale-100" : "opacity-0 scale-95",
+              maxHeight && "overflow-y-auto scrollbar-custom",
+              listClassName
+            )}
+            style={{
+              ...(useFixedPosition && menuPosition ? {
+                top: `${menuPosition.top + 4}px`,
+                left: `${menuPosition.left}px`,
+                width: `${menuPosition.width}px`,
+              } : {}),
+              ...(maxHeight ? { maxHeight: `${maxHeight}px` } : {}),
+            }}
+          >
+            {options.map((opt) => {
+              const isSelected = value === opt.value || opt.selected;
+              const hasCustomHover = opt.customClassName?.includes('hover:');
+              return (
+                <li
+                  key={opt.value}
+                  role="option"
+                  aria-selected={isSelected}
+                  aria-disabled={opt.disabled}
+                  onClick={() => handleSelect(opt.value, opt.disabled)}
+                  className={cn(
+                    "flex items-center px-4 py-2 select-none transition",
+                    opt.disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer",
+                    !hasCustomHover && !opt.disabled && "hover:bg-primary/10",
+                    optionClassName,
+                    opt.customClassName,
+                    isSelected && (opt.selectedClassName || optionSelectedClassName)
+                  )}
+                >
+                  {opt.leftIcon && (
+                    <span className="mr-2 flex-shrink-0">
+                      {opt.leftIcon}
+                    </span>
+                  )}
+                  <span className="flex-1 truncate">{opt.label}</span>
+                  {opt.rightIcon && (
+                    <span className="ml-2 flex-shrink-0">
+                      {opt.rightIcon}
+                    </span>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        );
+
+        return useFixedPosition ? createPortal(menu, document.body) : menu;
+      })()}
 
       {error && <div className="text-xs text-red-500 mt-1">{error}</div>}
     </div>

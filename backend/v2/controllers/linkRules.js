@@ -66,7 +66,7 @@ const createLinkRule = async (req, res) => {
     return errorResponse(res, ERRORS.INVALID_DATA, issues);
   }
 
-  const { priority, enabled, match, conditions, action, elseAction } = validate.data;
+  const { name, priority, enabled, match, conditions, action, elseAction } = validate.data;
 
   // Check limits based on user type
   const limits = getLimitsForUser(user, guest);
@@ -110,6 +110,7 @@ const createLinkRule = async (req, res) => {
     const rule = await prisma.linkRule.create({
       data: {
         linkId: link.id,
+        name: name || null,
         priority: priority ?? 0,
         enabled: enabled ?? true,
         match: match ?? "AND",
@@ -256,10 +257,11 @@ const updateLinkRule = async (req, res) => {
       return errorResponse(res, ERRORS.RULE_NOT_FOUND);
     }
 
-    const { priority, enabled, match, conditions, action, elseAction } = validate.data;
+    const { name, priority, enabled, match, conditions, action, elseAction } = validate.data;
 
     // Build update data
     const updateData = {};
+    if (name !== undefined) updateData.name = name;
     if (priority !== undefined) updateData.priority = priority;
     if (enabled !== undefined) updateData.enabled = enabled;
     if (match !== undefined) updateData.match = match;

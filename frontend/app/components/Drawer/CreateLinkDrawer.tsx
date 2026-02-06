@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import Drawer from '@/app/components/ui/Drawer/Drawer';
 import Input from '@/app/components/ui/Input/Input';
 import Button from '@/app/components/ui/Button/Button';
-import { TbCircleDashed, TbCircleDashedCheck, TbChevronDown, TbRocket, TbPlus } from 'react-icons/tb';
+import { TbCircleDashed, TbCircleDashedCheck, TbRocket, TbPlus } from 'react-icons/tb';
 import { useLinks } from '@/app/hooks';
 import { useToast } from '@/app/hooks/useToast';
 import * as motion from 'motion/react-client';
@@ -34,7 +34,6 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const [showRules, setShowRules] = useState(false);
     const [localRules, setLocalRules] = useState<LinkRuleType[]>([]);
 
     // Ref for animated text
@@ -172,7 +171,7 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
             match: 'AND',
             conditions: [{ field: 'always', operator: 'equals', value: true }],
             actionType: 'redirect',
-            actionSettings: { url: '{{longUrl}}' },
+            actionSettings: { url: '' },
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
         };
@@ -286,12 +285,9 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
                     transition={{ delay: 0.25, duration: 0.4, ease: "backInOut" }}
                     className='w-full'
                 >
-                    <div className="space-y-2">
-                        {/* Collapsible Header */}
-                        <button
-                            onClick={() => setShowRules(!showRules)}
-                            className='w-full flex items-center justify-between p-3 rounded-2xl border border-dark/10 hover:border-dark/20 hover:bg-dark/5 transition-all'
-                        >
+                    <div className="space-y-4">
+                        {/* Header */}
+                        <div className='flex items-center justify-between'>
                             <div className='flex items-center gap-2'>
                                 <TbRocket size={20} />
                                 <span className='font-black italic'>{t('linkRules')}</span>
@@ -299,80 +295,57 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
                                     ({localRules.length}/{limits.rulesPerLink ?? '∞'})
                                 </span>
                             </div>
-                            <motion.div
-                                animate={{ rotate: showRules ? 180 : 0 }}
-                                transition={{ duration: 0.3 }}
-                            >
-                                <TbChevronDown size={20} />
-                            </motion.div>
-                        </button>
+                        </div>
 
-                        <AnimatePresence>
-                            {showRules && (
-                                <motion.div
-                                    initial={{ opacity: 0, height: 0, y: -20, scale: 0.9 }}
-                                    animate={{ opacity: 1, height: 'auto', y: 0, scale: 1 }}
-                                    exit={{ opacity: 0, height: 0, y: -20, scale: 0.9 }}
-                                    transition={{
-                                        duration: 0.5,
-                                        ease: [0.34, 1.56, 0.64, 1],
-                                        height: { duration: 0.4 }
-                                    }}
-                                    className='overflow-hidden'
+                        {/* Rules List */}
+                        {localRules.length > 0 ? (
+                            <>
+                                <div className="space-y-4">
+                                    {localRules.map((rule, index) => (
+                                        <div key={rule.id}>
+                                            <LinkRule
+                                                rule={rule}
+                                                priority={index + 1}
+                                                onChange={(updatedRule) => handleRuleChange(rule.id, updatedRule)}
+                                                onDelete={() => handleDeleteRule(rule.id)}
+                                                maxConditions={limits.conditionsPerRule}
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                                <Button
+                                    variant="solid"
+                                    size="md"
+                                    rounded="2xl"
+                                    leftIcon={<TbPlus size={20} />}
+                                    onClick={handleAddRule}
+                                    disabled={limits.rulesPerLink !== null && localRules.length >= limits.rulesPerLink}
+                                    className='bg-primary text-dark hover:bg-primary hover:shadow-[4px_4px_0_var(--color-dark)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none'
+                                    title={limits.rulesPerLink !== null && localRules.length >= limits.rulesPerLink ? t('maxRulesTitle', { count: limits.rulesPerLink, plural: limits.rulesPerLink === 1 ? t('rule') : t('rules') }) : ''}
                                 >
-                                    <div className='space-y-4 mt-4'>
-                                        {localRules.length > 0 ? (
-                                            <>
-                                                <div className="space-y-4">
-                                                    {localRules.map((rule, index) => (
-                                                        <div key={rule.id}>
-                                                            <LinkRule
-                                                                rule={rule}
-                                                                priority={index + 1}
-                                                                onChange={(updatedRule) => handleRuleChange(rule.id, updatedRule)}
-                                                                onDelete={() => handleDeleteRule(rule.id)}
-                                                                maxConditions={limits.conditionsPerRule}
-                                                            />
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                                <Button
-                                                    variant="solid"
-                                                    size="md"
-                                                    rounded="2xl"
-                                                    leftIcon={<TbPlus size={20} />}
-                                                    onClick={handleAddRule}
-                                                    disabled={limits.rulesPerLink !== null && localRules.length >= limits.rulesPerLink}
-                                                    className='bg-primary text-dark hover:bg-primary hover:shadow-[4px_4px_0_var(--color-dark)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none'
-                                                    title={limits.rulesPerLink !== null && localRules.length >= limits.rulesPerLink ? t('maxRulesTitle', { count: limits.rulesPerLink, plural: limits.rulesPerLink === 1 ? t('rule') : t('rules') }) : ''}
-                                                >
-                                                    {t('addRule')}
-                                                </Button>
-                                                <p className='text-xs text-dark/50 text-center'>
-                                                    {t('rulesEvaluationNote')}
-                                                </p>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="lg"
-                                                    rounded="2xl"
-                                                    leftIcon={<TbPlus size={20} />}
-                                                    onClick={handleAddRule}
-                                                    className='w-full bg-dark/5 hover:bg-dark/10'
-                                                >
-                                                    {t('createFirstRule')}
-                                                </Button>
-                                                <p className='text-xs text-dark/50 text-center'>
-                                                    {t('rulesEvaluationNote')}
-                                                </p>
-                                            </>
-                                        )}
-                                    </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+                                    {t('addRule')}
+                                </Button>
+                                <p className='text-xs text-dark/50 text-center'>
+                                    {t('rulesEvaluationNote')}
+                                </p>
+                            </>
+                        ) : (
+                            <>
+                                <Button
+                                    variant="ghost"
+                                    size="lg"
+                                    rounded="2xl"
+                                    leftIcon={<TbPlus size={20} />}
+                                    onClick={handleAddRule}
+                                    className='w-full bg-dark/5 hover:bg-dark/10'
+                                >
+                                    {t('createFirstRule')}
+                                </Button>
+                                <p className='text-xs text-dark/50 text-center'>
+                                    {t('rulesEvaluationNote')}
+                                </p>
+                            </>
+                        )}
                     </div>
                 </motion.div>
 

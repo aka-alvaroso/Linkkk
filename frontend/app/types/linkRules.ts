@@ -82,6 +82,7 @@ export interface RuleCondition {
 
 export interface LinkRule {
   id: number;
+  name?: string | null;
   priority: number;
   enabled: boolean;
   match: MatchType;
@@ -97,6 +98,7 @@ export interface LinkRule {
 // ===== DTOs (Data Transfer Objects) =====
 
 export interface CreateRuleDTO {
+  name?: string;
   priority: number;
   enabled: boolean;
   match: MatchType;
@@ -112,6 +114,7 @@ export interface CreateRuleDTO {
 }
 
 export interface UpdateRuleDTO {
+  name?: string | null;
   priority?: number;
   enabled?: boolean;
   match?: MatchType;

@@ -1,13 +1,13 @@
 /**
  * RulesManager Component
- * Manages all rules for a link with drag & drop and unified save
+ * Manages all rules for a link with drag & drop, inline editing, and unified save
  */
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LinkRule } from './LinkRule';
 import Button from '../ui/Button/Button';
-import { TbPlus, TbRocket, TbChevronDown } from 'react-icons/tb';
+import { TbPlus, TbRocket } from 'react-icons/tb';
 import { useLinkRules } from '@/app/hooks';
 import {
   DndContext,
@@ -29,7 +29,6 @@ import { CSS } from '@dnd-kit/utilities';
 import { LinkRule as LinkRuleType, RuleCondition, UpdateRuleDTO, RedirectSettings, PasswordGateSettings } from '@/app/types/linkRules';
 import { useAuth } from '@/app/hooks';
 import { PLAN_LIMITS } from '@/app/constants/limits';
-import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 
 interface RulesManagerProps {
@@ -47,7 +46,9 @@ function SortableLinkRule(props: {
   priority: number;
   onChange: (rule: LinkRuleType) => void;
   onDelete: () => void;
-  maxConditions: number;
+  maxConditions: number | null;
+  isExpanded: boolean;
+  onToggleExpand: () => void;
 }) {
   const {
     attributes,
@@ -67,7 +68,13 @@ function SortableLinkRule(props: {
   return (
     <div ref={setNodeRef} style={style}>
       <LinkRule
-        {...props}
+        rule={props.rule}
+        priority={props.priority}
+        onChange={props.onChange}
+        onDelete={props.onDelete}
+        maxConditions={props.maxConditions}
+        isExpanded={props.isExpanded}
+        onToggleExpand={props.onToggleExpand}
         dragHandleProps={{ ...attributes, ...listeners }}
       />
     </div>
@@ -76,12 +83,12 @@ function SortableLinkRule(props: {
 
 export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
   const t = useTranslations('RulesManager');
-  const { rules: fetchedRules, isLoading, error, fetchRules, createRule, updateRule, deleteRule, reorderRules } = useLinkRules();
-  const { isAuthenticated, isGuest, user } = useAuth();
+  const { rules: fetchedRules, isLoading, error, fetchRules, createRule, updateRule, deleteRule } = useLinkRules();
+  const { isGuest, user } = useAuth();
 
   const [originalRules, setOriginalRules] = useState<LinkRuleType[]>([]);
   const [localRules, setLocalRules] = useState<LinkRuleType[]>([]);
-  const [showRules, setShowRules] = useState(false);
+  const [expandedRuleId, setExpandedRuleId] = useState<number | null>(null);
 
   // Get limits based on user type
   const limits = isGuest
@@ -236,6 +243,7 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
         if (!originalRule) {
           // New rule (created locally)
           await createRule(shortUrl, {
+            name: localRule.name || undefined,
             priority: localRule.priority,
             enabled: localRule.enabled,
             match: localRule.match,
@@ -254,6 +262,7 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
         } else if (JSON.stringify(originalRule) !== JSON.stringify(localRule)) {
           // Modified rule
           const updatePayload: UpdateRuleDTO = {
+            name: localRule.name,
             priority: localRule.priority,
             enabled: localRule.enabled,
             match: localRule.match,
@@ -290,7 +299,7 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
       console.error('Failed to save rules:', err);
       throw err;
     }
-  }, [localRules, originalRules, shortUrl, createRule, updateRule, deleteRule, limits]);
+  }, [localRules, originalRules, shortUrl, createRule, updateRule, deleteRule, limits, t]);
 
   // Cancel callback
   const cancelRules = useCallback(() => {
@@ -323,23 +332,25 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
     }
   };
 
-  // Add new rule
+  // Add new rule - adds directly to list expanded
   const handleAddRule = () => {
+    const newId = Date.now(); // Temporary ID
     const newRule: LinkRuleType = {
-      id: Date.now(), // Temporary ID
+      id: newId,
       priority: localRules.length,
       enabled: true,
       match: 'AND',
-      conditions: [{ field: 'always', operator: 'equals', value: true }], // Start with "Always" condition
+      conditions: [{ field: 'always', operator: 'equals', value: true }],
       actionType: 'redirect',
-      actionSettings: { url: '{{longUrl}}' },
+      actionSettings: { url: '' },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
     setLocalRules([...localRules, newRule]);
+    setExpandedRuleId(newId); // Expand the new rule
   };
 
-  // Update rule
+  // Handle rule change (inline editing)
   const handleRuleChange = (ruleId: number, updatedRule: LinkRuleType) => {
     setLocalRules(localRules.map(r => r.id === ruleId ? updatedRule : r));
   };
@@ -367,12 +378,9 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
   }
 
   return (
-    <div className="space-y-2 mt-4">
-      {/* Collapsible Header */}
-      <button
-        onClick={() => setShowRules(!showRules)}
-        className='w-full flex items-center justify-between p-3 rounded-2xl border border-dark/10 hover:border-dark/20 hover:bg-dark/5 transition-all'
-      >
+    <div className="space-y-4">
+      {/* Header */}
+      <div className='flex items-center justify-between'>
         <div className='flex items-center gap-2'>
           <TbRocket size={20} />
           <span className='font-black italic'>{t('linkRules')}</span>
@@ -380,110 +388,88 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
             ({localRules.length}/{limits.rulesPerLink ?? '∞'})
           </span>
         </div>
-        <motion.div
-          animate={{ rotate: showRules ? 180 : 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          <TbChevronDown size={20} />
-        </motion.div>
-      </button>
+      </div>
 
-      <AnimatePresence>
-        {showRules && (
-          <motion.div
-            initial={{ opacity: 0, height: 0, y: -20, scale: 0.9 }}
-            animate={{ opacity: 1, height: 'auto', y: 0, scale: 1 }}
-            exit={{ opacity: 0, height: 0, y: -20, scale: 0.9 }}
-            transition={{
-              duration: 0.5,
-              ease: [0.34, 1.56, 0.64, 1],
-              height: { duration: 0.4 }
-            }}
-            className='overflow-hidden'
+      {/* Error Message */}
+      {error && (
+        <div className="p-4 bg-danger/10 border border-danger/20 rounded-2xl">
+          <div className="flex items-center gap-2 text-danger text-sm">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{t('errorLoading', { error })}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Rules List with Drag & Drop */}
+      {localRules.length > 0 ? (
+        <>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
           >
-            <div className="space-y-4 mt-4">
-              {/* Error Message */}
-              {error && (
-                <div className="p-4 bg-danger/10 border border-danger/20 rounded-2xl">
-                  <div className="flex items-center gap-2 text-danger text-sm">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>{t('errorLoading', { error })}</span>
-                  </div>
-                </div>
-              )}
+            <SortableContext
+              items={localRules.map(r => r.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="space-y-3">
+                <AnimatePresence mode="popLayout">
+                  {localRules.map((rule, index) => (
+                    <SortableLinkRule
+                      key={rule.id}
+                      rule={rule}
+                      priority={index + 1}
+                      onChange={(updatedRule) => handleRuleChange(rule.id, updatedRule)}
+                      onDelete={() => handleDeleteRule(rule.id)}
+                      maxConditions={limits.conditionsPerRule}
+                      isExpanded={expandedRuleId === rule.id}
+                      onToggleExpand={() => setExpandedRuleId(expandedRuleId === rule.id ? null : rule.id)}
+                    />
+                  ))}
+                </AnimatePresence>
+              </div>
+            </SortableContext>
+          </DndContext>
 
-              {/* Rules List with Drag & Drop */}
-              {localRules.length > 0 ? (
-                <>
-                  <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragEnd={handleDragEnd}
-                  >
-                    <SortableContext
-                      items={localRules.map(r => r.id)}
-                      strategy={verticalListSortingStrategy}
-                    >
-                      <div className="space-y-4">
-                        <AnimatePresence mode="popLayout">
-                          {localRules.map((rule, index) => (
-                            <SortableLinkRule
-                              key={rule.id}
-                              rule={rule}
-                              priority={index + 1}
-                              onChange={(updatedRule) => handleRuleChange(rule.id, updatedRule)}
-                              onDelete={() => handleDeleteRule(rule.id)}
-                              maxConditions={limits.conditionsPerRule ?? 999}
-                            />
-                          ))}
-                        </AnimatePresence>
-                      </div>
-                    </SortableContext>
-                  </DndContext>
+          {/* Add rule button */}
+          <Button
+            variant="solid"
+            size="md"
+            rounded="2xl"
+            leftIcon={<TbPlus size={20} />}
+            onClick={handleAddRule}
+            disabled={limits.rulesPerLink !== null && localRules.length >= limits.rulesPerLink}
+            className="bg-primary text-dark hover:bg-primary hover:shadow-[4px_4px_0_var(--color-dark)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
+            title={limits.rulesPerLink !== null && localRules.length >= limits.rulesPerLink ? t('maxRulesTitle', { count: limits.rulesPerLink, plural: limits.rulesPerLink === 1 ? t('rule') : t('rules') }) : ''}
+          >
+            {t('addRule')}
+          </Button>
 
-                  {/* Add rule button */}
-                  <Button
-                    variant="solid"
-                    size="md"
-                    rounded="2xl"
-                    leftIcon={<TbPlus size={20} />}
-                    onClick={handleAddRule}
-                    disabled={limits.rulesPerLink !== null && localRules.length >= limits.rulesPerLink}
-                    className="bg-primary text-dark hover:bg-primary hover:shadow-[4px_4px_0_var(--color-dark)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
-                    title={limits.rulesPerLink !== null && localRules.length >= limits.rulesPerLink ? t('maxRulesTitle', { count: limits.rulesPerLink, plural: limits.rulesPerLink === 1 ? t('rule') : t('rules') }) : ''}
-                  >
-                    {t('addRule')}
-                  </Button>
-
-                  {/* Info Message */}
-                  <p className='text-xs text-dark/50 text-center'>
-                    {t('rulesEvaluationNote')}
-                  </p>
-                </>
-              ) : (
-                /* Empty State */
-                <>
-                  <Button
-                    variant="ghost"
-                    size="lg"
-                    rounded="2xl"
-                    leftIcon={<TbPlus size={20} />}
-                    onClick={handleAddRule}
-                    className="w-full bg-dark/5 hover:bg-dark/10"
-                  >
-                    {t('createFirstRule')}
-                  </Button>
-                  <p className='text-xs text-dark/50 text-center'>
-                    {t('rulesEvaluationNote')}
-                  </p>
-                </>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          {/* Info Message */}
+          <p className='text-xs text-dark/50 text-center'>
+            {t('rulesEvaluationNote')}
+          </p>
+        </>
+      ) : (
+        /* Empty State */
+        <>
+          <Button
+            variant="ghost"
+            size="lg"
+            rounded="2xl"
+            leftIcon={<TbPlus size={20} />}
+            onClick={handleAddRule}
+            className="w-full bg-dark/5 hover:bg-dark/10"
+          >
+            {t('createFirstRule')}
+          </Button>
+          <p className='text-xs text-dark/50 text-center'>
+            {t('rulesEvaluationNote')}
+          </p>
+        </>
+      )}
     </div>
   );
 }

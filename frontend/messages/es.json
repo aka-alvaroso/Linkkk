@@ -293,6 +293,7 @@
   },
   "EditLinkDrawer": {
     "tabOverview": "Resumen",
+    "tabRules": "Reglas",
     "tabSettings": "Ajustes",
     "tabHistory": "Historial",
     "tabQRCode": "QR Code",
@@ -353,22 +354,34 @@
     "errorPasswordRequired": "La contraseña es requerida para la protección con contraseña",
     "errorCountryRequired": "Se requiere al menos un código de país",
     "errorIpRequired": "La dirección IP es requerida",
-    "errorRulePrefix": "Regla {ruleNumber}: {error}"
+    "errorRulePrefix": "Regla {ruleNumber}: {error}",
+    "cancel": "Cancelar",
+    "save": "Guardar"
   },
   "LinkRule": {
     "rule": "Regla",
     "deleteRule": "Eliminar regla",
+    "editRule": "Editar regla",
+    "collapse": "Colapsar",
+    "newRule": "Nueva regla",
+    "ruleName": "Nombre de la regla",
+    "ruleNamePlaceholder": "ej. Bloquear bots, Redirigir por país...",
+    "enable": "Habilitar regla",
+    "disable": "Deshabilitar regla",
+    "active": "Activa",
+    "inactive": "Inactiva",
     "if": "Si",
     "and": "Y",
     "or": "O",
     "then": "Entonces",
     "else": "Si no",
-    "add": "Añadir",
+    "conditions": "Condiciones",
+    "action": "Acción",
+    "addCondition": "Añadir condición",
     "addElseAction": "Añadir acción \"Si no\"",
     "removeElseAction": "Eliminar acción alternativa",
     "maxConditionsTitle": "Máximo {count} {plural} permitidas",
-    "condition": "condición",
-    "conditions": "condiciones"
+    "condition": "condición"
   },
   "RuleCondition": {
     "fieldAlways": "Siempre",

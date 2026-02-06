@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Drawer from '@/app/components/ui/Drawer/Drawer';
 import { FiCornerDownRight } from 'react-icons/fi';
-import { TbCircleDashed, TbCircleDashedCheck, TbCopy, TbList, TbQrcode, TbDownload, TbPalette } from 'react-icons/tb';
+import { TbCircleDashed, TbCircleDashedCheck, TbCopy, TbList, TbDownload, TbPalette, TbCategory,TbPuzzle } from 'react-icons/tb';
 import Button from '../ui/Button/Button';
 import Input from '../ui/Input/Input';
 import { useLinks, useAuth } from '@/app/hooks';
@@ -189,10 +189,12 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
 
             if (e.key === '1') {
                 setTab('overview');
-            } else if (e.key === '2' && !isGuest) {
+            } else if (e.key === '2') {
+                setTab('rules');
+            } else if (e.key === '3' && !isGuest) {
                 // History solo para usuarios registrados
                 setTab('history');
-            } else if (e.key === '3' && !isGuest) {
+            } else if (e.key === '4' && !isGuest) {
                 // QR solo para usuarios registrados
                 setTab('qr');
             }
@@ -240,18 +242,35 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                             variant='ghost'
                             size='sm'
                             rounded='2xl'
-                            leftIcon={<TbQrcode size={20} />}
+                            leftIcon={<TbCategory size={20} />}
                             className={`rounded-2xl ${tab === 'overview' ? 'bg-dark text-light hover:bg-dark/90' : 'bg-dark/5 text-dark/50'}`}
                             onClick={() => setTab('overview')}
                         >
                             {t('tabOverview')}
                         </Button>
                     </motion.div>
-                    {/* History tab - Disabled for guests */}
+                    {/* Rules tab */}
                     <motion.div
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.05, duration: 0.4, ease: "backInOut" }}
+                    >
+                        <Button
+                            variant='ghost'
+                            size='sm'
+                            rounded='2xl'
+                            leftIcon={<TbPuzzle size={20} />}
+                            className={`rounded-2xl ${tab === 'rules' ? 'bg-dark text-light hover:bg-dark/90' : 'bg-dark/5 text-dark/50'}`}
+                            onClick={() => setTab('rules')}
+                        >
+                            {t('tabRules')}
+                        </Button>
+                    </motion.div>
+                    {/* History tab - Disabled for guests */}
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1, duration: 0.4, ease: "backInOut" }}
                     >
                         <Button
                             variant='ghost'
@@ -269,7 +288,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                     <motion.div
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1, duration: 0.4, ease: "backInOut" }}
+                        transition={{ delay: 0.15, duration: 0.4, ease: "backInOut" }}
                     >
                         <Button
                             variant='ghost'
@@ -527,18 +546,16 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                             )}
                         </div>
 
-                        {/* Link Rules Section */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.4, duration: 0.3, ease: "backOut" }}
-                            className='w-full'
-                        >
-                            <RulesManager
-                                shortUrl={newLink.shortUrl}
-                                onRulesChange={handleRulesChange}
-                            />
-                        </motion.div>
+                    </div>
+                )}
+
+                {/* Rules */}
+                {tab === 'rules' && (
+                    <div className='w-full flex flex-col gap-4 p-4'>
+                        <RulesManager
+                            shortUrl={newLink.shortUrl}
+                            onRulesChange={handleRulesChange}
+                        />
                     </div>
                 )}
 
