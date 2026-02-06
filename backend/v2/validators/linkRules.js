@@ -236,6 +236,7 @@ const actionSchema = z.discriminatedUnion("type", [
 // ============================================
 
 const createLinkRuleSchema = z.object({
+  name: z.string().max(100).optional(),
   priority: z.number().int().min(0).max(999).default(0),
   enabled: z.boolean().default(true),
   match: MatchTypeEnum.default("AND"),
@@ -251,6 +252,7 @@ const createLinkRuleSchema = z.object({
 // ============================================
 
 const updateLinkRuleSchema = z.object({
+  name: z.string().max(100).nullable().optional(),
   priority: z.number().int().min(0).max(999).optional(),
   enabled: z.boolean().optional(),
   match: MatchTypeEnum.optional(),

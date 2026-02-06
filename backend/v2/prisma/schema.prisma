@@ -100,6 +100,7 @@ model LinkRule {
   id          Int             @id @default(autoincrement())
   linkId      Int
   link        Link            @relation(fields: [linkId], references: [id], onDelete: Cascade)
+  name        String?
   priority    Int             @default(0)
   enabled     Boolean         @default(true)
   match       MatchType       @default(AND)

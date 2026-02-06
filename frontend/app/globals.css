@@ -56,6 +56,35 @@ body {
   display: none;  /* Safari and Chrome */
 }
 
+/* Custom scrollbar - small and light */
+.scrollbar-custom {
+  scrollbar-width: thin;  /* Firefox */
+  scrollbar-color: rgba(27, 27, 27, 0.3) transparent;  /* Firefox: thumb track */
+}
+
+.scrollbar-custom::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 4px 0;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background-color: rgba(27, 27, 27, 0.3);
+  border-radius: 10px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(27, 27, 27, 0.5);
+}
+
+.scrollbar-custom::-webkit-scrollbar-button {
+  display: none;
+}
+
+
 /* Safe area for mobile devices (iPhone notch, etc.) */
 .safe-bottom {
   padding-bottom: env(safe-area-inset-bottom);

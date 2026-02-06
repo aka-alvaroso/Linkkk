@@ -6,7 +6,7 @@
 import React from 'react';
 import Select from '../ui/Select/Select';
 import Input from '../ui/Input/Input';
-import { TbTrash } from 'react-icons/tb';
+import { TbTrash, TbCircleDashedCheck, TbFlag, TbDeviceLaptop, TbRobot, TbLockSquareRounded, TbCalendar, TbChartBar } from 'react-icons/tb';
 import { RuleCondition as RuleConditionType, FieldType, OperatorType, DeviceType, ConditionValue } from '@/app/types/linkRules';
 import { useTranslations } from 'next-intl';
 
@@ -21,14 +21,14 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
 
   // Field options
   const FIELD_OPTIONS = [
-    { label: t('fieldAlways'), value: 'always' },
-    { label: t('fieldCountry'), value: 'country' },
-    { label: t('fieldDevice'), value: 'device' },
-    { label: t('fieldIp'), value: 'ip' },
-    { label: t('fieldIsBot'), value: 'is_bot' },
-    { label: t('fieldIsVpn'), value: 'is_vpn' },
-    { label: t('fieldDate'), value: 'date' },
-    { label: t('fieldAccessCount'), value: 'access_count' },
+    { label: t('fieldAlways'), value: 'always', leftIcon: <TbCircleDashedCheck size={16} className='group-hover:color-primary' /> },
+    { label: t('fieldCountry'), value: 'country', leftIcon: <TbFlag size={16} className='group-hover:color-primary' /> },
+    { label: t('fieldDevice'), value: 'device', leftIcon: <TbDeviceLaptop size={16} /> },
+    { label: t('fieldIp'), value: 'ip', leftIcon: <TbDeviceLaptop size={16} /> },
+    { label: t('fieldIsBot'), value: 'is_bot', leftIcon: <TbRobot size={16} /> },
+    { label: t('fieldIsVpn'), value: 'is_vpn', leftIcon: <TbLockSquareRounded size={16} /> },
+    { label: t('fieldDate'), value: 'date', leftIcon: <TbCalendar size={16} /> },
+    { label: t('fieldAccessCount'), value: 'access_count', leftIcon: <TbChartBar size={16} /> },
   ];
 
   // Operator options per field type
@@ -220,9 +220,11 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
         options={FIELD_OPTIONS}
         value={condition.field}
         onChange={handleFieldChange}
+        maxHeight={150}
+        useFixedPosition={true}
         buttonClassName="w-auto rounded-lg text-sm border border-dark/10 bg-light px-2 py-1 hover:border-dark/20 whitespace-nowrap"
-        listClassName="rounded-lg w-auto shadow-lg h-48 overflow-auto"
-        optionClassName='rounded-md p-1.5 text-sm'
+        listClassName="rounded-lg min-w-48 max-w-48 shadow-lg h-48 overflow-auto"
+        optionClassName='rounded-md p-1.5 text-sm hover:color-primary group'
       />
 
       {/* Operator Select - Hide for "always" */}

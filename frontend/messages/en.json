@@ -293,6 +293,7 @@
   },
   "EditLinkDrawer": {
     "tabOverview": "Overview",
+    "tabRules": "Rules",
     "tabSettings": "Settings",
     "tabHistory": "History",
     "tabQR": "QR Code",
@@ -352,22 +353,34 @@
     "errorPasswordRequired": "Password is required for password gate",
     "errorCountryRequired": "At least one country code is required",
     "errorIpRequired": "IP address is required",
-    "errorRulePrefix": "Rule {ruleNumber}: {error}"
+    "errorRulePrefix": "Rule {ruleNumber}: {error}",
+    "cancel": "Cancel",
+    "save": "Save"
   },
   "LinkRule": {
     "rule": "Rule",
     "deleteRule": "Delete rule",
+    "editRule": "Edit rule",
+    "collapse": "Collapse",
+    "newRule": "New rule",
+    "ruleName": "Rule name",
+    "ruleNamePlaceholder": "e.g. Block bots, Geo redirect...",
+    "enable": "Enable rule",
+    "disable": "Disable rule",
+    "active": "Active",
+    "inactive": "Inactive",
     "if": "If",
     "and": "And",
     "or": "Or",
     "then": "Then",
     "else": "Else",
-    "add": "Add",
+    "conditions": "Conditions",
+    "action": "Action",
+    "addCondition": "Add condition",
     "addElseAction": "Add \"Else\" action",
     "removeElseAction": "Remove otherwise action",
     "maxConditionsTitle": "Maximum {count} {plural} allowed",
-    "condition": "condition",
-    "conditions": "conditions"
+    "condition": "condition"
   },
   "RuleCondition": {
     "fieldAlways": "Always",
