@@ -181,14 +181,57 @@ const evaluateDeviceCondition = (operator, value, contextDevice) => {
 };
 
 /**
+ * Checks if an IP matches a value that can be exact, wildcard (192.168.1.*) or CIDR (192.168.1.0/24)
+ */
+const ipMatches = (ip, pattern) => {
+  if (!ip || !pattern) return false;
+
+  // CIDR notation (e.g. 192.168.1.0/24)
+  if (pattern.includes("/")) {
+    const [subnet, bitsStr] = pattern.split("/");
+    const bits = parseInt(bitsStr, 10);
+    if (isNaN(bits) || bits < 0 || bits > 32) return false;
+    const mask = bits === 0 ? 0 : (~0 << (32 - bits)) >>> 0;
+    const ipNum = ipToInt(ip);
+    const subnetNum = ipToInt(subnet);
+    if (ipNum === null || subnetNum === null) return false;
+    return (ipNum & mask) === (subnetNum & mask);
+  }
+
+  // Wildcard notation (e.g. 192.168.1.*)
+  if (pattern.includes("*")) {
+    const regex = new RegExp("^" + pattern.replace(/\./g, "\\.").replace(/\*/g, "\\d{1,3}") + "$");
+    return regex.test(ip);
+  }
+
+  // Exact match
+  return ip === pattern;
+};
+
+/**
+ * Converts an IPv4 string to a 32-bit integer
+ */
+const ipToInt = (ip) => {
+  const parts = ip.split(".");
+  if (parts.length !== 4) return null;
+  let result = 0;
+  for (const part of parts) {
+    const num = parseInt(part, 10);
+    if (isNaN(num) || num < 0 || num > 255) return null;
+    result = (result << 8) | num;
+  }
+  return result >>> 0;
+};
+
+/**
  * Evaluates IP condition
  */
 const evaluateIpCondition = (operator, value, contextIp) => {
   if (operator === "equals") {
-    return contextIp === value;
+    return ipMatches(contextIp, value);
   }
   if (operator === "not_equals") {
-    return contextIp !== value;
+    return !ipMatches(contextIp, value);
   }
   return false;
 };
