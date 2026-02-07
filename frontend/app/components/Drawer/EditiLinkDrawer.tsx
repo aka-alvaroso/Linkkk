@@ -309,7 +309,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                 {tab === 'overview' && (
                     <div className='w-full h-full flex flex-col gap-6'>
                         {/* Two-column layout: Left = controls, Right = QR */}
-                        <div className='w-full flex flex-col md:flex-row md:items-start gap-6'>
+                        <div className='w-full flex flex-col sm:flex-row sm:items-start gap-6'>
                             {/* Left column - Link info + settings */}
                             <div className='flex-1 flex flex-col gap-3'>
                                 {/* Short URL */}
@@ -496,14 +496,16 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                     transition={{ delay: 0.2, duration: 0.3, ease: "backOut" }}
                                     className='flex md:flex-col items-center gap-2'
                                 >
-                                    <div className='p-2 md:mx-16 bg-white rounded-xl shadow-sm border border-dark/5'>
-                                        <QRCodePreview url={qrUrl} config={qrConfig} size={120} />
-                                    </div>
-                                    <div className='flex items-center gap-2 text-dark/60'>
-                                        <TbQrcode size={16} />
-                                        <span className='text-sm font-medium'>
-                                            {link.scanCount ?? 0} {t('scans')}
-                                        </span>
+                                    <div className='flex flex-col items-center gap-2'>
+                                        <div className='p-2 mx-2 md:mx-16 bg-white rounded-xl shadow-sm border border-dark/5'>
+                                            <QRCodePreview url={qrUrl} config={qrConfig} size={120} />
+                                        </div>
+                                        <div className='flex items-center gap-2 text-dark/60'>
+                                            <TbQrcode size={16} />
+                                            <span className='text-sm font-medium'>
+                                                {link.scanCount ?? 0} {t('scans')}
+                                            </span>
+                                        </div>
                                     </div>
                                     <div className='flex flex-col md:flex-row gap-2'>
                                         <Button

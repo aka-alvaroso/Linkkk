@@ -227,7 +227,7 @@ export default function QRCodeEditor({
     <div className="w-full flex flex-col gap-6"
     >
       {/* Preview and Controls */}
-      <div className="flex flex-col md:flex-row gap-6">
+      <div className="flex flex-col lg:flex-row gap-6">
         {/* QR Preview */}
         <div className="flex flex-col items-center gap-4">
           <motion.div

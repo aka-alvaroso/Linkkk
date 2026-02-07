@@ -7,7 +7,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LinkRule } from './LinkRule';
 import Button from '../ui/Button/Button';
-import { TbPlus, TbRocket } from 'react-icons/tb';
+import { TbPlus, TbRocket, TbCube } from 'react-icons/tb';
 import { useLinkRules } from '@/app/hooks';
 import {
   DndContext,
@@ -382,8 +382,8 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
       {/* Header */}
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-2'>
-          <TbRocket size={20} />
-          <span className='font-black italic'>{t('linkRules')}</span>
+          <TbRocket size={22} />
+          <span className='text-xl font-black italic'>{t('linkRules')}</span>
           <span className='text-xs text-dark/50'>
             ({localRules.length}/{limits.rulesPerLink ?? '∞'})
           </span>
@@ -454,21 +454,24 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
         </>
       ) : (
         /* Empty State */
-        <>
+        <div className='flex flex-col items-center justify-center gap-4'>
+          <TbCube size={64} className="text-dark/15" />
+
+          
           <Button
-            variant="ghost"
+            variant="solid"
             size="lg"
             rounded="2xl"
             leftIcon={<TbPlus size={20} />}
             onClick={handleAddRule}
-            className="w-full bg-dark/5 hover:bg-dark/10"
+            className="bg-primary text-dark hover:bg-primary hover:shadow-[4px_4px_0_var(--color-dark)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
           >
             {t('createFirstRule')}
           </Button>
           <p className='text-xs text-dark/50 text-center'>
             {t('rulesEvaluationNote')}
           </p>
-        </>
+        </div>
       )}
     </div>
   );

@@ -131,7 +131,7 @@ const Drawer: React.FC<DrawerProps> = ({
     );
 
     const drawerContent = (
-        <div className={`fixed inset-0 flex z-[9997] p-6 m-0 transition-all duration-300 ease-in-out ${placementClasses[placement]}`}>
+        <div className={`fixed inset-0 flex z-[9997] sm:p-6 m-0 transition-all duration-300 ease-in-out ${placementClasses[placement]}`}>
             {modal && <div className={overlayClasses} onClick={open ? onClose : undefined} />}
             <div className={cn(drawerClasses, 'relative')}>
                 {/* Close button */}
