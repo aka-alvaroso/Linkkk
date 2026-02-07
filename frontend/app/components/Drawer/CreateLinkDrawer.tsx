@@ -124,7 +124,6 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
                 status: true,
             });
             setLocalRules([]);
-            setShowRules(false);
             onClose();
 
             // Call onSuccess callback if provided (e.g., redirect to dashboard)
@@ -309,6 +308,8 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
                                                 onChange={(updatedRule) => handleRuleChange(rule.id, updatedRule)}
                                                 onDelete={() => handleDeleteRule(rule.id)}
                                                 maxConditions={limits.conditionsPerRule}
+                                                isExpanded={true}
+                                                onToggleExpand={() => {}}
                                             />
                                         </div>
                                     ))}

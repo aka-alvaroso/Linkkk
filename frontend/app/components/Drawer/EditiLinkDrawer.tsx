@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Drawer from '@/app/components/ui/Drawer/Drawer';
 import { FiCornerDownRight } from 'react-icons/fi';
-import { TbCircleDashed, TbCircleDashedCheck, TbCopy, TbList, TbDownload, TbPalette, TbCategory,TbPuzzle } from 'react-icons/tb';
+import { TbCircleDashed, TbCircleDashedCheck, TbCopy, TbList, TbDownload, TbPalette, TbCategory, TbPuzzle, TbQrcode } from 'react-icons/tb';
 import Button from '../ui/Button/Button';
 import Input from '../ui/Input/Input';
 import { useLinks, useAuth } from '@/app/hooks';
@@ -534,7 +534,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                             variant='ghost'
                                             size='sm'
                                             rounded='lg'
-                                            leftIcon={<TbPalette size={16} />}
+                                            leftIcon={<TbQrcode size={16} />}
                                             className='text-dark/60 hover:text-dark  leading-4'
                                             expandOnHover='text'
                                             onClick={() => setTab('qr')}
