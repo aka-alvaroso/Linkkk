@@ -61,23 +61,24 @@ const cleanupExpiredGuestLinks = async () => {
       deletedCount: sessionsResult.count,
     });
 
-    // Step 3: Delete old access records from registered users' links
-    // Get all links from registered users (userId is not null)
-    const userLinks = await prisma.link.findMany({
+    // Step 3: Delete old access records from STANDARD users' links only
+    // PRO users have unlimited access retention (linkAccessesDuration: null)
+    const standardUserLinks = await prisma.link.findMany({
       where: {
         userId: { not: null },
+        user: { role: "STANDARD" },
       },
       select: {
         id: true,
       },
     });
 
-    const userLinkIds = userLinks.map((link) => link.id);
+    const standardUserLinkIds = standardUserLinks.map((link) => link.id);
 
-    // Delete access records older than 30 days for user links
+    // Delete access records older than 30 days for STANDARD user links only
     const userAccessesResult = await prisma.access.deleteMany({
       where: {
-        linkId: { in: userLinkIds },
+        linkId: { in: standardUserLinkIds },
         createdAt: { lt: userAccessExpirationDate },
       },
     });

@@ -42,17 +42,18 @@ async function cleanupOldSessions() {
       }
     });
 
-    // Count user access records to delete
-    const userLinks = await prisma.link.findMany({
+    // Count STANDARD user access records to delete (PRO users have unlimited retention)
+    const standardUserLinks = await prisma.link.findMany({
       where: {
         userId: { not: null },
+        user: { role: "STANDARD" },
       },
       select: {
         id: true,
       },
     });
 
-    const userLinkIds = userLinks.map((link) => link.id);
+    const userLinkIds = standardUserLinks.map((link) => link.id);
 
     const userAccessesToDelete = await prisma.access.count({
       where: {
