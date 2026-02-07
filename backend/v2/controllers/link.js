@@ -155,42 +155,28 @@ const getAllLinks = async (req, res) => {
       return errorResponse(res, ERRORS.LINK_NOT_FOUND);
     }
 
-    // Get total access count and QR scan count in parallel
-    const linkIds = links.map((l) => l.id);
+    // Calculate totals from permanent counters (not affected by cleanup)
+    let totalClicks = 0;
+    let totalScans = 0;
 
-    const [totalAccessCount, totalScanCount, scanCounts] = await Promise.all([
-      prisma.access.count({
-        where: { link: whereClause },
-      }),
-      prisma.access.count({
-        where: { link: whereClause, source: "qr" },
-      }),
-      prisma.access.groupBy({
-        by: ["linkId"],
-        where: { linkId: { in: linkIds }, source: "qr" },
-        _count: { id: true },
-      }),
-    ]);
-
-    const scanCountMap = new Map(
-      scanCounts.map((sc) => [sc.linkId, sc._count.id])
-    );
+    const mappedLinks = links.map((link) => {
+      totalClicks += link.accessCount;
+      totalScans += link.scanCount || 0;
+      return {
+        shortUrl: link.shortUrl,
+        longUrl: link.longUrl,
+        status: link.status,
+        createdAt: link.createdAt,
+        accessCount: link.accessCount,
+        scanCount: link.scanCount || 0,
+      };
+    });
 
     return successResponse(res, {
-      links: links.map((link) => {
-        const scans = scanCountMap.get(link.id) || 0;
-        return {
-          shortUrl: link.shortUrl,
-          longUrl: link.longUrl,
-          status: link.status,
-          createdAt: link.createdAt,
-          accessCount: link.accessCount - scans,
-          scanCount: scans,
-        };
-      }),
+      links: mappedLinks,
       stats: {
-        totalClicks: totalAccessCount - totalScanCount,
-        totalScans: totalScanCount,
+        totalClicks,
+        totalScans,
       },
     });
   } catch (error) {
@@ -454,7 +440,11 @@ const redirectLink = async (req, res) => {
 
           await tx.link.update({
             where: { id: link.id },
-            data: { accessCount: { increment: 1 } },
+            data: {
+              ...(source === 'qr'
+                ? { scanCount: { increment: 1 } }
+                : { accessCount: { increment: 1 } }),
+            },
           });
         });
 
@@ -546,7 +536,11 @@ const redirectLink = async (req, res) => {
 
           await tx.link.update({
             where: { id: link.id },
-            data: { accessCount: { increment: 1 } },
+            data: {
+              ...(source === 'qr'
+                ? { scanCount: { increment: 1 } }
+                : { accessCount: { increment: 1 } }),
+            },
           });
         });
 
@@ -572,7 +566,11 @@ const redirectLink = async (req, res) => {
 
           await tx.link.update({
             where: { id: link.id },
-            data: { accessCount: { increment: 1 } },
+            data: {
+              ...(source === 'qr'
+                ? { scanCount: { increment: 1 } }
+                : { accessCount: { increment: 1 } }),
+            },
           });
         });
 
@@ -747,7 +745,11 @@ const verifyPasswordGate = async (req, res) => {
 
         await tx.link.update({
           where: { id: link.id },
-          data: { accessCount: { increment: 1 } },
+          data: {
+            ...(source === 'qr'
+              ? { scanCount: { increment: 1 } }
+              : { accessCount: { increment: 1 } }),
+          },
         });
       });
     }

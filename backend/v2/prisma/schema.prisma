@@ -67,6 +67,7 @@ model Link {
   longUrl     String
   status      Boolean @default(true)
   accessCount Int     @default(0)
+  scanCount   Int     @default(0)
   createdAt   DateTime @default(now())
 
   user        User? @relation(fields: [userId], references: [id])
