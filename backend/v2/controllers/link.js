@@ -19,8 +19,6 @@ const createLink = async (req, res) => {
   const isGuest = !!guest;
   const limits = getLimitsForUser(user, guest);
 
-  const { longUrl, status } = req.body;
-
   const validate = createLinkSchema.safeParse(req.body);
 
   if (!validate.success) {
@@ -33,6 +31,8 @@ const createLink = async (req, res) => {
 
     return errorResponse(res, ERRORS.INVALID_DATA, issues);
   }
+
+  const { longUrl, status } = validate.data;
 
   // Check link limit (skip if unlimited - null)
   if (limits.links !== null) {
@@ -190,8 +190,6 @@ const updateLink = async (req, res) => {
   const user = req.user;
   const guest = req.guest;
 
-  const { longUrl, status } = req.body;
-
   const validatedData = updateLinkSchema.safeParse(req.body);
 
   if (!validatedData.success) {
@@ -202,6 +200,8 @@ const updateLink = async (req, res) => {
 
     return errorResponse(res, ERRORS.INVALID_DATA, issues);
   }
+
+  const { longUrl, status } = validatedData.data;
 
   try {
     const existingLink = await prisma.link.findUnique({
