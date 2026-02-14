@@ -54,6 +54,47 @@ const getLinkAccesses = async (req, res) => {
   }
 };
 
+const DEMO_SHORT_URLS = ["demo-detection"];
+
+const getDemoAccesses = async (req, res) => {
+  try {
+    const { shortUrl } = req.params;
+
+    if (!DEMO_SHORT_URLS.includes(shortUrl)) {
+      return errorResponse(res, ERRORS.LINK_NOT_FOUND);
+    }
+
+    const link = await prisma.link.findUnique({
+      where: { shortUrl },
+    });
+
+    if (!link) {
+      return errorResponse(res, ERRORS.LINK_NOT_FOUND);
+    }
+
+    const accesses = await prisma.access.findMany({
+      where: { linkId: link.id },
+      orderBy: { createdAt: "desc" },
+      take: 50,
+      select: {
+        id: true,
+        createdAt: true,
+        userAgent: true,
+        country: true,
+        isVPN: true,
+        isBot: true,
+        source: true,
+      },
+    });
+
+    return successResponse(res, accesses);
+  } catch (error) {
+    console.error("Error fetching demo accesses:", error);
+    return errorResponse(res, ERRORS.INTERNAL_ERROR);
+  }
+};
+
 module.exports = {
   getLinkAccesses,
+  getDemoAccesses,
 };
