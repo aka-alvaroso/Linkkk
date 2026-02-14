@@ -21,6 +21,7 @@ const linkRouter = require("./v2/routers/link");
 const accessesRouter = require("./v2/routers/accesses");
 const userRouter = require("./v2/routers/user");
 const subscriptionRouter = require("./v2/routers/subscription");
+const analyticsRouter = require("./v2/routers/analytics");
 
 // Controllers
 const { redirectLink } = require("./v2/controllers/link");
@@ -207,6 +208,7 @@ app.get("/status", (req, res) => {
 app.use("/auth", csrfProtection, authRouter);
 app.use("/link", csrfProtection, linkRouter);
 app.use("/accesses", accessesRouter); // GET only, no CSRF needed
+app.use("/analytics", analyticsRouter); // GET only, no CSRF needed
 app.use("/user", csrfProtection, userRouter);
 
 // Subscription routes - CSRF applied conditionally (webhook excluded in router)

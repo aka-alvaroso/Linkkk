@@ -186,7 +186,18 @@
     "createLink": "Create link",
     "active": "Active",
     "inactive": "Inactive",
-    "totalScans": "QR scans"
+    "totalScans": "QR scans",
+    "apiUsage": "Links this month",
+    "clicksChart": "Clicks last 7 days",
+    "configure": "Configure",
+    "widgetConfigTitle": "Customize widgets",
+    "cellsUsed": "{used}/{total} cells used",
+    "noSpace": "Not enough space. Hide another widget first.",
+    "resetLayout": "Reset to default",
+    "done": "Done",
+    "editLayout": "Edit",
+    "doneEditing": "Done",
+    "widgetConfigDesc": "Toggle widgets on or off to customize your dashboard."
   },
   "Auth": {
     "home": "Home",

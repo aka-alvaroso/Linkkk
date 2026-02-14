@@ -85,6 +85,13 @@ body {
 }
 
 
+/* react-grid-layout placeholder (drag preview) */
+.react-grid-item.react-grid-placeholder {
+  background: var(--color-dark) !important;
+  opacity: 0.15 !important;
+  border-radius: 1rem !important;
+}
+
 /* Safe area for mobile devices (iPhone notch, etc.) */
 .safe-bottom {
   padding-bottom: env(safe-area-inset-bottom);

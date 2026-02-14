@@ -1,10 +1,10 @@
 "use client"
-import { useState, useEffect, useRef } from "react";
-import { TbFilterPlus, TbPlus, TbArrowLeft } from "react-icons/tb";
-import Link from "next/link";
+import { useState, useEffect } from "react";
+import { TbFilterPlus, TbPlus, TbLayoutDashboard, TbPencil, TbCheck } from "react-icons/tb";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import { useLinks, useStats, useAuth } from "@/app/hooks";
+import { useLinks, useAuth } from "@/app/hooks";
+import { useDashboardStore } from "@/app/stores/dashboardStore";
 
 import RouteGuard from '@/app/components/RouteGuard/RouteGuard';
 import Button from "@/app/components/ui/Button/Button";
@@ -14,68 +14,28 @@ import CreateLinkDrawer from "@/app/components/Drawer/CreateLinkDrawer";
 import FilterModal from "@/app/components/Modal/FilterModal";
 import SubscriptionSuccessModal from "@/app/components/Modal/SubscriptionSuccessModal";
 import Alert from "@/app/components/ui/Alert/Alert";
+import DashboardGrid from "@/app/components/Dashboard/DashboardGrid";
+import WidgetConfigModal from "@/app/components/Dashboard/WidgetConfigModal";
 import * as motion from 'motion/react-client';
-import { useMotionValue, animate } from 'motion/react';
-import AnimatedText, { AnimatedTextRef } from "@/app/components/ui/AnimatedText";
 import { useTranslations } from 'next-intl';
 
 import { API_CONFIG } from "@/app/config/api";
 
 const API_BASE_URL = API_CONFIG.BASE_URL;
-function AnimatedCounter({ value, delay = 0 }: { value: number; delay?: number }) {
-  const count = useMotionValue(0);
-  const textRef = useRef<AnimatedTextRef>(null);
-  const [currentValue, setCurrentValue] = useState(0);
-
-  useEffect(() => {
-    const controls = animate(count, value, {
-      duration: 0.1,
-      delay,
-      ease: "easeOut",
-      onUpdate: (latest) => {
-        const newValue = Math.round(latest);
-        if (newValue !== currentValue) {
-          setCurrentValue(newValue);
-          textRef.current?.setText(newValue.toString());
-        }
-      }
-    });
-
-    return controls.stop;
-  }, [count, value, delay, currentValue]);
-
-  return (
-    <AnimatedText
-      ref={textRef}
-      initialText={currentValue.toString()}
-      animationType="slide"
-      slideDirection="up"
-      triggerMode="none"
-    />
-  );
-}
 
 export default function Dashboard() {
   const t = useTranslations('Dashboard');
   const router = useRouter();
   const searchParams = useSearchParams();
   const { filteredLinks, filters, fetchLinks, updateFilters } = useLinks();
-  const { totalLinks, activeLinks, totalClicks, totalScans } = useStats();
   const { isAuthenticated, isGuest, user, checkSession } = useAuth();
+  const { isEditing, setEditing } = useDashboardStore();
 
-  // Get link limit based on user role
-  const getLinkLimit = () => {
-    if (isGuest) return 3;
-    if (!user) return 3;
-    if (user.role === 'PRO') return null; // unlimited
-    return 50; // STANDARD
-  };
-
-  const linkLimit = getLinkLimit();
   const [view] = useState('details');
   const [createLinkDrawerOpen, setCreateLinkDrawerOpen] = useState(false);
   const [filterModalOpen, setFilterModalOpen] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [widgetConfigOpen, setWidgetConfigOpen] = useState(false);
   const [subscriptionInfo, setSubscriptionInfo] = useState<{
     status: "ACTIVE" | "CANCELED" | "PAST_DUE" | "INACTIVE" | "TRIALING";
     currentPeriodEnd: string | null;
@@ -134,13 +94,43 @@ export default function Dashboard() {
       <div className="relative p-2 md:p-4 md:mt-20 md:max-w-3/4 mx-auto">
         {/* Dashboard */}
         <div className="space-y-6">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.05, duration: 0.4, ease: "backInOut" }}
-            className="text-4xl font-black mb-2 italic">
-            {t('title')}
-          </motion.h1>
+          <div className="flex items-center justify-between">
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05, duration: 0.4, ease: "backInOut" }}
+              className="text-4xl font-black mb-2 italic">
+              {t('title')}
+            </motion.h1>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1, duration: 0.4, ease: "backInOut" }}
+              className="hidden lg:flex items-center gap-2"
+            >
+              <Button
+                variant={isEditing ? "solid" : "ghost"}
+                size="sm"
+                rounded="xl"
+                leftIcon={isEditing ? <TbCheck size={20} /> : <TbPencil size={20} />}
+                onClick={() => setEditing(!isEditing)}
+                className={isEditing ? "bg-primary text-dark" : ""}
+                expandOnHover="text"
+              >
+                {isEditing ? t('doneEditing') : t('editLayout')}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                rounded="xl"
+                leftIcon={<TbLayoutDashboard size={20} />}
+                onClick={() => setWidgetConfigOpen(true)}
+                expandOnHover="text"
+              >
+                {t('configure')}
+              </Button>
+            </motion.div>
+          </div>
 
           {/* Guest User Alert */}
           {isGuest && (
@@ -173,51 +163,7 @@ export default function Dashboard() {
           )}
 
           {/* Widgets */}
-          <div className='flex items-center gap-1 py-1 overflow-x-auto scrollbar-hide lg:grid lg:gap-2 lg:grid-cols-4'>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.05, duration: 0.4, ease: "backInOut" }}
-              className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
-              <h2 className='text-md'>{t('totalLinks')}</h2>
-              <p className='text-end text-5xl font-black italic flex items-end justify-end gap-1'>
-                <AnimatedCounter value={totalLinks} delay={0.15} />
-                {linkLimit !== null && (
-                  <span className='text-lg text-dark/40 font-normal'>/{linkLimit}</span>
-                )}
-              </p>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1, duration: 0.4, ease: "backInOut" }}
-              className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
-              <h2 className='text-md'>{t('totalClicks')}</h2>
-              <p className='text-end text-5xl font-black italic'>
-                <AnimatedCounter value={totalClicks} delay={0.15} />
-              </p>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15, duration: 0.4, ease: "backInOut" }}
-              className='p-2 max-w-48 min-w-48 bg-dark/5 rounded-2xl md:max-w-full'>
-              <h2 className='text-md'>{t('activeLinks')}</h2>
-              <p className='text-end text-5xl font-black italic'>
-                <AnimatedCounter value={activeLinks} delay={0.15} />
-              </p>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.4, ease: "backInOut" }}
-              className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
-              <h2 className='text-md'>{t('totalScans')}</h2>
-              <p className='text-end text-5xl font-black italic'>
-                <AnimatedCounter value={totalScans} delay={0.15} />
-              </p>
-            </motion.div>
-          </div>
+          <DashboardGrid />
 
 
           <div className='flex flex-wrap items-center justify-between gap-4'>
@@ -277,6 +223,10 @@ export default function Dashboard() {
           <SubscriptionSuccessModal
             open={showSuccessModal}
             onClose={() => setShowSuccessModal(false)}
+          />
+          <WidgetConfigModal
+            open={widgetConfigOpen}
+            onClose={() => setWidgetConfigOpen(false)}
           />
         </div>
       </div>

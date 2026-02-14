@@ -186,7 +186,18 @@
     "createLink": "Crear link",
     "active": "Activo",
     "inactive": "Inactivo",
-    "totalScans": "Escaneos QR"
+    "totalScans": "Escaneos QR",
+    "apiUsage": "Links este mes",
+    "clicksChart": "Clics últimos 7 días",
+    "configure": "Configurar",
+    "widgetConfigTitle": "Personalizar widgets",
+    "cellsUsed": "{used}/{total} celdas usadas",
+    "noSpace": "No hay espacio suficiente. Oculta otro widget primero.",
+    "resetLayout": "Restablecer por defecto",
+    "done": "Listo",
+    "editLayout": "Editar",
+    "doneEditing": "Listo",
+    "widgetConfigDesc": "Activa o desactiva widgets para personalizar tu panel."
   },
   "Auth": {
     "home": "Inicio",

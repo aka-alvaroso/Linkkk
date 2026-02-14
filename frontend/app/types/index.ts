@@ -37,6 +37,27 @@ export interface LinkStats {
   totalScans: number;
 }
 
+// Widget types
+export type WidgetSize = '1x1' | '2x2';
+
+export interface WidgetLayoutItem {
+  widgetId: string;
+  visible: boolean;
+  col: number;
+  row: number;
+}
+
+export interface DashboardLayout {
+  version: number;
+  items: WidgetLayoutItem[];
+}
+
+// Analytics types
+export interface DailyClicksEntry {
+  date: string;
+  clicks: number;
+}
+
 // API Response types
 export interface ApiResponse<T> {
   success: boolean;
