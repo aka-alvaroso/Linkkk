@@ -6,6 +6,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { cookies } from 'next/headers';
 import { locales, defaultLocale, type Locale } from '@/i18n/request';
+import FeedbackBanner from "./components/FeedbackBanner/FeedbackBanner";
 
 export const metadata: Metadata = {
   title: "Linkkk - Smart Link Management Platform",
@@ -72,6 +73,7 @@ export default async function RootLayout({
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ToastProvider>
             <SessionProvider>{children}</SessionProvider>
+            <FeedbackBanner />
           </ToastProvider>
         </NextIntlClientProvider>
       </body>

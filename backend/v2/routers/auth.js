@@ -8,6 +8,7 @@ const {
   registerLimiter,
   guestLimiter,
   oauthLimiter,
+  feedbackLimiter,
 } = require("../middlewares/security");
 const {
   validateSession,
@@ -20,6 +21,7 @@ const {
   githubAuth,
   githubCallback,
   linkOAuthAccount,
+  sendFeedback,
 } = require("../controllers/auth");
 
 router.get("/validate", validateLimiter, optionalAuth, validateSession);
@@ -35,5 +37,6 @@ router.get("/callback/google", oauthLimiter, optionalGuest, googleCallback);
 router.get("/oauth/github", oauthLimiter, githubAuth);
 router.get("/callback/github", oauthLimiter, optionalGuest, githubCallback);
 router.post("/link-oauth", loginLimiter, optionalGuest, linkOAuthAccount);
+router.post("/feedback", feedbackLimiter, auth, sendFeedback);
 
 module.exports = router;

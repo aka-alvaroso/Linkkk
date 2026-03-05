@@ -188,6 +188,15 @@ const deleteRuleLimiter = rateLimit({
   handler: rateLimitHandler,
 });
 
+const feedbackLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: config.env.isDevelopment ? 1000 : 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => req.ip,
+  handler: rateLimitHandler,
+});
+
 // Logo upload rate limiter - stricter limits for file uploads
 const logoUploadLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
@@ -215,5 +224,6 @@ module.exports = {
   createRuleLimiter,
   updateRuleLimiter,
   deleteRuleLimiter,
+  feedbackLimiter,
   logoUploadLimiter,
 };

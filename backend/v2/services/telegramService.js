@@ -214,6 +214,30 @@ async function sendTestNotification() {
 }
 
 // ============================================================================
+// FEEDBACK NOTIFICATIONS
+// ============================================================================
+
+/**
+ * Notify user feedback
+ */
+async function notifyFeedback(message, username, email) {
+  const isAnonymous = !username && !email;
+
+  const msg = `
+💬 <b>Nuevo Feedback</b>
+
+${isAnonymous ? "👤 <b>Usuario:</b> Anónimo" : `👤 <b>Usuario:</b> ${username || "N/A"}\n📧 <b>Email:</b> ${email || "N/A"}`}
+
+📝 <b>Mensaje:</b>
+${message}
+
+🕐 ${formatDate(new Date())}
+  `.trim();
+
+  return sendMessage(msg);
+}
+
+// ============================================================================
 // AUTH NOTIFICATIONS
 // ============================================================================
 
@@ -446,6 +470,9 @@ async function notifyDeadLetter(eventType, eventId, error) {
 
 module.exports = {
   initializeTelegram,
+
+  // Feedback notifications
+  notifyFeedback,
 
   // Subscription notifications
   notifyNewSubscription,

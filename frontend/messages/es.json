@@ -607,6 +607,17 @@
     "bestValue": "2 meses gratis",
     "continueButton": "Continuar al Pago"
   },
+  "Feedback": {
+    "title": "¿Cómo podemos mejorar?",
+    "description": "Tu opinión nos ayuda a construir un mejor Linkkk. Cuéntanos qué piensas.",
+    "emailButton": "Escríbenos un correo",
+    "placeholder": "¿Qué mejorarías? ¿Algún bug? ¿Una idea?",
+    "anonymous": "Enviar de forma anónima",
+    "send": "Enviar",
+    "sending": "Enviando...",
+    "success": "¡Gracias por tu feedback! 🙌",
+    "error": "Error al enviar el feedback"
+  },
   "QRCodeEditor": {
     "foregroundColor": "Color del QR",
     "backgroundColor": "Color de Fondo",

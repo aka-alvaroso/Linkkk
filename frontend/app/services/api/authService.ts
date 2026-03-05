@@ -176,6 +176,16 @@ class AuthService {
       body: JSON.stringify({ password }),
     });
   }
+
+  /**
+   * Send user feedback
+   */
+  async sendFeedback(data: { message: string; anonymous: boolean }): Promise<{ message: string }> {
+    return this.request<{ message: string }>(`${this.baseUrl}/feedback`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
 }
 
 export const authService = new AuthService();

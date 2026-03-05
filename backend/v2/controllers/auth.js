@@ -950,6 +950,31 @@ const linkOAuthAccount = async (req, res) => {
   }
 };
 
+const sendFeedback = async (req, res) => {
+  try {
+    const { message, anonymous } = req.body;
+    const user = req.user;
+
+    if (!message || !message.trim()) {
+      return errorResponse(res, ERRORS.INVALID_DATA);
+    }
+
+    const trimmed = message.trim().slice(0, 1000);
+    const username = anonymous ? null : user.username;
+    const email = anonymous ? null : user.email;
+
+    telegramService.notifyFeedback(trimmed, username, email).catch(() => {});
+
+    return successResponse(res, { message: "Feedback received" });
+  } catch (error) {
+    logger.error("Error sending feedback", {
+      type: "FEEDBACK",
+      error: error.message,
+    });
+    return errorResponse(res, ERRORS.INTERNAL_ERROR);
+  }
+};
+
 module.exports = {
   validateSession,
   createGuestSession,
@@ -961,4 +986,5 @@ module.exports = {
   githubAuth,
   githubCallback,
   linkOAuthAccount,
+  sendFeedback,
 };
