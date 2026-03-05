@@ -607,10 +607,10 @@
     "continueButton": "Continue to Payment"
   },
   "Feedback": {
-    "title": "How can we improve?",
-    "description": "Your feedback helps us build a better Linkkk. Tell us what you think.",
-    "emailButton": "Send us an email",
-    "placeholder": "What would you improve? Any bugs? Ideas?",
+    "title": "Hey, what brought you to Linkkk?",
+    "description": "I'm Álvaro, I build this alone. Knowing what you were looking for helps me more than anything.",
+    "emailButton": "Or tell me via email",
+    "placeholder": "I was looking for a way to... / I found Linkkk on... / I needed...",
     "anonymous": "Send anonymously",
     "send": "Send",
     "sending": "Sending...",

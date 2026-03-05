@@ -54,7 +54,7 @@ export default function FeedbackBanner() {
           animate={{ y: 0 }}
           exit={{ y: "120%" }}
           transition={{ type: "spring", stiffness: 320, damping: 28, delay: 1.2 }}
-          className="fixed bottom-4 right-4 z-40 w-80 bg-warning rounded-2xl border-2 border-dark shadow-[4px_4px_0_var(--color-dark)] p-4"
+          className="fixed bottom-4 right-4 z-40 w-md bg-warning rounded-2xl border-2 border-dark shadow-[4px_4px_0_var(--color-dark)] p-5"
         >
           {/* Close */}
           <button
@@ -74,18 +74,6 @@ export default function FeedbackBanner() {
           <p className="text-dark/65 text-xs mt-1 mb-3 leading-relaxed">
             {t("description")}
           </p>
-
-          {/* Email button */}
-          <a
-            href="mailto:help@linkkk.dev"
-            className="flex items-center gap-2 text-xs font-bold text-dark border-2 border-dark rounded-xl px-3 py-2 hover:bg-dark hover:text-warning transition-all duration-200 w-fit mb-3"
-          >
-            <TbMail size={15} />
-            {t("emailButton")}
-          </a>
-
-          {/* Divider */}
-          <div className="border-t-2 border-dark/20 mb-3" />
 
           {/* Input row */}
           <div className="flex gap-2 items-end">
@@ -130,6 +118,15 @@ export default function FeedbackBanner() {
               {t("anonymous")}
             </span>
           </label>
+
+          {/* Email button */}
+          <a
+            href="mailto:help@linkkk.dev"
+            className="flex items-center gap-2 text-xs font-bold text-dark border-2 border-dark rounded-xl px-3 py-2 hover:bg-dark hover:text-warning transition-all duration-200 w-fit mt-3"
+          >
+            <TbMail size={15} />
+            {t("emailButton")}
+          </a>
         </motion.div>
       )}
     </AnimatePresence>
