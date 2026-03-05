@@ -73,7 +73,7 @@ const createGuestSession = async (req, res) => {
       maxAge: config.security.cookies.guestMaxAge,
       httpOnly: config.security.cookies.httpOnly,
       secure: config.security.cookies.secure,
-      sameSite: config.security.cookies.sameSite,
+      sameSite: "lax", // Must be "lax" to survive OAuth redirects (Google/GitHub → backend callback)
     });
     return successResponse(
       res,
