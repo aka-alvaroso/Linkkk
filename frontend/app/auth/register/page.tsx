@@ -71,6 +71,13 @@ export default function Register() {
       return;
     }
 
+    if (!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/.test(password)) {
+      toast.error(tSignup('passwordTooWeak'), {
+        description: tSignup('passwordRequirements'),
+      });
+      return;
+    }
+
     const result = await register({ email, username, password });
     if (result.success) {
       toast.success(tSignup('accountCreated'), {

@@ -236,6 +236,8 @@
       "pleaseFillAllFields": "Por favor completa todos los campos",
       "passwordTooShort": "Contraseña muy corta",
       "passwordMinLength": "La contraseña debe tener al menos 8 caracteres",
+      "passwordTooWeak": "Contraseña demasiado simple",
+      "passwordRequirements": "Debe incluir al menos una letra, un número y un carácter especial",
       "passwordGenerated": "Contraseña generada",
       "securePasswordGenerated": "Se ha generado una contraseña segura",
       "accountCreated": "¡Cuenta creada con éxito!",

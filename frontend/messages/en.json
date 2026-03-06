@@ -236,6 +236,8 @@
       "pleaseFillAllFields": "Please fill in all fields",
       "passwordTooShort": "Password too short",
       "passwordMinLength": "Password must be at least 8 characters",
+      "passwordTooWeak": "Password too simple",
+      "passwordRequirements": "Must include at least one letter, one number and one special character",
       "passwordGenerated": "Password generated",
       "securePasswordGenerated": "A secure password has been generated for you",
       "accountCreated": "Account created successfully!",
