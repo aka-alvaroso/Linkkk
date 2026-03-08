@@ -291,7 +291,14 @@
     "toastLinkLimitExceeded": "Has alcanzado tu límite de links. Hazte PRO para crear más links.",
     "toastUnauthorized": "Por favor inicia sesión nuevamente para continuar.",
     "toastInvalidData": "Por favor verifica tu información e inténtalo de nuevo.",
-    "toastUnexpectedError": "Ocurrió un error inesperado."
+    "toastUnexpectedError": "Ocurrió un error inesperado.",
+    "customSuffix": "Sufijo personalizado",
+    "customSuffixOptional": "opcional",
+    "customSuffixPlaceholder": "mi-enlace",
+    "customSuffixHint": "Solo letras, números, - y _. Mínimo 3 caracteres.",
+    "customSuffixInvalid": "Solo letras, números, guiones y guiones bajos. Mínimo 3.",
+    "toastSuffixTaken": "Error al crear el link",
+    "toastSuffixTakenDesc": "Ese sufijo ya está en uso. Prueba con otro."
   },
   "EditLinkDrawer": {
     "tabOverview": "Resumen",
@@ -324,7 +331,19 @@
     "toastUpdateSuccess": "¡Link y reglas actualizados exitosamente!",
     "toastSaveFailed": "Error al guardar los cambios",
     "copy": "Copiar",
-    "scans": "escaneos"
+    "clicks": "clics",
+    "scans": "escaneos",
+    "customSuffix": "Sufijo personalizado",
+    "customSuffixOptional": "opcional",
+    "customSuffixPlaceholder": "mi-enlace",
+    "customSuffixHint": "Solo letras, números, - y _. Mínimo 3 caracteres.",
+    "customSuffixInvalid": "Solo letras, números, guiones y guiones bajos. Mínimo 3.",
+    "toastSuffixTaken": "Error al actualizar el link",
+    "toastSuffixTakenDesc": "Ese sufijo ya está en uso. Prueba con otro.",
+    "clickToEdit": "Haz clic para editar",
+    "closeConfirmMessage": "Tienes cambios sin guardar. ¿Cerrar igualmente?",
+    "keepEditing": "Seguir editando",
+    "discardAndClose": "Descartar y cerrar"
   },
   "FilterModal": {
     "title": "Filtrar Links",
@@ -440,6 +459,7 @@
     "browser": "Navegador",
     "vpn": "VPN",
     "bot": "Bot",
+    "flags": "Flags",
     "yes": "Sí",
     "no": "No",
     "justNow": "Justo ahora",

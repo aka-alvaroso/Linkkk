@@ -91,13 +91,11 @@ export default function TopNavbar({ showCreate = false }: TopNavbarProps) {
               size='md'
               rounded='xl'
               leftIcon={<TbSparkles size={20} />}
-              expandOnHover="icon"
+              expandOnHover="text"
               className="bg-primary text-dark hover:bg-info hover:text-light hover:shadow-[_4px_4px_0_var(--color-dark)] leading-5"
               onClick={() => setShowSelectPlanModal(true)}
             >
-              <p className="font-black italic">
-              {t('upgradeToPro')}
-              </p>
+              <p className="font-black italic">{t('upgradeToPro')}</p>
             </Button>
           )}
 
@@ -108,8 +106,8 @@ export default function TopNavbar({ showCreate = false }: TopNavbarProps) {
                 variant='solid'
                 size='md'
                 rounded='xl'
-                rightIcon={<TbExternalLink size={20} />}
-                expandOnHover="icon"
+                leftIcon={<TbExternalLink size={20} />}
+                expandOnHover="text"
                 className="hover:bg-warning hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)] leading-5"
               >
                 {user.username}
@@ -126,8 +124,8 @@ export default function TopNavbar({ showCreate = false }: TopNavbarProps) {
                 variant='solid'
                 size='md'
                 rounded='xl'
-                rightIcon={<TbLogin size={20} />}
-                expandOnHover="icon"
+                leftIcon={<TbLogin size={20} />}
+                expandOnHover="text"
                 className="hover:bg-warning hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)] leading-5"
               >
                 {t('login')}

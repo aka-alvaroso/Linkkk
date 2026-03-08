@@ -25,15 +25,23 @@ const longUrlSchema = z.preprocess(
     })
 );
 
+const customSuffixSchema = z
+  .string()
+  .min(3, "Suffix must be at least 3 characters")
+  .max(30, "Suffix must be at most 30 characters")
+  .regex(/^[a-zA-Z0-9_-]+$/, "Suffix can only contain letters, numbers, hyphens and underscores");
+
 // Simplified schema for beta - only essential fields
 const createLinkSchema = z.object({
   longUrl: longUrlSchema,
   status: z.boolean().default(true),
+  customSuffix: customSuffixSchema.optional(),
 });
 
 const updateLinkSchema = z.object({
   longUrl: longUrlSchema.optional(),
   status: z.boolean().optional(),
+  newShortUrl: customSuffixSchema.optional(),
 });
 
 module.exports = {

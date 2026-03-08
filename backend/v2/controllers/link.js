@@ -32,7 +32,12 @@ const createLink = async (req, res) => {
     return errorResponse(res, ERRORS.INVALID_DATA, issues);
   }
 
-  const { longUrl, status } = validate.data;
+  const { longUrl, status, customSuffix } = validate.data;
+
+  // Custom suffix only allowed for authenticated users (not guests)
+  if (customSuffix && isGuest) {
+    return errorResponse(res, ERRORS.UNAUTHORIZED);
+  }
 
   // Check link limit (skip if unlimited - null)
   if (limits.links !== null) {
@@ -59,7 +64,7 @@ const createLink = async (req, res) => {
     }
   }
 
-  const shortUrl = await generateShortCode();
+  const shortUrl = customSuffix || await generateShortCode();
 
   try {
     const link = await prisma.link.create({
@@ -201,7 +206,12 @@ const updateLink = async (req, res) => {
     return errorResponse(res, ERRORS.INVALID_DATA, issues);
   }
 
-  const { longUrl, status } = validatedData.data;
+  const { longUrl, status, newShortUrl } = validatedData.data;
+
+  // Custom suffix change only allowed for authenticated users (not guests)
+  if (newShortUrl !== undefined && guest) {
+    return errorResponse(res, ERRORS.UNAUTHORIZED);
+  }
 
   try {
     const existingLink = await prisma.link.findUnique({
@@ -233,6 +243,7 @@ const updateLink = async (req, res) => {
     const updateData = {};
     if (longUrl !== undefined) updateData.longUrl = longUrl;
     if (status !== undefined) updateData.status = status;
+    if (newShortUrl !== undefined) updateData.shortUrl = newShortUrl;
 
     const updatedLink = await prisma.link.update({
       where: { shortUrl },

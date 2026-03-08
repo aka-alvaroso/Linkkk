@@ -434,43 +434,69 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
           </DndContext>
 
           {/* Add rule button */}
-          <Button
-            variant="solid"
-            size="md"
-            rounded="2xl"
-            leftIcon={<TbPlus size={20} />}
-            onClick={handleAddRule}
-            disabled={limits.rulesPerLink !== null && localRules.length >= limits.rulesPerLink}
-            className="bg-primary text-dark hover:bg-primary hover:shadow-[4px_4px_0_var(--color-dark)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
-            title={limits.rulesPerLink !== null && localRules.length >= limits.rulesPerLink ? t('maxRulesTitle', { count: limits.rulesPerLink, plural: limits.rulesPerLink === 1 ? t('rule') : t('rules') }) : ''}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.3, ease: 'easeOut' }}
           >
-            {t('addRule')}
-          </Button>
+            <Button
+              variant="solid"
+              size="md"
+              rounded="2xl"
+              leftIcon={<TbPlus size={20} />}
+              onClick={handleAddRule}
+              disabled={limits.rulesPerLink !== null && localRules.length >= limits.rulesPerLink}
+              className="bg-primary text-dark hover:bg-primary hover:shadow-[4px_4px_0_var(--color-dark)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
+              title={limits.rulesPerLink !== null && localRules.length >= limits.rulesPerLink ? t('maxRulesTitle', { count: limits.rulesPerLink, plural: limits.rulesPerLink === 1 ? t('rule') : t('rules') }) : ''}
+            >
+              {t('addRule')}
+            </Button>
+          </motion.div>
 
           {/* Info Message */}
-          <p className='text-xs text-dark/50 text-center'>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.15, duration: 0.3, ease: 'easeOut' }}
+            className='text-xs text-dark/50 text-center'
+          >
             {t('rulesEvaluationNote')}
-          </p>
+          </motion.p>
         </>
       ) : (
         /* Empty State */
         <div className='flex flex-col items-center justify-center gap-4'>
-          <TbCube size={64} className="text-dark/15" />
-
-          
-          <Button
-            variant="solid"
-            size="lg"
-            rounded="2xl"
-            leftIcon={<TbPlus size={20} />}
-            onClick={handleAddRule}
-            className="bg-primary text-dark hover:bg-primary hover:shadow-[4px_4px_0_var(--color-dark)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05, duration: 0.3, ease: 'easeOut' }}
           >
-            {t('createFirstRule')}
-          </Button>
-          <p className='text-xs text-dark/50 text-center'>
+            <TbCube size={64} className="text-dark/15" />
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.3, ease: 'easeOut' }}
+          >
+            <Button
+              variant="solid"
+              size="lg"
+              rounded="2xl"
+              leftIcon={<TbPlus size={20} />}
+              onClick={handleAddRule}
+              className="bg-primary text-dark hover:bg-primary hover:shadow-[4px_4px_0_var(--color-dark)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
+            >
+              {t('createFirstRule')}
+            </Button>
+          </motion.div>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.15, duration: 0.3, ease: 'easeOut' }}
+            className='text-xs text-dark/50 text-center'
+          >
             {t('rulesEvaluationNote')}
-          </p>
+          </motion.p>
         </div>
       )}
     </div>

@@ -291,7 +291,14 @@
     "toastLinkLimitExceeded": "You've reached your link limit. Upgrade your plan to create more links.",
     "toastUnauthorized": "Please login again to continue.",
     "toastInvalidData": "Please check your input and try again.",
-    "toastUnexpectedError": "An unexpected error occurred."
+    "toastUnexpectedError": "An unexpected error occurred.",
+    "customSuffix": "Custom suffix",
+    "customSuffixOptional": "optional",
+    "customSuffixPlaceholder": "my-link",
+    "customSuffixHint": "Letters, numbers, - and _ only. Min 3 characters.",
+    "customSuffixInvalid": "Letters, numbers, hyphens and underscores only. Min 3.",
+    "toastSuffixTaken": "Error creating link",
+    "toastSuffixTakenDesc": "That suffix is already taken. Try a different one."
   },
   "EditLinkDrawer": {
     "tabOverview": "Overview",
@@ -323,7 +330,19 @@
     "toastUpdateSuccess": "Link and rules updated successfully!",
     "toastSaveFailed": "Failed to save changes",
     "copy": "Copy",
-    "scans": "scans"
+    "clicks": "clicks",
+    "scans": "scans",
+    "customSuffix": "Custom suffix",
+    "customSuffixOptional": "optional",
+    "customSuffixPlaceholder": "my-link",
+    "customSuffixHint": "Letters, numbers, - and _ only. Min 3 characters.",
+    "customSuffixInvalid": "Letters, numbers, hyphens and underscores only. Min 3.",
+    "toastSuffixTaken": "Error updating link",
+    "toastSuffixTakenDesc": "That suffix is already taken. Try a different one.",
+    "clickToEdit": "Click to edit",
+    "closeConfirmMessage": "You have unsaved changes. Close anyway?",
+    "keepEditing": "Keep editing",
+    "discardAndClose": "Discard and close"
   },
   "FilterModal": {
     "title": "Filter Links",
@@ -439,6 +458,7 @@
     "browser": "Browser",
     "vpn": "VPN",
     "bot": "Bot",
+    "flags": "Flags",
     "yes": "Yes",
     "no": "No",
     "justNow": "Just now",

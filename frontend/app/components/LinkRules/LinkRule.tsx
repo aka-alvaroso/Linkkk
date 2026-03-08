@@ -3,9 +3,9 @@
  * Compact summary view of a rule with expandable inline editor
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { TbGripVertical, TbX, TbChevronDown, TbPlus, TbTrash, TbCircleDashed, TbCircleDashedCheck } from 'react-icons/tb';
+import { TbGripVertical, TbX, TbChevronDown, TbPlus, TbTrash, TbCircleDashed, TbCircleDashedCheck, TbPencil } from 'react-icons/tb';
 import Button from '../ui/Button/Button';
 import { LinkRule as LinkRuleType, RuleCondition as RuleConditionType, MatchType, ActionType, ActionSettings } from '@/app/types/linkRules';
 import { useTranslations } from 'next-intl';
@@ -13,7 +13,6 @@ import { getRuleConditionsSummary, getActionSummary } from '@/app/utils/ruleSumm
 import { RuleCondition } from './RuleCondition';
 import { RuleAction } from './RuleAction';
 import Select from '../ui/Select/Select';
-import Input from '../ui/Input/Input';
 
 interface LinkRuleProps {
   rule: LinkRuleType;
@@ -37,15 +36,23 @@ export function LinkRule({ rule, priority, onChange, onDelete, maxConditions, is
     : null;
 
   const displayName = rule.name || `${t('rule')} ${priority}`;
+  const [editingName, setEditingName] = useState(false);
+  const [draftName, setDraftName] = useState('');
+
+  const startEditingName = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDraftName(rule.name || '');
+    setEditingName(true);
+  };
+
+  const confirmName = () => {
+    onChange({ ...rule, name: draftName.trim() || null });
+    setEditingName(false);
+  };
 
   // Toggle enabled
   const handleToggleEnabled = (enabled: boolean) => {
     onChange({ ...rule, enabled });
-  };
-
-  // Handle name change
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange({ ...rule, name: e.target.value });
   };
 
   // Handle match type change
@@ -124,13 +131,32 @@ export function LinkRule({ rule, priority, onChange, onDelete, maxConditions, is
     >
       {/* Compact Header */}
       <div className='sm:hidden w-full flex items-center justify-between'>
-        <span className=" font-black italic text-dark truncate">
-          {displayName}
-        </span>
+        {editingName ? (
+          <input
+            autoFocus
+            value={draftName}
+            onChange={(e) => setDraftName(e.target.value)}
+            onBlur={confirmName}
+            onKeyDown={(e) => {
+              e.stopPropagation();
+              if (e.key === 'Enter') confirmName();
+              if (e.key === 'Escape') setEditingName(false);
+            }}
+            onClick={(e) => e.stopPropagation()}
+            className='font-black italic text-dark bg-transparent border-b border-dark/30 outline-none flex-1 min-w-0'
+          />
+        ) : (
+          <div className='flex items-center gap-1.5 flex-1 min-w-0'>
+            <span className="font-black italic text-dark truncate">{displayName}</span>
+            <button onClick={startEditingName} className='text-dark/30 hover:text-dark/60 flex-shrink-0'>
+              <TbPencil size={13} />
+            </button>
+          </div>
+        )}
         <motion.div
           animate={{ rotate: isExpanded ? 180 : 0 }}
           transition={{ duration: 0.2 }}
-          className="text-dark/30"
+          className="text-dark/30 flex-shrink-0"
         >
           <TbChevronDown size={20} />
         </motion.div>
@@ -147,10 +173,32 @@ export function LinkRule({ rule, priority, onChange, onDelete, maxConditions, is
 
         {/* Rule Info */}
         <div className="hidden sm:flex items-center flex-grow min-w-0 hover:cursor-pointer">
-          <div className="flex items-center gap-2">
-            <span className="font-black italic text-dark truncate">
-              {displayName}
-            </span>
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            {editingName ? (
+              <input
+                autoFocus
+                value={draftName}
+                onChange={(e) => setDraftName(e.target.value)}
+                onBlur={confirmName}
+                onKeyDown={(e) => {
+                  e.stopPropagation();
+                  if (e.key === 'Enter') confirmName();
+                  if (e.key === 'Escape') setEditingName(false);
+                }}
+                onClick={(e) => e.stopPropagation()}
+                className='font-black italic text-dark bg-transparent border-b border-dark/30 outline-none w-40'
+              />
+            ) : (
+              <>
+                <span className="font-black italic text-dark truncate">{displayName}</span>
+                <button
+                  onClick={startEditingName}
+                  className='text-dark/30 hover:text-dark/60 flex-shrink-0'
+                >
+                  <TbPencil size={13} />
+                </button>
+              </>
+            )}
           </div>
           {!isExpanded && (
             <div className="ml-2 text-sm text-dark/60 truncate">
@@ -220,21 +268,6 @@ export function LinkRule({ rule, priority, onChange, onDelete, maxConditions, is
             onClick={(e) => e.stopPropagation()}
           >
             <div className="pt-4 mt-4 border-t border-dark/10 space-y-4">
-              {/* Rule Name */}
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-dark/70 whitespace-nowrap">
-                  {t('ruleName')}
-                </label>
-                <Input
-                  value={rule.name || ''}
-                  onChange={handleNameChange}
-                  placeholder={t('ruleNamePlaceholder')}
-                  size="sm"
-                  rounded="lg"
-                  className="w-full max-w-xs"
-                />
-              </div>
-
               {/* Conditions Section */}
               <div>
                 <label className="block text-sm font-medium text-dark/70 mb-2">

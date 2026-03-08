@@ -197,7 +197,7 @@ export async function downloadQRCode(
     },
     imageOptions: {
       crossOrigin: 'anonymous',
-      margin: 5,
+      margin: 50,
       imageSize: config.logoSize,
     },
     image: config.logoUrl || undefined,

@@ -173,7 +173,8 @@ export default function Dashboard() {
           )}
 
           {/* Widgets */}
-          <div className='flex items-center gap-1 py-1 overflow-x-auto scrollbar-hide lg:grid lg:gap-2 lg:grid-cols-4'>
+          <div className='relative lg:contents'>
+            <div className='flex items-center gap-1 py-1 overflow-x-auto scrollbar-hide lg:grid lg:gap-2 lg:grid-cols-4'>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -217,6 +218,9 @@ export default function Dashboard() {
                 <AnimatedCounter value={totalScans} delay={0.15} />
               </p>
             </motion.div>
+            </div>
+            {/* Scroll fade indicator — only visible in flex/scroll mode (below lg) */}
+            <div className='absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-light to-transparent pointer-events-none lg:hidden' />
           </div>
 
 

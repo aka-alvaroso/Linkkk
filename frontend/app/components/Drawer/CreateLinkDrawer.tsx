@@ -31,9 +31,11 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
     const [newLink, setNewLink] = useState({
         longUrl: '',
         status: true,
+        customSuffix: '',
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [suffixError, setSuffixError] = useState('');
     const [localRules, setLocalRules] = useState<LinkRuleType[]>([]);
 
     // Ref for animated text
@@ -70,18 +72,27 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
             });
     };
 
+    const suffixRegex = /^[a-zA-Z0-9_-]{3,30}$/;
+
     const handleCreateLink = useCallback(async () => {
         if (!newLink.longUrl) {
             toast.error(t('toastLongUrlRequired'));
             return;
         }
 
+        if (newLink.customSuffix && !suffixRegex.test(newLink.customSuffix)) {
+            setSuffixError(t('customSuffixInvalid'));
+            return;
+        }
+
         setLoading(true);
         setError('');
+        setSuffixError('');
 
         const response = await createLink({
             longUrl: newLink.longUrl,
             status: newLink.status,
+            ...(newLink.customSuffix && { customSuffix: newLink.customSuffix }),
         });
 
         if (response.success && response.data) {
@@ -122,6 +133,7 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
             setNewLink({
                 longUrl: '',
                 status: true,
+                customSuffix: '',
             });
             setLocalRules([]);
             onClose();
@@ -131,7 +143,12 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
                 onSuccess();
             }
         } else {
-            if (response.errorCode === 'LINK_LIMIT_EXCEEDED') {
+            if (response.errorCode === 'SHORT_URL_EXISTS') {
+                toast.error(t('toastSuffixTaken'), {
+                    showIcon: false,
+                    description: t('toastSuffixTakenDesc'),
+                });
+            } else if (response.errorCode === 'LINK_LIMIT_EXCEEDED') {
                 toast.error(t('toastErrorCreating'), {
                     showIcon: false,
                     description: t('toastLinkLimitExceeded'),
@@ -277,11 +294,43 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
                     </motion.div>
                 </div>
 
+                {/* Custom Suffix (authenticated users only) */}
+                {isAuthenticated && !isGuest && (
+                    <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.2, duration: 0.4, ease: "backInOut" }}
+                        className='w-full flex flex-col gap-1.5'
+                    >
+                        <p className='text-xs font-semibold text-dark/40 uppercase tracking-wide'>
+                            {t('customSuffix')} <span className='normal-case font-normal'>({t('customSuffixOptional')})</span>
+                        </p>
+                        <Input
+                            value={newLink.customSuffix}
+                            onChange={(e) => {
+                                setNewLink({ ...newLink, customSuffix: e.target.value });
+                                setSuffixError('');
+                            }}
+                            placeholder={t('customSuffixPlaceholder')}
+                            size='sm'
+                            rounded='xl'
+                            className='w-48'
+                        />
+                        {suffixError ? (
+                            <p className='text-xs text-danger'>{suffixError}</p>
+                        ) : (
+                            <p className='text-xs text-dark/40 font-mono'>
+                                linkkk.dev/r/<span className='text-dark/70'>{newLink.customSuffix || t('customSuffixPlaceholder')}</span>
+                            </p>
+                        )}
+                    </motion.div>
+                )}
+
                 {/* Link Rules Section */}
                 <motion.div
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.25, duration: 0.4, ease: "backInOut" }}
+                    transition={{ delay: 0.3, duration: 0.4, ease: "backInOut" }}
                     className='w-full'
                 >
                     <div className="space-y-4">
@@ -389,8 +438,10 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
                                             setNewLink({
                                                 longUrl: '',
                                                 status: true,
+                                                customSuffix: '',
                                             });
                                             setLocalRules([]);
+                                            setSuffixError('');
                                             setShowStatusBar("none");
                                             onClose();
                                         }}

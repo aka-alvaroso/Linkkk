@@ -15,11 +15,13 @@ export interface Link {
 export interface CreateLinkDTO {
   longUrl: string;
   status?: boolean;
+  customSuffix?: string;
 }
 
 export interface UpdateLinkDTO {
   longUrl?: string;
   status?: boolean;
+  newShortUrl?: string;
 }
 
 // Filter types

@@ -234,9 +234,9 @@ export default function QRCodeEditor({
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05, duration: 0.4, ease: "backInOut" }}
-            className="p-4 bg-white rounded-2xl shadow-sm border border-dark/5"
+            className="p-2 bg-white rounded-2xl shadow-sm border border-dark/5"
           >
-            <QRCodePreview url={qrUrl} config={config} size={175} />
+            <QRCodePreview url={qrUrl} config={config} size={125} />
           </motion.div>
 
           {/* Download button */}
@@ -247,8 +247,8 @@ export default function QRCodeEditor({
           >
             <Button
               variant="solid"
-              size="md"
-              rounded="2xl"
+              size="sm"
+              rounded="xl"
               leftIcon={<TbDownload size={20} />}
               className="bg-primary text-dark w-full"
               onClick={handleDownload}
@@ -333,7 +333,7 @@ export default function QRCodeEditor({
           </div>
 
           {/* Logo Upload */}
-          <LogoUploader
+          {/* <LogoUploader
             shortUrl={shortUrl}
             currentLogoUrl={config.logoUrl}
             onLogoChange={(url, publicId) => {
@@ -349,7 +349,7 @@ export default function QRCodeEditor({
                 });
               }
             }}
-          />
+          /> */}
 
           {/* Reset button */}
           <Button

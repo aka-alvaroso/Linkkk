@@ -185,10 +185,7 @@ export const AccessesList = ({ shortUrl }: AccessesListProps) => {
                                 {t('browser')}
                             </th>
                             <th className="px-4 py-3 text-center font-black italic text-md">
-                                {t('vpn')}
-                            </th>
-                            <th className="px-4 py-3 text-center font-black italic text-md">
-                                {t('bot')}
+                                {t('flags')}
                             </th>
                         </tr>
                     </thead>
@@ -204,12 +201,9 @@ export const AccessesList = ({ shortUrl }: AccessesListProps) => {
                                     className="border-b border-dark/15 hover:bg-dark/5 transition-colors"
                                 >
                                     <td className="px-4 py-4">
-                                        <div className="flex flex-col">
-                                            <span className="font-bold text-sm">{formatDate(access.createdAt)}</span>
-                                            <span className="text-xs text-dark/50">
-                                                {formatFullDate(access.createdAt)}
-                                            </span>
-                                        </div>
+                                        <span className="font-bold text-sm" title={formatFullDate(access.createdAt)}>
+                                            {formatDate(access.createdAt)}
+                                        </span>
                                     </td>
                                     <td className="px-4 py-4">
                                         <div className="flex justify-center">
@@ -255,32 +249,22 @@ export const AccessesList = ({ shortUrl }: AccessesListProps) => {
                                         </div>
                                     </td>
                                     <td className="px-4 py-4">
-                                        <div className="flex justify-center">
+                                        <div className="flex justify-center items-center gap-2">
                                             {access.isVPN ? (
-                                                <div className="px-3 py-1.5 bg-danger text-light rounded-lg flex items-center gap-1.5">
-                                                    <TbShieldX size={14} className="text-light" />
-                                                    <span className="text-xs font-black">{t('yes')}</span>
+                                                <div className="px-2 py-1 bg-danger text-light rounded-lg flex items-center gap-1" title="VPN">
+                                                    <TbShieldX size={13} />
+                                                    <span className="text-xs font-black">VPN</span>
                                                 </div>
                                             ) : (
-                                                <div className="px-3 py-1.5 bg-success rounded-lg flex items-center gap-1.5">
-                                                    <TbShieldCheck size={14} className="text-dark" />
-                                                    <span className="text-xs font-black">{t('no')}</span>
-                                                </div>
+                                                <TbShieldCheck size={16} className="text-dark/20" title="No VPN" />
                                             )}
-                                        </div>
-                                    </td>
-                                    <td className="px-4 py-4">
-                                        <div className="flex justify-center">
                                             {access.isBot ? (
-                                                <div className="px-3 py-1.5 bg-danger text-light rounded-lg flex items-center gap-1.5">
-                                                    <TbRobot size={14} className="text-light" />
-                                                    <span className="text-xs font-black">{t('yes')}</span>
+                                                <div className="px-2 py-1 bg-danger text-light rounded-lg flex items-center gap-1" title="Bot">
+                                                    <TbRobot size={13} />
+                                                    <span className="text-xs font-black">Bot</span>
                                                 </div>
                                             ) : (
-                                                <div className="px-3 py-1.5 bg-success rounded-lg flex items-center gap-1.5">
-                                                    <TbUser size={14} className="text-dark" />
-                                                    <span className="text-xs font-black">{t('no')}</span>
-                                                </div>
+                                                <TbUser size={16} className="text-dark/20" title="No Bot" />
                                             )}
                                         </div>
                                     </td>
