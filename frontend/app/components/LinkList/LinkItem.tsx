@@ -111,9 +111,7 @@ export default function LinkItem({ view, data }: LinkItemProps) {
 
                     </div>
                 </div>
-                <EditLinkDrawer open={linkDetailsDrawer} onClose={() => setLinkDetailsDrawer(false)}
-                    link={data}
-                />
+                <EditLinkDrawer open={linkDetailsDrawer} onClose={() => setLinkDetailsDrawer(false)} link={data} />
             </>
         )
     }

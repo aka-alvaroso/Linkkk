@@ -6,7 +6,7 @@ import CreateLinkDrawer from "../Drawer/CreateLinkDrawer";
 import SelectPlanModal from "../Modal/SelectPlanModal";
 import { useAuth } from "@/app/hooks";
 import { useToast } from "@/app/hooks/useToast";
-import { TbPlus, TbLogin, TbExternalLink, TbSparkles } from "react-icons/tb";
+import { TbPlus, TbLogin, TbUser, TbSparkles } from "react-icons/tb";
 import * as motion from "motion/react-client";
 import { AnimatePresence } from "motion/react";
 import Button from "../ui/Button/Button";
@@ -106,7 +106,7 @@ export default function TopNavbar({ showCreate = false }: TopNavbarProps) {
                 variant='solid'
                 size='md'
                 rounded='xl'
-                leftIcon={<TbExternalLink size={20} />}
+                leftIcon={<TbUser size={20} />}
                 expandOnHover="text"
                 className="hover:bg-warning hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)] leading-5"
               >

@@ -17,7 +17,7 @@ const planLimits = {
     conditionsPerRule: 2,
     linkAnalytics: {
       linkCharts: true,
-      linkAccesses: 20,
+      linkAccesses: null,
       linkAccessesDuration: 30,
     },
   },
