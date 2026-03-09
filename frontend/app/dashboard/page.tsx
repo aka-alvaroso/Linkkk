@@ -174,7 +174,7 @@ export default function Dashboard() {
 
           {/* Widgets */}
           <div className='relative lg:contents'>
-            <div className='flex items-center gap-1 py-1 overflow-x-auto scrollbar-hide lg:grid lg:gap-2 lg:grid-cols-4'>
+            <div className='flex items-center gap-1 py-2 overflow-x-auto scrollbar-hide lg:grid lg:gap-2 lg:grid-cols-4'>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

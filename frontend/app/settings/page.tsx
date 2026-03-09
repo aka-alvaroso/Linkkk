@@ -298,7 +298,7 @@ export default function SettingsPage() {
     <RouteGuard type="user-only" title="Settings - Linkkk">
       <Navigation showCreate={false} />
 
-      <div className="relative p-2 md:p-4 md:mt-20 md:max-w-3/4 mx-auto">
+      <div className="relative p-2 pb-24 md:pb-4 md:p-4 md:mt-20 md:max-w-3/4 mx-auto">
         <div className="space-y-6">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
