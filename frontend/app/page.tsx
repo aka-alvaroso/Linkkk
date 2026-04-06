@@ -1,1654 +1,1228 @@
 "use client";
-import React, { useState, useRef } from "react";
-import Link from "next/link";
+import React, { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 import Navigation from "@/app/components/Navigation/Navigation";
-import Button from "@/app/components/ui/Button/Button";
-import Input from "@/app/components/ui/Input/Input";
-import RouteGuard from "@/app/components/RouteGuard/RouteGuard";
-import AnimatedText, {
-  AnimatedTextRef,
-} from "@/app/components/ui/AnimatedText/AnimatedText";
 import CreateLinkDrawer from "@/app/components/Drawer/CreateLinkDrawer";
-import InlineSelect from "@/app/components/ui/InlineSelect/InlineSelect";
+import RouteGuard from "@/app/components/RouteGuard/RouteGuard";
+import Button from "@/app/components/ui/Button/Button";
+import SplitWords from "@/app/components/Landing/SplitWords";
+import UseCaseCard from "@/app/components/Landing/UseCaseCard";
+import RulePill from "@/app/components/Landing/RulePill";
+import FaqItem from "@/app/components/Landing/FaqItem";
+import { useAuth } from "@/app/hooks";
+import { subscriptionService } from "@/app/services/api/subscriptionService";
 import * as motion from "motion/react-client";
-import { useScroll, useTransform, MotionValue } from "motion/react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
+  TbClipboard,
+  TbAdjustmentsHorizontal,
+  TbShare,
+  TbArrowUpRight,
   TbWorld,
   TbDeviceMobile,
-  TbShieldCheck,
-  TbCalendar,
-  TbUsers,
-  TbBolt,
-  TbCheck,
-  TbRocket,
-  TbSparkles,
+  TbDots,
+  TbShieldLock,
   TbClick,
-  TbEye,
-  TbLock,
-  TbInfoCircle,
-  TbCode,
-  TbArrowUpRight,
-  TbBrandGithub,
-  TbMail,
-  TbArrowRight,
-  TbUserPlus,
-  TbChartBar,
-  TbTarget,
-  TbX,
+  TbCalendar,
   TbRobot,
-  TbNetwork,
+  TbArrowFork,
+  TbForbid2,
+  TbLock,
   TbWebhook,
-  TbChecklist,
-  TbPlus,
+  TbUser,
+  TbBrandGithub,
+  TbAppWindow,
+  TbInfoCircle,
   TbChevronDown,
+  TbHeartFilled,
 } from "react-icons/tb";
-import { useRouter } from "next/navigation";
-import { useLinks } from "@/app/hooks/useLinks";
-import { useToast } from "@/app/hooks/useToast";
-import { useLanguage } from "@/app/hooks/useLanguage";
-import { useAuth } from "@/app/hooks/useAuth";
-import { subscriptionService } from "@/app/services/api/subscriptionService";
-import { RiLoader5Fill } from "react-icons/ri";
-import { useTranslations } from "next-intl";
 
-// Feature Card Component for stacked animation
-const FeatureCard = ({
-  scrollProgress,
-  index,
-  total,
-  icon: Icon,
-  iconColor,
-  title,
-  description,
-  bgColor,
-  tags,
-  textLight = false,
-}: {
-  scrollProgress: MotionValue<number>;
-  index: number;
-  total: number;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
-  iconColor: string;
-  title: string;
-  description: string;
-  bgColor?: string;
-  tags: string[];
-  textLight?: boolean;
-}) => {
-  // Ajustamos para que las animaciones ocupen solo el 70% del scroll
-  // dejando 30% al final para ver la última card
-  const maxProgress = 0.7;
-  const cardProgress = (index / total) * maxProgress;
-  const nextCardProgress = ((index + 1) / total) * maxProgress;
-
-  const y = useTransform(
-    scrollProgress,
-    [cardProgress, nextCardProgress],
-    [1200, 0],
-  );
-
-  return (
-    <motion.div
-      style={{
-        y,
-        zIndex: index + 10,
-      }}
-      className="absolute inset-0"
-    >
-      <div
-        className={`h-full p-4 md:p-8 ${bgColor} rounded-3xl border-3 border-dark shadow-[4px_4px_0_var(--color-dark)]`}
-      >
-        <div className="flex flex-col h-full justify-start gap-4 md:justify-between">
-          <div>
-            <div className="size-20 rounded-2xl bg-dark flex items-center justify-center mb-4">
-              <Icon size={40} className={iconColor} />
-            </div>
-            <h3
-              className={`text-4xl font-black italic mb-3 ${textLight ? "text-light" : ""}`}
-            >
-              {title}
-            </h3>
-            <p
-              className={`text-sm md:text-lg ${textLight ? "text-light/90" : "text-dark/80"}`}
-            >
-              {description}
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-3 text-sm font-bold">
-            {tags.map((tag, i) => (
-              <div key={i} className="px-4 py-2 bg-dark text-light rounded-xl">
-                {tag}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
-};
+gsap.registerPlugin(ScrollTrigger);
 
 export default function Landing() {
-  const router = useRouter();
-  const { createLink } = useLinks();
-  const toast = useToast();
-  const { currentLocale, changeLanguage } = useLanguage();
-  const { isAuthenticated, isGuest } = useAuth();
-  const t = useTranslations("Landing.Hero");
-  const tDemos = useTranslations("Landing.Demos");
-  const tRules = useTranslations("Landing.Rules");
-  const tCarousel = useTranslations("Landing.Carousel");
-  const tFeatures = useTranslations("Landing.Features");
-  const tGettingStarted = useTranslations("Landing.GettingStarted");
-  const tFinalCTA = useTranslations("Landing.FinalCTA");
-  const tFAQ = useTranslations("Landing.FAQ");
-  const tFooter = useTranslations("Landing.Footer");
-  const [url, setUrl] = useState("");
-  const [isShortening, setIsShortening] = useState(false);
+  const [createLinkDrawer, setCreateLinkDrawer] = useState(false);
+  const { isAuthenticated } = useAuth();
 
-  // Ref for the stacked cards section
-  const featuresRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: featuresRef,
-    offset: ["start end", "end start"],
-  });
+  // Hero zoom refs
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const heroSectionRef = useRef<HTMLElement>(null);
+  const controlWordRef = useRef<HTMLSpanElement>(null);
+  const heroContentRef = useRef<HTMLDivElement>(null);
 
-  // Rules Engine Examples State
-  const [activeExampleIndex, setActiveExampleIndex] = useState(0);
+  // Horizontal scroll refs
+  const horizontalSectionRef = useRef<HTMLDivElement>(null);
+  const horizontalTrackRef = useRef<HTMLDivElement>(null);
+  const sectionTitleRef = useRef<HTMLHeadingElement>(null);
 
-  // Create Link Drawer State
-  const [isCreateLinkDrawerOpen, setIsCreateLinkDrawerOpen] = useState(false);
+  // Steps section ref
+  const stepsSectionRef = useRef<HTMLElement>(null);
 
-  // Billing Period State (monthly/yearly)
-  const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">(
-    "monthly",
-  );
+  // Use cases section ref
+  const useCasesSectionRef = useRef<HTMLElement>(null);
 
-  // FAQ Accordion State
-  const [openFAQ, setOpenFAQ] = useState<number | null>(null);
+  // Rules section ref
+  const rulesSectionRef = useRef<HTMLElement>(null);
 
-  const ruleExamples = [
-    {
-      textCondition: tRules("example1Condition"),
-      textAction: tRules("example1Action"),
-      conditions: [tRules("conditionDevice")],
-      actions: [tRules("actionRedirect")],
-      color1: "bg-secondary text-light",
-      color2: "bg-primary",
-    },
-    {
-      textCondition: tRules("example2Condition"),
-      textAction: tRules("example2Action"),
-      conditions: [tRules("conditionCountry")],
-      actions: [tRules("actionRedirect")],
-      color1: "bg-primary",
-      color2: "bg-primary",
-    },
-    {
-      textCondition: tRules("example3Condition"),
-      textAction: tRules("example3Action"),
-      conditions: [tRules("conditionVPN")],
-      actions: [tRules("actionBlock")],
-      color1: "bg-info",
-      color2: "bg-danger",
-    },
-    {
-      textCondition: tRules("example4Condition"),
-      textAction: tRules("example4Action"),
-      conditions: [tRules("conditionDevice")],
-      actions: [tRules("actionPassword")],
-      color1: "bg-secondary text-light",
-      color2: "bg-warning",
-    },
-    {
-      textCondition: tRules("example5Condition"),
-      textAction: tRules("example5Action"),
-      conditions: [tRules("conditionBot")],
-      actions: [tRules("actionWebhook")],
-      color1: "bg-danger",
-      color2: "bg-info",
-    },
-  ];
+  // Bento section ref
+  const bentoSectionRef = useRef<HTMLElement>(null);
 
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveExampleIndex((prev) => (prev + 1) % ruleExamples.length);
-    }, 5000);
+  // Pricing section ref
+  const pricingSectionRef = useRef<HTMLElement>(null);
 
-    return () => clearInterval(interval);
-  }, [ruleExamples.length]);
+  // Active pill tooltip
+  const [activePill, setActivePill] = useState<string | null>(null);
 
-  const handleShorten = async () => {
-    if (!url) return;
+  // Pricing toggle
+  const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">("monthly");
 
-    setIsShortening(true);
-    const response = await createLink({ longUrl: url });
-
-    if (response.success) {
-      toast.success("Link created successfully!");
-      setIsShortening(false);
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 400);
-    } else {
-      if (response.errorCode === "LINK_LIMIT_EXCEEDED") {
-        toast.error("Link limit exceeded", {
-          description:
-            "You've reached your link limit. Upgrade your plan to create more links.",
-          duration: 6000,
-        });
-      } else if (response.errorCode === "UNAUTHORIZED") {
-        toast.error("Session expired", {
-          description: "Please login again to continue.",
-        });
-      } else if (response.errorCode === "INVALID_DATA") {
-        toast.error("Invalid data", {
-          description: "Please check your input and try again.",
-        });
-      } else {
-        toast.error("Failed to create link", {
-          description: response.error || "An unexpected error occurred.",
-        });
-      }
-      setIsShortening(false);
+  const handleUpgradePro = async () => {
+    if (!isAuthenticated) {
+      window.location.href = "/auth/login";
+      return;
+    }
+    try {
+      await subscriptionService.createCheckoutSession(billingPeriod);
+    } catch (error) {
+      console.error("Error creating checkout session:", error);
     }
   };
 
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      if (!controlWordRef.current || !heroContentRef.current || !triggerRef.current || !heroSectionRef.current) return;
+
+      // --- Hero zoom animation ---
+      const heroTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: triggerRef.current,
+          start: "top top",
+          end: "bottom bottom",
+          scrub: 1,
+          pin: heroSectionRef.current,
+          pinSpacing: false,
+        },
+      });
+
+      heroTl.to(
+        heroContentRef.current.querySelectorAll(".hero-fade"),
+        {
+          opacity: 0,
+          duration: 0.3,
+        },
+        0
+      );
+
+      heroTl.to(
+        controlWordRef.current,
+        {
+          scale: 150,
+          duration: 0.7,
+          ease: "power2.in",
+        },
+        0.1
+      );
+
+      // --- Horizontal scroll animation ---
+      if (!horizontalSectionRef.current || !horizontalTrackRef.current || !sectionTitleRef.current) return;
+
+      const track = horizontalTrackRef.current;
+      const totalScrollWidth = track.scrollWidth - window.innerWidth;
+      const scrollPadding = window.innerWidth * 0.6;
+
+      const horizontalScroll = gsap.to(track, {
+        x: -totalScrollWidth,
+        ease: "none",
+        scrollTrigger: {
+          trigger: horizontalSectionRef.current,
+          start: "top top",
+          end: () => `+=${totalScrollWidth + scrollPadding}`,
+          scrub: 1,
+          pin: true,
+          anticipatePin: 1,
+        },
+      });
+
+      // Section title: appears centered, then moves to top
+      const titleEl = sectionTitleRef.current;
+      const titleWords = titleEl.querySelectorAll(".anim-word");
+
+      ScrollTrigger.create({
+        trigger: horizontalSectionRef.current,
+        start: "top top",
+        onEnter: () => {
+          gsap.to(titleWords, {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            ease: "back.out(1.7)",
+            stagger: 0.05,
+          });
+        },
+        onLeaveBack: () => {
+          gsap.set(titleWords, { opacity: 0, y: 40 });
+        },
+      });
+
+      gsap.to(titleEl, {
+        top: "8%",
+        scale: 0.6,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: horizontalSectionRef.current,
+          start: "top top",
+          end: () => `+=${window.innerWidth * 0.5}`,
+          scrub: 1,
+        },
+      });
+
+      // Animate words inside each content slide
+      const slides = track.querySelectorAll<HTMLElement>(".h-slide");
+
+      slides.forEach((slide) => {
+        const words = slide.querySelectorAll(".anim-word");
+        const sticker = slide.querySelector(".anim-sticker");
+
+        if (words.length > 0) {
+          gsap.to(words, {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            ease: "back.out(1.7)",
+            stagger: 0.04,
+            scrollTrigger: {
+              trigger: slide,
+              containerAnimation: horizontalScroll,
+              start: "left 50%",
+              toggleActions: "play none none reverse",
+            },
+          });
+        }
+
+        if (sticker) {
+          gsap.fromTo(
+            sticker,
+            { opacity: 0, scale: 0.5, rotate: -15 },
+            {
+              opacity: 1,
+              scale: 1,
+              rotate: 0,
+              duration: 1,
+              ease: "back.out(2)",
+              scrollTrigger: {
+                trigger: slide,
+                containerAnimation: horizontalScroll,
+                start: "left 50%",
+                toggleActions: "play none none reverse",
+              },
+            }
+          );
+        }
+      });
+
+      // --- Steps section animations ---
+      if (!stepsSectionRef.current) return;
+      const stepsEl = stepsSectionRef.current;
+
+      // Title words (SplitWords with .anim-word)
+      const stepsTitleWords = stepsEl.querySelectorAll(".steps-title .anim-word");
+      if (stepsTitleWords.length > 0) {
+        gsap.to(stepsTitleWords, {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: "back.out(1.7)",
+          stagger: 0.05,
+          scrollTrigger: {
+            trigger: stepsEl.querySelector(".steps-title"),
+            start: "top 80%",
+            toggleActions: "play none none reverse",
+          },
+        });
+      }
+
+      // Each step card — subtle fade up
+      const stepCards = stepsEl.querySelectorAll(".step-card");
+      stepCards.forEach((card, i) => {
+        gsap.fromTo(
+          card,
+          { opacity: 0, y: 30 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            delay: i * 0.15,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: card,
+              start: "top 85%",
+              toggleActions: "play none none reverse",
+            },
+          }
+        );
+      });
+
+      // CTA button
+      const stepsCta = stepsEl.querySelector(".steps-cta");
+      if (stepsCta) {
+        gsap.fromTo(
+          stepsCta,
+          { opacity: 0, y: 20 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: stepsCta,
+              start: "top 90%",
+              toggleActions: "play none none reverse",
+            },
+          }
+        );
+      }
+
+      // --- Use cases section animations (desktop only) ---
+      if (!useCasesSectionRef.current) return;
+      const useCasesEl = useCasesSectionRef.current;
+
+      // Title
+      const useCasesTitleWords = useCasesEl.querySelectorAll(".usecases-title .anim-word");
+      if (useCasesTitleWords.length > 0) {
+        gsap.to(useCasesTitleWords, {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: "back.out(1.7)",
+          stagger: 0.05,
+          scrollTrigger: {
+            trigger: useCasesEl.querySelector(".usecases-title"),
+            start: "top 80%",
+            toggleActions: "play none none reverse",
+          },
+        });
+      }
+
+      // --- Rules section animations ---
+      if (!rulesSectionRef.current) return;
+      const rulesEl = rulesSectionRef.current;
+
+      // Title
+      const rulesTitleWords = rulesEl.querySelectorAll(".rules-title .anim-word");
+      if (rulesTitleWords.length > 0) {
+        gsap.to(rulesTitleWords, {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: "back.out(1.7)",
+          stagger: 0.05,
+          scrollTrigger: {
+            trigger: rulesEl.querySelector(".rules-title"),
+            start: "top 80%",
+            toggleActions: "play none none reverse",
+          },
+        });
+      }
+
+      // Subtitle fade in
+      const rulesSubtitle = rulesEl.querySelector(".rules-subtitle");
+      if (rulesSubtitle) {
+        gsap.fromTo(
+          rulesSubtitle,
+          { opacity: 0, y: 15 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: rulesSubtitle,
+              start: "top 85%",
+              toggleActions: "play none none reverse",
+            },
+          }
+        );
+      }
+
+      // Pill groups stagger in
+      const pillGroups = rulesEl.querySelectorAll(".pill-group");
+      pillGroups.forEach((group) => {
+        const pills = group.querySelectorAll(".rule-pill");
+        gsap.fromTo(
+          pills,
+          { opacity: 0, y: 20, scale: 0.9 },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.5,
+            stagger: 0.06,
+            ease: "back.out(1.5)",
+            scrollTrigger: {
+              trigger: group,
+              start: "top 85%",
+              toggleActions: "play none none reverse",
+            },
+          }
+        );
+      });
+
+      // --- Bento section animations ---
+      if (!bentoSectionRef.current) return;
+      const bentoEl = bentoSectionRef.current;
+
+      // Title
+      const bentoTitleWords = bentoEl.querySelectorAll(".bento-title .anim-word");
+      if (bentoTitleWords.length > 0) {
+        gsap.to(bentoTitleWords, {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: "back.out(1.7)",
+          stagger: 0.05,
+          scrollTrigger: {
+            trigger: bentoEl.querySelector(".bento-title"),
+            start: "top 80%",
+            toggleActions: "play none none reverse",
+          },
+        });
+      }
+
+      // Bento cells
+      const bentoCells = bentoEl.querySelectorAll(".bento-cell");
+      bentoCells.forEach((cell, i) => {
+        gsap.fromTo(
+          cell,
+          { opacity: 0, y: 40, scale: 0.95 },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.7,
+            delay: i * 0.1,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: bentoEl.querySelector(".bento-grid"),
+              start: "top 75%",
+              toggleActions: "play none none reverse",
+            },
+          }
+        );
+      });
+
+      // --- Pricing section animations ---
+      if (!pricingSectionRef.current) return;
+      const pricingEl = pricingSectionRef.current;
+
+      const pricingTitleWords = pricingEl.querySelectorAll(".pricing-title .anim-word");
+      if (pricingTitleWords.length > 0) {
+        gsap.to(pricingTitleWords, {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: "back.out(1.7)",
+          stagger: 0.05,
+          scrollTrigger: {
+            trigger: pricingEl.querySelector(".pricing-title"),
+            start: "top 80%",
+            toggleActions: "play none none reverse",
+          },
+        });
+      }
+
+      const pricingCards = pricingEl.querySelectorAll(".pricing-card");
+      pricingCards.forEach((card, i) => {
+        gsap.fromTo(
+          card,
+          { opacity: 0, y: 30 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            delay: i * 0.15,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: pricingEl.querySelector(".pricing-cards"),
+              start: "top 80%",
+              toggleActions: "play none none reverse",
+            },
+          }
+        );
+      });
+    });
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <RouteGuard type="public" title="Linkkk - Smart Link Management Platform">
+    <RouteGuard>
       <Navigation />
 
-      <div className="min-h-screen md:pb-0">
-        {/* Hero Section - Input First */}
-        <section className="relative h-[100dvh] flex items-center justify-center px-4 pt-0 pb-10 overflow-hidden">
-          <div className="relative z-10 max-w-4xl mx-auto text-center w-full">
-            {/* App Icon - Mobile Only */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.05 }}
-              className="md:hidden mb-12 flex justify-center"
-            >
-              <img
-                src="/k-logo-noBg.svg"
-                alt={t("logoAlt")}
-                className="w-8 h-auto"
-              />
-            </motion.div>
-
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="text-5xl md:text-7xl font-black italic mb-4"
-            >
-              {t("title")}
-              <br />
-              <span className="text-shadow-[_4px_4px_0_var(--color-primary)] md:text-shadow-[_8px_8px_0_var(--color-primary)]">
-                {t("titleHighlight")}
+      {/* ==================== HERO ==================== */}
+      <div ref={triggerRef}>
+        <section
+          ref={heroSectionRef}
+          className="h-screen flex flex-col items-center justify-center px-6 md:px-40 overflow-hidden"
+        >
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            ref={heroContentRef}
+            className="max-w-4xl mx-auto text-center"
+          >
+            <h1 className="text-5xl md:text-8xl font-black italic leading-[1.05] tracking-tight text-dark mb-6">
+              <span className="hero-fade">Cada clic bajo{" "}</span>
+              <br className="md:hidden" />
+              <span className="hero-fade">tu </span>
+              <span
+                ref={controlWordRef}
+                className="inline-block will-change-transform"
+                style={{ transformOrigin: "45% 60%" }}
+              >
+                control.
               </span>
-            </motion.h1>
+            </h1>
 
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="text-md md:text-lg text-dark/60 mb-12 max-w-3xl mx-auto"
-            >
-              {t("description")}
-            </motion.p>
+            <p className="hero-fade text-xl font-black italic text-dark leading-snug mb-8 max-w-2xl mx-auto">
+              Decide qué hacen tus enlaces cuando acceden a ellos. Sin código.
+            </p>
 
-            {/* Main Input */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="w-full max-w-2xl mx-auto"
-            >
-              <div className="relative flex flex-col sm:flex-row gap-3 p-3 bg-white rounded-3xl shadow-[8px_8px_0_var(--color-dark)] border border-dark overflow-hidden">
-                <motion.div
-                  animate={{
-                    opacity: isShortening ? 0 : 1,
-                    x: isShortening ? -20 : 0,
-                    paddingRight: url && !isShortening ? "140px" : "0px",
-                  }}
-                  transition={{ duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
-                  className="flex-1"
-                >
-                  <Input
-                    autoFocus
-                    value={url}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      setUrl(e.target.value)
-                    }
-                    placeholder={t("inputPlaceholder")}
-                    className="bg-transparent border-none shadow-none focus:ring-0 text-md focus:outline-none"
-                    onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                      if (e.key === "Enter" && url) {
-                        handleShorten();
-                      }
-                    }}
-                    disabled={isShortening}
-                  />
-                </motion.div>
-                <motion.div
-                  initial={false}
-                  animate={{
-                    width: isShortening
-                      ? "calc(100% - 1rem)"
-                      : url
-                        ? "auto"
-                        : 0,
-                    opacity: url || isShortening ? 1 : 0,
-                    scale: url || isShortening ? 1 : 0.8,
-                  }}
-                  transition={{ duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 overflow-hidden"
-                >
-                  <Button
-                    size="lg"
-                    rounded="2xl"
-                    className="w-full h-full bg-dark hover:bg-primary text-light hover:text-dark whitespace-nowrap hover:shadow-[_0_0_0_var(--color-dark)]"
-                    leftIcon={
-                      isShortening ? (
-                        <RiLoader5Fill size={18} className="animate-spin" />
-                      ) : (
-                        <TbBolt size={18} />
-                      )
-                    }
-                    onClick={handleShorten}
-                    disabled={isShortening}
-                  >
-                    <p className="font-black italic">
-                      {isShortening ? t("buttonCreating") : t("buttonShorten")}
-                    </p>
-                  </Button>
-                </motion.div>
-              </div>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* Interactive Demos Section */}
-        <section className="min-h-[100dvh] flex items-center justify-center py-10 px-4">
-          <div className="max-w-6xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-16"
-            >
-              <div className="inline-block bg-primary px-2 py-1 rounded-full mb-4 text-xs font-black italic uppercase tracking-wide transition-all hover:shadow-[2px_2px_0_var(--color-dark)]">
-                {tDemos("badge")}
-              </div>
-              <h2 className="text-5xl md:text-6xl font-black italic mb-4">
-                {tDemos("title")}{" "}
-                <span className="text-light bg-danger text-shadow-[_4px_4px_0_var(--color-dark)]">
-                  {tDemos("titleHighlight")}
-                </span>
-              </h2>
-              <div className="inline text-2xl">
-                <p className="z-20 relative inline-flex flex-col md:flex-row items-center">
-                  {tDemos("subtitle")}
-                </p>
-              </div>
-            </motion.div>
-
-            <div className="grid md:grid-cols-3 gap-6">
-              {/* Demo 1: Device Detection */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="relative group p-4 md:p-8 bg-primary rounded-2xl md:border-2 border-dark shadow-[0px_0px_0_var(--color-dark)] hover:shadow-[4px_4px_0_var(--color-dark)] transition-all"
+            <div className="hero-fade">
+              <Button
+                variant="solid"
+                size="lg"
+                rounded="3xl"
+                onClick={() => setCreateLinkDrawer(true)}
+                className="bg-primary text-dark border-dark shadow-[4px_4px_0_var(--color-dark)] hover:shadow-[6px_6px_0_var(--color-dark)] font-black italic"
               >
-                {/* <div className="size-20 rounded-2xl bg-dark flex items-center justify-center mb-6">
-                  <TbDeviceMobile size={40} className="text-primary" />
-                </div> */}
-                <h3 className="text-3xl md:text-4xl font-black italic mb-3">
-                  {tDemos("demo1Title")}
-                </h3>
-                <p className="text-lg md:text-xl mb-8">
-                  {tDemos("demo1Description")}
-                </p>
-                <a
-                  href="/r/demo-device"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <div className="absolute flex flex-col items-center justify-center inset-1 bg-primary rounded-xl origin-right scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out">
-                    <p className="text-4xl text-dark font-black italic">
-                      {tDemos("tryDemo")}
-                    </p>
-                    <TbArrowUpRight size={64} />
-                  </div>
-                </a>
-
-                <a
-                  className="block md:hidden"
-                  href="/r/demo-device"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Button
-                    size="lg"
-                    rounded="2xl"
-                    className="w-full bg-primary text-dark shadow-[4px_4px_0_var(--color-dark)]"
-                    rightIcon={<TbArrowUpRight size={32} />}
-                  >
-                    <p className="font-black italic text-xl">
-                      {tDemos("tryDemo")}
-                    </p>
-                  </Button>
-                </a>
-              </motion.div>
-
-              {/* Demo 2: Password Protection */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 }}
-                className="relative group p-4 md:p-8 bg-secondary text-light rounded-2xl md:border-2 border-dark shadow-[0px_0px_0_var(--color-dark)] hover:shadow-[4px_4px_0_var(--color-dark)] transition-all"
-              >
-                {/* <div className="size-20 rounded-2xl bg-dark flex items-center justify-center mb-6">
-                  <TbLock size={40} className="text-secondary" />
-                </div> */}
-                <h3 className="text-3xl md:text-4xl font-black italic mb-3">
-                  {tDemos("demo2Title")}
-                </h3>
-                <p className="text-lg md:text-xl mb-8">
-                  {tDemos("demo2Description")}
-                </p>
-                <a
-                  href="/r/demo-password"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <div className="absolute flex flex-col items-center justify-center inset-1 bg-secondary rounded-xl origin-right scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out">
-                    <p className="text-4xl text-light font-black italic">
-                      {tDemos("tryDemo")}
-                    </p>
-                    <TbArrowUpRight size={64} className="text-light" />
-                  </div>
-                </a>
-
-                <a
-                  className="block md:hidden"
-                  href="/r/demo-password"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Button
-                    size="lg"
-                    rounded="2xl"
-                    className="w-full bg-secondary text-light shadow-[4px_4px_0_var(--color-dark)]"
-                    rightIcon={<TbArrowUpRight size={32} />}
-                  >
-                    <p className="font-black italic text-xl">
-                      {tDemos("tryDemo")}
-                    </p>
-                  </Button>
-                </a>
-              </motion.div>
-
-              {/* Demo 3: Detection Info */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2 }}
-                className="relative group p-4 md:p-8 bg-warning rounded-2xl md:border-2 border-dark shadow-[0px_0px_0_var(--color-dark)] hover:shadow-[4px_4px_0_var(--color-dark)] transition-all"
-              >
-                {/* <div className="size-20 rounded-2xl bg-dark flex items-center justify-center mb-6">
-                  <TbEye size={40} className="text-warning" />
-                </div> */}
-                <h3 className="text-3xl md:text-4xl font-black italic mb-3">
-                  {tDemos("demo3Title")}
-                </h3>
-                <p className="text-lg md:text-xl mb-8">
-                  {tDemos("demo3Description")}
-                </p>
-                <a
-                  href="/r/demo-detection"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <div className="absolute flex flex-col items-center justify-center inset-1 bg-warning rounded-xl origin-right scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out">
-                    <p className="text-4xl text-dark font-black italic">
-                      {tDemos("tryDemo")}
-                    </p>
-                    <TbArrowUpRight size={64} />
-                  </div>
-                </a>
-
-                <a
-                  className="block md:hidden"
-                  href="/r/demo-detection"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Button
-                    size="lg"
-                    rounded="2xl"
-                    className="w-full bg-warning text-dark shadow-[4px_4px_0_var(--color-dark)]"
-                    rightIcon={<TbArrowUpRight size={32} />}
-                  >
-                    <p className="font-black italic text-xl">
-                      {tDemos("tryDemo")}
-                    </p>
-                  </Button>
-                </a>
-              </motion.div>
+                Crea tu primer smart link
+              </Button>
             </div>
-          </div>
+
+            <p className="hero-fade text-xs text-dark/50 mt-4">
+              Sin registro, gratis y en 30 segundos
+            </p>
+          </motion.div>
         </section>
 
-        {/* Rules Engine Section - Carousel Pills */}
-        <section className="min-h-[100dvh] flex flex-col items-center justify-center py-10 px-4 relative overflow-hidden">
-          <div className="max-w-6xl mx-auto relative z-10">
-            {/* Header */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-16"
+        <div className="h-[150vh]" />
+      </div>
+
+      {/* ==================== HORIZONTAL SCROLL SECTION ==================== */}
+      <div ref={horizontalSectionRef} className="bg-dark overflow-hidden relative pt-px">
+        {/* Floating section title */}
+        <h2
+          ref={sectionTitleRef}
+          className="absolute left-1/2 -translate-x-1/2 top-1/2 pt-96 -translate-y-1/2 z-10 text-4xl md:text-6xl font-black italic text-light text-center leading-tight whitespace-nowrap will-change-transform"
+        >
+          <SplitWords>El problema con los links</SplitWords>{" "}
+          <span className="inline-block overflow-hidden">
+            <span
+              className="anim-word inline-block bg-danger px-2 text-light text-shadow-[4px_4px_0_var(--color-dark)]"
+              style={{ opacity: 0, transform: "translateY(40px)" }}
             >
-              <div className="inline-block bg-warning px-2 py-1 rounded-full mb-4 text-xs font-black italic uppercase tracking-wide transition-all hover:shadow-[2px_2px_0_var(--color-dark)]">
-                {tRules("badge")}
+              tontos
+            </span>
+          </span>
+        </h2>
+
+        <div
+          ref={horizontalTrackRef}
+          className="flex h-screen items-center will-change-transform"
+        >
+          {/* Spacer: first "screen" is just the title */}
+          <div className="flex-shrink-0 w-screen h-full" />
+
+          {/* --- Slide 1: Bots --- */}
+          <div className="h-slide flex-shrink-0 w-screen h-full flex items-center px-8 md:px-20 pt-24 md:pt-32">
+            <div className="flex flex-col md:flex-row items-center gap-8 md:gap-16 w-full max-w-5xl mx-auto">
+              <div className="anim-sticker flex-shrink-0">
+                <Image
+                  src="/robot-sticker.png"
+                  alt="Robot sticker"
+                  width={280}
+                  height={280}
+                  className="w-40 md:w-72 h-auto drop-shadow-2xl"
+                />
               </div>
-              <h2 className="text-4xl md:text-6xl font-black italic mb-4">
-                {tRules("title")}{" "}
-                <span className="text-light bg-info text-shadow-[_4px_4px_0_var(--color-dark)]">
-                  {tRules("titleHighlight")}
-                </span>
-              </h2>
-              <p className="text-xl text-dark/60">{tRules("subtitle")}</p>
-            </motion.div>
-
-            {/* Example Text */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.4 }}
-              className="mb-8 text-center"
-            >
-              <div className="inline-block">
-                <div className="flex flex-wrap items-center justify-center gap-2">
-                  <span className="font-black text-lg md:text-xl italic">
-                    {tRules("if")}
-                  </span>
-                  <div className="inline-block">
-                    <AnimatedText
-                      key={`condition-${activeExampleIndex}`}
-                      initialText={
-                        ruleExamples[activeExampleIndex].textCondition
-                      }
-                      triggerMode="none"
-                      animationType="slide"
-                      slideDirection="up"
-                      duration={0.5}
-                      className={`font-black text-lg md:text-xl italic ${ruleExamples[activeExampleIndex].color1}`}
-                    />
-                  </div>
-                  <span className="font-black text-lg md:text-xl italic -ml-">
-                    {tRules("then")}
-                  </span>
-                  <div className="inline-block">
-                    <AnimatedText
-                      key={`action-${activeExampleIndex}`}
-                      initialText={ruleExamples[activeExampleIndex].textAction}
-                      triggerMode="none"
-                      animationType="slide"
-                      slideDirection="up"
-                      duration={0.5}
-                      className={`font-black text-lg md:text-xl italic ${ruleExamples[activeExampleIndex].color2}`}
-                    />
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* IF Section */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="mb-12"
-            >
-              <div className="flex items-center gap-3 mb-6">
-                <div className="px-4 py-2 bg-dark text-light rounded-xl font-black italic text-sm">
-                  {tRules("conditionsLabel")}
-                </div>
-                <div className="h-px flex-1 bg-dark/20" />
-              </div>
-
-              {/* Conditions Pills */}
-              <div className="flex flex-wrap gap-3 justify-center">
-                {[
-                  {
-                    icon: TbWorld,
-                    label: tRules("conditionCountry"),
-                    color: "bg-primary",
-                  },
-                  {
-                    icon: TbDeviceMobile,
-                    label: tRules("conditionDevice"),
-                    color: "bg-secondary text-light",
-                  },
-                  {
-                    icon: TbNetwork,
-                    label: tRules("conditionIP"),
-                    color: "bg-warning",
-                  },
-                  {
-                    icon: TbShieldCheck,
-                    label: tRules("conditionVPN"),
-                    color: "bg-info",
-                  },
-                  {
-                    icon: TbRobot,
-                    label: tRules("conditionBot"),
-                    color: "bg-danger",
-                  },
-                  {
-                    icon: TbCalendar,
-                    label: tRules("conditionDateTime"),
-                    color: "bg-success",
-                  },
-                  {
-                    icon: TbChartBar,
-                    label: tRules("conditionAccessCount"),
-                    color: "bg-info",
-                  },
-                ].map((item, i) => {
-                  const textRef = { current: null as AnimatedTextRef | null };
-                  const isActive = ruleExamples[
-                    activeExampleIndex
-                  ].conditions.includes(item.label);
-                  return (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      viewport={{ once: true }}
-                      onMouseEnter={() => textRef.current?.setText(item.label)}
-                      onMouseLeave={() => textRef.current?.reset()}
-                      className={`flex items-center gap-2 px-4 py-3 ${item.color} ${isActive ? `border-dark shadow-[2px_2px_0_var(--color-dark)]` : `border-transparent`} rounded-full border-2 border-dark cursor-pointer transition-all duration-300`}
-                    >
-                      <item.icon size={20} className="" />
-                      <AnimatedText
-                        ref={textRef}
-                        initialText={item.label}
-                        triggerMode="none"
-                        animationType="slide"
-                        slideDirection="up"
-                        duration={0.3}
-                        className="font-black text-sm whitespace-nowrap"
-                      />
-                    </motion.div>
-                  );
-                })}
-              </div>
-            </motion.div>
-
-            {/* THEN Section */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-            >
-              <div className="flex items-center gap-3 mb-6">
-                <div className="px-4 py-2 bg-dark text-light rounded-xl font-black italic text-sm">
-                  {tRules("actionsLabel")}
-                </div>
-                <div className="h-px flex-1 bg-dark/20" />
-              </div>
-
-              {/* Actions Pills */}
-              <div className="flex flex-wrap gap-3 justify-center">
-                {[
-                  {
-                    icon: TbArrowRight,
-                    label: tRules("actionRedirect"),
-                    color: "bg-primary",
-                  },
-                  {
-                    icon: TbX,
-                    label: tRules("actionBlock"),
-                    color: "bg-danger",
-                  },
-                  {
-                    icon: TbLock,
-                    label: tRules("actionPassword"),
-                    color: "bg-warning",
-                  },
-                  {
-                    icon: TbWebhook,
-                    label: tRules("actionWebhook"),
-                    color: "bg-info",
-                  },
-                ].map((item, i) => {
-                  const textRef = { current: null as AnimatedTextRef | null };
-                  const isActive = ruleExamples[
-                    activeExampleIndex
-                  ].actions.includes(item.label);
-                  return (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      viewport={{ once: true }}
-                      onMouseEnter={() => textRef.current?.setText(item.label)}
-                      onMouseLeave={() => textRef.current?.reset()}
-                      className={`flex items-center gap-2 px-4 py-3 ${item.color} ${isActive ? `border-dark shadow-[2px_2px_0_var(--color-dark)]` : `border-transparent`} rounded-full border-2 border-dark cursor-pointer transition-all duration-300`}
-                    >
-                      <item.icon size={20} className="text-dark" />
-                      <AnimatedText
-                        ref={textRef}
-                        initialText={item.label}
-                        triggerMode="none"
-                        animationType="slide"
-                        slideDirection="up"
-                        duration={0.3}
-                        className="font-black text-sm whitespace-nowrap text-dark"
-                      />
-                    </motion.div>
-                  );
-                })}
-              </div>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* Motivational Carousel Separator */}
-        <section className="py-4 px-4 bg-dark overflow-hidden">
-          <div className="relative">
-            <motion.div
-              className="flex gap-8 whitespace-nowrap"
-              animate={{
-                x: [0, -1500],
-              }}
-              transition={{
-                x: {
-                  repeat: Infinity,
-                  repeatType: "loop",
-                  duration: 30,
-                  ease: "linear",
-                },
-              }}
-            >
-              {[
-                tCarousel("phrase1"),
-                tCarousel("phrase2"),
-                tCarousel("phrase3"),
-                tCarousel("phrase4"),
-                tCarousel("phrase5"),
-                tCarousel("phrase6"),
-                tCarousel("phrase7"),
-                tCarousel("phrase8"),
-                // Duplicate for seamless loop
-                tCarousel("phrase1"),
-                tCarousel("phrase2"),
-                tCarousel("phrase3"),
-                tCarousel("phrase4"),
-                tCarousel("phrase5"),
-                tCarousel("phrase6"),
-                tCarousel("phrase7"),
-                tCarousel("phrase8"),
-              ].map((message, i) => (
-                <div
-                  key={i}
-                  className="text-3xl md:text-5xl font-black italic text-warning flex-shrink-0"
-                >
-                  {message}
-                  <span className="text-light mx-4">•</span>
-                </div>
-              ))}
-            </motion.div>
-          </div>
-        </section>
-
-        {/* General Features - Stacked Scroll Animation */}
-        <section ref={featuresRef} className="relative h-auto md:h-[400vh]">
-          <div className="relative md:sticky md:top-0 h-auto md:h-screen md:overflow-hidden flex items-center">
-            <div className="w-full px-4 md:px-8">
-              <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-12 items-center">
-                {/* Left Side - Sticky Text */}
-                <div className="flex flex-col">
-                  <div className="inline-block bg-warning px-2 py-1 rounded-full mb-4 text-xs font-black italic uppercase tracking-wide w-fit">
-                    {tFeatures("badge")}
-                  </div>
-                  <h2 className="text-4xl md:text-6xl font-black italic mb-4">
-                    {tFeatures("title")}
-                  </h2>
-                  <p className="text-xl text-dark/60 mb-6 md:mb-8">
-                    {tFeatures("subtitle")}
-                  </p>
-                  <Button
-                    variant="solid"
-                    size="lg"
-                    rounded="xl"
-                    leftIcon={<TbPlus size={20} />}
-                    expandOnHover="icon"
-                    className="w-fit bg-dark hover:bg-primary hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)]"
-                    onClick={() => setIsCreateLinkDrawerOpen(true)}
-                  >
-                    <p className="font-black italic">
-                      {tFeatures("createLinkButton")}
-                    </p>
-                  </Button>
-                  <div className="space-y-4 hidden">
-                    <div className="flex items-start gap-3">
-                      <div className="size-8 mt-1 rounded-lg bg-primary flex items-center justify-center flex-shrink-0">
-                        <TbUserPlus size={20} />
-                      </div>
-                      <div>
-                        <h4 className="font-black text-lg">Guest Mode</h4>
-                        <p className="text-dark/60">
-                          Start instantly without signup
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <div className="size-8 mt-1 rounded-lg bg-warning flex items-center justify-center flex-shrink-0">
-                        <TbTarget size={20} />
-                      </div>
-                      <div>
-                        <h4 className="font-black text-lg">Link Rules</h4>
-                        <p className="text-dark/60">
-                          Conditional logic for your links
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <div className="size-8 mt-1 rounded-lg bg-secondary flex items-center justify-center flex-shrink-0">
-                        <TbChartBar size={20} className="text-light" />
-                      </div>
-                      <div>
-                        <h4 className="font-black text-lg">Access tracking</h4>
-                        <p className="text-dark/60">
-                          Track every visitor detail
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right Side - Mobile: Horizontal Scroll, Desktop: Stacked Cards */}
-
-                {/* Mobile Version - Horizontal Scroll */}
-                <div className="md:hidden overflow-x-auto snap-x snap-mandatory pb-4 -mx-4 px-4">
-                  <div className="flex gap-4" style={{ width: "max-content" }}>
-                    {/* Card 1: Guest Mode */}
-                    <div
-                      className="snap-center"
-                      style={{ width: "85vw", maxWidth: "400px" }}
-                    >
-                      <div className="h-[500px] p-6 bg-primary rounded-3xl border-4 border-dark shadow-[4px_4px_0_var(--color-dark)]">
-                        <div className="flex flex-col h-full justify-between">
-                          <div>
-                            <div className="size-16 md:size-20 rounded-2xl bg-dark flex items-center justify-center mb-4">
-                              <TbUserPlus size={40} className="text-primary" />
-                            </div>
-                            <h3 className="text-2xl md:text-4xl font-black italic mb-3">
-                              {tFeatures("card1Title")}
-                            </h3>
-                            <p className="text-md md:text-lg text-dark/80">
-                              {tFeatures("card1DescriptionShort")}
-                            </p>
-                          </div>
-                          <div className="flex flex-wrap gap-3 text-sm font-bold">
-                            <div className="px-4 py-2 bg-dark text-light rounded-xl">
-                              {tFeatures("card1Tag1")}
-                            </div>
-                            <div className="px-4 py-2 bg-dark text-light rounded-xl">
-                              {tFeatures("card1Tag2")}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Card 2: Smart Rules */}
-                    <div
-                      className="snap-center"
-                      style={{ width: "85vw", maxWidth: "400px" }}
-                    >
-                      <div className="h-[500px] p-6 bg-warning rounded-3xl border-4 border-dark shadow-[4px_4px_0_var(--color-dark)]">
-                        <div className="flex flex-col h-full justify-between">
-                          <div>
-                            <div className="size-16 md:size-20 rounded-2xl bg-dark flex items-center justify-center mb-4">
-                              <TbTarget size={40} className="text-warning" />
-                            </div>
-                            <h3 className="text-2xl md:text-4xl font-black italic mb-3">
-                              {tFeatures("card2Title")}
-                            </h3>
-                            <p className="text-md md:text-lg text-dark/80">
-                              {tFeatures("card2DescriptionShort")}
-                            </p>
-                          </div>
-                          <div className="flex flex-wrap gap-3 text-sm font-bold">
-                            <div className="px-4 py-2 bg-dark text-light rounded-xl">
-                              {tFeatures("card2Tag1")}
-                            </div>
-                            <div className="px-4 py-2 bg-dark text-light rounded-xl">
-                              {tFeatures("card2Tag2")}
-                            </div>
-                            <div className="px-4 py-2 bg-dark text-light rounded-xl">
-                              {tFeatures("card2Tag3")}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Card 3: Analytics */}
-                    <div
-                      className="snap-center"
-                      style={{ width: "85vw", maxWidth: "400px" }}
-                    >
-                      <div className="h-[500px] p-6 bg-secondary rounded-3xl border-4 border-dark shadow-[4px_4px_0_var(--color-dark)]">
-                        <div className="flex flex-col h-full justify-between">
-                          <div>
-                            <div className="size-16 md:size-20 rounded-2xl bg-dark flex items-center justify-center mb-4">
-                              <TbChartBar
-                                size={40}
-                                className="text-secondary"
-                              />
-                            </div>
-                            <h3 className="text-2xl md:text-4xl font-black italic mb-3 text-light">
-                              {tFeatures("card3Title")}
-                            </h3>
-                            <p className="text-md md:text-lg text-light/90">
-                              {tFeatures("card3DescriptionShort")}
-                            </p>
-                          </div>
-                          <div className="flex flex-wrap gap-3 text-sm font-bold">
-                            <div className="px-4 py-2 bg-dark text-light rounded-xl">
-                              {tFeatures("card3Tag1")}
-                            </div>
-                            <div className="px-4 py-2 bg-dark text-light rounded-xl">
-                              {tFeatures("card3Tag2")}
-                            </div>
-                            <div className="px-4 py-2 bg-dark text-light rounded-xl">
-                              {tFeatures("card3Tag3")}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Desktop Version - Stacked Cards */}
-                <div className="relative h-[500px] hidden md:flex items-center justify-center">
-                  {/* Card 1: Guest Mode */}
-                  <FeatureCard
-                    scrollProgress={scrollYProgress}
-                    index={0}
-                    total={3}
-                    icon={TbUserPlus}
-                    iconColor="text-primary"
-                    bgColor="bg-primary"
-                    title={tFeatures("card1Title")}
-                    description={tFeatures("card1DescriptionLong")}
-                    tags={[tFeatures("card1Tag1"), tFeatures("card1Tag2")]}
-                  />
-
-                  {/* Card 2: Smart Rules */}
-                  <FeatureCard
-                    scrollProgress={scrollYProgress}
-                    index={1}
-                    total={3}
-                    icon={TbTarget}
-                    iconColor="text-warning"
-                    bgColor="bg-warning"
-                    title={tFeatures("card2Title")}
-                    description={tFeatures("card2DescriptionLong")}
-                    tags={[
-                      tFeatures("card2Tag1"),
-                      tFeatures("card2Tag2"),
-                      tFeatures("card2Tag3"),
-                    ]}
-                  />
-
-                  {/* Card 3: Analytics */}
-                  <FeatureCard
-                    scrollProgress={scrollYProgress}
-                    index={2}
-                    total={3}
-                    icon={TbChartBar}
-                    iconColor="text-secondary"
-                    bgColor="bg-secondary"
-                    title={tFeatures("card3Title")}
-                    description={tFeatures("card3DescriptionLong")}
-                    tags={[
-                      tFeatures("card3Tag1"),
-                      tFeatures("card3Tag2"),
-                      tFeatures("card3Tag3"),
-                    ]}
-                    textLight
-                  />
-                </div>
+              <div>
+                <p className="font-black italic text-light leading-none mb-2">
+                  <SplitWords className="text-5xl md:text-7xl">.01</SplitWords>
+                  <SplitWords className="text-2xl md:text-4xl ml-1">
+                    Los bots devoran tu presupuesto de ads.
+                  </SplitWords>
+                </p>
+                <p className="font-bold italic text-light/60 text-lg md:text-xl mt-4">
+                  <SplitWords>Tus métricas mienten.</SplitWords>
+                </p>
               </div>
             </div>
           </div>
-        </section>
 
-        {/* Getting Started */}
-        <section className="min-h-[100dvh] py-20 px-4">
-          <div className="max-w-6xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-8"
-            >
-              <div className="inline-block bg-info text-light px-2 py-1 rounded-full mb-4 text-xs font-black italic uppercase tracking-wide">
-                {tGettingStarted("badge")}
+          {/* --- Slide 2: Affiliate / Geo --- */}
+          <div className="h-slide flex-shrink-0 w-screen h-full flex items-center px-8 md:px-20 pt-24 md:pt-32">
+            <div className="flex flex-col md:flex-row items-center gap-8 md:gap-16 w-full max-w-5xl mx-auto">
+              <div className="anim-sticker flex-shrink-0 relative">
+                <Image
+                  src="/dollar-sticker.png"
+                  alt="Dollar sticker"
+                  width={200}
+                  height={200}
+                  className="w-28 md:w-48 h-auto drop-shadow-2xl"
+                />
+                <Image
+                  src="/euro-sticker.png"
+                  alt="Euro sticker"
+                  width={200}
+                  height={200}
+                  className="w-28 md:w-48 h-auto drop-shadow-2xl absolute -right-8 md:-right-12 -bottom-4 md:-bottom-6"
+                />
               </div>
-              <h2 className="text-4xl md:text-6xl font-black italic mb-4">
-                {tGettingStarted("title")}{" "}
-                <span className="bg-primary">
-                  {tGettingStarted("titleHighlight")}
-                </span>
-              </h2>
-              <p className="text-xl text-dark/60 mb-6">
-                {tGettingStarted("subtitle")}
+              <div>
+                <p className="font-black italic text-light leading-none mb-2">
+                  <SplitWords className="text-5xl md:text-7xl">.02</SplitWords>
+                  <SplitWords className="text-2xl md:text-4xl ml-1">
+                    Tu oferta de afiliado en EEUU la clica alguien desde Alemania.
+                  </SplitWords>
+                </p>
+                <p className="font-bold italic text-light/60 text-lg md:text-xl mt-4">
+                  <SplitWords>Comisión: $0.</SplitWords>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* --- Slide 3: Mobile user --- */}
+          <div className="h-slide flex-shrink-0 w-screen h-full flex items-center px-8 md:px-20 pt-24 md:pt-32">
+            <div className="flex flex-col md:flex-row items-center gap-8 md:gap-16 w-full max-w-5xl mx-auto">
+              <div className="anim-sticker flex-shrink-0">
+                <Image
+                  src="/mobile-sticker.png"
+                  alt="Mobile sticker"
+                  width={280}
+                  height={280}
+                  className="w-36 md:w-64 h-auto drop-shadow-2xl"
+                />
+              </div>
+              <div>
+                <p className="font-black italic text-light leading-none mb-2">
+                  <SplitWords className="text-5xl md:text-7xl">.03</SplitWords>
+                  <SplitWords className="text-2xl md:text-4xl ml-1">
+                    Un usuario móvil aterriza en tu versión de escritorio.
+                  </SplitWords>
+                </p>
+                <p className="font-bold italic text-light/60 text-lg md:text-xl mt-4">
+                  <SplitWords>Se va antes de que cargue.</SplitWords>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* --- Slide 4: Public link --- */}
+          <div className="h-slide flex-shrink-0 w-screen h-full flex items-center px-8 md:px-20 pt-24 md:pt-32">
+            <div className="flex flex-col md:flex-row items-center gap-8 md:gap-16 w-full max-w-5xl mx-auto">
+              <div className="anim-sticker flex-shrink-0">
+                <Image
+                  src="/lock-sticker.png"
+                  alt="Lock sticker"
+                  width={280}
+                  height={280}
+                  className="w-32 md:w-56 h-auto drop-shadow-2xl"
+                />
+              </div>
+              <div>
+                <p className="font-black italic text-light leading-none mb-2">
+                  <SplitWords className="text-5xl md:text-7xl">.04</SplitWords>
+                  <SplitWords className="text-2xl md:text-4xl ml-1">
+                    Compartes un link en público.
+                  </SplitWords>
+                </p>
+                <p className="font-bold italic text-light/60 text-lg md:text-xl mt-4">
+                  <SplitWords>Competidores, scrapers y curiosos se sirven solos.</SplitWords>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ==================== STEPS SECTION ==================== */}
+      <section ref={stepsSectionRef} className="bg-light min-h-screen flex flex-col items-center justify-center gap-12 py-16 px-6 md:px-20 relative overflow-x-clip">
+        <div className="max-w-6xl mx-auto w-full">
+          {/* Title */}
+          <h2 className="steps-title text-3xl md:text-4xl font-black italic text-dark text-center leading-tight  md:mb-24">
+            <SplitWords>Tres pasos. Cero código.</SplitWords>
+          </h2>
+
+          {/* Steps — vertical on mobile, horizontal on desktop */}
+          <div className="flex flex-col md:flex-row md:items-stretch gap-16 md:gap-8 relative">
+            {/* Step 1 */}
+            <div className="step-card flex-1 relative bg-dark/5 rounded-2xl p-6">
+              <div className="size-9 rounded-full bg-primary/15 flex items-center justify-center mb-4">
+                <TbClipboard size={22} className="text-primary" />
+              </div>
+              <h3 className="text-xl md:text-2xl font-black italic text-dark mb-2">
+                1. Pega tu enlace
+              </h3>
+              <p className="text-xs md:text-base text-dark/70 leading-relaxed">
+                Da igual lo largo, feo o complicado que sea. Nosotros lo convertimos en un enlace <strong>inteligente</strong>.
               </p>
-
-              {/* Billing Period Toggle */}
-              <div className="inline-flex gap-1 p-1 bg-dark/5 rounded-2xl">
-                <button
-                  onClick={() => setBillingPeriod("monthly")}
-                  className={`px-4 py-2 rounded-xl italic text-sm transition-all duration-200 ${
-                    billingPeriod === "monthly"
-                      ? "bg-dark text-light"
-                      : "text-dark/60 hover:text-dark hover:cursor-pointer"
-                  }`}
-                >
-                  <p className="font-black">
-                    {tGettingStarted("billingToggleMonthly")}
-                  </p>
-                </button>
-                <button
-                  onClick={() => setBillingPeriod("yearly")}
-                  className={`px-4 py-2 rounded-xl italic text-sm transition-all duration-200 ${
-                    billingPeriod === "yearly"
-                      ? "bg-dark text-light"
-                      : "text-dark/60 hover:text-dark hover:cursor-pointer"
-                  }`}
-                >
-                  <p className="font-black">
-                    {tGettingStarted("billingToggleYearly")}
-                  </p>
-                </button>
-              </div>
-            </motion.div>
-
-            <div className="grid md:grid-cols-3 gap-6">
-              {/* Guest */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="flex flex-col p-8 bg-dark/5 rounded-3xl transition-all duration-200 border-2 border-transparent hover:border-dark hover:shadow-[6px_6px_0_var(--color-dark)]"
-              >
-                <div className="text-sm font-bold text-dark/60 mb-2">
-                  {tGettingStarted("guestLabel")}
-                </div>
-                <div className="text-4xl font-black mb-2">
-                  {tGettingStarted("guestPrice")}
-                </div>
-                <div className="text-dark/60 mb-6">
-                  {tGettingStarted("guestSubtitle")}
-                </div>
-
-                <ul className="space-y-3 mb-8">
-                  <li className="flex items-start gap-2">
-                    <TbCheck className="text-success mt-1 flex-shrink-0" />
-                    <span>{tGettingStarted("guestFeature1")}</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <TbCheck className="text-success mt-1 flex-shrink-0" />
-                    <span>{tGettingStarted("guestFeature2")}</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <TbCheck className="text-success mt-1 flex-shrink-0" />
-                    <span>{tGettingStarted("guestFeature3")}</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <TbCheck className="text-success mt-1 flex-shrink-0" />
-                    <span>{tGettingStarted("guestFeature4")}</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <TbCheck className="text-success mt-1 flex-shrink-0" />
-                    <span>{tGettingStarted("guestFeature5")}</span>
-                  </li>
-                </ul>
-
-                <Button
-                  variant="outline"
-                  size="lg"
-                  rounded="xl"
-                  rightIcon={<TbArrowUpRight size={24} />}
-                  expandOnHover="icon"
-                  className="mt-auto w-full hover:bg-warning"
-                  onClick={() => setIsCreateLinkDrawerOpen(true)}
-                >
-                  <p className="font-black italic">
-                    {tGettingStarted("guestButton")}
-                  </p>
-                </Button>
-              </motion.div>
-
-              {/* Free Account - Popular */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 }}
-                className="flex flex-col p-8 bg-primary rounded-3xl border-2 border-dark relative shadow-[6px_6px_0_var(--color-dark)]"
-              >
-                {/* <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-dark text-light rounded-full text-xs font-black">
-                  MOST POPULAR
-                </div> */}
-
-                <div className="text-sm font-bold text-dark mb-2">
-                  {tGettingStarted("freeLabel")}
-                </div>
-                <div className="text-4xl font-black text-dark mb-2">
-                  {tGettingStarted("freePrice")}
-                </div>
-                <div className="text-dark/60 mb-6">
-                  {tGettingStarted("freeSubtitle")}
-                </div>
-
-                <ul className="space-y-3 mb-8">
-                  <li className="flex items-start gap-2">
-                    <TbCheck className="text-dark mt-1 flex-shrink-0" />
-                    <span className="text-dark">
-                      {tGettingStarted("freeFeature1")}
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <TbCheck className="text-dark mt-1 flex-shrink-0" />
-                    <span className="text-dark">
-                      {tGettingStarted("freeFeature2")}
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <TbCheck className="text-dark mt-1 flex-shrink-0" />
-                    <span className="text-dark">
-                      {tGettingStarted("freeFeature3")}
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <TbCheck className="text-dark mt-1 flex-shrink-0" />
-                    <span className="text-dark">
-                      {tGettingStarted("freeFeature4")}
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <TbCheck className="text-dark mt-1 flex-shrink-0" />
-                    <span className="text-dark">
-                      {tGettingStarted("freeFeature5")}
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <TbCheck className="text-dark mt-1 flex-shrink-0" />
-                    <span className="text-dark">
-                      {tGettingStarted("freeFeature6")}
-                    </span>
-                  </li>
-                  {/* <li className="flex items-start gap-2">
-                    <TbCheck className="text-dark mt-1 flex-shrink-0" />
-                    <span className="text-dark">{tGettingStarted('freeFeature7')}</span>
-                  </li> */}
-                  <li className="flex items-start gap-2">
-                    <TbCheck className="text-dark mt-1 flex-shrink-0" />
-                    <span className="text-dark">
-                      {tGettingStarted("freeFeature8")}
-                    </span>
-                  </li>
-                </ul>
-
-                <Link href="/auth/register" className="mt-auto">
-                  <Button
-                    variant="solid"
-                    size="lg"
-                    rounded="xl"
-                    rightIcon={<TbRocket size={24} />}
-                    expandOnHover="icon"
-                    className="w-full bg-dark hover:text-dark hover:bg-primary"
-                  >
-                    <p className="font-black italic">
-                      {tGettingStarted("freeButton")}
-                    </p>
-                  </Button>
-                </Link>
-              </motion.div>
-
-              {/* PRO Plan */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2 }}
-                className="relative overflow-hidden flex flex-col p-8 bg-dark/5 rounded-3xl transition-all duration-200 border-2 border-transparent hover:border-dark hover:shadow-[6px_6px_0_var(--color-dark)]"
-              >
-                <div className="text-sm font-bold text-dark/60 mb-2">
-                  {tGettingStarted("proLabel")}
-                </div>
-                <div className="text-4xl font-black mb-2">
-                  <span className="text-secondary">
-                    <AnimatedText
-                      key={`price-${billingPeriod}`}
-                      initialText={
-                        billingPeriod === "monthly"
-                          ? tGettingStarted("proPriceMonthly")
-                          : tGettingStarted("proPriceYearly")
-                      }
-                      animationType="slide"
-                      slideDirection="up"
-                      duration={0.3}
-                    />
-                  </span>
-                  <span className="text-lg text-dark/60">
-                    <AnimatedText
-                      key={`period-${billingPeriod}`}
-                      initialText={
-                        billingPeriod === "monthly"
-                          ? tGettingStarted("proPeriodMonthly")
-                          : tGettingStarted("proPeriodYearly")
-                      }
-                      animationType="slide"
-                      slideDirection="up"
-                      duration={0.3}
-                    />
-                  </span>
-                </div>
-                <div className="text-dark/60 mb-6">
-                  {tGettingStarted("proSubtitle")}
-                </div>
-
-                <ul className="space-y-3 mb-8">
-                  <li className="flex items-start gap-2">
-                    <TbSparkles className="text-secondary mt-1 flex-shrink-0" />
-                    <span>{tGettingStarted("proFeature1")}</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <TbSparkles className="text-secondary mt-1 flex-shrink-0" />
-                    <span>{tGettingStarted("proFeature2")}</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <TbSparkles className="text-secondary mt-1 flex-shrink-0" />
-                    <span>{tGettingStarted("proFeature3")}</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <TbSparkles className="text-secondary mt-1 flex-shrink-0" />
-                    <span>{tGettingStarted("proFeature5")}</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <TbSparkles className="text-secondary mt-1 flex-shrink-0" />
-                    <span>{tGettingStarted("proFeature4")}</span>
-                  </li>
-                </ul>
-
-                {isAuthenticated && !isGuest ? (
-                  <Button
-                    variant="solid"
-                    size="lg"
-                    rounded="xl"
-                    rightIcon={<TbRocket size={24} />}
-                    expandOnHover="icon"
-                    className="w-full bg-dark hover:bg-secondary mt-auto"
-                    onClick={async () => {
-                      try {
-                        await subscriptionService.createCheckoutSession(
-                          billingPeriod,
-                        );
-                      } catch (error) {
-                        console.error(
-                          "Error creating checkout session:",
-                          error,
-                        );
-                        toast.error(
-                          "Failed to start checkout. Please try again.",
-                        );
-                      }
-                    }}
-                  >
-                    <p className="font-black italic">
-                      {tGettingStarted("proButton")}
-                    </p>
-                  </Button>
-                ) : (
-                  <Link href="/auth/login" className="mt-auto">
-                    <Button
-                      variant="solid"
-                      size="lg"
-                      rounded="xl"
-                      rightIcon={<TbRocket size={24} />}
-                      expandOnHover="icon"
-                      className="w-full bg-dark hover:bg-secondary"
-                    >
-                      <p className="font-black italic">
-                        {tGettingStarted("proButton")}
-                      </p>
-                    </Button>
-                  </Link>
-                )}
-              </motion.div>
+              {/* Arrow to step 2 */}
+              <Image
+                src="/green-arrow.svg"
+                alt=""
+                width={32}
+                height={32}
+                className="absolute hidden md:block rotate-90 w-46 md:-bottom-18 md:left-40 md:rotate-0 md:w-64"
+              />
             </div>
-          </div>
-        </section>
 
-        {/* FAQ Section */}
-        <section className="py-20 px-4">
-          <div className="max-w-4xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-12"
-            >
-              <div className="inline-block bg-secondary text-light px-2 py-1 rounded-full mb-4 text-xs font-black italic uppercase tracking-wide">
-                {tFAQ("badge")}
+            {/* Step 2 */}
+            <div className="step-card flex-1 relative bg-dark/5 rounded-2xl p-6">
+              <div className="size-9 rounded-full bg-warning/20 flex items-center justify-center mb-4">
+                <TbAdjustmentsHorizontal size={22} className="text-warning" />
               </div>
-              <h2 className="text-4xl md:text-6xl font-black italic mb-4">
-                {tFAQ("title")}{" "}
-                <span className="bg-warning">{tFAQ("titleHighlight")}</span>
-              </h2>
-            </motion.div>
-
-            <div className="space-y-4">
-              {[
-                { question: tFAQ("question1"), answer: tFAQ("answer1") },
-                { question: tFAQ("question2"), answer: tFAQ("answer2") },
-                { question: tFAQ("question3"), answer: tFAQ("answer3") },
-                { question: tFAQ("question4"), answer: tFAQ("answer4") },
-              ].map((faq, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  className={`rounded-2xl border-2 border-dark overflow-hidden transition-all duration-300 ${
-                    openFAQ === index
-                      ? "bg-primary shadow-[4px_4px_0_var(--color-dark)]"
-                      : "bg-light hover:shadow-[4px_4px_0_var(--color-dark)]"
-                  }`}
-                >
-                  <button
-                    onClick={() => setOpenFAQ(openFAQ === index ? null : index)}
-                    className="w-full p-6 flex items-center justify-between text-left cursor-pointer"
-                  >
-                    <span className="text-lg md:text-xl font-black italic pr-4">
-                      {faq.question}
-                    </span>
-                    <motion.div
-                      animate={{ rotate: openFAQ === index ? 180 : 0 }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 300,
-                        damping: 20,
-                      }}
-                      className="flex-shrink-0"
-                    >
-                      <TbChevronDown size={24} />
-                    </motion.div>
-                  </button>
-                  <motion.div
-                    initial={false}
-                    animate={{
-                      height: openFAQ === index ? "auto" : 0,
-                      opacity: openFAQ === index ? 1 : 0,
-                    }}
-                    transition={{
-                      type: "spring",
-                      stiffness: 700,
-                      damping: 50,
-                      opacity: { duration: 0.15 },
-                    }}
-                    className="overflow-hidden"
-                  >
-                    <p className="px-6 pb-6 text-dark/80">{faq.answer}</p>
-                  </motion.div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Final CTA with creative separator */}
-        <section className="min-h-[60dvh] relative bg-primary flex items-center justify-center ">
-          {/* Creative wavy separator */}
-          <div className="px-4">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              className="max-w-4xl mx-auto text-center"
-            >
-              <h2 className="text-4xl md:text-6xl font-black italic mb-6">
-                {tFinalCTA("title")}
-              </h2>
-              <p className="text-xl text-dark/80 mb-8">
-                {tFinalCTA("subtitle")}
+              <h3 className="text-xl md:text-2xl font-black italic text-dark mb-2">
+                2. Define las reglas
+              </h3>
+              <p className="text-xs md:text-base text-dark/70 leading-relaxed">
+                País, dispositivo, VPN, bots, horario... Elige <strong>condiciones</strong>. Elige <strong>acciones</strong>. <strong>Combínalas</strong>.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/auth/register">
-                  <Button
-                    variant="solid"
-                    size="xl"
-                    rounded="2xl"
-                    rightIcon={<TbRocket size={24} />}
-                    expandOnHover="icon"
-                    className="bg-dark text-light hover:bg-warning hover:text-dark"
-                  >
-                    {tFinalCTA("button1")}
-                  </Button>
-                </Link>
+              {/* Arrow to step 3 */}
+              <Image
+                src="/yellow-arrow.svg"
+                alt=""
+                width={32}
+                height={32}
+                className="absolute hidden md:block rotate-90 w-46 md:-top-12 md:left-32 md:rotate-0 md:w-56"
+              />
+            </div>
+
+            {/* Step 3 */}
+            <div className="step-card flex-1 bg-dark/5 rounded-2xl p-6">
+              <div className="size-9 rounded-full bg-secondary/15 flex items-center justify-center mb-4">
+                <TbShare size={22} className="text-secondary" />
+              </div>
+              <h3 className="text-xl md:text-2xl font-black italic text-dark mb-2">
+                3. Comparte y olvídate
+              </h3>
+              <p className="text-xs md:text-base text-dark/70 leading-relaxed">
+                Un solo link que se <strong>adapta</strong> a cada visitante. Tú defines la lógica <strong>una vez</strong>. El link hace el trabajo <strong>siempre</strong>.
+              </p>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="steps-cta flex justify-center mt-16">
+            <Button
+              variant="outline"
+              size="lg"
+              rounded="3xl"
+              leftIcon={<TbArrowUpRight size={24} strokeWidth={3} className="text-primary group-hover:text-dark transition-all duration-200" />}
+              onClick={() => setCreateLinkDrawer(true)}
+              className="group bg-primary/25 border-transparent hover:border-dark hover:shadow-[6px_6px_0_var(--color-dark)] hover:bg-primary font-black italic"
+            >
+              <span className="font-black italic">Pruébalo ahora &bull; ¡Sin cuenta!</span>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* ==================== USE CASES SECTION ==================== */}
+      <section ref={useCasesSectionRef} className="bg-light min-h-screen flex flex-col items-center justify-center px-6 md:px-20 py-20 overflow-x-clip">
+        {/* Title */}
+        <h2 className="usecases-title text-3xl md:text-4xl font-black italic text-dark text-center leading-tight mb-12 md:mb-20">
+          <SplitWords>Para quienes les importa a dónde van sus clics</SplitWords>
+        </h2>
+
+        {/* Cards — Mobile: horizontal scroll / Desktop: row with GSAP animation */}
+        {/* Mobile */}
+        <div className="md:hidden w-full overflow-x-auto scrollbar-hide pb-4 -mx-6 px-6">
+          <div className="flex gap-4 w-max">
+            <UseCaseCard
+              color="bg-primary"
+              title="Ofertas geo-segmentadas"
+              description="Cada país tiene su oferta. Cada clic debería ir a la correcta."
+              footer="Sin redirecciones manuales. Sin comisiones perdidas."
+            />
+            <UseCaseCard
+              color="bg-warning"
+              title="App y Web en un solo link"
+              description="Móvil va a la App Store. Escritorio va a la web."
+              footer="Un link. Dos experiencias. Cero lógica en tu código."
+            />
+            <UseCaseCard
+              color="bg-info"
+              title="Campañas con fecha de caducidad"
+              description="Antes de la deadline: página de oferta. Después: página normal."
+              footer="Automatizado. Sin tocar nada manualmente."
+            />
+            <UseCaseCard
+              color="bg-danger"
+              title="Webhooks cuando algo sucede"
+              description="Un bot accede. Un usuario de un país específico hace clic. Un límite se alcanza."
+              footer=""
+            />
+            <UseCaseCard
+              color="bg-secondary"
+              title="Escudo anti-bots"
+              description="Bloquea bots y tráfico VPN antes de que devoren tu presupuesto."
+              footer="Solo clics reales. Solo datos reales."
+            />
+          </div>
+        </div>
+
+        {/* Desktop */}
+        <div className="usecases-cards hidden md:flex flex-wrap gap-4 justify-center items-start">
+          <UseCaseCard
+
+            color="bg-primary"
+            title="Ofertas geo-segmentadas"
+            description="Cada país tiene su oferta. Cada clic debería ir a la correcta."
+            footer="Sin redirecciones manuales. Sin comisiones perdidas."
+          />
+          <UseCaseCard
+
+            color="bg-warning"
+            title="App y Web en un solo link"
+            description="Móvil va a la App Store. Escritorio va a la web."
+            footer="Un link. Dos experiencias. Cero lógica en tu código."
+          />
+          <UseCaseCard
+
+            color="bg-info"
+            title="Campañas con fecha de caducidad"
+            description="Antes de la deadline: página de oferta. Después: página normal."
+            footer="Automatizado. Sin tocar nada manualmente."
+          />
+          <UseCaseCard
+
+            color="bg-danger"
+            title="Webhooks cuando algo sucede"
+            description="Un bot accede. Un usuario de un país específico hace clic. Un límite se alcanza."
+            footer=""
+          />
+          <UseCaseCard
+
+            color="bg-secondary"
+            title="Escudo anti-bots"
+            description="Bloquea bots y tráfico VPN antes de que devoren tu presupuesto."
+            footer="Solo clics reales. Solo datos reales."
+          />
+        </div>
+      </section>
+
+      {/* ==================== RULES SECTION ==================== */}
+      <section ref={rulesSectionRef} className="bg-light min-h-screen flex flex-col items-center justify-center px-6 md:px-20 py-20">
+        <div className="max-w-4xl mx-auto w-full text-center">
+          {/* Title */}
+          <h2 className="rules-title text-3xl md:text-4xl font-black italic text-dark leading-tight mb-4">
+            <SplitWords>Si pasa esto, haz aquello. Para tus links.</SplitWords>
+          </h2>
+
+          {/* Subtitle */}
+          <p className="rules-subtitle text-sm md:text-xl italic font-black text-dark/50 mb-16 md:mb-20 max-w-2xl mx-auto">
+            Decide con 7 condiciones y 4 acciones qué hacer cuando tu enlace es visitado. Sin escribir una línea de código.
+          </p>
+
+          {/* Condiciones */}
+          <div className="pill-group mb-10">
+            <h3 className="font-black italic text-base text-dark mb-4 tracking-wide text-left md:text-center">Condiciones</h3>
+            <div className="flex flex-wrap justify-center gap-3 relative">
+              <RulePill icon={TbWorld} label="País" color="bg-primary text-dark" activePill={activePill} setActivePill={setActivePill} description="Actúa según el país del visitante" />
+              <RulePill icon={TbDeviceMobile} label="Dispositivo" color="bg-warning text-dark" activePill={activePill} setActivePill={setActivePill} description="Decide según el tipo de dispositivo" />
+              <RulePill icon={TbDots} label="IP" color="bg-info text-light border-dark" activePill={activePill} setActivePill={setActivePill} description="Filtra por dirección IP" />
+              <RulePill icon={TbShieldLock} label="VPN" color="bg-secondary text-light border-dark" activePill={activePill} setActivePill={setActivePill} description="Detecta tráfico VPN o proxy" />
+              <RulePill icon={TbClick} label="N. Clics" color="bg-info text-light border-dark" activePill={activePill} setActivePill={setActivePill} description="Limita por número de clics" />
+              <RulePill icon={TbCalendar} label="Fecha" color="bg-primary text-dark" activePill={activePill} setActivePill={setActivePill} description="Decide según la fecha" />
+              <RulePill icon={TbRobot} label="Bot" color="bg-danger text-light border-dark" activePill={activePill} setActivePill={setActivePill} description="Detectar bots" />
+            </div>
+          </div>
+
+          {/* Acciones */}
+          <div className="pill-group">
+            <h3 className="font-black italic text-base text-dark mb-4 tracking-wide text-left md:text-center">Acciones</h3>
+            <div className="flex flex-wrap justify-center gap-3">
+              <RulePill icon={TbArrowFork} label="Redirigir" color="bg-primary text-dark" activePill={activePill} setActivePill={setActivePill} description="Envía al usario a una URL" />
+              <RulePill icon={TbForbid2} label="Bloquear" color="bg-danger text-light border-dark" activePill={activePill} setActivePill={setActivePill} description="Bloquea el acceso" />
+              <RulePill icon={TbLock} label="Contraseña" color="bg-warning text-dark" activePill={activePill} setActivePill={setActivePill} description="Pide contraseña para acceder" />
+              <RulePill icon={TbWebhook} label="Webhooks" color="bg-info text-light border-dark" activePill={activePill} setActivePill={setActivePill} description="Dispara un webhook" />
+            </div>
+          </div>
+
+          {/* Hint */}
+          <p className="text-sm text-dark/30 italic mt-12">
+            Pulsa sobre cada una para descubrir qué hace
+          </p>
+        </div>
+      </section>
+
+      {/* ==================== BENTO SECTION ==================== */}
+      <section ref={bentoSectionRef} className="bg-light min-h-screen flex flex-col items-center justify-center px-6 md:px-20 py-20">
+        <div className="max-w-3xl mx-auto w-full">
+          {/* Title */}
+          <h2 className="bento-title text-3xl md:text-4xl font-black italic text-dark text-center leading-tight mb-12 md:mb-16">
+            <SplitWords>Un enlace único, infinitas formas de conectar.</SplitWords>
+          </h2>
+
+          {/* Bento Grid */}
+          <div className="bento-grid grid grid-cols-[repeat(3,100px)] auto-rows-[100px] md:grid-cols-[repeat(3,150px)] md:auto-rows-[150px] gap-2 justify-center">
+
+            {/* A tu gusto — tall left */}
+            <div className="bento-cell bg-primary rounded-3xl row-span-2 overflow-hidden relative">
+              <h3 className="font-black mt-2 ml-2 italic text-sm md:text-2xl text-dark relative z-10">A tu gusto</h3>
+              <Image
+                src="/bento-image1.svg"
+                alt="QR customization panel"
+                width={300}
+                height={400}
+                className="absolute left-0 top-[20%] w-[90%] md:w-[80%]"
+              />
+              <Image
+                src="/bento-image2.svg"
+                alt="Rules panel"
+                width={300}
+                height={200}
+                className="absolute right-0 bottom-2 md:bottom-8 w-[90%] md:w-[85%]"
+              />
+            </div>
+
+            {/* Velocidad — top right */}
+            <div className="bento-cell bg-info rounded-3xl p-4 col-span-2 overflow-hidden relative flex flex-col">
+              <h3 className="font-black italic text-sm md:text-2xl text-light">Velocidad</h3>
+              <div className="flex-1 w-full flex items-center justify-center gap-2 text-light">
+                <span className="text-lg"><TbUser className="size-6 md:size-8" strokeWidth={2}/></span>
+                <span className="line-through">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                <span className="font-black italic text-lg">&lt;50ms</span>
+                <span className="line-through">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                <span className="text-lg"><TbAppWindow className="size-6 md:size-8" strokeWidth={2}/></span>
+              </div>
+              <span className="absolute left-1/2 -translate-x-1/2 -bottom-4 text-6xl md:text-8xl font-black italic text-light/15 select-none">&lt;50ms</span>
+            </div>
+
+            {/* k. logo — center */}
+            <div className="bento-cell bg-light rounded-3xl flex items-center justify-center">
+              <span className="text-6xl font-black italic text-dark">k.</span>
+            </div>
+
+            {/* Organiza — right middle (folder shape via SVG mask) */}
+            <div className="bento-cell relative overflow-hidden">
+            
+            <svg 
+              viewBox="0 0 100 100" 
+              preserveAspectRatio="none" 
+              className="absolute inset-0 w-full h-full" 
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path 
+                d="M99.9,75.9 L99.7,35.4 C99.7,22.2 89,11.5 75.7,11.5 H61.7 C54.3,11.5 48.4,0 41,0 H24 C10.7,0 0,10.7 0,24 V76 C0,89.3 10.7,100 24,100 H75.9 C89.2,100 100,89.2 99.9,75.9 Z" 
+                fill="#FC4736"
+              />
+            </svg>
+
+              <div className="relative z-10 p-2 h-full flex flex-col gap-1 justify-center">
+                <h3 className="font-black italic text-sm md:text-2xl text-light">Organiza</h3>
+                <p className="text-xs md:text-base text-light">Con grupos y etiquetas</p>
+              </div>
+            </div>
+
+            {/* De forma segura — bottom left wide */}
+            <div className="bento-cell bg-warning rounded-3xl p-2 col-span-2 relative overflow-hidden">
+              <h3 className="font-black italic text-sm md:text-2xl text-dark mb-1">De forma segura</h3>
+              <p className="text-xs md:text-base text-dark">Tus datos siempre seguros con:</p>
+              <div className="flex gap-2 mt-2">
+                <span className="bg-dark/15 text-dark text-xs font-black p-1 rounded-full">Cifrado</span>
+                <span className="bg-dark/15 text-dark text-xs font-black p-1 rounded-full">OAuth</span>
+              </div>
+              <Image
+                className="absolute -right-1/2 -bottom-1/2"
+                src="/eclipses.svg"
+                alt="Eclipses"
+                width={300}
+                height={300}
+              />
+            </div>
+
+            {/* Código abierto — bottom right */}
+            <div className="bento-cell bg-secondary/10 rounded-3xl p-2 relative overflow-hidden">
+              <h3 className="font-black italic text-sm md:text-2xl text-secondary">Código abierto</h3>
+              <p className="text-xs md:text-base text-secondary mt-1">Accede al código</p>
+              <TbBrandGithub size={100} className="absolute -bottom-4 -right-6 -rotate-28 text-secondary/25" />
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* ==================== PRICING SECTION ==================== */}
+      <section ref={pricingSectionRef} className="bg-light min-h-screen flex flex-col items-center justify-center px-6 md:px-20 py-20">
+        <div className="max-w-4xl mx-auto w-full">
+          {/* Title */}
+          <h2 className="pricing-title text-3xl md:text-4xl font-black italic text-dark text-center leading-tight mb-8">
+            <SplitWords>Empieza gratis, escala cuando quieras.</SplitWords>
+          </h2>
+
+          {/* Billing Toggle */}
+          <div className="flex justify-center mb-12">
+            <div className="flex bg-dark/5 rounded-full p-1">
+              <button
+                onClick={() => setBillingPeriod("monthly")}
+                className={`px-5 py-2 rounded-full text-sm font-black italic transition-all duration-200 cursor-pointer ${
+                  billingPeriod === "monthly"
+                    ? "bg-dark text-light shadow-sm"
+                    : "text-dark/60 hover:text-dark"
+                }`}
+              >
+                <span className="font-black italic">Mensual</span>
+              </button>
+              <button
+                onClick={() => setBillingPeriod("yearly")}
+                className={`px-5 py-2 rounded-full text-sm  transition-all duration-200 cursor-pointer ${
+                  billingPeriod === "yearly"
+                    ? "bg-dark text-light shadow-sm"
+                    : "text-dark/60 hover:text-dark"
+                }`}
+              >
+                <span className="font-black italic">Anual</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Pricing Cards */}
+          <div className="pricing-cards flex flex-col md:flex-row gap-6 justify-center items-stretch">
+
+            {/* STANDARD / Free */}
+            <div className="pricing-card flex-1 max-w-md bg-dark/10 rounded-3xl p-4 flex flex-col justify-between">
+              <div>
+                <p className="text-sm md:text-base font-black italic text-dark/50 uppercase tracking-wider mb-1">Invitado</p>
+                <h3 className="text-3xl font-black italic text-dark mb-3">GRATIS</h3>
+                <p className="text-xs md:text-sm text-dark/50 mb-6">
+                  Para <strong>siempre</strong>, en serio. <strong>Sin tarjeta</strong>, sin cuenta si no quieres.
+                </p>
+
+                <p className="text-xs md:text-sm text-dark mb-3">Incluye:</p>
+                <ul className="space-y-2 text-xs md:text-sm text-dark">
+                  <li>● Hasta <strong>50</strong> links</li>
+                  <li>● Links <strong>permanentes</strong></li>
+                  <li>● <strong>3</strong> reglas por link</li>
+                  <li>● <strong>2</strong> condiciones por regla</li>
+                  <li>● Métricas de cada enlace</li>
+                  <li>● Historial de últimos <strong>30 días</strong></li>
+                  <li>● Slug personalizado</li>
+                  <li>● Códigos QR</li>
+                </ul>
+              </div>
+
+              <div className="flex items-center gap-3 mt-8">
                 <Button
                   variant="solid"
-                  size="xl"
-                  rounded="2xl"
-                  rightIcon={<TbPlus size={24} />}
-                  expandOnHover="icon"
-                  className="bg-primary text-dark hover:bg-secondary hover:text-light"
-                  onClick={() => setIsCreateLinkDrawerOpen(true)}
+                  size="lg"
+                  rounded="3xl"
+                  onClick={() => setCreateLinkDrawer(true)}
+                  className="flex-1 border-2 border-transparent hover:bg-transparent hover:text-dark hover:border-dark hover:shadow-[4px_4px_0_var(--color-dark)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] font-black italic"
                 >
-                  {tFinalCTA("button2")}
+                  <span className="font-black italic">Empezar gratis</span>
                 </Button>
               </div>
-            </motion.div>
-          </div>
-        </section>
+            </div>
 
-        {/* Footer */}
-        <footer className="bg-dark text-light py-16 px-4 pb-24">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid md:grid-cols-4 gap-8 mb-12">
-              {/* Brand */}
+            {/* PRO */}
+            <div className="pricing-card flex-1 max-w-md bg-primary rounded-3xl p-4 flex flex-col justify-between">
               <div>
-                <div className="text-4xl font-black italic mb-4">
-                  <Link href="/" className="text-4xl font-black italic z-10">
-                    <span className="text-light transition-all duration-300 ease-in-out hover:text-primary hover:text-shadow-[_4px_4px_0_var(--color-light)]">
-                      k.
-                    </span>
-                  </Link>
-                </div>
-                <p className="text-light/60 text-sm">
-                  {tFooter("brandDescription")}
+                <p className="text-sm md:text-base font-black italic text-dark/50 uppercase tracking-wider mb-1">PRO</p>
+                <h3 className="text-3xl font-black italic text-dark mb-3">
+                  {billingPeriod === "monthly" ? "3.50€" : "2.90€"}
+                  <span className="text-lg font-bold text-dark/50 ml-1">/mes</span>
+                </h3>
+                <p className="text-xs md:text-sm text-dark/50 mb-6">
+                  Para cuando 50 links se queden cortos.
                 </p>
-              </div>
 
-              {/* Product */}
-              <div>
-                <h4 className="font-black italic mb-4">
-                  {tFooter("productHeading")}
-                </h4>
-                <ul className="space-y-2 text-sm text-light/60">
-                  <li>
-                    <Link
-                      href="/"
-                      className="relative hover:text-dark transition-colors group"
-                    >
-                      <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
-                      <p className="text-sm z-20 relative inline-flex flex-col md:flex-row items-center">
-                        {tFooter("productLink1")}
-                      </p>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/dashboard"
-                      className="relative hover:text-dark transition-colors group"
-                    >
-                      <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
-                      <p className="text-sm z-20 relative inline-flex flex-col md:flex-row items-center">
-                        {tFooter("productLink2")}
-                      </p>
-                    </Link>
-                  </li>
+                <p className="text-xs md:text-sm text-dark mb-3">Incluye:</p>
+                <ul className="space-y-2 text-xs md:text-sm text-dark">
+                  <li>● Todo lo de gratis</li>
+                  <li>● Links <strong>ilimitados</strong></li>
+                  <li>● Reglas <strong>ilimitadas</strong></li>
+                  <li>● Condiciones <strong>ilimitadas</strong></li>
+                  <li>● Historial completo <strong>sin límite</strong></li>
+                  <li>● Soporte <strong>prioritario</strong></li>
                 </ul>
               </div>
 
-              {/* Resources */}
+              <div className="flex items-center gap-3 mt-8">
+                <Button
+                  variant="solid"
+                  size="lg"
+                  rounded="3xl"
+                  onClick={handleUpgradePro}
+                  className="flex-1 border-2 border-transparent hover:bg-transparent hover:text-dark hover:border-dark hover:shadow-[4px_4px_0_var(--color-dark)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] font-black italic"
+                >
+                  <span className="font-black italic">Hazte PRO</span>
+                </Button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <Button 
+          variant="ghost"
+          size="md"
+          rounded="3xl"
+          onClick={() => alert("TODO")}
+          className="mt-8"
+
+        >
+          ¿Tienes dudas sobre los planes?
+        </Button>
+      </section>
+
+      {/* ==================== FAQ SECTION ==================== */}
+      <section className="relative bg-light py-20 md:py-32 px-6">
+        <div className="max-w-2xl mx-auto">
+          <h2 className="text-4xl md:text-5xl font-black italic text-dark text-center mb-12">
+            Respuestas rápidas
+          </h2>
+
+          <div className="flex flex-col gap-3">
+            <FaqItem
+              question="¿En qué se diferencia esto de Bitly?"
+              answer="Bitly acorta URLs. Linkkk les da comportamiento. Puedes definir condiciones (país, dispositivo, VPN, bots, horario) y acciones (redirigir, bloquear, contraseña, webhook). Un link que hace cosas diferentes según quién haga clic."
+            />
+            <FaqItem
+              question="¿Necesito saber programar?"
+              answer="No. El motor de reglas es visual: selecciona condiciones, elige acciones, guarda. Si sabes rellenar un formulario, puedes usar Linkkk."
+            />
+            <FaqItem
+              question="¿Qué tan rápidas son las redirecciones?"
+              answer="Menos de 50 milisegundos. Tus visitantes no notan ningún retraso. Las redirecciones lentas matan conversiones — las nuestras no lo son."
+            />
+            <FaqItem
+              question="¿Qué pasa si supero los límites de mi plan?"
+              answer={<>Recibes un <strong>aviso</strong>. Los links existentes <strong>siguen funcionando</strong>. Nunca rompemos links activos. Puedes subir de plan cuando quieras.</>}
+            />
+            <FaqItem
+              question="¿Y si Linkkk cierra?"
+              answer="El código está en GitHub. Puedes auto-alojarlo. Y tus URLs de destino siempre funcionarán independientemente — solo las redirecciones dependen de nosotros, y las hemos diseñado para que puedas migrar si lo necesitas."
+            />
+            <FaqItem
+              question="¿Están seguros mis datos?"
+              answer="Contraseñas hasheadas con bcrypt. Datos cifrados. IPs anonimizadas para cumplir GDPR. No vendemos datos a nadie. Punto."
+            />
+            <FaqItem
+              question="¿Puedo probar todo antes de pagar?"
+              answer="Sí. El plan gratuito incluye reglas, analytics y QR. PRO solo quita límites. Incluso puedes probar como invitado sin dar tu email."
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* ==================== FOOTER ==================== */}
+      <footer className="relative bg-dark py-16 pb-24 md:py-24 px-6 overflow-hidden">
+        {/* Decorative watermark */}
+        <div className="absolute -bottom-3 md:-bottom-1/12 left-0 flex items-center justify-center pointer-events-none select-none">
+          <span className="text-8xl md:text-[20rem] font-black italic text-light/[0.03] whitespace-nowrap leading-none">
+            Linkkk.
+          </span>
+        </div>
+
+        <div className="relative max-w-4xl mx-auto">
+          {/* Logo */}
+          <h2 className="text-4xl font-black italic text-light mb-12 md:mb-16">
+            Linkkk.
+          </h2>
+
+          {/* Links grid */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-10 md:gap-16 mb-16 md:mb-24">
+            {/* Producto */}
+            <div className="flex flex-col gap-6">
               <div>
-                <h4 className="font-black italic mb-4">
-                  {tFooter("resourcesHeading")}
-                </h4>
-                <ul className="space-y-2 text-sm text-light/60">
+                <h3 className="text-lg font-black italic text-light mb-4">Producto</h3>
+                <ul className="flex flex-col gap-2">
                   <li>
-                    <a
-                      href="https://github.com/aka-alvaroso/linkkk"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="
-                  relative group hover:text-dark transition-colors inline-flex items-center"
-                    >
-                      <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
-                      <p className="text-sm z-20 relative inline-flex flex-col md:flex-row md:gap-1 items-center">
-                        <TbBrandGithub size={16} /> GitHub
-                      </p>
+                    <a href="/" className="text-sm text-light/60 hover:text-light transition-colors">
+                      Comenzar
                     </a>
                   </li>
-                  {/* <li>
-                    <Link href="/features" className="relative hover:text-dark transition-colors group">
-                        <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
-                        <p className="text-sm z-20 relative inline-flex flex-col md:flex-row items-center">
-                          Documentation
-                        </p>
-                    </Link>
-                  </li> */}
+                  <li>
+                    <a href="/dashboard" className="text-sm text-light/60 hover:text-light transition-colors">
+                      Panel
+                    </a>
+                  </li>
                 </ul>
               </div>
 
-              {/* Legal */}
-              {/* Legal */}
+              {/* Recursos */}
               <div>
-                <h4 className="font-black italic mb-4">
-                  {tFooter("legalHeading")}
-                </h4>
-                <ul className="space-y-2 text-sm text-light/60">
+                <h3 className="text-lg font-black italic text-light mb-4">Recursos</h3>
+                <ul className="flex flex-col gap-2">
                   <li>
-                    <Link
-                      href="/legal/privacy-policy"
-                      className="relative hover:text-dark transition-colors group"
+                    <a
+                      href="https://github.com/akaAlvaroso/linkkk"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-light/60 hover:text-light transition-colors"
                     >
-                      <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
-                      <p className="text-sm z-20 relative inline-flex flex-col md:flex-row items-center">
-                        {tFooter("privacyPolicy")}
-                      </p>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/legal/terms-of-service"
-                      className="relative hover:text-dark transition-colors group"
-                    >
-                      <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
-                      <p className="text-sm z-20 relative inline-flex flex-col md:flex-row items-center">
-                        {tFooter("termsOfService")}
-                      </p>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/legal/cookies"
-                      className="relative hover:text-dark transition-colors group"
-                    >
-                      <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
-                      <p className="text-sm z-20 relative inline-flex flex-col md:flex-row items-center">
-                        {tFooter("cookiePolicy")}
-                      </p>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/legal/legal-notice"
-                      className="relative hover:text-dark transition-colors group"
-                    >
-                      <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
-                      <p className="text-sm z-20 relative inline-flex flex-col md:flex-row items-center">
-                        {tFooter("legalNotice")}
-                      </p>
-                    </Link>
+                      Código fuente
+                    </a>
                   </li>
                 </ul>
               </div>
             </div>
 
-            <div className="border-t border-light/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-              <p className="text-sm text-light/40">
-                &copy; {new Date().getFullYear()} Linkkk. {tFooter("copyright")}{" "}
-                <a
-                  href="https://alvaroso.dev"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-primary transition-colors"
-                >
-                  @alvaroso
-                </a>
-              </p>
-              <InlineSelect
-                options={[
-                  {
-                    label: "Español",
-                    value: "es",
-                    rightIcon:
-                      currentLocale === "es" ? (
-                        <TbCheck size={16} />
-                      ) : undefined,
-                  },
-                  {
-                    label: "English",
-                    value: "en",
-                    rightIcon:
-                      currentLocale === "en" ? (
-                        <TbCheck size={16} />
-                      ) : undefined,
-                  },
-                ]}
-                value={currentLocale}
-                onChange={(value) => changeLanguage(value as "es" | "en")}
-              />
+            {/* Legal */}
+            <div>
+              <h3 className="text-lg font-black italic text-light mb-4">Legal</h3>
+              <ul className="flex flex-col gap-2">
+                <li>
+                  <a href="/legal/privacy" className="text-sm text-light/60 hover:text-light transition-colors">
+                    Política de Privacidad
+                  </a>
+                </li>
+                <li>
+                  <a href="/legal/terms" className="text-sm text-light/60 hover:text-light transition-colors">
+                    Términos y Condiciones
+                  </a>
+                </li>
+                <li>
+                  <a href="/legal/cookies" className="text-sm text-light/60 hover:text-light transition-colors">
+                    Política de Cookies
+                  </a>
+                </li>
+                <li>
+                  <a href="/legal/notice" className="text-sm text-light/60 hover:text-light transition-colors">
+                    Aviso legal
+                  </a>
+                </li>
+              </ul>
             </div>
           </div>
-        </footer>
-      </div>
+
+          {/* Bottom credit */}
+          <div className="flex justify-center">
+            <p className="text-xs text-light/50">
+              Hecho con{" "}
+              <TbHeartFilled className="inline text-primary align-text-bottom" size={16} />
+              {" "}por{" "}
+              <a
+                href="https://twitter.com/aka_alvaroso"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary font-bold hover:underline"
+              >
+                @aka_alvaroso
+              </a>
+            </p>
+          </div>
+        </div>
+      </footer>
 
       {/* Create Link Drawer */}
       <CreateLinkDrawer
-        open={isCreateLinkDrawerOpen}
-        onClose={() => setIsCreateLinkDrawerOpen(false)}
-        onSuccess={() => router.push("/dashboard")}
+        open={createLinkDrawer}
+        onClose={() => setCreateLinkDrawer(false)}
       />
     </RouteGuard>
   );
 }
+
