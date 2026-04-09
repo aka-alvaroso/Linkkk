@@ -52,5 +52,5 @@ backend/prisma/*.db-journal
 
 .claude/
 
-docs/
+/docs/
 
