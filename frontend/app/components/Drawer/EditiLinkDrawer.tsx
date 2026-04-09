@@ -524,7 +524,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                                     <CartesianGrid strokeDasharray='3 3' stroke='rgba(0,0,0,0.06)' />
                                                     <XAxis dataKey='date' tickFormatter={(d) => { const dt = new Date(d + 'T00:00:00'); return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); }} tick={{ fontSize: 10, fill: 'rgba(0,0,0,0.4)' }} interval='preserveStartEnd' axisLine={false} tickLine={false} />
                                                     <YAxis tick={{ fontSize: 10, fill: 'rgba(0,0,0,0.4)' }} allowDecimals={false} axisLine={false} tickLine={false} />
-                                                    <Tooltip contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.12)', fontSize: 12 }} labelFormatter={(d) => { const dt = new Date(d + 'T00:00:00'); return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); }} formatter={(v: number) => [v, t('statClicks')]} />
+                                                    <Tooltip contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.12)', fontSize: 12 }} labelFormatter={(d) => { const dt = new Date(d + 'T00:00:00'); return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); }} formatter={(v) => [v ?? 0, t('statClicks')]} />
                                                     <Area type='monotone' dataKey='count' stroke='#72d763' strokeWidth={2} fill='url(#cg)' dot={false} activeDot={{ r: 4, fill: '#72d763' }} />
                                                 </AreaChart>
                                             </ResponsiveContainer>
