@@ -15,7 +15,7 @@ import {
   NotifySettings
 } from '@/app/types/linkRules';
 import { useTranslations } from 'next-intl';
-import { TbArrowUpRight, TbBan, TbBell, TbLockPassword } from 'react-icons/tb';
+import { TbArrowFork, TbForbid2, TbWebhook, TbLock } from 'react-icons/tb';
 
 interface RuleActionProps {
   actionType: ActionType;
@@ -32,10 +32,10 @@ export function RuleAction({
 
   // Action type options
   const ACTION_TYPE_OPTIONS = [
-    { label: t('actionRedirect'), value: 'redirect', leftIcon: <TbArrowUpRight size={16} /> },
-    { label: t('actionBlockAccess'), value: 'block_access', leftIcon: <TbBan size={16} /> },
-    { label: t('actionPasswordGate'), value: 'password_gate', leftIcon: <TbLockPassword size={16} /> },
-    { label: t('actionNotify'), value: 'notify', leftIcon: <TbBell size={16} /> },
+    { label: t('actionRedirect'), value: 'redirect', leftIcon: <TbArrowFork size={16} /> },
+    { label: t('actionBlockAccess'), value: 'block_access', leftIcon: <TbForbid2 size={16} /> },
+    { label: t('actionPasswordGate'), value: 'password_gate', leftIcon: <TbLock size={16} /> },
+    { label: t('actionNotify'), value: 'notify', leftIcon: <TbWebhook size={16} /> },
   ];
 
   const handleTypeChange = (newType: React.SetStateAction<string | number | null>) => {

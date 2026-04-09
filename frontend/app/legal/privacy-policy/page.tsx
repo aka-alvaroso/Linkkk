@@ -51,13 +51,14 @@ export default function PrivacyPolicy() {
                         <strong className="text-dark text-lg block mb-1">Datos de Acceso a Enlaces</strong>
                         <p className="mb-2">Cuando un usuario visita un enlace corto creado en Linkkk, recopilamos automáticamente:</p>
                         <ul className="list-disc pl-5 space-y-1 text-dark/80 bg-light p-3 rounded-lg">
-                            <li>Dirección IP (para geolocalización y detección de abuso).</li>
+                            <li>Dirección IP (para geolocalización, detección de abuso y evaluación de reglas de condición IP).</li>
                             <li>Tipo de dispositivo y navegador (User Agent).</li>
                             <li>País de origen.</li>
                             <li>Detección de VPN o Bots.</li>
                         </ul>
                         <p className="text-sm mt-3 italic text-dark/60">
                             Estos datos son estrictamente necesarios para proporcionar las analíticas avanzadas y las reglas de redirección, que son la funcionalidad principal del servicio.
+                            Las direcciones IP se muestran de forma anonimizada (último octeto enmascarado) a los creadores de los enlaces en el panel de analíticas.
                         </p>
                     </li>
                 </ul>
@@ -118,15 +119,24 @@ export default function PrivacyPolicy() {
 
                 <h2 className="text-2xl font-black italic mt-12 mb-6 flex items-baseline gap-3">
                     <span className="text-4xl text-dark/20">05</span>
-                    Alojamiento y Transferencias
+                    Servicios de Terceros
                 </h2>
-                <div className="bg-white p-6 rounded-2xl border-2 border-dark/20">
-                    <p className="mb-2">
-                        Nuestros servidores están alojados en <strong>OVH</strong>, en centros de datos ubicados en <strong>Canadá</strong>.
-                    </p>
-                    <p className="text-sm text-dark/70 m-0">
-                        Canadá cuenta con una <strong>decisión de adecuación</strong> de la Comisión Europea, lo que garantiza un nivel de protección de datos equivalente al estándar europeo (GDPR).
-                    </p>
+                <div className="space-y-4">
+                    <div className="bg-white p-6 rounded-2xl border-2 border-dark/20">
+                        <p className="font-bold mb-2">Geolocalización y detección de VPN (ipquery.io)</p>
+                        <p className="text-sm text-dark/70 m-0">
+                            Para determinar el país de origen y detectar conexiones VPN/proxy de los visitantes de enlaces, enviamos la dirección IP a la API de <strong>ipquery.io</strong>. Este servicio solo recibe la IP y devuelve datos de geolocalización y detección. No compartimos ningún otro dato personal con este proveedor.
+                        </p>
+                    </div>
+                    <div className="bg-white p-6 rounded-2xl border-2 border-dark/20">
+                        <p className="font-bold mb-2">Alojamiento (OVH)</p>
+                        <p className="mb-2">
+                            Nuestros servidores están alojados en <strong>OVH</strong>, en centros de datos ubicados en <strong>Canadá</strong>.
+                        </p>
+                        <p className="text-sm text-dark/70 m-0">
+                            Canadá cuenta con una <strong>decisión de adecuación</strong> de la Comisión Europea, lo que garantiza un nivel de protección de datos equivalente al estándar europeo (GDPR).
+                        </p>
+                    </div>
                 </div>
 
                 <h2 className="text-2xl font-black italic mt-12 mb-6 flex items-baseline gap-3">
@@ -208,13 +218,14 @@ export default function PrivacyPolicy() {
                     <strong className="text-dark text-lg block mb-1">Link Access Data</strong>
                     <p className="mb-2">When a user visits a short link created on Linkkk, we automatically collect:</p>
                     <ul className="list-disc pl-5 space-y-1 text-dark/80 bg-light p-3 rounded-lg">
-                        <li>IP Address (for geolocation and abuse detection).</li>
+                        <li>IP Address (for geolocation, abuse detection, and IP-based rule conditions).</li>
                         <li>Device type and browser (User Agent).</li>
                         <li>Country of origin.</li>
                         <li>VPN or Bot detection status.</li>
                     </ul>
                     <p className="text-sm mt-3 italic text-dark/60">
                         These data are strictly necessary to provide advanced analytics and redirection rules, which are the core functionality of the service.
+                        IP addresses are shown in anonymized form (last octet masked) to link creators in the analytics panel.
                     </p>
                 </li>
             </ul>
@@ -275,15 +286,24 @@ export default function PrivacyPolicy() {
 
             <h2 className="text-2xl font-black italic mt-12 mb-6 flex items-baseline gap-3">
                 <span className="text-4xl text-dark/20">05</span>
-                Hosting and Transfers
+                Third-Party Services
             </h2>
-            <div className="bg-white p-6 rounded-2xl border-2 border-dark/20">
-                <p className="mb-2">
-                    Our servers are hosted by <strong>OVH</strong>, in data centers located in <strong>Canada</strong>.
-                </p>
-                <p className="text-sm text-dark/70 m-0">
-                    Canada has an <strong>adequacy decision</strong> from the European Commission, ensuring a level of data protection equivalent to European standards (GDPR).
-                </p>
+            <div className="space-y-4">
+                <div className="bg-white p-6 rounded-2xl border-2 border-dark/20">
+                    <p className="font-bold mb-2">Geolocation and VPN Detection (ipquery.io)</p>
+                    <p className="text-sm text-dark/70 m-0">
+                        To determine the country of origin and detect VPN/proxy connections from link visitors, we send the IP address to the <strong>ipquery.io</strong> API. This service only receives the IP and returns geolocation and detection data. We do not share any other personal data with this provider.
+                    </p>
+                </div>
+                <div className="bg-white p-6 rounded-2xl border-2 border-dark/20">
+                    <p className="font-bold mb-2">Hosting (OVH)</p>
+                    <p className="mb-2">
+                        Our servers are hosted by <strong>OVH</strong>, in data centers located in <strong>Canada</strong>.
+                    </p>
+                    <p className="text-sm text-dark/70 m-0">
+                        Canada has an <strong>adequacy decision</strong> from the European Commission, ensuring a level of data protection equivalent to European standards (GDPR).
+                    </p>
+                </div>
             </div>
 
             <h2 className="text-2xl font-black italic mt-12 mb-6 flex items-baseline gap-3">

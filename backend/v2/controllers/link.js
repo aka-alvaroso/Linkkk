@@ -64,7 +64,7 @@ const createLink = async (req, res) => {
     }
   }
 
-  const shortUrl = customSuffix || await generateShortCode();
+  const shortUrl = customSuffix || (await generateShortCode());
 
   try {
     const link = await prisma.link.create({
@@ -82,7 +82,10 @@ const createLink = async (req, res) => {
       // Prisma unique constraint error
       return errorResponse(res, ERRORS.SHORT_URL_EXISTS);
     }
-    logger.error('Link creation error', { error: error.message, stack: error.stack });
+    logger.error("Link creation error", {
+      error: error.message,
+      stack: error.stack,
+    });
     return errorResponse(res, ERRORS.INTERNAL_ERROR);
   }
 };
@@ -113,8 +116,12 @@ const getLink = async (req, res) => {
     }
 
     // Guest access: Both IDs must exist and match
-    if (!hasAccess && guest?.guestSessionId && link.guestSessionId &&
-        link.guestSessionId === guest.guestSessionId) {
+    if (
+      !hasAccess &&
+      guest?.guestSessionId &&
+      link.guestSessionId &&
+      link.guestSessionId === guest.guestSessionId
+    ) {
       hasAccess = true;
     }
 
@@ -231,8 +238,12 @@ const updateLink = async (req, res) => {
     }
 
     // Guest access: Both IDs must exist and match
-    if (!hasAccess && guest?.guestSessionId && existingLink.guestSessionId &&
-        existingLink.guestSessionId === guest.guestSessionId) {
+    if (
+      !hasAccess &&
+      guest?.guestSessionId &&
+      existingLink.guestSessionId &&
+      existingLink.guestSessionId === guest.guestSessionId
+    ) {
       hasAccess = true;
     }
 
@@ -288,8 +299,12 @@ const deleteLink = async (req, res) => {
     }
 
     // Guest access: Both IDs must exist and match
-    if (!hasAccess && guest?.guestSessionId && existingLink.guestSessionId &&
-        existingLink.guestSessionId === guest.guestSessionId) {
+    if (
+      !hasAccess &&
+      guest?.guestSessionId &&
+      existingLink.guestSessionId &&
+      existingLink.guestSessionId === guest.guestSessionId
+    ) {
       hasAccess = true;
     }
 
@@ -309,7 +324,7 @@ const deleteLink = async (req, res) => {
 
 const generateShortCode = async () => {
   // SECURITY: Use crypto.randomBytes instead of Math.random for cryptographically secure codes
-  const crypto = require('crypto');
+  const crypto = require("crypto");
   const characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
@@ -345,17 +360,9 @@ const redirectLink = async (req, res) => {
   const { shortUrl } = req.params;
   const userAgent = req.headers["user-agent"];
   const ip = req.ip === "::1" ? "127.0.0.1" : req.ip;
-  const source = req.query.src === 'qr' ? 'qr' : 'direct';
+  const source = req.query.src === "qr" ? "qr" : "direct";
 
   try {
-    // SECURITY NOTE: Race condition mitigation
-    // There's a small window between reading accessCount and incrementing it
-    // under very high concurrent load. Full fix would require SELECT FOR UPDATE
-    // inside transaction, but this would slow down ALL redirects due to external
-    // API calls (country lookup, VPN check). Current trade-off accepts ~1-2%
-    // inaccuracy under extreme load for better performance.
-    // For critical access limits, implement additional server-side validation.
-
     // Fetch link with rules
     const link = await prisma.link.findUnique({
       where: { shortUrl },
@@ -406,8 +413,8 @@ const redirectLink = async (req, res) => {
       const timeoutPromise = new Promise((_, reject) =>
         setTimeout(
           () => reject(new Error("Rule evaluation timeout")),
-          RULE_EVALUATION_TIMEOUT
-        )
+          RULE_EVALUATION_TIMEOUT,
+        ),
       );
 
       const evaluationResult = await Promise.race([
@@ -417,7 +424,7 @@ const redirectLink = async (req, res) => {
       allowed = evaluationResult.allowed;
       action = evaluationResult.action;
     } catch (ruleError) {
-      logger.error('[CRITICAL] Rule evaluation failed', {
+      logger.error("[CRITICAL] Rule evaluation failed", {
         shortUrl,
         error: ruleError.message || ruleError,
       });
@@ -452,7 +459,7 @@ const redirectLink = async (req, res) => {
           await tx.link.update({
             where: { id: link.id },
             data: {
-              ...(source === 'qr'
+              ...(source === "qr"
                 ? { scanCount: { increment: 1 } }
                 : { accessCount: { increment: 1 } }),
             },
@@ -467,7 +474,7 @@ const redirectLink = async (req, res) => {
         return res.redirect(
           `${
             config.frontend.url
-          }/blocked?url=${shortUrl}&reason=${encodeURIComponent(action.reason)}`
+          }/blocked?url=${shortUrl}&reason=${encodeURIComponent(action.reason)}`,
         );
 
       case "password_gate":
@@ -476,7 +483,7 @@ const redirectLink = async (req, res) => {
         return res.redirect(
           `${config.frontend.url}/password?shortUrl=${shortUrl}${
             action.hint ? `&hint=${encodeURIComponent(action.hint)}` : ""
-          }${source === 'qr' ? '&src=qr' : ''}`
+          }${source === "qr" ? "&src=qr" : ""}`,
         );
 
       case "notify":
@@ -486,7 +493,7 @@ const redirectLink = async (req, res) => {
 
           // SECURITY: Validate webhook URL to prevent SSRF attacks
           if (!isValidWebhookUrl(action.webhookUrl)) {
-            logger.security('[SECURITY] Blocked SSRF attempt on webhook', {
+            logger.security("[SECURITY] Blocked SSRF attempt on webhook", {
               webhookUrl: action.webhookUrl,
               shortUrl: link.shortUrl,
             });
@@ -521,7 +528,7 @@ const redirectLink = async (req, res) => {
               signal: AbortSignal.timeout(5000), // 5 second timeout
             }).catch((error) => {
               // Log error but don't fail the request
-              logger.warn('[NOTIFY] Webhook failed', {
+              logger.warn("[NOTIFY] Webhook failed", {
                 shortUrl: link.shortUrl,
                 webhookUrl: action.webhookUrl,
                 error: error.message,
@@ -548,7 +555,7 @@ const redirectLink = async (req, res) => {
           await tx.link.update({
             where: { id: link.id },
             data: {
-              ...(source === 'qr'
+              ...(source === "qr"
                 ? { scanCount: { increment: 1 } }
                 : { accessCount: { increment: 1 } }),
             },
@@ -559,7 +566,10 @@ const redirectLink = async (req, res) => {
 
       default:
         // Unknown action type - fallback to redirect
-        logger.warn('Unknown action type', { actionType: action.type, shortUrl });
+        logger.warn("Unknown action type", {
+          actionType: action.type,
+          shortUrl,
+        });
 
         // Track access and increment counter atomically (prevents race condition)
         await prisma.$transaction(async (tx) => {
@@ -578,7 +588,7 @@ const redirectLink = async (req, res) => {
           await tx.link.update({
             where: { id: link.id },
             data: {
-              ...(source === 'qr'
+              ...(source === "qr"
                 ? { scanCount: { increment: 1 } }
                 : { accessCount: { increment: 1 } }),
             },
@@ -588,7 +598,11 @@ const redirectLink = async (req, res) => {
         return res.redirect(302, link.longUrl);
     }
   } catch (error) {
-    logger.error('Redirect error', { shortUrl, error: error.message, stack: error.stack });
+    logger.error("Redirect error", {
+      shortUrl,
+      error: error.message,
+      stack: error.stack,
+    });
     return res.redirect(`${config.frontend.url}/error`);
   }
 };
@@ -599,7 +613,7 @@ const verifyPasswordGate = async (req, res) => {
   const { password } = req.body;
   const userAgent = req.headers["user-agent"];
   const ip = req.ip === "::1" ? "127.0.0.1" : req.ip;
-  const source = req.body.src === 'qr' ? 'qr' : 'direct';
+  const source = req.body.src === "qr" ? "qr" : "direct";
 
   try {
     // Validate input
@@ -666,7 +680,7 @@ const verifyPasswordGate = async (req, res) => {
 
       passwordHash = action.passwordHash;
     } catch (error) {
-      logger.error('Error evaluating rules for password verification', {
+      logger.error("Error evaluating rules for password verification", {
         shortUrl,
         error: error.message,
       });
@@ -687,13 +701,13 @@ const verifyPasswordGate = async (req, res) => {
 
     try {
       const { allowed, action } = await evaluateLinkRules(link, context, {
-        skipActionTypes: ['password_gate'],
+        skipActionTypes: ["password_gate"],
       });
       accessAllowed = allowed;
 
       switch (action.type) {
         case "block":
-          finalUrl = `${config.frontend.url}/blocked?url=${shortUrl}&reason=${encodeURIComponent(action.reason || '')}`;
+          finalUrl = `${config.frontend.url}/blocked?url=${shortUrl}&reason=${encodeURIComponent(action.reason || "")}`;
           break;
 
         case "notify":
@@ -706,17 +720,31 @@ const verifyPasswordGate = async (req, res) => {
                 event: "link_accessed",
                 link: { shortUrl: link.shortUrl, longUrl: link.longUrl },
                 timestamp: new Date().toISOString(),
-                context: { country, device, ip, isBot, isVPN: isVpn, accessCount: link.accessCount },
+                context: {
+                  country,
+                  device,
+                  ip,
+                  isBot,
+                  isVPN: isVpn,
+                  accessCount: link.accessCount,
+                },
                 customMessage: action.message || null,
               };
 
               fetch(action.webhookUrl, {
                 method: "POST",
-                headers: { "Content-Type": "application/json", "User-Agent": "Linkkk-Webhook/1.0" },
+                headers: {
+                  "Content-Type": "application/json",
+                  "User-Agent": "Linkkk-Webhook/1.0",
+                },
                 body: JSON.stringify(webhookPayload),
                 signal: AbortSignal.timeout(5000),
               }).catch((error) => {
-                logger.warn('[NOTIFY] Webhook failed', { shortUrl: link.shortUrl, webhookUrl: action.webhookUrl, error: error.message });
+                logger.warn("[NOTIFY] Webhook failed", {
+                  shortUrl: link.shortUrl,
+                  webhookUrl: action.webhookUrl,
+                  error: error.message,
+                });
               });
             }
           }
@@ -732,10 +760,13 @@ const verifyPasswordGate = async (req, res) => {
           break;
       }
     } catch (error) {
-      logger.error('Error evaluating remaining rules after password verification', {
-        shortUrl,
-        error: error.message,
-      });
+      logger.error(
+        "Error evaluating remaining rules after password verification",
+        {
+          shortUrl,
+          error: error.message,
+        },
+      );
       // Fallback to longUrl on error
     }
 
@@ -757,7 +788,7 @@ const verifyPasswordGate = async (req, res) => {
         await tx.link.update({
           where: { id: link.id },
           data: {
-            ...(source === 'qr'
+            ...(source === "qr"
               ? { scanCount: { increment: 1 } }
               : { accessCount: { increment: 1 } }),
           },
@@ -770,7 +801,7 @@ const verifyPasswordGate = async (req, res) => {
       url: finalUrl,
     });
   } catch (error) {
-    logger.error('Password verification error', {
+    logger.error("Password verification error", {
       shortUrl,
       error: error.message,
     });

@@ -6,7 +6,7 @@
 import React from 'react';
 import Select from '../ui/Select/Select';
 import Input from '../ui/Input/Input';
-import { TbTrash, TbCircleDashedCheck, TbFlag, TbDeviceLaptop, TbRobot, TbLockSquareRounded, TbCalendar, TbChartBar } from 'react-icons/tb';
+import { TbTrash, TbCircleDashedCheck, TbWorld, TbDeviceMobile, TbRobot, TbShieldLock, TbCalendar, TbClick, TbDots } from 'react-icons/tb';
 import { RuleCondition as RuleConditionType, FieldType, OperatorType, DeviceType, ConditionValue } from '@/app/types/linkRules';
 import { useTranslations } from 'next-intl';
 
@@ -22,13 +22,13 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
   // Field options
   const FIELD_OPTIONS = [
     { label: t('fieldAlways'), value: 'always', leftIcon: <TbCircleDashedCheck size={16} className='group-hover:color-primary' /> },
-    { label: t('fieldCountry'), value: 'country', leftIcon: <TbFlag size={16} className='group-hover:color-primary' /> },
-    { label: t('fieldDevice'), value: 'device', leftIcon: <TbDeviceLaptop size={16} /> },
-    { label: t('fieldIp'), value: 'ip', leftIcon: <TbDeviceLaptop size={16} /> },
+    { label: t('fieldCountry'), value: 'country', leftIcon: <TbWorld size={16} className='group-hover:color-primary' /> },
+    { label: t('fieldDevice'), value: 'device', leftIcon: <TbDeviceMobile size={16} /> },
+    { label: t('fieldIp'), value: 'ip', leftIcon: <TbDots size={16} /> },
     { label: t('fieldIsBot'), value: 'is_bot', leftIcon: <TbRobot size={16} /> },
-    { label: t('fieldIsVpn'), value: 'is_vpn', leftIcon: <TbLockSquareRounded size={16} /> },
+    { label: t('fieldIsVpn'), value: 'is_vpn', leftIcon: <TbShieldLock size={16} /> },
     { label: t('fieldDate'), value: 'date', leftIcon: <TbCalendar size={16} /> },
-    { label: t('fieldAccessCount'), value: 'access_count', leftIcon: <TbChartBar size={16} /> },
+    { label: t('fieldAccessCount'), value: 'access_count', leftIcon: <TbClick size={16} /> },
   ];
 
   // Operator options per field type
