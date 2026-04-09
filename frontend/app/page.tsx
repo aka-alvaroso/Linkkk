@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import Navigation from "@/app/components/Navigation/Navigation";
 import CreateLinkDrawer from "@/app/components/Drawer/CreateLinkDrawer";
 import RouteGuard from "@/app/components/RouteGuard/RouteGuard";
@@ -455,7 +456,7 @@ export default function Landing() {
   }, []);
 
   return (
-    <RouteGuard>
+    <RouteGuard type="guest-or-user">
       <Navigation />
 
       {/* ==================== HERO ==================== */}
@@ -1140,9 +1141,9 @@ export default function Landing() {
                 <h3 className="text-lg font-black italic text-light mb-4">Producto</h3>
                 <ul className="flex flex-col gap-2">
                   <li>
-                    <a href="/" className="text-sm text-light/60 hover:text-light transition-colors">
+                    <Link href="/" className="text-sm text-light/60 hover:text-light transition-colors">
                       Comenzar
-                    </a>
+                    </Link>
                   </li>
                   <li>
                     <a href="/dashboard" className="text-sm text-light/60 hover:text-light transition-colors">
