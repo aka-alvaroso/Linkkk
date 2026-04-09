@@ -1,14 +1,12 @@
 "use client"
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { TbLayoutDashboard, TbLogin, TbPlus, TbSettings, TbSparkles } from "react-icons/tb";
+import { TbHome, TbLayoutGrid, TbUser, TbPlus, TbSettings, TbSparkles } from "react-icons/tb";
 import * as motion from "motion/react-client";
 import CreateLinkDrawer from "../Drawer/CreateLinkDrawer";
 import SelectPlanModal from "../Modal/SelectPlanModal";
 import { useAuth } from "@/app/hooks";
-import { useToast } from "@/app/hooks/useToast";
 import { useTranslations } from 'next-intl';
-import { subscriptionService } from "@/app/services/api/subscriptionService";
 
 export default function BottomNavbar() {
   const pathname = usePathname();
@@ -16,77 +14,77 @@ export default function BottomNavbar() {
   const { isAuthenticated, user } = useAuth();
   const [createLinkDrawer, setCreateLinkDrawer] = useState(false);
   const [showSelectPlanModal, setShowSelectPlanModal] = useState(false);
-  const toast = useToast();
   const t = useTranslations('Navigation');
 
-  // Simple navigation based on authentication and user role
   const navigationItems = isAuthenticated
     ? user && user.role === 'STANDARD'
       ? [
-          // STANDARD users - show upgrade button
-          { id: "dashboard", label: t('dashboard'), icon: TbLayoutDashboard, href: "/dashboard" },
-          { id: "settings", label: t('settings'), icon: TbSettings, href: "/settings" },
-          { id: "upgrade", label: t('upgradeToPro'), icon: TbSparkles, action: "upgrade", isUpgrade: true },
-          { id: "create", label: t('create'), icon: TbPlus, action: "create", isFAB: true },
+          { id: "home", icon: TbHome, href: "/" },
+          { id: "dashboard", icon: TbLayoutGrid, href: "/dashboard" },
+          { id: "settings", icon: TbSettings, href: "/settings" },
         ]
       : [
-          // PRO users - show settings
-          { id: "dashboard", label: t('dashboard'), icon: TbLayoutDashboard, href: "/dashboard" },
-          { id: "settings", label: t('settings'), icon: TbSettings, href: "/settings" },
-          { id: "create", label: t('create'), icon: TbPlus, action: "create", isFAB: true },
+          { id: "home", icon: TbHome, href: "/" },
+          { id: "dashboard", icon: TbLayoutGrid, href: "/dashboard" },
+          { id: "settings", icon: TbSettings, href: "/settings" },
         ]
     : [
-        // Guest users
-        { id: "dashboard", label: t('dashboard'), icon: TbLayoutDashboard, href: "/dashboard" },
-        { id: "login", label: t('login'), icon: TbLogin, href: "/auth/login" },
-        { id: "create", label: t('create'), icon: TbPlus, action: "create", isFAB: true },
+        { id: "home", icon: TbHome, href: "/" },
+        { id: "dashboard", icon: TbLayoutGrid, href: "/dashboard" },
+        { id: "login", icon: TbUser, href: "/auth/login" },
       ];
 
-  const handleClick = async (item: typeof navigationItems[0]) => {
-    if (item.action === "create") {
-      setCreateLinkDrawer(true);
-    } else if (item.action === "upgrade") {
-      setShowSelectPlanModal(true);
-    } else if (item.href) {
-      router.push(item.href);
-    }
-  };
-
   const isActive = (item: typeof navigationItems[0]) => {
-    if (!item.href) return false;
-    if (item.href === "/dashboard") {
-      return pathname.startsWith("/dashboard");
-    }
-    if (item.href === "/auth/login") {
-      return pathname.startsWith("/auth/login") || pathname.startsWith("/auth/register");
-    }
+    if (item.href === "/") return pathname === "/";
+    if (item.href === "/dashboard") return pathname.startsWith("/dashboard");
+    if (item.href === "/auth/login") return pathname.startsWith("/auth");
     return pathname.startsWith(item.href);
   };
 
   return (
     <>
-      {/* Bottom Navigation Bar - Pill Style */}
-      <motion.nav
-        initial={{ y: 100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.3, ease: "backOut" }}
-        className="md:hidden fixed bottom-6 left-0 right-0 z-[100] flex justify-center px-4"
+      {/* Bottom Navigation Bar — uses CSS animation instead of motion
+          to avoid transform interfering with fixed positioning during GSAP pins */}
+      <nav
+        className="md:hidden fixed bottom-6 left-0 right-0 z-[100] flex items-center justify-between px-6 animate-slide-up"
       >
-        {/* Pill Container */}
-        <div className="flex items-center gap-1 bg-dark/95 backdrop-blur-md rounded-2xl p-1.5 border border-dark shadow-lg">
-          {navigationItems.map((item) => (
-            <NavButton
-              key={item.id}
-              icon={item.icon}
-              label={item.label}
-              active={isActive(item)}
-              isFAB={item.isFAB}
-              isUpgrade={item.isUpgrade}
-              onClick={() => handleClick(item)}
-            />
-          ))}
+        {/* Nav Pill - Left */}
+        <div className="flex items-center gap-1 bg-dark/95 backdrop-blur-md rounded-full py-2.5 px-3.5 border border-dark shadow-lg">
+          {navigationItems.map((item) => {
+            const Icon = item.icon;
+            const active = isActive(item);
+            return (
+              <motion.button
+                key={item.id}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => router.push(item.href)}
+                className={`
+                  relative flex items-center justify-center
+                  size-11 rounded-xl
+                  transition-all duration-200
+                  ${active
+                    ? "text-primary before:content-[''] before:absolute before:h-1 before:w-3 before:bottom-0 before:left-1/2 before:-translate-x-1/2 before:bg-primary before:rounded-full"
+                    : "text-light"
+                  }
+                `}
+                aria-label={item.id}
+              >
+                <Icon size={32} strokeWidth={2} />
+              </motion.button>
+            );
+          })}
         </div>
-      </motion.nav>
+
+        {/* FAB - Right */}
+        <motion.button
+          whileTap={{ scale: 0.9 }}
+          onClick={() => setCreateLinkDrawer(true)}
+          className="flex items-center justify-center p-4 rounded-full bg-primary text-dark border-2 border-dark shadow-[3px_3px_0_var(--color-dark)]"
+          aria-label={t('create')}
+        >
+          <TbPlus size={32} strokeWidth={2} />
+        </motion.button>
+      </nav>
 
       {/* Create Link Drawer */}
       <CreateLinkDrawer
@@ -100,42 +98,5 @@ export default function BottomNavbar() {
         onClose={() => setShowSelectPlanModal(false)}
       />
     </>
-  );
-}
-
-/**
- * Navigation button component - Icon only
- */
-interface NavButtonProps {
-  icon: React.ElementType;
-  label: string;
-  active: boolean;
-  isFAB?: boolean;
-  isUpgrade?: boolean;
-  onClick: () => void;
-}
-
-function NavButton({ icon: Icon, label, active, isFAB, isUpgrade, onClick }: NavButtonProps) {
-  return (
-    <motion.button
-      whileTap={{ scale: 0.9 }}
-      onClick={onClick}
-      className={`
-        flex items-center justify-center
-        size-12 rounded-xl
-        transition-all duration-200
-        ${isFAB
-          ? "bg-primary text-dark"
-          : isUpgrade
-            ? "bg-info text-light"
-            : active
-              ? "bg-light text-dark"
-              : "text-light/90 hover:text-light hover:bg-light/10"
-        }
-      `}
-      aria-label={label}
-    >
-      <Icon size={22} strokeWidth={active || isFAB || isUpgrade ? 2.5 : 2} />
-    </motion.button>
   );
 }

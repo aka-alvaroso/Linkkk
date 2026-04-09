@@ -101,6 +101,17 @@ export const AccessesList = ({ shortUrl }: AccessesListProps) => {
         return `https://cdn.simpleicons.org/${slug}`;
     };
 
+    const anonymizeIp = (ip: string): string => {
+        if (ip.includes(':')) {
+            // IPv6: mask last two groups
+            const parts = ip.split(':');
+            return parts.slice(0, -2).join(':') + ':***:***';
+        }
+        // IPv4: mask last octet
+        const parts = ip.split('.');
+        return parts.slice(0, 3).join('.') + '.***';
+    };
+
     const getBrowserInfo = (userAgent: string) => {
         console.log(userAgent)
         if (userAgent.includes('Chrome')) return 'Chrome';
@@ -228,7 +239,7 @@ export const AccessesList = ({ shortUrl }: AccessesListProps) => {
                                     </td>
                                     <td className="px-4 py-4">
                                         <code className="px-2.5 py-1.5 bg-dark/5 rounded-lg text-xs font-mono font-bold border border-dark/10">
-                                            {access.ip}
+                                            {anonymizeIp(access.ip)}
                                         </code>
                                     </td>
                                     <td className="px-4 py-4">
