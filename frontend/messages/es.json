@@ -3,6 +3,7 @@
     "home": "Inicio",
     "dashboard": "Panel",
     "settings": "Ajustes",
+    "docs": "Docs",
     "create": "Crear",
     "login": "Entrar",
     "upgradeToPro": "Hazte PRO"
@@ -647,8 +648,8 @@
     "subtitle": "Selecciona el periodo de facturación que mejor te convenga",
     "monthly": "Mensual",
     "yearly": "Anual",
-    "monthlyPrice": "€9",
-    "yearlyPrice": "€90",
+    "monthlyPrice": "3.50€",
+    "yearlyPrice": "34.90€",
     "monthlyPeriod": "/mes",
     "yearlyPeriod": "/año",
     "bestValue": "2 meses gratis",

@@ -92,8 +92,8 @@ export default function TermsOfService() {
                 <div className="bg-white p-6 rounded-2xl border-2 border-primary/20 mb-6">
                     <h3 className="font-bold text-lg mb-3">Precios del Plan PRO</h3>
                     <ul className="list-disc pl-5 space-y-2 m-0">
-                        <li><strong>Mensual:</strong> 9€/mes</li>
-                        <li><strong>Anual:</strong> 90€/año (equivalente a 7.50€/mes)</li>
+                        <li><strong>Mensual:</strong> 3.50€/mes</li>
+                        <li><strong>Anual:</strong> 34.90€/año (equivalente a 2.90€/mes)</li>
                     </ul>
                     <p className="text-sm mt-3 text-dark/70 m-0">
                         Los precios son base. El IVA y otros impuestos aplicables se calcularán automáticamente según tu ubicación al momento del pago.
@@ -282,8 +282,8 @@ export default function TermsOfService() {
             <div className="bg-white p-6 rounded-2xl border-2 border-primary/20 mb-6">
                 <h3 className="font-bold text-lg mb-3">PRO Plan Pricing</h3>
                 <ul className="list-disc pl-5 space-y-2 m-0">
-                    <li><strong>Monthly:</strong> €9/month</li>
-                    <li><strong>Yearly:</strong> €90/year (equivalent to €7.50/month)</li>
+                    <li><strong>Monthly:</strong> €3.50/month</li>
+                    <li><strong>Yearly:</strong> €34.90/year (equivalent to €2.90/month)</li>
                 </ul>
                 <p className="text-sm mt-3 text-dark/70 m-0">
                     Prices are base prices. VAT and other applicable taxes will be calculated automatically based on your location at the time of payment.

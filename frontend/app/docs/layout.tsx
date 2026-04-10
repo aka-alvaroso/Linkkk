@@ -70,7 +70,7 @@ export default function DocsLayout({
           className="md:hidden flex items-center gap-2 mb-4 px-3 py-2 rounded-xl bg-dark/5 text-dark font-bold text-sm cursor-pointer"
         >
           {sidebarOpen ? <TbX size={18} /> : <TbMenu2 size={18} />}
-          Documentos
+          {sidebarOpen ? "Cerrar" : "Menú"}
         </button>
 
         {/* Mobile sidebar */}

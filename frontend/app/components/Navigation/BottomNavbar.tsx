@@ -1,7 +1,7 @@
 "use client"
 import { useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
-import { TbHome, TbLayoutGrid, TbUser, TbPlus, TbSettings, TbSparkles } from "react-icons/tb";
+import { usePathname } from "next/navigation";
+import { TbHome, TbLayoutGrid, TbUser, TbPlus, TbSettings, TbSparkles, TbBook } from "react-icons/tb";
 import * as motion from "motion/react-client";
 import CreateLinkDrawer from "../Drawer/CreateLinkDrawer";
 import SelectPlanModal from "../Modal/SelectPlanModal";
@@ -10,35 +10,37 @@ import { useTranslations } from 'next-intl';
 
 export default function BottomNavbar() {
   const pathname = usePathname();
-  const router = useRouter();
   const { isAuthenticated, user } = useAuth();
+  const isLandingPage = pathname === "/";
   const [createLinkDrawer, setCreateLinkDrawer] = useState(false);
   const [showSelectPlanModal, setShowSelectPlanModal] = useState(false);
   const t = useTranslations('Navigation');
 
   const navigationItems = isAuthenticated
-    ? user && user.role === 'STANDARD'
-      ? [
-          { id: "home", icon: TbHome, href: "/" },
-          { id: "dashboard", icon: TbLayoutGrid, href: "/dashboard" },
-          { id: "settings", icon: TbSettings, href: "/settings" },
-        ]
-      : [
-          { id: "home", icon: TbHome, href: "/" },
-          { id: "dashboard", icon: TbLayoutGrid, href: "/dashboard" },
-          { id: "settings", icon: TbSettings, href: "/settings" },
-        ]
+    ? [
+        { id: "home", icon: TbHome, href: "/" },
+        { id: "dashboard", icon: TbLayoutGrid, href: "/dashboard" },
+        { id: "docs", icon: TbBook, href: "/docs" },
+        { id: "settings", icon: TbSettings, href: "/settings" },
+      ]
     : [
         { id: "home", icon: TbHome, href: "/" },
         { id: "dashboard", icon: TbLayoutGrid, href: "/dashboard" },
+        { id: "docs", icon: TbBook, href: "/docs" },
         { id: "login", icon: TbUser, href: "/auth/login" },
       ];
 
   const isActive = (item: typeof navigationItems[0]) => {
     if (item.href === "/") return pathname === "/";
     if (item.href === "/dashboard") return pathname.startsWith("/dashboard");
+    if (item.href === "/docs") return pathname.startsWith("/docs");
     if (item.href === "/auth/login") return pathname.startsWith("/auth");
     return pathname.startsWith(item.href);
+  };
+
+  const handleNavigate = (href: string) => {
+    // Always use window.location.href to avoid GSAP DOM conflicts with Next.js router on landing
+    window.location.href = href;
   };
 
   return (
@@ -57,7 +59,7 @@ export default function BottomNavbar() {
               <motion.button
                 key={item.id}
                 whileTap={{ scale: 0.9 }}
-                onClick={() => router.push(item.href)}
+                onClick={() => handleNavigate(item.href)}
                 className={`
                   relative flex items-center justify-center
                   size-11 rounded-xl
