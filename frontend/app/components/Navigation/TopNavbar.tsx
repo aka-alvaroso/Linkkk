@@ -6,7 +6,7 @@ import CreateLinkDrawer from "../Drawer/CreateLinkDrawer";
 import SelectPlanModal from "../Modal/SelectPlanModal";
 import { useAuth } from "@/app/hooks";
 import { useToast } from "@/app/hooks/useToast";
-import { TbPlus, TbLogin, TbUser, TbSparkles } from "react-icons/tb";
+import { TbPlus, TbLogin, TbUser, TbSparkles, TbBook } from "react-icons/tb";
 import * as motion from "motion/react-client";
 import { AnimatePresence } from "motion/react";
 import Button from "../ui/Button/Button";
@@ -20,6 +20,7 @@ interface TopNavbarProps {
 export default function TopNavbar({ showCreate = false }: TopNavbarProps) {
   const { user } = useAuth();
   const pathname = usePathname();
+  const isLandingPage = pathname === "/";
   const [createLinkDrawer, setCreateLinkDrawer] = useState(false);
   const [showSelectPlanModal, setShowSelectPlanModal] = useState(false);
   const toast = useToast();
@@ -54,6 +55,11 @@ export default function TopNavbar({ showCreate = false }: TopNavbarProps) {
               href="/dashboard"
               label={t('dashboard')}
               active={pathname.startsWith("/dashboard")}
+            />
+            <NavItem
+              href="/docs"
+              label={t('docs')}
+              active={pathname.startsWith("/docs")}
             />
 
             {/* Create Button with Animation */}
@@ -101,7 +107,7 @@ export default function TopNavbar({ showCreate = false }: TopNavbarProps) {
 
           {/* User or Login button */}
           {user ? (
-            <Link href="/settings" className="relative">
+            <a href="/settings" className="relative">
               <Button
                 variant='solid'
                 size='md'
@@ -117,9 +123,9 @@ export default function TopNavbar({ showCreate = false }: TopNavbarProps) {
                   PRO
                 </span>
               )}
-            </Link>
+            </a>
           ) : (
-            <Link href="/auth/login">
+            <a href="/auth/login">
               <Button
                 variant='solid'
                 size='md'
@@ -130,7 +136,7 @@ export default function TopNavbar({ showCreate = false }: TopNavbarProps) {
               >
                 {t('login')}
               </Button>
-            </Link>
+            </a>
           )}
           </div>
         </div>
@@ -161,8 +167,19 @@ interface NavItemProps {
 }
 
 function NavItem({ href, label, active }: NavItemProps) {
+  const currentPathname = usePathname();
+  const isLanding = currentPathname === "/";
+
+  const handleClick = (e: React.MouseEvent) => {
+    // On the landing page, use window.location to avoid GSAP DOM conflicts with Next.js router
+    if (isLanding && href !== "/") {
+      e.preventDefault();
+      window.location.href = href;
+    }
+  };
+
   return (
-    <Link href={href} className="relative group m-1">
+    <Link href={href} onClick={handleClick} className="relative group m-1">
       <div className="absolute top-0 left-0 w-0 h-full bg-primary z-10 group-hover:w-full transition-all duration-300 ease-in-out" />
       <p className="text-sm font-black italic z-20 relative inline-flex flex-col md:flex-row items-center">
         {label}

@@ -54,7 +54,7 @@ export default function FeedbackBanner() {
           animate={{ y: 0 }}
           exit={{ y: "120%" }}
           transition={{ type: "spring", stiffness: 320, damping: 28, delay: 1.2 }}
-          className="fixed bottom-4 right-4 z-40 w-md bg-warning rounded-2xl border-2 border-dark shadow-[4px_4px_0_var(--color-dark)] p-5"
+          className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 z-40 md:w-md bg-warning rounded-2xl border-2 border-dark shadow-[4px_4px_0_var(--color-dark)] p-5"
         >
           {/* Close */}
           <button

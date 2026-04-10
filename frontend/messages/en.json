@@ -3,6 +3,7 @@
     "home": "Home",
     "dashboard": "Dashboard",
     "settings": "Settings",
+    "docs": "Docs",
     "create": "Create",
     "login": "Login",
     "upgradeToPro": "Upgrade to PRO"
@@ -646,8 +647,8 @@
     "subtitle": "Select the billing period that works best for you",
     "monthly": "Monthly",
     "yearly": "Yearly",
-    "monthlyPrice": "€9",
-    "yearlyPrice": "€90",
+    "monthlyPrice": "€3.50",
+    "yearlyPrice": "€34.90",
     "monthlyPeriod": "/month",
     "yearlyPeriod": "/year",
     "bestValue": "2 months free",
