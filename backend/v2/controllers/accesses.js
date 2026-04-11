@@ -99,7 +99,17 @@ const parseBrowser = (userAgent) => {
 const getLinkStats = async (req, res) => {
   const user = req.user;
   const guest = req.guest;
-  const { period } = req.query; // '7d' | '30d' | 'all'
+  const { period, tz } = req.query; // '7d' | '30d' | 'all'
+
+  // Helper: format a Date as YYYY-MM-DD in the given timezone (falls back to UTC)
+  const toLocalDateStr = (date) => {
+    try {
+      if (!tz) throw new Error();
+      return new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' }).format(date);
+    } catch {
+      return date.toISOString().split('T')[0];
+    }
+  };
 
   try {
     const link = await prisma.link.findUnique({ where: { shortUrl: req.params.shortUrl } });
@@ -136,7 +146,7 @@ const getLinkStats = async (req, res) => {
     for (let i = days - 1; i >= 0; i--) {
       const d = new Date(now);
       d.setDate(d.getDate() - i);
-      dateMap[d.toISOString().split('T')[0]] = 0;
+      dateMap[toLocalDateStr(d)] = 0;
     }
 
     const countries = {};
@@ -144,7 +154,7 @@ const getLinkStats = async (req, res) => {
     let vpnCount = 0, botCount = 0, qrCount = 0, directCount = 0;
 
     for (const a of accesses) {
-      const day = new Date(a.createdAt).toISOString().split('T')[0];
+      const day = toLocalDateStr(new Date(a.createdAt));
       if (dateMap[day] !== undefined) dateMap[day]++;
       countries[a.country] = (countries[a.country] || 0) + 1;
       const b = parseBrowser(a.userAgent);

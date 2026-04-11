@@ -19,8 +19,9 @@ export interface LinkStats {
 
 export const statsService = {
   getLinkStats: async (shortUrl: string, period: StatsPeriod): Promise<LinkStats> => {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const res = await fetch(
-      `${API_CONFIG.BASE_URL}/accesses/link/${shortUrl}/stats?period=${period}`,
+      `${API_CONFIG.BASE_URL}/accesses/link/${shortUrl}/stats?period=${period}&tz=${encodeURIComponent(tz)}`,
       { credentials: 'include' }
     );
     const data = await res.json();
