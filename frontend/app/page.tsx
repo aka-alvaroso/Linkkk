@@ -1088,16 +1088,16 @@ export default function Landing() {
 
           </div>
         </div>
-        <Button 
-          variant="ghost"
-          size="md"
-          rounded="3xl"
-          onClick={() => alert("TODO")}
-          className="mt-8"
-
-        >
-          ¿Tienes dudas sobre los planes?
-        </Button>
+        <Link href="/docs/plans">
+          <Button
+            variant="ghost"
+            size="md"
+            rounded="3xl"
+            className="mt-8"
+          >
+            ¿Tienes dudas sobre los planes?
+          </Button>
+        </Link>
       </section>
 
       {/* ==================== FAQ SECTION ==================== */}
