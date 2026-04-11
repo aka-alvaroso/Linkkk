@@ -1088,16 +1088,15 @@ export default function Landing() {
 
           </div>
         </div>
-        <Link href="/docs/plans">
-          <Button
-            variant="ghost"
-            size="md"
-            rounded="3xl"
-            className="mt-8"
-          >
-            ¿Tienes dudas sobre los planes?
-          </Button>
-        </Link>
+        <Button
+          variant="ghost"
+          size="md"
+          rounded="3xl"
+          onClick={() => { window.location.href = "/docs/plans"; }}
+          className="mt-8"
+        >
+          ¿Tienes dudas sobre los planes?
+        </Button>
       </section>
 
       {/* ==================== FAQ SECTION ==================== */}
