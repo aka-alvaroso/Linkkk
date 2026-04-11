@@ -37,6 +37,11 @@ import {
   TbInfoCircle,
   TbChevronDown,
   TbHeartFilled,
+  TbMicrophone2,
+  TbChartBar,
+  TbShoppingBag,
+  TbBriefcase,
+  TbRocket,
 } from "react-icons/tb";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -743,73 +748,90 @@ export default function Landing() {
           <div className="flex gap-4 w-max">
             <UseCaseCard
               color="bg-primary"
-              title="Ofertas geo-segmentadas"
-              description="Cada país tiene su oferta. Cada clic debería ir a la correcta."
-              footer="Sin redirecciones manuales. Sin comisiones perdidas."
+              icon={TbMicrophone2}
+              role="Creadora de contenido"
+              name="Ana"
+              description="Un solo link en su bio que manda a YouTube, Spotify o Amazon según lo que busca su seguidor."
+              tagline="Menos fricción. Más conversiones."
             />
             <UseCaseCard
               color="bg-warning"
-              title="App y Web en un solo link"
-              description="Móvil va a la App Store. Escritorio va a la web."
-              footer="Un link. Dos experiencias. Cero lógica en tu código."
+              icon={TbChartBar}
+              role="Growth marketer"
+              name="Carlos"
+              description="Lanza campañas en 5 canales. Sabe exactamente cuál convierte y cuáles son bots."
+              tagline="Datos reales. Decisiones reales."
             />
             <UseCaseCard
               color="bg-info"
-              title="Campañas con fecha de caducidad"
-              description="Antes de la deadline: página de oferta. Después: página normal."
-              footer="Automatizado. Sin tocar nada manualmente."
+              icon={TbShoppingBag}
+              role="Dueña de ecommerce"
+              name="Sofía"
+              description="Móvil va a su app. Escritorio va a la web. Sin una línea de código extra."
+              tagline="Un link. Dos experiencias."
             />
             <UseCaseCard
               color="bg-danger"
-              title="Webhooks cuando algo sucede"
-              description="Un bot accede. Un usuario de un país específico hace clic. Un límite se alcanza."
-              footer=""
+              icon={TbBriefcase}
+              role="Freelancer"
+              name="David"
+              description="Manda su portfolio a un cliente. Sabe cuándo lo abren, desde dónde, y cuántas veces."
+              tagline="Nunca más el «¿lo viste ya?»"
             />
             <UseCaseCard
               color="bg-secondary"
-              title="Escudo anti-bots"
-              description="Bloquea bots y tráfico VPN antes de que devoren tu presupuesto."
-              footer="Solo clics reales. Solo datos reales."
+              icon={TbRocket}
+              role="Indie hacker"
+              name="Marta"
+              description="Pone una fecha de expiración a su oferta de lanzamiento. Después el link redirige al precio normal."
+              tagline="Urgencia real. Sin mentiras."
+              light
             />
           </div>
         </div>
 
         {/* Desktop */}
-        <div className="usecases-cards hidden md:flex flex-wrap gap-4 justify-center items-start">
+        <div className="usecases-cards hidden md:flex flex-wrap gap-4 justify-center items-stretch">
           <UseCaseCard
-
             color="bg-primary"
-            title="Ofertas geo-segmentadas"
-            description="Cada país tiene su oferta. Cada clic debería ir a la correcta."
-            footer="Sin redirecciones manuales. Sin comisiones perdidas."
+            icon={TbMicrophone2}
+            role="Creadora de contenido"
+            name="Ana"
+            description="Un solo link en su bio que manda a YouTube, Spotify o Amazon según lo que busca su seguidor."
+            tagline="Menos fricción. Más conversiones."
           />
           <UseCaseCard
-
             color="bg-warning"
-            title="App y Web en un solo link"
-            description="Móvil va a la App Store. Escritorio va a la web."
-            footer="Un link. Dos experiencias. Cero lógica en tu código."
+            icon={TbChartBar}
+            role="Growth marketer"
+            name="Carlos"
+            description="Lanza campañas en 5 canales. Sabe exactamente cuál convierte y cuáles son bots."
+            tagline="Datos reales. Decisiones reales."
           />
           <UseCaseCard
-
             color="bg-info"
-            title="Campañas con fecha de caducidad"
-            description="Antes de la deadline: página de oferta. Después: página normal."
-            footer="Automatizado. Sin tocar nada manualmente."
+            icon={TbShoppingBag}
+            role="Dueña de ecommerce"
+            name="Sofía"
+            description="Móvil va a su app. Escritorio va a la web. Sin una línea de código extra."
+            tagline="Un link. Dos experiencias."
           />
           <UseCaseCard
-
             color="bg-danger"
-            title="Webhooks cuando algo sucede"
-            description="Un bot accede. Un usuario de un país específico hace clic. Un límite se alcanza."
-            footer=""
+            icon={TbBriefcase}
+            role="Freelancer"
+            name="David"
+            description="Manda su portfolio a un cliente. Sabe cuándo lo abren, desde dónde, y cuántas veces."
+            tagline="Nunca más el «¿lo viste ya?»"
           />
           <UseCaseCard
-
             color="bg-secondary"
-            title="Escudo anti-bots"
-            description="Bloquea bots y tráfico VPN antes de que devoren tu presupuesto."
-            footer="Solo clics reales. Solo datos reales."
+            icon={TbRocket}
+            role="Indie hacker"
+            name="Marta"
+            description="Pone una fecha de expiración a su oferta de lanzamiento. Después el link redirige al precio normal."
+            tagline="Urgencia real. Sin mentiras."
+            light
           />
         </div>
       </section>
