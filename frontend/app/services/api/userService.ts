@@ -8,7 +8,6 @@ interface UpdateUserDTO {
   email?: string;
   username?: string;
   password?: string;
-  locale?: "en" | "es";
 }
 
 class UserService {
@@ -116,12 +115,6 @@ class UserService {
     return this.handleResponse<void>(response);
   }
 
-  /**
-   * Update user locale preference
-   */
-  async updateLocale(locale: "en" | "es"): Promise<User> {
-    return this.updateUser({ locale });
-  }
 }
 
 export const userService = new UserService();

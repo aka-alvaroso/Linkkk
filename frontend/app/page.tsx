@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import Link from "next/link";
 import Navigation from "@/app/components/Navigation/Navigation";
@@ -10,6 +11,7 @@ import SplitWords from "@/app/components/Landing/SplitWords";
 import UseCaseCard from "@/app/components/Landing/UseCaseCard";
 import RulePill from "@/app/components/Landing/RulePill";
 import FaqItem from "@/app/components/Landing/FaqItem";
+import LanguageSwitcher from "@/app/components/ui/LanguageSwitcher/LanguageSwitcher";
 import { useAuth } from "@/app/hooks";
 import { subscriptionService } from "@/app/services/api/subscriptionService";
 import * as motion from "motion/react-client";
@@ -47,6 +49,7 @@ import {
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Landing() {
+  const t = useTranslations("Landing");
   const [createLinkDrawer, setCreateLinkDrawer] = useState(false);
   const { isAuthenticated } = useAuth();
 
@@ -478,20 +481,20 @@ export default function Landing() {
             className="max-w-4xl mx-auto text-center"
           >
             <h1 className="text-5xl md:text-8xl font-black italic leading-[1.05] tracking-tight text-dark mb-6">
-              <span className="hero-fade">Cada clic bajo{" "}</span>
+              <span className="hero-fade">{t("Hero.titleStart")}{" "}</span>
               <br className="md:hidden" />
-              <span className="hero-fade">tu </span>
+              <span className="hero-fade">{t("Hero.titleMid")} </span>
               <span
                 ref={controlWordRef}
                 className="inline-block will-change-transform"
                 style={{ transformOrigin: "45% 60%" }}
               >
-                control.
+                {t("Hero.titleEnd")}
               </span>
             </h1>
 
             <p className="hero-fade text-xl font-black italic text-dark leading-snug mb-8 max-w-2xl mx-auto">
-              Decide qué hacen tus enlaces cuando acceden a ellos. Sin código.
+              {t("Hero.subtitle")}
             </p>
 
             <div className="hero-fade">
@@ -502,12 +505,12 @@ export default function Landing() {
                 onClick={() => setCreateLinkDrawer(true)}
                 className="bg-primary text-dark border-dark shadow-[4px_4px_0_var(--color-dark)] hover:shadow-[6px_6px_0_var(--color-dark)] font-black italic"
               >
-                Crea tu primer smart link
+                {t("Hero.cta")}
               </Button>
             </div>
 
             <p className="hero-fade text-xs text-dark/50 mt-4">
-              Sin registro, gratis y en 30 segundos
+              {t("Hero.note")}
             </p>
           </motion.div>
         </section>
@@ -522,13 +525,13 @@ export default function Landing() {
           ref={sectionTitleRef}
           className="absolute left-1/2 -translate-x-1/2 top-1/2 pt-96 -translate-y-1/2 z-10 text-4xl md:text-6xl font-black italic text-light text-center leading-tight whitespace-nowrap will-change-transform"
         >
-          <SplitWords>El problema con los links</SplitWords>{" "}
+          <SplitWords>{t("Problems.title")}</SplitWords>{" "}
           <span className="inline-block overflow-hidden">
             <span
               className="anim-word inline-block bg-danger px-2 text-light text-shadow-[4px_4px_0_var(--color-dark)]"
               style={{ opacity: 0, transform: "translateY(40px)" }}
             >
-              tontos
+              {t("Problems.titleHighlight")}
             </span>
           </span>
         </h2>
@@ -546,7 +549,7 @@ export default function Landing() {
               <div className="anim-sticker flex-shrink-0">
                 <Image
                   src="/robot-sticker.png"
-                  alt="Robot sticker"
+                  alt={t("Problems.slide1ImageAlt")}
                   width={280}
                   height={280}
                   className="w-40 md:w-72 h-auto drop-shadow-2xl"
@@ -556,11 +559,11 @@ export default function Landing() {
                 <p className="font-black italic text-light leading-none mb-2">
                   <SplitWords className="text-5xl md:text-7xl">.01</SplitWords>
                   <SplitWords className="text-2xl md:text-4xl ml-1">
-                    Los bots devoran tu presupuesto de ads.
+                    {t("Problems.slide1Title")}
                   </SplitWords>
                 </p>
                 <p className="font-bold italic text-light/60 text-lg md:text-xl mt-4">
-                  <SplitWords>Tus métricas mienten.</SplitWords>
+                  <SplitWords>{t("Problems.slide1Subtitle")}</SplitWords>
                 </p>
               </div>
             </div>
@@ -572,14 +575,14 @@ export default function Landing() {
               <div className="anim-sticker flex-shrink-0 relative">
                 <Image
                   src="/dollar-sticker.png"
-                  alt="Dollar sticker"
+                  alt={t("Problems.slide2Image1Alt")}
                   width={200}
                   height={200}
                   className="w-28 md:w-48 h-auto drop-shadow-2xl"
                 />
                 <Image
                   src="/euro-sticker.png"
-                  alt="Euro sticker"
+                  alt={t("Problems.slide2Image2Alt")}
                   width={200}
                   height={200}
                   className="w-28 md:w-48 h-auto drop-shadow-2xl absolute -right-8 md:-right-12 -bottom-4 md:-bottom-6"
@@ -589,11 +592,11 @@ export default function Landing() {
                 <p className="font-black italic text-light leading-none mb-2">
                   <SplitWords className="text-5xl md:text-7xl">.02</SplitWords>
                   <SplitWords className="text-2xl md:text-4xl ml-1">
-                    Tu oferta de afiliado en EEUU la clica alguien desde Alemania.
+                    {t("Problems.slide2Title")}
                   </SplitWords>
                 </p>
                 <p className="font-bold italic text-light/60 text-lg md:text-xl mt-4">
-                  <SplitWords>Comisión: $0.</SplitWords>
+                  <SplitWords>{t("Problems.slide2Subtitle")}</SplitWords>
                 </p>
               </div>
             </div>
@@ -605,7 +608,7 @@ export default function Landing() {
               <div className="anim-sticker flex-shrink-0">
                 <Image
                   src="/mobile-sticker.png"
-                  alt="Mobile sticker"
+                  alt={t("Problems.slide3ImageAlt")}
                   width={280}
                   height={280}
                   className="w-36 md:w-64 h-auto drop-shadow-2xl"
@@ -615,11 +618,11 @@ export default function Landing() {
                 <p className="font-black italic text-light leading-none mb-2">
                   <SplitWords className="text-5xl md:text-7xl">.03</SplitWords>
                   <SplitWords className="text-2xl md:text-4xl ml-1">
-                    Un usuario móvil aterriza en tu versión de escritorio.
+                    {t("Problems.slide3Title")}
                   </SplitWords>
                 </p>
                 <p className="font-bold italic text-light/60 text-lg md:text-xl mt-4">
-                  <SplitWords>Se va antes de que cargue.</SplitWords>
+                  <SplitWords>{t("Problems.slide3Subtitle")}</SplitWords>
                 </p>
               </div>
             </div>
@@ -631,7 +634,7 @@ export default function Landing() {
               <div className="anim-sticker flex-shrink-0">
                 <Image
                   src="/lock-sticker.png"
-                  alt="Lock sticker"
+                  alt={t("Problems.slide4ImageAlt")}
                   width={280}
                   height={280}
                   className="w-32 md:w-56 h-auto drop-shadow-2xl"
@@ -641,11 +644,11 @@ export default function Landing() {
                 <p className="font-black italic text-light leading-none mb-2">
                   <SplitWords className="text-5xl md:text-7xl">.04</SplitWords>
                   <SplitWords className="text-2xl md:text-4xl ml-1">
-                    Compartes un link en público.
+                    {t("Problems.slide4Title")}
                   </SplitWords>
                 </p>
                 <p className="font-bold italic text-light/60 text-lg md:text-xl mt-4">
-                  <SplitWords>Competidores, scrapers y curiosos se sirven solos.</SplitWords>
+                  <SplitWords>{t("Problems.slide4Subtitle")}</SplitWords>
                 </p>
               </div>
             </div>
@@ -658,7 +661,7 @@ export default function Landing() {
         <div className="max-w-6xl mx-auto w-full">
           {/* Title */}
           <h2 className="steps-title text-3xl md:text-4xl font-black italic text-dark text-center leading-tight  md:mb-24">
-            <SplitWords>Tres pasos. Cero código.</SplitWords>
+            <SplitWords>{t("Steps.title")}</SplitWords>
           </h2>
 
           {/* Steps — vertical on mobile, horizontal on desktop */}
@@ -669,10 +672,10 @@ export default function Landing() {
                 <TbClipboard size={22} className="text-primary" />
               </div>
               <h3 className="text-xl md:text-2xl font-black italic text-dark mb-2">
-                1. Pega tu enlace
+                {t("Steps.step1Title")}
               </h3>
               <p className="text-xs md:text-base text-dark/70 leading-relaxed">
-                Da igual lo largo, feo o complicado que sea. Nosotros lo convertimos en un enlace <strong>inteligente</strong>.
+                {t("Steps.step1Desc")}
               </p>
               {/* Arrow to step 2 */}
               <Image
@@ -690,10 +693,10 @@ export default function Landing() {
                 <TbAdjustmentsHorizontal size={22} className="text-warning" />
               </div>
               <h3 className="text-xl md:text-2xl font-black italic text-dark mb-2">
-                2. Define las reglas
+                {t("Steps.step2Title")}
               </h3>
               <p className="text-xs md:text-base text-dark/70 leading-relaxed">
-                País, dispositivo, VPN, bots, horario... Elige <strong>condiciones</strong>. Elige <strong>acciones</strong>. <strong>Combínalas</strong>.
+                {t("Steps.step2Desc")}
               </p>
               {/* Arrow to step 3 */}
               <Image
@@ -711,10 +714,10 @@ export default function Landing() {
                 <TbShare size={22} className="text-secondary" />
               </div>
               <h3 className="text-xl md:text-2xl font-black italic text-dark mb-2">
-                3. Comparte y olvídate
+                {t("Steps.step3Title")}
               </h3>
               <p className="text-xs md:text-base text-dark/70 leading-relaxed">
-                Un solo link que se <strong>adapta</strong> a cada visitante. Tú defines la lógica <strong>una vez</strong>. El link hace el trabajo <strong>siempre</strong>.
+                {t("Steps.step3Desc")}
               </p>
             </div>
           </div>
@@ -729,7 +732,7 @@ export default function Landing() {
               onClick={() => setCreateLinkDrawer(true)}
               className="group bg-primary/25 border-transparent hover:border-dark hover:shadow-[6px_6px_0_var(--color-dark)] hover:bg-primary font-black italic"
             >
-              <span className="font-black italic">Pruébalo ahora &bull; ¡Sin cuenta!</span>
+              <span className="font-black italic">{t("Steps.cta")}</span>
             </Button>
           </div>
         </div>
@@ -739,7 +742,7 @@ export default function Landing() {
       <section ref={useCasesSectionRef} className="bg-light min-h-screen flex flex-col items-center justify-center px-6 md:px-20 py-20 overflow-x-clip">
         {/* Title */}
         <h2 className="usecases-title text-3xl md:text-4xl font-black italic text-dark text-center leading-tight mb-12 md:mb-20">
-          <SplitWords>Para quienes les importa a dónde van sus clics</SplitWords>
+          <SplitWords>{t("UseCases.title")}</SplitWords>
         </h2>
 
         {/* Cards — Mobile: horizontal scroll / Desktop: row with GSAP animation */}
@@ -749,42 +752,42 @@ export default function Landing() {
             <UseCaseCard
               color="bg-primary"
               icon={TbMicrophone2}
-              role="Creadora de contenido"
-              name="Ana"
-              description="Un solo link en su bio que manda a YouTube, Spotify o Amazon según lo que busca su seguidor."
-              tagline="Menos fricción. Más conversiones."
+              role={t("UseCases.persona1Role")}
+              name={t("UseCases.persona1Name")}
+              description={t("UseCases.persona1Desc")}
+              tagline={t("UseCases.persona1Tagline")}
             />
             <UseCaseCard
               color="bg-warning"
               icon={TbChartBar}
-              role="Growth marketer"
-              name="Carlos"
-              description="Lanza campañas en 5 canales. Sabe exactamente cuál convierte y cuáles son bots."
-              tagline="Datos reales. Decisiones reales."
+              role={t("UseCases.persona2Role")}
+              name={t("UseCases.persona2Name")}
+              description={t("UseCases.persona2Desc")}
+              tagline={t("UseCases.persona2Tagline")}
             />
             <UseCaseCard
               color="bg-info"
               icon={TbShoppingBag}
-              role="Dueña de ecommerce"
-              name="Sofía"
-              description="Móvil va a su app. Escritorio va a la web. Sin una línea de código extra."
-              tagline="Un link. Dos experiencias."
+              role={t("UseCases.persona3Role")}
+              name={t("UseCases.persona3Name")}
+              description={t("UseCases.persona3Desc")}
+              tagline={t("UseCases.persona3Tagline")}
             />
             <UseCaseCard
               color="bg-danger"
               icon={TbBriefcase}
-              role="Freelancer"
-              name="David"
-              description="Manda su portfolio a un cliente. Sabe cuándo lo abren, desde dónde, y cuántas veces."
-              tagline="Nunca más el «¿lo viste ya?»"
+              role={t("UseCases.persona4Role")}
+              name={t("UseCases.persona4Name")}
+              description={t("UseCases.persona4Desc")}
+              tagline={t("UseCases.persona4Tagline")}
             />
             <UseCaseCard
               color="bg-secondary"
               icon={TbRocket}
-              role="Indie hacker"
-              name="Marta"
-              description="Pone una fecha de expiración a su oferta de lanzamiento. Después el link redirige al precio normal."
-              tagline="Urgencia real. Sin mentiras."
+              role={t("UseCases.persona5Role")}
+              name={t("UseCases.persona5Name")}
+              description={t("UseCases.persona5Desc")}
+              tagline={t("UseCases.persona5Tagline")}
               light
             />
           </div>
@@ -795,42 +798,42 @@ export default function Landing() {
           <UseCaseCard
             color="bg-primary"
             icon={TbMicrophone2}
-            role="Creadora de contenido"
-            name="Ana"
-            description="Un solo link en su bio que manda a YouTube, Spotify o Amazon según lo que busca su seguidor."
-            tagline="Menos fricción. Más conversiones."
+            role={t("UseCases.persona1Role")}
+            name={t("UseCases.persona1Name")}
+            description={t("UseCases.persona1Desc")}
+            tagline={t("UseCases.persona1Tagline")}
           />
           <UseCaseCard
             color="bg-warning"
             icon={TbChartBar}
-            role="Growth marketer"
-            name="Carlos"
-            description="Lanza campañas en 5 canales. Sabe exactamente cuál convierte y cuáles son bots."
-            tagline="Datos reales. Decisiones reales."
+            role={t("UseCases.persona2Role")}
+            name={t("UseCases.persona2Name")}
+            description={t("UseCases.persona2Desc")}
+            tagline={t("UseCases.persona2Tagline")}
           />
           <UseCaseCard
             color="bg-info"
             icon={TbShoppingBag}
-            role="Dueña de ecommerce"
-            name="Sofía"
-            description="Móvil va a su app. Escritorio va a la web. Sin una línea de código extra."
-            tagline="Un link. Dos experiencias."
+            role={t("UseCases.persona3Role")}
+            name={t("UseCases.persona3Name")}
+            description={t("UseCases.persona3Desc")}
+            tagline={t("UseCases.persona3Tagline")}
           />
           <UseCaseCard
             color="bg-danger"
             icon={TbBriefcase}
-            role="Freelancer"
-            name="David"
-            description="Manda su portfolio a un cliente. Sabe cuándo lo abren, desde dónde, y cuántas veces."
-            tagline="Nunca más el «¿lo viste ya?»"
+            role={t("UseCases.persona4Role")}
+            name={t("UseCases.persona4Name")}
+            description={t("UseCases.persona4Desc")}
+            tagline={t("UseCases.persona4Tagline")}
           />
           <UseCaseCard
             color="bg-secondary"
             icon={TbRocket}
-            role="Indie hacker"
-            name="Marta"
-            description="Pone una fecha de expiración a su oferta de lanzamiento. Después el link redirige al precio normal."
-            tagline="Urgencia real. Sin mentiras."
+            role={t("UseCases.persona5Role")}
+            name={t("UseCases.persona5Name")}
+            description={t("UseCases.persona5Desc")}
+            tagline={t("UseCases.persona5Tagline")}
             light
           />
         </div>
@@ -841,42 +844,42 @@ export default function Landing() {
         <div className="max-w-4xl mx-auto w-full text-center">
           {/* Title */}
           <h2 className="rules-title text-3xl md:text-4xl font-black italic text-dark leading-tight mb-4">
-            <SplitWords>Si pasa esto, haz aquello. Para tus links.</SplitWords>
+            <SplitWords>{t("RulesSection.title")}</SplitWords>
           </h2>
 
           {/* Subtitle */}
           <p className="rules-subtitle text-sm md:text-xl italic font-black text-dark/50 mb-16 md:mb-20 max-w-2xl mx-auto">
-            Decide con 7 condiciones y 4 acciones qué hacer cuando tu enlace es visitado. Sin escribir una línea de código.
+            {t("RulesSection.subtitle")}
           </p>
 
           {/* Condiciones */}
           <div className="pill-group mb-10">
-            <h3 className="font-black italic text-base text-dark mb-4 tracking-wide text-left md:text-center">Condiciones</h3>
+            <h3 className="font-black italic text-base text-dark mb-4 tracking-wide text-left md:text-center">{t("RulesSection.conditionsLabel")}</h3>
             <div className="flex flex-wrap justify-center gap-3 relative">
-              <RulePill icon={TbWorld} label="País" color="bg-primary text-dark" activePill={activePill} setActivePill={setActivePill} description="Actúa según el país del visitante" />
-              <RulePill icon={TbDeviceMobile} label="Dispositivo" color="bg-warning text-dark" activePill={activePill} setActivePill={setActivePill} description="Decide según el tipo de dispositivo" />
-              <RulePill icon={TbDots} label="IP" color="bg-info text-light border-dark" activePill={activePill} setActivePill={setActivePill} description="Filtra por dirección IP" />
-              <RulePill icon={TbShieldLock} label="VPN" color="bg-secondary text-light border-dark" activePill={activePill} setActivePill={setActivePill} description="Detecta tráfico VPN o proxy" />
-              <RulePill icon={TbClick} label="N. Clics" color="bg-info text-light border-dark" activePill={activePill} setActivePill={setActivePill} description="Limita por número de clics" />
-              <RulePill icon={TbCalendar} label="Fecha" color="bg-primary text-dark" activePill={activePill} setActivePill={setActivePill} description="Decide según la fecha" />
-              <RulePill icon={TbRobot} label="Bot" color="bg-danger text-light border-dark" activePill={activePill} setActivePill={setActivePill} description="Detectar bots" />
+              <RulePill icon={TbWorld} label={t("RulesSection.pillCountry")} color="bg-primary text-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillCountryDesc")} />
+              <RulePill icon={TbDeviceMobile} label={t("RulesSection.pillDevice")} color="bg-warning text-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillDeviceDesc")} />
+              <RulePill icon={TbDots} label={t("RulesSection.pillIP")} color="bg-info text-light border-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillIPDesc")} />
+              <RulePill icon={TbShieldLock} label={t("RulesSection.pillVPN")} color="bg-secondary text-light border-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillVPNDesc")} />
+              <RulePill icon={TbClick} label={t("RulesSection.pillClicks")} color="bg-info text-light border-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillClicksDesc")} />
+              <RulePill icon={TbCalendar} label={t("RulesSection.pillDate")} color="bg-primary text-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillDateDesc")} />
+              <RulePill icon={TbRobot} label={t("RulesSection.pillBot")} color="bg-danger text-light border-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillBotDesc")} />
             </div>
           </div>
 
           {/* Acciones */}
           <div className="pill-group">
-            <h3 className="font-black italic text-base text-dark mb-4 tracking-wide text-left md:text-center">Acciones</h3>
+            <h3 className="font-black italic text-base text-dark mb-4 tracking-wide text-left md:text-center">{t("RulesSection.actionsLabel")}</h3>
             <div className="flex flex-wrap justify-center gap-3">
-              <RulePill icon={TbArrowFork} label="Redirigir" color="bg-primary text-dark" activePill={activePill} setActivePill={setActivePill} description="Envía al usario a una URL" />
-              <RulePill icon={TbForbid2} label="Bloquear" color="bg-danger text-light border-dark" activePill={activePill} setActivePill={setActivePill} description="Bloquea el acceso" />
-              <RulePill icon={TbLock} label="Contraseña" color="bg-warning text-dark" activePill={activePill} setActivePill={setActivePill} description="Pide contraseña para acceder" />
-              <RulePill icon={TbWebhook} label="Webhooks" color="bg-info text-light border-dark" activePill={activePill} setActivePill={setActivePill} description="Dispara un webhook" />
+              <RulePill icon={TbArrowFork} label={t("RulesSection.pillRedirect")} color="bg-primary text-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillRedirectDesc")} />
+              <RulePill icon={TbForbid2} label={t("RulesSection.pillBlock")} color="bg-danger text-light border-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillBlockDesc")} />
+              <RulePill icon={TbLock} label={t("RulesSection.pillPassword")} color="bg-warning text-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillPasswordDesc")} />
+              <RulePill icon={TbWebhook} label={t("RulesSection.pillWebhook")} color="bg-info text-light border-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillWebhookDesc")} />
             </div>
           </div>
 
           {/* Hint */}
           <p className="text-sm text-dark/30 italic mt-12">
-            Pulsa sobre cada una para descubrir qué hace
+            {t("RulesSection.hint")}
           </p>
         </div>
       </section>
@@ -886,7 +889,7 @@ export default function Landing() {
         <div className="max-w-3xl mx-auto w-full">
           {/* Title */}
           <h2 className="bento-title text-3xl md:text-4xl font-black italic text-dark text-center leading-tight mb-12 md:mb-16">
-            <SplitWords>Un enlace único, infinitas formas de conectar.</SplitWords>
+            <SplitWords>{t("Bento.title")}</SplitWords>
           </h2>
 
           {/* Bento Grid */}
@@ -894,7 +897,7 @@ export default function Landing() {
 
             {/* A tu gusto — tall left */}
             <div className="bento-cell bg-primary rounded-3xl row-span-2 overflow-hidden relative">
-              <h3 className="font-black mt-2 ml-2 italic text-sm md:text-2xl text-dark relative z-10">A tu gusto</h3>
+              <h3 className="font-black mt-2 ml-2 italic text-sm md:text-2xl text-dark relative z-10">{t("Bento.cell1Title")}</h3>
               <Image
                 src="/bento-image1.svg"
                 alt="QR customization panel"
@@ -913,7 +916,7 @@ export default function Landing() {
 
             {/* Velocidad — top right */}
             <div className="bento-cell bg-info rounded-3xl p-4 col-span-2 overflow-hidden relative flex flex-col">
-              <h3 className="font-black italic text-sm md:text-2xl text-light">Velocidad</h3>
+              <h3 className="font-black italic text-sm md:text-2xl text-light">{t("Bento.cell2Title")}</h3>
               <div className="flex-1 w-full flex items-center justify-center gap-2 text-light">
                 <span className="text-lg"><TbUser className="size-6 md:size-8" strokeWidth={2}/></span>
                 <span className="line-through">&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -945,18 +948,18 @@ export default function Landing() {
             </svg>
 
               <div className="relative z-10 p-2 h-full flex flex-col gap-1 justify-center">
-                <h3 className="font-black italic text-sm md:text-2xl text-light">Organiza</h3>
-                <p className="text-xs md:text-base text-light">Con grupos y etiquetas</p>
+                <h3 className="font-black italic text-sm md:text-2xl text-light">{t("Bento.cell3Title")}</h3>
+                <p className="text-xs md:text-base text-light">{t("Bento.cell3Subtitle")}</p>
               </div>
             </div>
 
             {/* De forma segura — bottom left wide */}
             <div className="bento-cell bg-warning rounded-3xl p-2 col-span-2 relative overflow-hidden">
-              <h3 className="font-black italic text-sm md:text-2xl text-dark mb-1">De forma segura</h3>
-              <p className="text-xs md:text-base text-dark">Tus datos siempre seguros con:</p>
+              <h3 className="font-black italic text-sm md:text-2xl text-dark mb-1">{t("Bento.cell4Title")}</h3>
+              <p className="text-xs md:text-base text-dark">{t("Bento.cell4Subtitle")}</p>
               <div className="flex gap-2 mt-2">
-                <span className="bg-dark/15 text-dark text-xs font-black p-1 rounded-full">Cifrado</span>
-                <span className="bg-dark/15 text-dark text-xs font-black p-1 rounded-full">OAuth</span>
+                <span className="bg-dark/15 text-dark text-xs font-black p-1 rounded-full">{t("Bento.cell4Badge1")}</span>
+                <span className="bg-dark/15 text-dark text-xs font-black p-1 rounded-full">{t("Bento.cell4Badge2")}</span>
               </div>
               <Image
                 className="absolute -right-1/2 -bottom-1/2"
@@ -969,8 +972,8 @@ export default function Landing() {
 
             {/* Código abierto — bottom right */}
             <div className="bento-cell bg-secondary/10 rounded-3xl p-2 relative overflow-hidden">
-              <h3 className="font-black italic text-sm md:text-2xl text-secondary">Código abierto</h3>
-              <p className="text-xs md:text-base text-secondary mt-1">Accede al código</p>
+              <h3 className="font-black italic text-sm md:text-2xl text-secondary">{t("Bento.cell5Title")}</h3>
+              <p className="text-xs md:text-base text-secondary mt-1">{t("Bento.cell5Subtitle")}</p>
               <TbBrandGithub size={100} className="absolute -bottom-4 -right-6 -rotate-28 text-secondary/25" />
             </div>
 
@@ -983,7 +986,7 @@ export default function Landing() {
         <div className="max-w-4xl mx-auto w-full">
           {/* Title */}
           <h2 className="pricing-title text-3xl md:text-4xl font-black italic text-dark text-center leading-tight mb-8">
-            <SplitWords>Empieza gratis, escala cuando quieras.</SplitWords>
+            <SplitWords>{t("Pricing.title")}</SplitWords>
           </h2>
 
           {/* Billing Toggle */}
@@ -997,7 +1000,7 @@ export default function Landing() {
                     : "text-dark/60 hover:text-dark"
                 }`}
               >
-                <span className="font-black italic">Mensual</span>
+                <span className="font-black italic">{t("Pricing.monthly")}</span>
               </button>
               <button
                 onClick={() => setBillingPeriod("yearly")}
@@ -1007,7 +1010,7 @@ export default function Landing() {
                     : "text-dark/60 hover:text-dark"
                 }`}
               >
-                <span className="font-black italic">Anual</span>
+                <span className="font-black italic">{t("Pricing.yearly")}</span>
               </button>
             </div>
           </div>
@@ -1018,22 +1021,22 @@ export default function Landing() {
             {/* STANDARD / Free */}
             <div className="pricing-card flex-1 max-w-md bg-dark/10 rounded-3xl p-4 flex flex-col justify-between">
               <div>
-                <p className="text-sm md:text-base font-black italic text-dark/50 uppercase tracking-wider mb-1">Invitado</p>
-                <h3 className="text-3xl font-black italic text-dark mb-3">GRATIS</h3>
+                <p className="text-sm md:text-base font-black italic text-dark/50 uppercase tracking-wider mb-1">{t("Pricing.freeLabel")}</p>
+                <h3 className="text-3xl font-black italic text-dark mb-3">{t("Pricing.freePrice")}</h3>
                 <p className="text-xs md:text-sm text-dark/50 mb-6">
-                  Para <strong>siempre</strong>, en serio. <strong>Sin tarjeta</strong>, sin cuenta si no quieres.
+                  {t("Pricing.freeDesc")}
                 </p>
 
-                <p className="text-xs md:text-sm text-dark mb-3">Incluye:</p>
+                <p className="text-xs md:text-sm text-dark mb-3">{t("Pricing.includes")}</p>
                 <ul className="space-y-2 text-xs md:text-sm text-dark">
-                  <li>● Hasta <strong>50</strong> links</li>
-                  <li>● Links <strong>permanentes</strong></li>
-                  <li>● <strong>3</strong> reglas por link</li>
-                  <li>● <strong>2</strong> condiciones por regla</li>
-                  <li>● Métricas de cada enlace</li>
-                  <li>● Historial de últimos <strong>30 días</strong></li>
-                  <li>● Slug personalizado</li>
-                  <li>● Códigos QR</li>
+                  <li>● {t("Pricing.freeFeature1")}</li>
+                  <li>● {t("Pricing.freeFeature2")}</li>
+                  <li>● {t("Pricing.freeFeature3")}</li>
+                  <li>● {t("Pricing.freeFeature4")}</li>
+                  <li>● {t("Pricing.freeFeature5")}</li>
+                  <li>● {t("Pricing.freeFeature6")}</li>
+                  <li>● {t("Pricing.freeFeature7")}</li>
+                  <li>● {t("Pricing.freeFeature8")}</li>
                 </ul>
               </div>
 
@@ -1045,7 +1048,7 @@ export default function Landing() {
                   onClick={() => setCreateLinkDrawer(true)}
                   className="flex-1 border-2 border-transparent hover:bg-transparent hover:text-dark hover:border-dark hover:shadow-[4px_4px_0_var(--color-dark)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] font-black italic"
                 >
-                  <span className="font-black italic">Empezar gratis</span>
+                  <span className="font-black italic">{t("Pricing.freeCTA")}</span>
                 </Button>
               </div>
             </div>
@@ -1053,23 +1056,23 @@ export default function Landing() {
             {/* PRO */}
             <div className="pricing-card flex-1 max-w-md bg-primary rounded-3xl p-4 flex flex-col justify-between">
               <div>
-                <p className="text-sm md:text-base font-black italic text-dark/50 uppercase tracking-wider mb-1">PRO</p>
+                <p className="text-sm md:text-base font-black italic text-dark/50 uppercase tracking-wider mb-1">{t("Pricing.proLabel")}</p>
                 <h3 className="text-3xl font-black italic text-dark mb-3">
-                  {billingPeriod === "monthly" ? "3.50€" : "2.90€"}
-                  <span className="text-lg font-bold text-dark/50 ml-1">/mes</span>
+                  {billingPeriod === "monthly" ? t("Pricing.proPriceMonthly") : t("Pricing.proPriceYearly")}
+                  <span className="text-lg font-bold text-dark/50 ml-1">{t("Pricing.proPeriod")}</span>
                 </h3>
                 <p className="text-xs md:text-sm text-dark/50 mb-6">
-                  Para cuando 50 links se queden cortos.
+                  {t("Pricing.proDesc")}
                 </p>
 
-                <p className="text-xs md:text-sm text-dark mb-3">Incluye:</p>
+                <p className="text-xs md:text-sm text-dark mb-3">{t("Pricing.includes")}</p>
                 <ul className="space-y-2 text-xs md:text-sm text-dark">
-                  <li>● Todo lo de gratis</li>
-                  <li>● Links <strong>ilimitados</strong></li>
-                  <li>● Reglas <strong>ilimitadas</strong></li>
-                  <li>● Condiciones <strong>ilimitadas</strong></li>
-                  <li>● Historial completo <strong>sin límite</strong></li>
-                  <li>● Soporte <strong>prioritario</strong></li>
+                  <li>● {t("Pricing.proFeature1")}</li>
+                  <li>● {t("Pricing.proFeature2")}</li>
+                  <li>● {t("Pricing.proFeature3")}</li>
+                  <li>● {t("Pricing.proFeature4")}</li>
+                  <li>● {t("Pricing.proFeature5")}</li>
+                  <li>● {t("Pricing.proFeature6")}</li>
                 </ul>
               </div>
 
@@ -1081,7 +1084,7 @@ export default function Landing() {
                   onClick={handleUpgradePro}
                   className="flex-1 border-2 border-transparent hover:bg-transparent hover:text-dark hover:border-dark hover:shadow-[4px_4px_0_var(--color-dark)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] font-black italic"
                 >
-                  <span className="font-black italic">Hazte PRO</span>
+                  <span className="font-black italic">{t("Pricing.proCTA")}</span>
                 </Button>
               </div>
             </div>
@@ -1095,7 +1098,7 @@ export default function Landing() {
           onClick={() => { window.location.href = "/docs/plans"; }}
           className="mt-8"
         >
-          ¿Tienes dudas sobre los planes?
+          {t("Pricing.docsLink")}
         </Button>
       </section>
 
@@ -1103,37 +1106,37 @@ export default function Landing() {
       <section className="relative bg-light py-20 md:py-32 px-6">
         <div className="max-w-2xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-black italic text-dark text-center mb-12">
-            Respuestas rápidas
+            {t("FAQ.title")}
           </h2>
 
           <div className="flex flex-col gap-3">
             <FaqItem
-              question="¿En qué se diferencia esto de Bitly?"
-              answer="Bitly acorta URLs. Linkkk les da comportamiento. Puedes definir condiciones (país, dispositivo, VPN, bots, horario) y acciones (redirigir, bloquear, contraseña, webhook). Un link que hace cosas diferentes según quién haga clic."
+              question={t("FAQ.q1")}
+              answer={t("FAQ.a1")}
             />
             <FaqItem
-              question="¿Necesito saber programar?"
-              answer="No. El motor de reglas es visual: selecciona condiciones, elige acciones, guarda. Si sabes rellenar un formulario, puedes usar Linkkk."
+              question={t("FAQ.q2")}
+              answer={t("FAQ.a2")}
             />
             <FaqItem
-              question="¿Qué tan rápidas son las redirecciones?"
-              answer="Menos de 50 milisegundos. Tus visitantes no notan ningún retraso. Las redirecciones lentas matan conversiones — las nuestras no lo son."
+              question={t("FAQ.q3")}
+              answer={t("FAQ.a3")}
             />
             <FaqItem
-              question="¿Qué pasa si supero los límites de mi plan?"
-              answer={<>Recibes un <strong>aviso</strong>. Los links existentes <strong>siguen funcionando</strong>. Nunca rompemos links activos. Puedes subir de plan cuando quieras.</>}
+              question={t("FAQ.q4")}
+              answer={t("FAQ.a4")}
             />
             <FaqItem
-              question="¿Y si Linkkk cierra?"
-              answer="El código está en GitHub. Puedes auto-alojarlo. Y tus URLs de destino siempre funcionarán independientemente — solo las redirecciones dependen de nosotros, y las hemos diseñado para que puedas migrar si lo necesitas."
+              question={t("FAQ.q5")}
+              answer={t("FAQ.a5")}
             />
             <FaqItem
-              question="¿Están seguros mis datos?"
-              answer="Contraseñas hasheadas con bcrypt. Datos cifrados. IPs anonimizadas para cumplir GDPR. No vendemos datos a nadie. Punto."
+              question={t("FAQ.q6")}
+              answer={t("FAQ.a6")}
             />
             <FaqItem
-              question="¿Puedo probar todo antes de pagar?"
-              answer="Sí. El plan gratuito incluye reglas, analytics y QR. PRO solo quita límites. Incluso puedes probar como invitado sin dar tu email."
+              question={t("FAQ.q7")}
+              answer={t("FAQ.a7")}
             />
           </div>
         </div>
@@ -1159,16 +1162,16 @@ export default function Landing() {
             {/* Producto */}
             <div className="flex flex-col gap-6">
               <div>
-                <h3 className="text-lg font-black italic text-light mb-4">Producto</h3>
+                <h3 className="text-lg font-black italic text-light mb-4">{t("Footer.productHeading")}</h3>
                 <ul className="flex flex-col gap-2">
                   <li>
                     <Link href="/" className="text-sm text-light/60 hover:text-light transition-colors">
-                      Comenzar
+                      {t("Footer.productLink1")}
                     </Link>
                   </li>
                   <li>
                     <a href="/dashboard" className="text-sm text-light/60 hover:text-light transition-colors">
-                      Panel
+                      {t("Footer.productLink2")}
                     </a>
                   </li>
                 </ul>
@@ -1176,7 +1179,7 @@ export default function Landing() {
 
               {/* Recursos */}
               <div>
-                <h3 className="text-lg font-black italic text-light mb-4">Recursos</h3>
+                <h3 className="text-lg font-black italic text-light mb-4">{t("Footer.resourcesHeading")}</h3>
                 <ul className="flex flex-col gap-2">
                   <li>
                     <a
@@ -1185,7 +1188,7 @@ export default function Landing() {
                       rel="noopener noreferrer"
                       className="text-sm text-light/60 hover:text-light transition-colors"
                     >
-                      Código fuente
+                      {t("Footer.resourcesLink1")}
                     </a>
                   </li>
                 </ul>
@@ -1194,38 +1197,38 @@ export default function Landing() {
 
             {/* Legal */}
             <div>
-              <h3 className="text-lg font-black italic text-light mb-4">Legal</h3>
+              <h3 className="text-lg font-black italic text-light mb-4">{t("Footer.legalHeading")}</h3>
               <ul className="flex flex-col gap-2">
                 <li>
                   <a href="/legal/privacy" className="text-sm text-light/60 hover:text-light transition-colors">
-                    Política de Privacidad
+                    {t("Footer.legalLink1")}
                   </a>
                 </li>
                 <li>
                   <a href="/legal/terms" className="text-sm text-light/60 hover:text-light transition-colors">
-                    Términos y Condiciones
+                    {t("Footer.legalLink2")}
                   </a>
                 </li>
                 <li>
                   <a href="/legal/cookies" className="text-sm text-light/60 hover:text-light transition-colors">
-                    Política de Cookies
+                    {t("Footer.legalLink3")}
                   </a>
                 </li>
                 <li>
                   <a href="/legal/notice" className="text-sm text-light/60 hover:text-light transition-colors">
-                    Aviso legal
+                    {t("Footer.legalLink4")}
                   </a>
                 </li>
               </ul>
             </div>
           </div>
 
-          {/* Bottom credit */}
-          <div className="flex justify-center">
+          {/* Bottom row: credit + language switcher */}
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-xs text-light/50">
-              Hecho con{" "}
+              {t("Footer.madeWith")}{" "}
               <TbHeartFilled className="inline text-primary align-text-bottom" size={16} />
-              {" "}por{" "}
+              {" "}{t("Footer.madeBy")}{" "}
               <a
                 href="https://twitter.com/aka_alvaroso"
                 target="_blank"
@@ -1235,6 +1238,7 @@ export default function Landing() {
                 @aka_alvaroso
               </a>
             </p>
+            <LanguageSwitcher variant="dark" />
           </div>
         </div>
       </footer>

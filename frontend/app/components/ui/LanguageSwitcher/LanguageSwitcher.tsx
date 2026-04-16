@@ -3,32 +3,44 @@
 import { useLanguage } from '@/app/hooks';
 import { type Locale } from '@/i18n/request';
 
+interface LanguageSwitcherProps {
+  variant?: 'light' | 'dark';
+}
+
 /**
  * Language Switcher Component
- * Simple dropdown to switch between available languages
- *
- * Usage:
- * <LanguageSwitcher />
+ * Toggle between available languages
  */
-export default function LanguageSwitcher() {
+export default function LanguageSwitcher({ variant = 'light' }: LanguageSwitcherProps) {
   const { currentLocale, changeLanguage, availableLocales } = useLanguage();
 
-  const languageNames: Record<Locale, string> = {
-    es: '🇪🇸 Español',
-    en: '🇬🇧 English',
+  const languageLabels: Record<Locale, string> = {
+    es: '🇪🇸 ES',
+    en: '🇬🇧 EN',
   };
 
   return (
-    <select
-      value={currentLocale}
-      onChange={(e) => changeLanguage(e.target.value as Locale)}
-      className="px-3 py-2 border border-dark/20 rounded-lg bg-light cursor-pointer hover:border-dark/40 transition-colors"
-    >
-      {availableLocales.map((locale) => (
-        <option key={locale} value={locale}>
-          {languageNames[locale]}
-        </option>
-      ))}
-    </select>
+    <div className="flex items-center gap-1">
+      {availableLocales.map((locale) => {
+        const isActive = currentLocale === locale;
+        return (
+          <button
+            key={locale}
+            onClick={() => !isActive && changeLanguage(locale)}
+            className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              isActive
+                ? variant === 'dark'
+                  ? 'bg-light/15 text-light'
+                  : 'bg-dark/10 text-dark'
+                : variant === 'dark'
+                  ? 'text-light/40 hover:text-light/70'
+                  : 'text-dark/40 hover:text-dark/70'
+            }`}
+          >
+            {languageLabels[locale]}
+          </button>
+        );
+      })}
+    </div>
   );
 }
