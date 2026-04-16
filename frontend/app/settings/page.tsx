@@ -26,6 +26,7 @@ import { useTranslations } from 'next-intl';
 import CancelSubscriptionModal from "@/app/components/Modal/CancelSubscriptionModal";
 import SelectPlanModal from "@/app/components/Modal/SelectPlanModal";
 import { HttpError } from "@/app/utils/errors";
+import LanguageSwitcher from "@/app/components/ui/LanguageSwitcher/LanguageSwitcher";
 
 import { API_CONFIG } from "@/app/config/api";
 
@@ -539,6 +540,17 @@ export default function SettingsPage() {
                         </Button>
                       </div>
                     )}
+                  </div>
+
+                  {/* Language Section */}
+                  <div className="p-4 bg-dark/5 rounded-2xl">
+                    <div className="flex items-center gap-2 mb-3">
+                      <h3 className="text-xl font-bold">{t('language')}</h3>
+                    </div>
+                    <p className="text-sm text-dark/60 mb-3">
+                      {t('languageDescription')}
+                    </p>
+                    <LanguageSwitcher />
                   </div>
 
                   {/* Logout Button */}
