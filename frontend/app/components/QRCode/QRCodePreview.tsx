@@ -11,6 +11,7 @@ interface QRCodePreviewProps {
   url: string;
   config: QRConfig;
   size?: number;
+  className?: string;
 }
 
 // Map our style types to qr-code-styling types
@@ -29,6 +30,7 @@ export default function QRCodePreview({
   url,
   config,
   size = 200,
+  className = '',
 }: QRCodePreviewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const qrCodeRef = useRef<QRCodeStyling | null>(null);
@@ -109,7 +111,7 @@ export default function QRCodePreview({
   return (
     <div
       ref={containerRef}
-      className="flex items-center justify-center overflow-hidden"
+      className={`${className} flex items-center justify-center overflow-hidden`}
       style={{
         width: size,
         height: size,

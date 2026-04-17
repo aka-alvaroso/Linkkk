@@ -49,6 +49,7 @@ backend/prisma/*.db-journal
 *.tmp
 *.temp
 .cache/
+DESIGN.md
 
 .claude/
 
