@@ -177,25 +177,25 @@ export const AccessesList = ({ shortUrl }: AccessesListProps) => {
 
             {/* Table - Scrollable on mobile */}
             <div className="w-full overflow-x-auto rounded-2xl scrollbar-hide">
-                <table className="w-full border-collapse min-w-[800px]">
+                <table className="w-full border-collapse">
                     <thead>
                         <tr className="border-b border-dark/15">
-                            <th className="px-4 py-3 text-left font-black italic text-md">
+                            <th className="px-2 py-2 text-left font-black italic text-xs">
                                 {t('time')}
                             </th>
-                            <th className="px-4 py-3 text-center font-black italic text-md">
+                            <th className="px-2 py-2 text-center font-black italic text-xs">
                                 {t('source')}
                             </th>
-                            <th className="px-4 py-3 text-left font-black italic text-md">
+                            <th className="px-2 py-2 text-left font-black italic text-xs">
                                 {t('location')}
                             </th>
-                            <th className="px-4 py-3 text-left font-black italic text-md">
+                            <th className="px-2 py-2 text-left font-black italic text-xs">
                                 {t('ipAddress')}
                             </th>
-                            <th className="px-4 py-3 text-left font-black italic text-md">
+                            <th className="px-2 py-2 text-left font-black italic text-xs">
                                 {t('browser')}
                             </th>
-                            <th className="px-4 py-3 text-center font-black italic text-md">
+                            <th className="px-2 py-2 text-center font-black italic text-xs">
                                 {t('flags')}
                             </th>
                         </tr>
@@ -211,71 +211,78 @@ export const AccessesList = ({ shortUrl }: AccessesListProps) => {
                                     transition={{ delay: index * 0.05, duration: 0.3 }}
                                     className="border-b border-dark/15 hover:bg-dark/5 transition-colors"
                                 >
-                                    <td className="px-4 py-4">
-                                        <span className="font-bold text-sm" title={formatFullDate(access.createdAt)}>
+                                    <td className="px-2 py-2">
+                                        <span className="font-bold text-xs" title={formatFullDate(access.createdAt)}>
                                             {formatDate(access.createdAt)}
                                         </span>
                                     </td>
-                                    <td className="px-4 py-4">
+                                    <td className="px-2 py-2">
                                         <div className="flex justify-center">
                                             {access.source === 'qr' ? (
-                                                <div className="px-3 py-1.5 bg-dark text-light rounded-lg flex items-center gap-1.5">
-                                                    <TbQrcode size={14} />
+                                                <div className="px-2 py-1 bg-dark text-light rounded-lg flex items-center gap-1">
+                                                    <TbQrcode size={12} />
                                                     <span className="text-xs font-black">QR</span>
                                                 </div>
                                             ) : (
-                                                <div className="px-3 py-1.5 bg-dark/10 rounded-lg flex items-center gap-1.5">
-                                                    <TbClick size={14} className="text-dark" />
+                                                <div className="px-2 py-1 bg-dark/10 rounded-lg flex items-center gap-1">
+                                                    <TbClick size={12} className="text-dark" />
                                                     <span className="text-xs font-black text-dark">{t('direct')}</span>
                                                 </div>
                                             )}
                                         </div>
                                     </td>
-                                    <td className="px-4 py-4">
-                                        <div className="flex items-center gap-2">
-                                            {/* TODO: Flag */}
-                                            <span className="font-bold text-sm">{access.country}</span>
+                                    <td className="px-2 py-2">
+                                        <div className="flex items-center gap-1.5">
+                                            {access.country && (
+                                                <img
+                                                    src={`https://flagcdn.com/20x15/${access.country.toLowerCase()}.png`}
+                                                    alt={access.country}
+                                                    className="w-4 h-3 object-cover rounded-sm flex-shrink-0"
+                                                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                                                />
+                                            )}
+                                            <span className="font-bold text-xs">{access.country || '—'}</span>
                                         </div>
                                     </td>
-                                    <td className="px-4 py-4">
-                                        <code className="px-2.5 py-1.5 bg-dark/5 rounded-lg text-xs font-mono font-bold border border-dark/10">
+                                    <td className="px-2 py-2">
+                                        <code className="px-1.5 py-1 bg-dark/5 rounded-lg text-xs font-mono font-bold border border-dark/10">
                                             {anonymizeIp(access.ip)}
                                         </code>
                                     </td>
-                                    <td className="px-4 py-4">
-                                        <div className="flex items-center gap-2">
+                                    <td className="px-2 py-2">
+                                        <div className="flex items-center gap-1.5">
                                             {getBrowserLogoUrl(browser) ? (
                                                 <Image
                                                     src={getBrowserLogoUrl(browser)!}
                                                     alt={browser}
-                                                    width={20}
-                                                    height={20}
+                                                    width={16}
+                                                    height={16}
                                                     className="object-contain"
                                                     unoptimized
                                                 />
                                             ) : (
-                                                <TbBrowser size={20} className="text-dark/40" />
+                                                <TbBrowser size={16} className="text-dark/40" />
                                             )}
-                                            <span className="text-sm font-bold">{browser}</span>
+                                            <span className="text-xs font-bold">{browser}</span>
                                         </div>
                                     </td>
-                                    <td className="px-4 py-4">
-                                        <div className="flex justify-center items-center gap-2">
+                                    <td className="px-2 py-2">
+                                        <div className="flex justify-center items-center gap-1.5">
                                             {access.isVPN ? (
-                                                <div className="px-2 py-1 bg-danger text-light rounded-lg flex items-center gap-1" title="VPN">
-                                                    <TbShieldX size={13} />
+                                                <div className="px-1.5 py-0.5 bg-danger text-light rounded-lg flex items-center gap-1" title="VPN">
+                                                    <TbShieldX size={11} />
                                                     <span className="text-xs font-black">VPN</span>
                                                 </div>
                                             ) : (
-                                                <TbShieldCheck size={16} className="text-dark/20" title="No VPN" />
+                                                <TbShieldCheck size={14} className="text-dark/20" title="No VPN" />
                                             )}
                                             {access.isBot ? (
-                                                <div className="px-2 py-1 bg-danger text-light rounded-lg flex items-center gap-1" title="Bot">
-                                                    <TbRobot size={13} />
+                                                <div className="px-1.5 py-0.5 bg-danger text-light rounded-lg flex items-center gap-1" title="Bot">
+                                                    <TbRobot size={11} />
                                                     <span className="text-xs font-black">Bot</span>
                                                 </div>
                                             ) : (
-                                                <TbUser size={16} className="text-dark/20" title="No Bot" />
+                                                <TbUser size={14} className="text-dark/20" title="No Bot" />
                                             )}
                                         </div>
                                     </td>
