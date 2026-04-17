@@ -548,7 +548,8 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                                 const dt = new Date(d + 'T00:00:00');
                                                 return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                                             };
-                                            const formatTooltipLabel = (d: string) => {
+                                            const formatTooltipLabel = (d: unknown) => {
+                                                if (typeof d !== 'string') return String(d ?? '');
                                                 if (isMonthly) {
                                                     const [y, m] = d.split('-');
                                                     return new Date(parseInt(y), parseInt(m) - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
