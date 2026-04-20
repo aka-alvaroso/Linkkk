@@ -149,7 +149,7 @@
       "q3": "How fast are the redirects?",
       "a3": "Under 50 milliseconds. Your visitors won't notice any delay. Slow redirects kill conversions — ours don't.",
       "q4": "What happens if I exceed my plan limits?",
-      "a4": "You get a warning. Existing links keep working. We never break active links. You can upgrade whenever you want.",
+      "a4": "You can't create more links, but existing ones keep working. We never break active links. You can upgrade whenever you want.",
       "q5": "What if Linkkk shuts down?",
       "a5": "The code is on GitHub. You can self-host it. And your destination URLs will always work independently — only redirects depend on us, and we've designed them so you can migrate if needed.",
       "q6": "Is my data safe?",
