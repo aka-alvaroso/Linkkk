@@ -1183,7 +1183,7 @@ export default function Landing() {
                 <ul className="flex flex-col gap-2">
                   <li>
                     <a
-                      href="https://github.com/akaAlvaroso/linkkk"
+                      href="https://github.com/aka-alvaroso/Linkkk"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm text-light/60 hover:text-light transition-colors"
