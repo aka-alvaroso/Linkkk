@@ -280,6 +280,7 @@ export default function Dashboard() {
                     variant="ghost"
                     size="sm"
                     rounded="xl"
+                    leftIcon={<TbLayoutGrid size={20} />}
                     rightIcon={<TbChevronDown size={18} className={`transition-transform duration-200 ${organizeDropdownOpen ? 'rotate-180' : ''}`} />}
                     onClick={() => setOrganizeDropdownOpen(v => !v)}
                   >

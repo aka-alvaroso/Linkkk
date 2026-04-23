@@ -324,7 +324,7 @@ export default function FilterModal({
             variant="solid"
             size="md"
             rounded="2xl"
-            className='w-full rounded-xl hover:bg-primary hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)]'
+            className='w-full hover:bg-primary hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)]'
             onClick={handleApply}
           >
             {t('applyFilters')}
