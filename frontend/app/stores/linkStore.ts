@@ -9,6 +9,8 @@ import type { Link, LinkFilters } from "@/app/types";
 const defaultFilters: LinkFilters = {
   search: "",
   status: "all",
+  tagIds: [],
+  groupIds: [],
 };
 
 interface LinkStore {
@@ -105,6 +107,20 @@ export const useLinkStore = create<LinkStore>((set, get) => ({
     if (filters.status !== "all") {
       filtered = filtered.filter((link) =>
         filters.status === "active" ? link.status : !link.status
+      );
+    }
+
+    // Group filter (multi-select: link must belong to one of the selected groups)
+    if (filters.groupIds && filters.groupIds.length > 0) {
+      filtered = filtered.filter((link) =>
+        filters.groupIds!.includes(link.group?.id ?? -1)
+      );
+    }
+
+    // Tag filter (multi-select: link must have ALL selected tags)
+    if (filters.tagIds && filters.tagIds.length > 0) {
+      filtered = filtered.filter((link) =>
+        filters.tagIds!.every((tagId) => link.tags?.some((tag) => tag.id === tagId))
       );
     }
 

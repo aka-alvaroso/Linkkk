@@ -4,6 +4,9 @@ const planLimits = {
     linkExpiration: 7,
     rulesPerLink: 1,
     conditionsPerRule: 1,
+    groups: 0,
+    tags: 0,
+    tagsPerLink: 0,
     linkAnalytics: {
       linkCharts: false,
       linkAccesses: 0,
@@ -15,6 +18,9 @@ const planLimits = {
     linkExpiration: null,
     rulesPerLink: 3,
     conditionsPerRule: 2,
+    groups: 5,
+    tags: 20,
+    tagsPerLink: 5,
     linkAnalytics: {
       linkCharts: true,
       linkAccesses: null,
@@ -26,6 +32,9 @@ const planLimits = {
     linkExpiration: null,
     rulesPerLink: null,
     conditionsPerRule: null,
+    groups: null,
+    tags: null,
+    tagsPerLink: null,
     linkAnalytics: {
       linkCharts: true,
       linkAccesses: null,

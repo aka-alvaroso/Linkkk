@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
-import { TbClick, TbCopy, TbCircleDashedCheck, TbCircleDashed, TbQrcode, TbSettings, TbShare3, TbTrash } from 'react-icons/tb'
+import { TbClick, TbCopy, TbCircleDashedCheck, TbCircleDashed, TbQrcode, TbSettings, TbShare3, TbTrash, TbFolder } from 'react-icons/tb'
 import { FiCornerDownRight } from "react-icons/fi";
 import Button from '@/app/components/ui/Button/Button';
 import Chip from '@/app/components/ui/Chip/Chip';
+import TagChip from '@/app/components/Tags/TagChip';
 import EditLinkDrawer from '@/app/components/Drawer/EditiLinkDrawer';
 import { useLinks } from '@/app/hooks';
 import { Link } from '@/app/types';
@@ -77,7 +78,7 @@ export default function LinkItem({ view, data }: LinkItemProps) {
 
                         <div className='flex flex-col justify-between sm:flex-row gap-2 w-full'>
                             {/* URLs */}
-                            <div className='flex flex-col w-full sm:max-w-1/2'>
+                            <div className='flex flex-col w-full sm:max-w-1/2 gap-1'>
                                 <div className='flex items-center justify-between'>
                                     <p className='text-lg italic'>linkkk.dev/r/<span className='font-bold'>{data.shortUrl}</span></p>
                                 </div>
@@ -85,6 +86,19 @@ export default function LinkItem({ view, data }: LinkItemProps) {
                                     <FiCornerDownRight size={20} />
                                     <p className='flex-1 truncate'>{data.longUrl}</p>
                                 </div>
+                                {/* Group badge */}
+                                {data.group && (
+                                    <div className='flex items-center gap-1 text-xs text-dark/40'>
+                                        <TbFolder size={12} style={{ color: data.group.color ?? '#6b7280' }} />
+                                        <span>{data.group.name}</span>
+                                    </div>
+                                )}
+                                {/* Tag chips */}
+                                {data.tags && data.tags.length > 0 && (
+                                    <div className='flex flex-wrap gap-1'>
+                                        {data.tags.map(tag => <TagChip key={tag.id} tag={tag} size='xs' />)}
+                                    </div>
+                                )}
                             </div>
 
                             {/* Status & Stats */}

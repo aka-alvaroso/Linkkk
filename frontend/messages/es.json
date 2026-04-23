@@ -185,6 +185,9 @@
     "myLinks": "Mis links",
     "filters": "Filtros",
     "filtersActive": "Filtros activos",
+    "organize": "Organizar",
+    "manageGroups": "Grupos",
+    "manageTags": "Etiquetas",
     "newLink": "Nuevo link",
     "noLinksFound": "No se encontraron links",
     "createLink": "Crear link",
@@ -376,7 +379,16 @@
     "clickToEdit": "Haz clic para editar",
     "closeConfirmMessage": "Tienes cambios sin guardar. ¿Cerrar igualmente?",
     "keepEditing": "Seguir editando",
-    "discardAndClose": "Descartar y cerrar"
+    "discardAndClose": "Descartar y cerrar",
+    "tabOrganize": "Organizar",
+    "organizeTagsTitle": "Etiquetas",
+    "organizeNoTags": "Aún no hay etiquetas. Créalas desde el panel.",
+    "organizeTagsPlaceholder": "Seleccionar etiquetas...",
+    "organizeGroupTitle": "Grupo",
+    "organizeNoGroups": "Aún no hay grupos. Créalos desde el panel.",
+    "organizeNoGroup": "Ninguno",
+    "organizeSave": "Guardar",
+    "organizeTagsLimit": "Límite de etiquetas alcanzado para este link"
   },
   "FilterModal": {
     "title": "Filtrar Links",
@@ -388,7 +400,32 @@
     "statusAll": "Todos",
     "statusActive": "Activos",
     "statusInactive": "Inactivos",
+    "groupLabel": "Grupo",
+    "groupAll": "Todos los grupos",
+    "tagLabel": "Etiqueta",
+    "tagAll": "Todas las etiquetas",
     "applyFilters": "Aplicar Filtros"
+  },
+  "ManageTags": {
+    "title": "Etiquetas",
+    "newTag": "Nueva etiqueta",
+    "namePlaceholder": "Nombre de la etiqueta",
+    "add": "Añadir",
+    "preview": "Vista previa",
+    "limitReached": "Has alcanzado el límite de {max} etiquetas en tu plan.",
+    "loading": "Cargando etiquetas...",
+    "empty": "Aún no hay etiquetas. ¡Crea la primera!",
+    "done": "Listo"
+  },
+  "ManageGroups": {
+    "title": "Grupos",
+    "newGroup": "Nuevo grupo",
+    "namePlaceholder": "Nombre del grupo",
+    "add": "Añadir",
+    "limitReached": "Has alcanzado el límite de {max} grupos en tu plan.",
+    "loading": "Cargando grupos...",
+    "empty": "Aún no hay grupos. ¡Crea el primero!",
+    "done": "Listo"
   },
   "RulesManager": {
     "linkRules": "Reglas del Link",

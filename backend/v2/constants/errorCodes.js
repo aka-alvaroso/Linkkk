@@ -159,6 +159,91 @@ const ERRORS = {
   },
 
   // ============================================================================
+  // GROUP ERRORS
+  // ============================================================================
+  GROUP_NOT_FOUND: {
+    code: "GROUP_NOT_FOUND",
+    message: "Group not found",
+    userMessage: "The group you're looking for doesn't exist",
+    statusCode: 404,
+    retryable: false,
+  },
+  GROUP_ACCESS_DENIED: {
+    code: "GROUP_ACCESS_DENIED",
+    message: "Access denied to group",
+    userMessage: "You don't have permission to access this group",
+    statusCode: 403,
+    retryable: false,
+  },
+  GROUP_NAME_EXISTS: {
+    code: "GROUP_NAME_EXISTS",
+    message: "Group name already exists",
+    userMessage: "You already have a group with this name",
+    statusCode: 400,
+    retryable: false,
+  },
+  GROUP_LIMIT_EXCEEDED: {
+    code: "GROUP_LIMIT_EXCEEDED",
+    message: "Group limit exceeded",
+    userMessage: "You've reached your group limit. Upgrade your plan to create more groups",
+    statusCode: 400,
+    retryable: false,
+  },
+  GROUPS_NOT_AVAILABLE: {
+    code: "GROUPS_NOT_AVAILABLE",
+    message: "Groups not available on this plan",
+    userMessage: "Groups are not available on your current plan. Upgrade to use this feature",
+    statusCode: 403,
+    retryable: false,
+  },
+
+  // ============================================================================
+  // TAG ERRORS
+  // ============================================================================
+  TAG_NOT_FOUND: {
+    code: "TAG_NOT_FOUND",
+    message: "Tag not found",
+    userMessage: "The tag you're looking for doesn't exist",
+    statusCode: 404,
+    retryable: false,
+  },
+  TAG_ACCESS_DENIED: {
+    code: "TAG_ACCESS_DENIED",
+    message: "Access denied to tag",
+    userMessage: "You don't have permission to access this tag",
+    statusCode: 403,
+    retryable: false,
+  },
+  TAG_NAME_EXISTS: {
+    code: "TAG_NAME_EXISTS",
+    message: "Tag name already exists",
+    userMessage: "You already have a tag with this name",
+    statusCode: 400,
+    retryable: false,
+  },
+  TAG_LIMIT_EXCEEDED: {
+    code: "TAG_LIMIT_EXCEEDED",
+    message: "Tag limit exceeded",
+    userMessage: "You've reached your tag limit. Upgrade your plan to create more tags",
+    statusCode: 400,
+    retryable: false,
+  },
+  TAGS_PER_LINK_EXCEEDED: {
+    code: "TAGS_PER_LINK_EXCEEDED",
+    message: "Tags per link limit exceeded",
+    userMessage: "You've reached the maximum number of tags for this link",
+    statusCode: 400,
+    retryable: false,
+  },
+  TAGS_NOT_AVAILABLE: {
+    code: "TAGS_NOT_AVAILABLE",
+    message: "Tags not available on this plan",
+    userMessage: "Tags are not available on your current plan. Upgrade to use this feature",
+    statusCode: 403,
+    retryable: false,
+  },
+
+  // ============================================================================
   // RATE LIMITING ERRORS
   // ============================================================================
   RATE_LIMIT_EXCEEDED: {
@@ -257,6 +342,21 @@ ERRORS.categories = {
     "LINK_NO_PASSWORD",
     "LINK_DISABLED",
     "LINK_EXPIRED",
+  ],
+  GROUP: [
+    "GROUP_NOT_FOUND",
+    "GROUP_ACCESS_DENIED",
+    "GROUP_NAME_EXISTS",
+    "GROUP_LIMIT_EXCEEDED",
+    "GROUPS_NOT_AVAILABLE",
+  ],
+  TAG: [
+    "TAG_NOT_FOUND",
+    "TAG_ACCESS_DENIED",
+    "TAG_NAME_EXISTS",
+    "TAG_LIMIT_EXCEEDED",
+    "TAGS_PER_LINK_EXCEEDED",
+    "TAGS_NOT_AVAILABLE",
   ],
   RATE_LIMIT: ["RATE_LIMIT_EXCEEDED"],
   SYSTEM: ["INTERNAL_ERROR", "DATABASE_ERROR"],

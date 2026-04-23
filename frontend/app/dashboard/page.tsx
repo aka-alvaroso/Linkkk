@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect, useRef } from "react";
-import { TbFilterPlus, TbPlus, TbArrowLeft } from "react-icons/tb";
+import { TbFilterPlus, TbPlus, TbArrowLeft, TbTag, TbFolder, TbLayoutGrid, TbChevronDown } from "react-icons/tb";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -12,10 +12,12 @@ import LinkDetails from "@/app/components/LinkList/LinkDetails";
 import Navigation from "@/app/components/Navigation/Navigation";
 import CreateLinkDrawer from "@/app/components/Drawer/CreateLinkDrawer";
 import FilterModal from "@/app/components/Modal/FilterModal";
+import ManageTagsModal from "@/app/components/Modal/ManageTagsModal";
+import ManageGroupsModal from "@/app/components/Modal/ManageGroupsModal";
 import SubscriptionSuccessModal from "@/app/components/Modal/SubscriptionSuccessModal";
 import Alert from "@/app/components/ui/Alert/Alert";
 import * as motion from 'motion/react-client';
-import { useMotionValue, animate } from 'motion/react';
+import { useMotionValue, animate, AnimatePresence } from 'motion/react';
 import AnimatedText, { AnimatedTextRef } from "@/app/components/ui/AnimatedText";
 import { useTranslations } from 'next-intl';
 
@@ -75,6 +77,10 @@ export default function Dashboard() {
   const [view] = useState('details');
   const [createLinkDrawerOpen, setCreateLinkDrawerOpen] = useState(false);
   const [filterModalOpen, setFilterModalOpen] = useState(false);
+  const [manageTagsOpen, setManageTagsOpen] = useState(false);
+  const [manageGroupsOpen, setManageGroupsOpen] = useState(false);
+  const [organizeDropdownOpen, setOrganizeDropdownOpen] = useState(false);
+  const organizeDropdownRef = useRef<HTMLDivElement>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [subscriptionInfo, setSubscriptionInfo] = useState<{
     status: "ACTIVE" | "CANCELED" | "PAST_DUE" | "INACTIVE" | "TRIALING";
@@ -121,6 +127,16 @@ export default function Dashboard() {
       router.replace('/dashboard');
     }
   }, [searchParams, checkSession, router]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (organizeDropdownRef.current && !organizeDropdownRef.current.contains(e.target as Node)) {
+        setOrganizeDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const hasActiveFilters = () => {
     return filters.search !== '' ||
@@ -252,6 +268,61 @@ export default function Dashboard() {
                   <span>{hasActiveFilters() ? t('filtersActive') : t('filters')}</span>
                 </Button>
               </motion.div>
+              {!isGuest && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3, duration: 0.4, ease: "backInOut" }}
+                  className="relative"
+                  ref={organizeDropdownRef}
+                >
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    rounded="xl"
+                    rightIcon={<TbChevronDown size={18} className={`transition-transform duration-200 ${organizeDropdownOpen ? 'rotate-180' : ''}`} />}
+                    onClick={() => setOrganizeDropdownOpen(v => !v)}
+                  >
+                    {t('organize')}
+                  </Button>
+                  <AnimatePresence>
+                    {organizeDropdownOpen && (
+                      <motion.div
+                        key="organize-dropdown"
+                        initial={{ opacity: 0, scale: 0.95, y: -6 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: -6 }}
+                        transition={{ duration: 0.15, ease: "backOut" }}
+                        style={{ transformOrigin: 'top left' }}
+                        className="absolute top-full left-0 mt-1 z-50 bg-light border border-dark/10 rounded-2xl shadow-lg overflow-hidden min-w-40"
+                      >
+                        <motion.button
+                          type="button"
+                          initial={{ opacity: 0, x: -8 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.05, ease: "backOut" }}
+                          onClick={() => { setManageGroupsOpen(true); setOrganizeDropdownOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-dark/5 transition-colors cursor-pointer"
+                        >
+                          <TbFolder size={16} className="text-dark/50" />
+                          {t('manageGroups')}
+                        </motion.button>
+                        <motion.button
+                          type="button"
+                          initial={{ opacity: 0, x: -8 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.09, ease: "backOut" }}
+                          onClick={() => { setManageTagsOpen(true); setOrganizeDropdownOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-dark/5 transition-colors cursor-pointer"
+                        >
+                          <TbTag size={16} className="text-dark/50" />
+                          {t('manageTags')}
+                        </motion.button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              )}
             </div>
 
             <div className='flex items-center gap-2'>
@@ -272,6 +343,8 @@ export default function Dashboard() {
           {view === 'details' && <LinkDetails links={filteredLinks} />}
 
           <CreateLinkDrawer open={createLinkDrawerOpen} onClose={() => setCreateLinkDrawerOpen(false)} />
+          <ManageTagsModal open={manageTagsOpen} onClose={() => setManageTagsOpen(false)} />
+          <ManageGroupsModal open={manageGroupsOpen} onClose={() => setManageGroupsOpen(false)} />
           <FilterModal
             open={filterModalOpen}
             onClose={() => setFilterModalOpen(false)}

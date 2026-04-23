@@ -188,6 +188,43 @@ const deleteRuleLimiter = rateLimit({
   handler: rateLimitHandler,
 });
 
+// Tag & Group limiters
+const createTagLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: config.env.isDevelopment ? 1000 : 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => req.ip + ":" + (req.user?.id || "anon"),
+  handler: rateLimitHandler,
+});
+
+const updateTagLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: config.env.isDevelopment ? 1000 : 120,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => req.ip + ":" + (req.user?.id || "anon"),
+  handler: rateLimitHandler,
+});
+
+const createGroupLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: config.env.isDevelopment ? 1000 : 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => req.ip + ":" + (req.user?.id || "anon"),
+  handler: rateLimitHandler,
+});
+
+const updateGroupLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: config.env.isDevelopment ? 1000 : 120,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => req.ip + ":" + (req.user?.id || "anon"),
+  handler: rateLimitHandler,
+});
+
 const feedbackLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
   max: config.env.isDevelopment ? 1000 : 10,
@@ -226,4 +263,8 @@ module.exports = {
   deleteRuleLimiter,
   feedbackLimiter,
   logoUploadLimiter,
+  createTagLimiter,
+  updateTagLimiter,
+  createGroupLimiter,
+  updateGroupLimiter,
 };
