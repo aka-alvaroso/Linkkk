@@ -14,24 +14,26 @@ import {
   TbX,
 } from "react-icons/tb";
 import { useState } from "react";
-
-const sections = [
-  { href: "/docs/getting-started", label: "Primeros pasos", icon: TbRocket },
-  { href: "/docs/links", label: "Enlaces", icon: TbLink },
-  { href: "/docs/rules", label: "Reglas", icon: TbAdjustmentsHorizontal },
-  { href: "/docs/analytics", label: "Analytics", icon: TbChartBar },
-  { href: "/docs/qr-codes", label: "Códigos QR", icon: TbQrcode },
-  { href: "/docs/plans", label: "Planes", icon: TbCrown },
-  { href: "/docs/security", label: "Seguridad", icon: TbShieldLock },
-];
+import { useTranslations } from "next-intl";
 
 export default function DocsLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const t = useTranslations("Docs.layout");
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const sections = [
+    { href: "/docs/getting-started", label: t("nav.gettingStarted"), icon: TbRocket },
+    { href: "/docs/links", label: t("nav.links"), icon: TbLink },
+    { href: "/docs/rules", label: t("nav.rules"), icon: TbAdjustmentsHorizontal },
+    { href: "/docs/analytics", label: t("nav.analytics"), icon: TbChartBar },
+    { href: "/docs/qr-codes", label: t("nav.qrCodes"), icon: TbQrcode },
+    { href: "/docs/plans", label: t("nav.plans"), icon: TbCrown },
+    { href: "/docs/security", label: t("nav.security"), icon: TbShieldLock },
+  ];
 
   const sidebar = (
     <nav className="flex flex-col gap-1">
@@ -70,7 +72,7 @@ export default function DocsLayout({
           className="md:hidden flex items-center gap-2 mb-4 px-3 py-2 rounded-xl bg-dark/5 text-dark font-bold text-sm cursor-pointer"
         >
           {sidebarOpen ? <TbX size={18} /> : <TbMenu2 size={18} />}
-          {sidebarOpen ? "Cerrar" : "Menú"}
+          {sidebarOpen ? t("menuClose") : t("menuOpen")}
         </button>
 
         {/* Mobile sidebar */}
@@ -84,7 +86,7 @@ export default function DocsLayout({
           {/* Desktop sidebar */}
           <aside className="hidden md:block w-56 shrink-0 sticky top-32 self-start">
             <p className="text-xs font-black italic text-dark/40 uppercase tracking-wider mb-4 px-4">
-              Documentos
+              {t("documents")}
             </p>
             {sidebar}
           </aside>
