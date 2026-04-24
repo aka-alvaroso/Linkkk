@@ -70,9 +70,9 @@ export default function GettingStarted() {
               <p className="text-sm text-dark/60">{t("step1Desc")}</p>
             </div>
             <Button
-              variant="outline"
-              size="md"
-              className="rounded-3xl"
+              variant="solid"
+              size="sm"
+              className="rounded-3xl hover:bg-primary hover:text-dark"
               leftIcon={<TbPlus size={16}/>}
             >
               {t("step1Button")}
