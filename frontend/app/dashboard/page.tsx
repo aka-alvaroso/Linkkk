@@ -1,6 +1,7 @@
 "use client"
 import { useState, useEffect, useRef } from "react";
-import { TbFilterPlus, TbPlus, TbArrowLeft } from "react-icons/tb";
+import { TbFilterPlus, TbPlus, TbArrowLeft, TbTag, TbFolder, TbLayoutGrid, TbChevronDown } from "react-icons/tb";
+import Dropdown from "@/app/components/ui/Dropdown/Dropdown";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -12,10 +13,12 @@ import LinkDetails from "@/app/components/LinkList/LinkDetails";
 import Navigation from "@/app/components/Navigation/Navigation";
 import CreateLinkDrawer from "@/app/components/Drawer/CreateLinkDrawer";
 import FilterModal from "@/app/components/Modal/FilterModal";
+import ManageTagsModal from "@/app/components/Modal/ManageTagsModal";
+import ManageGroupsModal from "@/app/components/Modal/ManageGroupsModal";
 import SubscriptionSuccessModal from "@/app/components/Modal/SubscriptionSuccessModal";
 import Alert from "@/app/components/ui/Alert/Alert";
 import * as motion from 'motion/react-client';
-import { useMotionValue, animate } from 'motion/react';
+import { useMotionValue, animate, AnimatePresence } from 'motion/react';
 import AnimatedText, { AnimatedTextRef } from "@/app/components/ui/AnimatedText";
 import { useTranslations } from 'next-intl';
 
@@ -75,6 +78,8 @@ export default function Dashboard() {
   const [view] = useState('details');
   const [createLinkDrawerOpen, setCreateLinkDrawerOpen] = useState(false);
   const [filterModalOpen, setFilterModalOpen] = useState(false);
+  const [manageTagsOpen, setManageTagsOpen] = useState(false);
+  const [manageGroupsOpen, setManageGroupsOpen] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [subscriptionInfo, setSubscriptionInfo] = useState<{
     status: "ACTIVE" | "CANCELED" | "PAST_DUE" | "INACTIVE" | "TRIALING";
@@ -121,6 +126,7 @@ export default function Dashboard() {
       router.replace('/dashboard');
     }
   }, [searchParams, checkSession, router]);
+
 
   const hasActiveFilters = () => {
     return filters.search !== '' ||
@@ -252,6 +258,44 @@ export default function Dashboard() {
                   <span>{hasActiveFilters() ? t('filtersActive') : t('filters')}</span>
                 </Button>
               </motion.div>
+              {!isGuest && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3, duration: 0.4, ease: "backInOut" }}
+                >
+                  <Dropdown
+                    placement="bottom-left"
+                    trigger={
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        rounded="xl"
+                        leftIcon={<TbFolder size={20} />}
+                        rightIcon={<TbChevronDown size={18} />}
+                        className="relative border border-secondary"
+                      >
+                        {t('organize')}
+                        <span className="absolute -top-2 -right-4 rotate-20 text-xs bg-secondary text-light rounded-full py-0.5 px-2">{t('organizeBadge')}</span>
+                      </Button>
+                    }
+                    items={[
+                      {
+                        value: "groups",
+                        label: t('manageGroups'),
+                        icon: <TbFolder size={16} />,
+                        onClick: () => setManageGroupsOpen(true),
+                      },
+                      {
+                        value: "tags",
+                        label: t('manageTags'),
+                        icon: <TbTag size={16} />,
+                        onClick: () => setManageTagsOpen(true),
+                      },
+                    ]}
+                  />
+                </motion.div>
+              )}
             </div>
 
             <div className='flex items-center gap-2'>
@@ -272,6 +316,8 @@ export default function Dashboard() {
           {view === 'details' && <LinkDetails links={filteredLinks} />}
 
           <CreateLinkDrawer open={createLinkDrawerOpen} onClose={() => setCreateLinkDrawerOpen(false)} />
+          <ManageTagsModal open={manageTagsOpen} onClose={() => setManageTagsOpen(false)} />
+          <ManageGroupsModal open={manageGroupsOpen} onClose={() => setManageGroupsOpen(false)} />
           <FilterModal
             open={filterModalOpen}
             onClose={() => setFilterModalOpen(false)}

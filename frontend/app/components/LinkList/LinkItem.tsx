@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
-import { TbClick, TbCopy, TbCircleDashedCheck, TbCircleDashed, TbQrcode, TbSettings, TbShare3, TbTrash } from 'react-icons/tb'
+import { TbClick, TbCopy, TbCircleDashedCheck, TbCircleDashed, TbQrcode, TbSettings, TbShare3, TbTrash, TbFolder } from 'react-icons/tb'
 import { FiCornerDownRight } from "react-icons/fi";
 import Button from '@/app/components/ui/Button/Button';
 import Chip from '@/app/components/ui/Chip/Chip';
+import TagChip from '@/app/components/Tags/TagChip';
 import EditLinkDrawer from '@/app/components/Drawer/EditiLinkDrawer';
 import { useLinks } from '@/app/hooks';
 import { Link } from '@/app/types';
@@ -77,14 +78,27 @@ export default function LinkItem({ view, data }: LinkItemProps) {
 
                         <div className='flex flex-col justify-between sm:flex-row gap-2 w-full'>
                             {/* URLs */}
-                            <div className='flex flex-col w-full sm:max-w-1/2'>
-                                <div className='flex items-center justify-between'>
+                            <div className='flex flex-col w-full sm:max-w-1/2 gap-1'>
+                                <div className='flex items-center gap-2'>
                                     <p className='text-lg italic'>linkkk.dev/r/<span className='font-bold'>{data.shortUrl}</span></p>
+                                    {/* Group badge */}
+                                    {data.group && (
+                                        <div className='flex items-center gap-1 text-sm px-2 py-1 rounded-full border' style={{ color: data.group.color ?? '#6b7280', backgroundColor: (data.group.color ?? '#6b7280') + '22' }}>
+                                            <TbFolder size={16} />
+                                            <span className=''>{data.group.name}</span>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className='flex items-center gap-2 text-dark/50'>
                                     <FiCornerDownRight size={20} />
                                     <p className='flex-1 truncate'>{data.longUrl}</p>
                                 </div>
+                                {/* Tag chips */}
+                                {data.tags && data.tags.length > 0 && (
+                                    <div className='flex flex-wrap gap-1'>
+                                        {data.tags.map(tag => <TagChip key={tag.id} tag={tag} size='xs' />)}
+                                    </div>
+                                )}
                             </div>
 
                             {/* Status & Stats */}

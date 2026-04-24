@@ -3,15 +3,18 @@ import Modal from '@/app/components/ui/Modal/Modal';
 import Input from '@/app/components/ui/Input/Input';
 import InlineSelect from '@/app/components/ui/InlineSelect/InlineSelect';
 import Button from '@/app/components/ui/Button/Button';
-import { TbSearch, TbCircleDashedCheck, TbCircleDashed, TbFilterOff, TbCircleFilled } from 'react-icons/tb';
+import { TbSearch, TbCircleDashedCheck, TbCircleDashed, TbFilterOff, TbCircleFilled, TbTag, TbFolder } from 'react-icons/tb';
 import * as motion from 'motion/react-client';
 import { AnimatePresence } from 'motion/react';
 import { useTranslations } from 'next-intl';
+import { useTagStore } from '@/app/stores/tagStore';
+import { useGroupStore } from '@/app/stores/groupStore';
+import { useTags } from '@/app/hooks';
+import { useGroups } from '@/app/hooks';
+import SelectDropdown from '@/app/components/ui/Select/SelectDropdown';
+import type { LinkFilters } from '@/app/types';
 
-export interface LinkFilters {
-  search: string;
-  status: 'all' | 'active' | 'inactive';
-}
+export type { LinkFilters };
 
 interface FilterModalProps {
   open: boolean;
@@ -23,6 +26,8 @@ interface FilterModalProps {
 const defaultFilters: LinkFilters = {
   search: '',
   status: 'all',
+  tagIds: [],
+  groupIds: [],
 };
 
 export default function FilterModal({
@@ -33,6 +38,17 @@ export default function FilterModal({
 }: FilterModalProps) {
   const t = useTranslations('FilterModal');
   const [filters, setFilters] = useState<LinkFilters>(initialFilters);
+  const { tags } = useTagStore();
+  const { groups } = useGroupStore();
+  const { fetchTags } = useTags();
+  const { fetchGroups } = useGroups();
+
+  useEffect(() => {
+    if (open) {
+      fetchTags();
+      fetchGroups();
+    }
+  }, [open, fetchTags, fetchGroups]);
 
   const handleApply = () => {
     onApplyFilters(filters);
@@ -60,9 +76,12 @@ export default function FilterModal({
     onApplyFilters(defaultFilters);
   };
 
+
   const hasActiveFilters = () => {
     return filters.search !== '' ||
-      filters.status !== 'all'
+      filters.status !== 'all' ||
+      (filters.tagIds?.length ?? 0) > 0 ||
+      (filters.groupIds?.length ?? 0) > 0;
   };
 
   return (
@@ -185,18 +204,78 @@ export default function FilterModal({
           </motion.div>
         </div>
 
+        {/* Group filter */}
+        {groups.length > 0 && (
+          <div className="flex flex-col gap-2">
+            <motion.label
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2, ease: "backInOut" }}
+              className="text-lg font-semibold flex items-center gap-2"
+            >
+              <TbFolder size={18} /> {t('groupLabel')}
+            </motion.label>
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.225, ease: "backInOut" }}
+            >
+              <SelectDropdown
+                mode="multi"
+                options={groups.map(g => ({ label: g.name, value: g.id, color: g.color ?? '#6b7280' }))}
+                values={filters.groupIds ?? []}
+                onChangeMulti={(next) => setFilters({ ...filters, groupIds: next as number[] })}
+                placeholder={t('groupPlaceholder')}
+                showAllOption
+                allLabel={t('selectAll')}
+                noneLabel={t('selectNone')}
+              />
+            </motion.div>
+          </div>
+        )}
+
+        {/* Tag filter */}
+        {tags.length > 0 && (
+          <div className="flex flex-col gap-2">
+            <motion.label
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.25, ease: "backInOut" }}
+              className="text-lg font-semibold flex items-center gap-2"
+            >
+              <TbTag size={18} /> {t('tagLabel')}
+            </motion.label>
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.275, ease: "backInOut" }}
+            >
+              <SelectDropdown
+                mode="multi"
+                options={tags.map(tag => ({ label: tag.name, value: tag.id, color: tag.color ?? '#6b7280' }))}
+                values={filters.tagIds ?? []}
+                onChangeMulti={(next) => setFilters({ ...filters, tagIds: next as number[] })}
+                placeholder={t('tagPlaceholder')}
+                showAllOption
+                allLabel={t('selectAll')}
+                noneLabel={t('selectNone')}
+              />
+            </motion.div>
+          </div>
+        )}
+
         {/* Actions */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2, ease: "backInOut" }}
+          transition={{ delay: 0.3, ease: "backInOut" }}
           className="mt-4"
         >
           <Button
             variant="solid"
             size="md"
             rounded="2xl"
-            className='w-full rounded-xl hover:bg-primary hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)]'
+            className='w-full hover:bg-primary hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)]'
             onClick={handleApply}
           >
             {t('applyFilters')}

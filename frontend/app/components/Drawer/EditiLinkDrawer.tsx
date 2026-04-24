@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Drawer from '@/app/components/ui/Drawer/Drawer';
 import { FiCornerDownRight } from 'react-icons/fi';
-import { TbCircleDashed, TbCircleDashedCheck, TbCopy, TbList, TbPalette, TbCategory, TbPuzzle, TbQrcode, TbPencil, TbClick, TbWorld, TbShieldX, TbRobot } from 'react-icons/tb';
+import { TbCircleDashed, TbCircleDashedCheck, TbCopy, TbList, TbPalette, TbCategory, TbPuzzle, TbQrcode, TbPencil, TbClick, TbWorld, TbShieldX, TbRobot, TbTag, TbFolder } from 'react-icons/tb';
 import Button from '../ui/Button/Button';
-import { useLinks, useAuth } from '@/app/hooks';
+import { useLinks, useAuth, useTags, useGroups } from '@/app/hooks';
+import SelectDropdown from '@/app/components/ui/Select/SelectDropdown';
+import { PLAN_LIMITS } from '@/app/constants/limits';
 import type { Link } from '@/app/types';
 import { AccessesList } from '../Accesses/accessesList';
 import { useToast } from '@/app/hooks/useToast';
@@ -78,6 +80,13 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
     const [stats, setStats] = useState<LinkStats | null>(null);
     const [statsLoading, setStatsLoading] = useState(false);
 
+    // Organize (tags + group) state
+    const { tags, fetchTags, assignTagsToLink } = useTags();
+    const { groups, fetchGroups, moveLinkToGroup, removeLinkFromGroup } = useGroups();
+    const [selectedTagIds, setSelectedTagIds] = useState<number[]>((link.tags ?? []).map(t => t.id));
+    const [selectedGroupId, setSelectedGroupId] = useState<number | null>(link.group?.id ?? null);
+    const organizeLimit = user?.role === 'PRO' ? PLAN_LIMITS.pro : PLAN_LIMITS.user;
+
     // QR state
     const [isDownloadingQR, setIsDownloadingQR] = useState(false);
     const [hasQRChanges, setHasQRChanges] = useState(false);
@@ -93,11 +102,19 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
         setEditingShortUrl(false);
         setEditingLongUrl(false);
         setSuffixError('');
+        setSelectedTagIds((link.tags ?? []).map(t => t.id));
+        setSelectedGroupId(link.group?.id ?? null);
     }, [link]);
 
     useEffect(() => {
-        if (open && !isGuest) fetchQRConfig();
-    }, [open, isGuest, fetchQRConfig]);
+        if (open && !isGuest) {
+            fetchQRConfig();
+            fetchTags();
+            fetchGroups();
+        }
+    }, [open, isGuest, fetchQRConfig, fetchTags, fetchGroups]);
+
+
 
     useEffect(() => {
         if (!open || isGuest || tab !== 'overview') return;
@@ -442,7 +459,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                 )}
 
                                 {/* Status + quick stats */}
-                                <div className='flex items-center gap-3 flex-wrap'>
+                                <div className='flex flex-col gap-3'>
                                     <motion.div
                                         initial={{ opacity: 0, x: 20 }}
                                         animate={{ opacity: 1, x: 0 }}
@@ -468,6 +485,66 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                             />
                                         </Button>
                                     </motion.div>
+
+                                    <div className='flex items-center gap-2'>
+                                        {/* Tags dropdown */}
+                                        {!isGuest && tags.length > 0 && (
+                                            <motion.div
+                                                initial={{ opacity: 0, x: 20 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                transition={{ delay: 0.15, duration: 0.4, ease: "backInOut" }}
+                                                className='flex flex-col gap-1'
+                                            >
+                                                <span className='text-xs font-semibold text-dark/40 flex items-center gap-1'><TbTag size={12} /> {t('organizeTagsTitle')}</span>
+                                                <SelectDropdown
+                                                    triggerClassName=''
+                                                    mode="multi"
+                                                    options={tags.map(tag => ({ label: tag.name, value: tag.id, color: tag.color ?? '#6b7280' }))}
+                                                    values={selectedTagIds}
+                                                    onChangeMulti={async (next) => {
+                                                        if (!link.id) return;
+                                                        const atLimit = organizeLimit.tagsPerLink !== null && next.length > organizeLimit.tagsPerLink;
+                                                        const bounded = atLimit ? next.slice(0, organizeLimit.tagsPerLink!) : next;
+                                                        setSelectedTagIds(bounded as number[]);
+                                                        await assignTagsToLink(link.id, bounded as number[]);
+                                                        await fetchLinks();
+                                                    }}
+                                                    placeholder={t('organizeTagsPlaceholder')}
+                                                />
+                                            </motion.div>
+                                        )}
+
+                                        {/* Group dropdown */}
+                                        {!isGuest && groups.length > 0 && (
+                                            <motion.div
+                                                initial={{ opacity: 0, x: 20 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                transition={{ delay: 0.2, duration: 0.4, ease: "backInOut" }}
+                                                className='flex flex-col gap-1'
+                                            >
+                                                <span className='text-xs font-semibold text-dark/40 flex items-center gap-1'><TbFolder size={12} /> {t('organizeGroupTitle')}</span>
+                                                <SelectDropdown
+                                                    mode="single"
+                                                    options={groups.map(g => ({ label: g.name, value: g.id, color: g.color ?? '#6b7280' }))}
+                                                    value={selectedGroupId}
+                                                    onChange={async (val) => {
+                                                        if (!link.id) return;
+                                                        if (val === null) {
+                                                            if (link.group?.id) await removeLinkFromGroup(link.group.id, link.id);
+                                                            setSelectedGroupId(null);
+                                                        } else {
+                                                            setSelectedGroupId(val as number);
+                                                            await moveLinkToGroup(val as number, link.id);
+                                                        }
+                                                        await fetchLinks();
+                                                    }}
+                                                    placeholder={t('organizeNoGroup')}
+                                                    showNoneOption
+                                                    noneLabel={t('organizeNoGroup')}
+                                                />
+                                            </motion.div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 
@@ -753,6 +830,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                         <AccessesList shortUrl={link.shortUrl} />
                     </div>
                 )}
+
 
                 {/* QR */}
                 {tab === 'qr' && (

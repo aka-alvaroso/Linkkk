@@ -66,6 +66,16 @@ const createLink = async (req, res) => {
 
   const shortUrl = customSuffix || (await generateShortCode());
 
+  // groupId only allowed for authenticated users
+  const groupId = (!isGuest && req.body.groupId) ? parseInt(req.body.groupId, 10) : undefined;
+
+  if (groupId) {
+    const group = await prisma.group.findUnique({ where: { id: groupId } });
+    if (!group || group.userId !== user.id) {
+      return errorResponse(res, ERRORS.GROUP_NOT_FOUND);
+    }
+  }
+
   try {
     const link = await prisma.link.create({
       data: {
@@ -74,7 +84,9 @@ const createLink = async (req, res) => {
         longUrl,
         status: status ?? true,
         shortUrl,
+        groupId: groupId || null,
       },
+      include: { tags: { include: { tag: true } } },
     });
     return successResponse(res, link, 201);
   } catch (error) {
@@ -98,8 +110,10 @@ const getLink = async (req, res) => {
 
   try {
     const link = await prisma.link.findUnique({
-      where: {
-        shortUrl,
+      where: { shortUrl },
+      include: {
+        tags: { include: { tag: true } },
+        group: true,
       },
     });
 
@@ -134,6 +148,8 @@ const getLink = async (req, res) => {
       longUrl: link.longUrl,
       status: link.status,
       createdAt: link.createdAt,
+      group: link.group,
+      tags: link.tags.map((lt) => lt.tag),
     });
   } catch (error) {
     return errorResponse(res, ERRORS.INTERNAL_ERROR);
@@ -155,12 +171,19 @@ const getAllLinks = async (req, res) => {
       return errorResponse(res, ERRORS.UNAUTHORIZED);
     }
 
+    // Optional filters
+    const { groupId, tag } = req.query;
+    if (groupId) whereClause.groupId = parseInt(groupId, 10) || null;
+    if (tag) whereClause.tags = { some: { tag: { name: tag } } };
+
     // Get all links
     const links = await prisma.link.findMany({
       where: whereClause,
-      orderBy: {
-        createdAt: "desc",
+      include: {
+        tags: { include: { tag: true } },
+        group: true,
       },
+      orderBy: { createdAt: "desc" },
     });
 
     if (!links) {
@@ -175,12 +198,15 @@ const getAllLinks = async (req, res) => {
       totalClicks += link.accessCount;
       totalScans += link.scanCount || 0;
       return {
+        id: link.id,
         shortUrl: link.shortUrl,
         longUrl: link.longUrl,
         status: link.status,
         createdAt: link.createdAt,
         accessCount: link.accessCount,
         scanCount: link.scanCount || 0,
+        group: link.group,
+        tags: link.tags.map((lt) => lt.tag),
       };
     });
 
@@ -256,9 +282,22 @@ const updateLink = async (req, res) => {
     if (status !== undefined) updateData.status = status;
     if (newShortUrl !== undefined) updateData.shortUrl = newShortUrl;
 
+    // groupId: allow null to ungroup, or a valid group id (auth users only)
+    if (req.body.groupId !== undefined && user) {
+      const newGroupId = req.body.groupId === null ? null : parseInt(req.body.groupId, 10);
+      if (newGroupId !== null) {
+        const group = await prisma.group.findUnique({ where: { id: newGroupId } });
+        if (!group || group.userId !== user.id) {
+          return errorResponse(res, ERRORS.GROUP_NOT_FOUND);
+        }
+      }
+      updateData.groupId = newGroupId;
+    }
+
     const updatedLink = await prisma.link.update({
       where: { shortUrl },
       data: updateData,
+      include: { tags: { include: { tag: true } }, group: true },
     });
 
     return successResponse(res, {
@@ -266,6 +305,8 @@ const updateLink = async (req, res) => {
       longUrl: updatedLink.longUrl,
       status: updatedLink.status,
       createdAt: updatedLink.createdAt,
+      group: updatedLink.group,
+      tags: updatedLink.tags.map((lt) => lt.tag),
     });
   } catch (error) {
     if (error.code === "P2002") {

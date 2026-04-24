@@ -9,17 +9,19 @@ datasource db {
 
 // Models
 model User {
-  id           Int           @id @default(autoincrement())
-  username     String        @unique
-  email        String        @unique
-  password     String?
-  role         Role          @default(STANDARD)
-  createdAt    DateTime      @default(now())
-  links        Link[]
-  subscription Subscription?
-  auditLogs    AuditLog[]
+  id            Int           @id @default(autoincrement())
+  username      String        @unique
+  email         String        @unique
+  password      String?
+  role          Role          @default(STANDARD)
+  createdAt     DateTime      @default(now())
+  links         Link[]
+  subscription  Subscription?
+  auditLogs     AuditLog[]
   oauthProvider String?
   oauthId       String?
+  groups        Group[]
+  tags          Tag[]
 
   @@unique([oauthProvider, oauthId])
 }
@@ -59,23 +61,64 @@ model Subscription {
 }
 
 model Link {
-  id          Int     @id @default(autoincrement())
-  userId      Int?
+  id             Int          @id @default(autoincrement())
+  userId         Int?
   guestSessionId Int?
-  shortUrl    String  @unique
-  longUrl     String
-  status      Boolean @default(true)
-  accessCount Int     @default(0)
-  scanCount   Int     @default(0)
-  createdAt   DateTime @default(now())
+  groupId        Int?
+  shortUrl       String       @unique
+  longUrl        String
+  status         Boolean      @default(true)
+  accessCount    Int          @default(0)
+  scanCount      Int          @default(0)
+  createdAt      DateTime     @default(now())
 
-  user        User? @relation(fields: [userId], references: [id])
-  guestSession GuestSession? @relation(fields: [guestSessionId], references: [id])
-  accesses Access[]
-  rules       LinkRule[]
-  qrConfig    QRConfig?
+  user           User?        @relation(fields: [userId], references: [id])
+  guestSession   GuestSession? @relation(fields: [guestSessionId], references: [id])
+  group          Group?       @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  accesses       Access[]
+  rules          LinkRule[]
+  qrConfig       QRConfig?
+  tags           LinkTag[]
 
   @@index([shortUrl])
+  @@index([userId, groupId])
+}
+
+model Group {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  color       String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  links       Link[]
+
+  @@unique([name, userId])
+  @@index([userId])
+}
+
+model Tag {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  color     String?
+  createdAt DateTime  @default(now())
+  links     LinkTag[]
+
+  @@unique([name, userId])
+  @@index([userId])
+}
+
+model LinkTag {
+  linkId Int
+  tagId  Int
+  link   Link @relation(fields: [linkId], references: [id], onDelete: Cascade)
+  tag    Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([linkId, tagId])
 }
 
 model Access {

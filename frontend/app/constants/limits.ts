@@ -7,14 +7,23 @@ export const PLAN_LIMITS = {
   guest: {
     rulesPerLink: 1,
     conditionsPerRule: 1,
+    groups: 0,
+    tags: 0,
+    tagsPerLink: 0,
   },
   user: {
     rulesPerLink: 3,
     conditionsPerRule: 2,
+    groups: 5,
+    tags: 20,
+    tagsPerLink: 5,
   },
   pro: {
-    rulesPerLink: null, // unlimited
-    conditionsPerRule: null, // unlimited
+    rulesPerLink: null,
+    conditionsPerRule: null,
+    groups: null,
+    tags: null,
+    tagsPerLink: null,
   },
 } as const;
 
