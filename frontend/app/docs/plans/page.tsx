@@ -18,6 +18,8 @@ export default function PlansDoc() {
     { featureKey: "featureSuffix", guest: false, standard: true, pro: true },
     { featureKey: "featureQr", guest: false, standard: true, pro: true },
     { featureKey: "featureQrCustom", guest: false, standard: true, pro: true },
+    { featureKey: "featureGroups", guest: false, standard: true, pro: true },
+    { featureKey: "featureTags", guest: false, standard: true, pro: true },
     { featureKey: "featureCharts", guest: false, standard: true, pro: true },
     { featureKey: "featureOAuth", guest: false, standard: true, pro: true },
     { featureKey: "featureSupport", guest: false, standard: false, pro: true },

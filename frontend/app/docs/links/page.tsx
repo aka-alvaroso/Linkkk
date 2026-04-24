@@ -31,8 +31,8 @@ export default function LinksDoc() {
         </div>
         <Button
           variant="solid"
-          size="lg"
-          className="hover:bg-primary hover:text-dark rounded-3xl"
+          size="md"
+          className="w-48 hover:bg-primary hover:text-dark rounded-3xl"
           leftIcon={<TbPlus size={16}/>}
         >
           {t("createButton")}
@@ -84,6 +84,24 @@ export default function LinksDoc() {
         <p className="text-sm text-dark/70 leading-relaxed">
           {t("editDesc")}
         </p>
+      </div>
+
+      {/* Groups & Tags */}
+      <div>
+        <h2 className="text-xl font-black italic text-dark mb-3">{t("organizeTitle")}</h2>
+        <p className="text-sm text-dark/70 leading-relaxed mb-4">
+          {t("organizeDesc")}
+        </p>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="border border-dark/10 rounded-3xl p-5 space-y-2">
+            <p className="font-black italic text-dark">{t("groupsTitle")}</p>
+            <p className="text-sm text-dark/60 leading-relaxed">{t("groupsDesc")}</p>
+          </div>
+          <div className="border border-dark/10 rounded-3xl p-5 space-y-2">
+            <p className="font-black italic text-dark">{t("tagsTitle")}</p>
+            <p className="text-sm text-dark/60 leading-relaxed">{t("tagsDesc")}</p>
+          </div>
+        </div>
       </div>
 
       {/* Limits */}
