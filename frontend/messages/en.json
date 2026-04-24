@@ -186,6 +186,7 @@
     "filters": "Filters",
     "filtersActive": "Filters active",
     "organize": "Organize",
+    "organizeBadge": "New",
     "manageGroups": "Groups",
     "manageTags": "Tags",
     "newLink": "New link",
@@ -401,8 +402,12 @@
     "statusInactive": "Inactive",
     "groupLabel": "Group",
     "groupAll": "All groups",
+    "groupPlaceholder": "Select groups...",
     "tagLabel": "Tag",
     "tagAll": "All tags",
+    "tagPlaceholder": "Select tags...",
+    "selectAll": "All",
+    "selectNone": "None",
     "applyFilters": "Apply Filters"
   },
   "ManageTags": {

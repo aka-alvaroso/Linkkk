@@ -1,4 +1,7 @@
+"use client";
 import { useState, useRef, useEffect, ReactNode } from "react";
+import { AnimatePresence } from "motion/react";
+import * as motion from "motion/react-client";
 import { cn } from "@/app/utils/cn";
 
 export interface DropdownItem {
@@ -9,6 +12,7 @@ export interface DropdownItem {
   onClick?: () => void;
   separator?: boolean;
   customClassName?: string;
+  danger?: boolean;
 }
 
 interface DropdownProps {
@@ -22,6 +26,13 @@ interface DropdownProps {
   disabled?: boolean;
 }
 
+const placementClasses: Record<string, string> = {
+  "bottom-left":  "top-full left-0 mt-1 origin-top-left",
+  "bottom-right": "top-full right-0 mt-1 origin-top-right",
+  "top-left":     "bottom-full left-0 mb-1 origin-bottom-left",
+  "top-right":    "bottom-full right-0 mb-1 origin-bottom-right",
+};
+
 export default function Dropdown({
   trigger,
   items,
@@ -33,92 +44,36 @@ export default function Dropdown({
   disabled = false,
 }: DropdownProps) {
   const [open, setOpen] = useState(false);
-  const [menuVisible, setMenuVisible] = useState(false);
-  const [animateOpen, setAnimateOpen] = useState(false);
-  const triggerRef = useRef<HTMLDivElement>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Handle animation timing
+  // Outside-click
   useEffect(() => {
-    let openTimeout: NodeJS.Timeout;
-    let closeTimeout: NodeJS.Timeout;
-
-    if (open) {
-      setMenuVisible(true);
-      openTimeout = setTimeout(() => setAnimateOpen(true), 20);
-    } else {
-      setAnimateOpen(false);
-      closeTimeout = setTimeout(() => setMenuVisible(false), 200);
-    }
-
-    return () => {
-      clearTimeout(openTimeout);
-      clearTimeout(closeTimeout);
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (!containerRef.current?.contains(e.target as Node)) setOpen(false);
     };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
   }, [open]);
 
-  // Handle click outside
+  // Escape key
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        triggerRef.current &&
-        menuRef.current &&
-        !triggerRef.current.contains(event.target as Node) &&
-        !menuRef.current.contains(event.target as Node)
-      ) {
-        setOpen(false);
-      }
-    }
-
-    if (open) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [open]);
-
-  // Handle escape key
-  useEffect(() => {
-    function handleEscape(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setOpen(false);
-      }
-    }
-
-    if (open) {
-      document.addEventListener("keydown", handleEscape);
-    }
-
-    return () => document.removeEventListener("keydown", handleEscape);
+    if (!open) return;
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
   }, [open]);
 
   const handleItemClick = (item: DropdownItem) => {
-    if (!item.disabled && item.onClick) {
-      item.onClick();
-      setOpen(false);
-    }
-  };
-
-  const getPlacementClasses = () => {
-    switch (placement) {
-      case "bottom-left":
-        return "top-full left-0 mt-2 origin-top-left";
-      case "bottom-right":
-        return "top-full right-0 mt-2 origin-top-right";
-      case "top-left":
-        return "bottom-full left-0 mb-2 origin-bottom-left";
-      case "top-right":
-        return "bottom-full right-0 mb-2 origin-bottom-right";
-      default:
-        return "top-full right-0 mt-2 origin-top-right";
-    }
+    if (item.disabled) return;
+    item.onClick?.();
+    setOpen(false);
   };
 
   return (
-    <div className={cn("relative inline-block", className)}>
+    <div ref={containerRef} className={cn("relative inline-block", className)}>
       {/* Trigger */}
       <div
-        ref={triggerRef}
         onClick={() => !disabled && setOpen((prev) => !prev)}
         className={cn(
           "cursor-pointer select-none",
@@ -130,44 +85,51 @@ export default function Dropdown({
       </div>
 
       {/* Menu */}
-      {menuVisible && (
-        <div
-          ref={menuRef}
-          className={cn(
-            "absolute z-50 min-w-[12rem] py-1 bg-white rounded-xl shadow-lg border border-dark/10",
-            "transition-all duration-200 ease-in-out transform",
-            animateOpen ? "opacity-100 scale-100" : "opacity-0 scale-95",
-            getPlacementClasses(),
-            menuClassName
-          )}
-        >
-          {items.map((item, index) => (
-            <div key={`${item.value}-${index}`}>
-              {item.separator && index > 0 && (
-                <div className="my-1 border-t border-dark/5" />
-              )}
-              <button
-                onClick={() => handleItemClick(item)}
-                disabled={item.disabled}
-                className={cn(
-                  "w-full flex items-center gap-3 px-4 py-2 text-left text-sm transition-colors",
-                  "hover:bg-dark/5 active:bg-dark/10",
-                  item.disabled && "opacity-50 cursor-not-allowed hover:bg-transparent",
-                  itemClassName,
-                  item.customClassName
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            key="dropdown-menu"
+            initial={{ opacity: 0, scale: 0.95, y: -6 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: -6 }}
+            transition={{ duration: 0.15, ease: "backOut" }}
+            className={cn(
+              "absolute z-50 min-w-40 py-1 bg-light border border-dark/10 rounded-2xl overflow-hidden",
+              placementClasses[placement],
+              menuClassName
+            )}
+          >
+            {items.map((item, index) => (
+              <div key={`${item.value}-${index}`}>
+                {item.separator && index > 0 && (
+                  <div className="my-1 border-t border-dark/5" />
                 )}
-              >
-                {item.icon && (
-                  <span className="flex-shrink-0 text-lg">
-                    {item.icon}
-                  </span>
-                )}
-                <span className="flex-1 truncate">{item.label}</span>
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
+                <motion.button
+                  initial={{ opacity: 0, x: -8 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.04 + index * 0.04, ease: "backOut" }}
+                  type="button"
+                  onClick={() => handleItemClick(item)}
+                  disabled={item.disabled}
+                  className={cn(
+                    "w-full flex items-center gap-2.5 px-4 py-2.5 text-left text-sm transition-colors cursor-pointer",
+                    "hover:bg-dark/5",
+                    item.danger && "text-danger hover:bg-danger/10",
+                    item.disabled && "opacity-50 cursor-not-allowed hover:bg-transparent",
+                    itemClassName,
+                    item.customClassName
+                  )}
+                >
+                  {item.icon && (
+                    <span className="flex-shrink-0 text-dark/50">{item.icon}</span>
+                  )}
+                  <span className="flex-1 truncate">{item.label}</span>
+                </motion.button>
+              </div>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

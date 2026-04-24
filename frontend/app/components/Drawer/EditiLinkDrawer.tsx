@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Drawer from '@/app/components/ui/Drawer/Drawer';
 import { FiCornerDownRight } from 'react-icons/fi';
-import { TbCircleDashed, TbCircleDashedCheck, TbCopy, TbList, TbPalette, TbCategory, TbPuzzle, TbQrcode, TbPencil, TbClick, TbWorld, TbShieldX, TbRobot, TbTag, TbFolder, TbFolderOff, TbChevronDown, TbX } from 'react-icons/tb';
+import { TbCircleDashed, TbCircleDashedCheck, TbCopy, TbList, TbPalette, TbCategory, TbPuzzle, TbQrcode, TbPencil, TbClick, TbWorld, TbShieldX, TbRobot, TbTag, TbFolder } from 'react-icons/tb';
 import Button from '../ui/Button/Button';
 import { useLinks, useAuth, useTags, useGroups } from '@/app/hooks';
-import TagChip, { isDark } from '@/app/components/Tags/TagChip';
+import SelectDropdown from '@/app/components/ui/Select/SelectDropdown';
 import { PLAN_LIMITS } from '@/app/constants/limits';
 import type { Link } from '@/app/types';
 import { AccessesList } from '../Accesses/accessesList';
@@ -86,10 +86,6 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
     const [selectedTagIds, setSelectedTagIds] = useState<number[]>((link.tags ?? []).map(t => t.id));
     const [selectedGroupId, setSelectedGroupId] = useState<number | null>(link.group?.id ?? null);
     const organizeLimit = user?.role === 'PRO' ? PLAN_LIMITS.pro : PLAN_LIMITS.user;
-    const [tagsDropdownOpen, setTagsDropdownOpen] = useState(false);
-    const [groupDropdownOpen, setGroupDropdownOpen] = useState(false);
-    const tagsDropdownRef = useRef<HTMLDivElement>(null);
-    const groupDropdownRef = useRef<HTMLDivElement>(null);
 
     // QR state
     const [isDownloadingQR, setIsDownloadingQR] = useState(false);
@@ -118,14 +114,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
         }
     }, [open, isGuest, fetchQRConfig, fetchTags, fetchGroups]);
 
-    useEffect(() => {
-        const handler = (e: MouseEvent) => {
-            if (tagsDropdownRef.current && !tagsDropdownRef.current.contains(e.target as Node)) setTagsDropdownOpen(false);
-            if (groupDropdownRef.current && !groupDropdownRef.current.contains(e.target as Node)) setGroupDropdownOpen(false);
-        };
-        document.addEventListener('mousedown', handler);
-        return () => document.removeEventListener('mousedown', handler);
-    }, []);
+
 
     useEffect(() => {
         if (!open || isGuest || tab !== 'overview') return;
@@ -497,159 +486,65 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                         </Button>
                                     </motion.div>
 
-                                    {/* Tags dropdown */}
-                                    {!isGuest && tags.length > 0 && (
-                                        <motion.div
-                                            initial={{ opacity: 0, x: 20 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: 0.15, duration: 0.4, ease: "backInOut" }}
-                                            className='flex flex-col gap-1'
-                                        >
-                                            <span className='text-xs font-semibold text-dark/40 flex items-center gap-1'><TbTag size={12} /> {t('organizeTagsTitle')}</span>
-                                            <div className='relative inline-block' ref={tagsDropdownRef}>
-                                                <button
-                                                    type='button'
-                                                    onClick={() => setTagsDropdownOpen(v => !v)}
-                                                    className='flex items-center gap-2 px-3 py-1.5 rounded-xl bg-dark/5 hover:bg-dark/10 border border-dark/10 text-sm transition-colors cursor-pointer'
-                                                >
-                                                    <TbTag size={14} className='text-dark/40 flex-shrink-0' />
-                                                    <span className='text-dark/60 text-xs'>
-                                                        {selectedTagIds.length === 0
-                                                            ? t('organizeTagsPlaceholder')
-                                                            : selectedTagIds.length === 1
-                                                                ? tags.find(t => t.id === selectedTagIds[0])?.name
-                                                                : `${selectedTagIds.length} tags`
-                                                        }
-                                                    </span>
-                                                    <TbChevronDown size={14} className={`flex-shrink-0 text-dark/40 transition-transform duration-200 ${tagsDropdownOpen ? 'rotate-180' : ''}`} />
-                                                </button>
-                                                <AnimatePresence>
-                                                    {tagsDropdownOpen && (
-                                                        <motion.div
-                                                            initial={{ opacity: 0, scale: 0.95, y: -6 }}
-                                                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                                                            exit={{ opacity: 0, scale: 0.95, y: -6 }}
-                                                            transition={{ duration: 0.15, ease: 'backOut' }}
-                                                            style={{ transformOrigin: 'top left' }}
-                                                            className='absolute top-full left-0 mt-1 z-50 bg-light border border-dark/10 rounded-2xl overflow-hidden py-1 min-w-40'
-                                                        >
-                                                            {tags.map(tag => {
-                                                                const selected = selectedTagIds.includes(tag.id);
-                                                                const atLimit = organizeLimit.tagsPerLink !== null && selectedTagIds.length >= organizeLimit.tagsPerLink;
-                                                                const color = tag.color ?? '#6b7280';
-                                                                return (
-                                                                    <button
-                                                                        key={tag.id}
-                                                                        type='button'
-                                                                        onClick={async () => {
-                                                                            if (!link.id) return;
-                                                                            const next = selected
-                                                                                ? selectedTagIds.filter(id => id !== tag.id)
-                                                                                : atLimit ? selectedTagIds : [...selectedTagIds, tag.id];
-                                                                            setSelectedTagIds(next);
-                                                                            await assignTagsToLink(link.id, next);
-                                                                            await fetchLinks();
-                                                                        }}
-                                                                        className='w-full flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-dark/5 transition-colors cursor-pointer'
-                                                                    >
-                                                                        <span className='w-2 h-2 rounded-full flex-shrink-0' style={{ backgroundColor: color }} />
-                                                                        <span className='flex-1 text-left'>{tag.name}</span>
-                                                                        {selected && <TbX size={12} className='text-dark/30 flex-shrink-0' />}
-                                                                    </button>
-                                                                );
-                                                            })}
-                                                        </motion.div>
-                                                    )}
-                                                </AnimatePresence>
-                                            </div>
-                                        </motion.div>
-                                    )}
+                                    <div className='flex items-center gap-2'>
+                                        {/* Tags dropdown */}
+                                        {!isGuest && tags.length > 0 && (
+                                            <motion.div
+                                                initial={{ opacity: 0, x: 20 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                transition={{ delay: 0.15, duration: 0.4, ease: "backInOut" }}
+                                                className='flex flex-col gap-1'
+                                            >
+                                                <span className='text-xs font-semibold text-dark/40 flex items-center gap-1'><TbTag size={12} /> {t('organizeTagsTitle')}</span>
+                                                <SelectDropdown
+                                                    triggerClassName=''
+                                                    mode="multi"
+                                                    options={tags.map(tag => ({ label: tag.name, value: tag.id, color: tag.color ?? '#6b7280' }))}
+                                                    values={selectedTagIds}
+                                                    onChangeMulti={async (next) => {
+                                                        if (!link.id) return;
+                                                        const atLimit = organizeLimit.tagsPerLink !== null && next.length > organizeLimit.tagsPerLink;
+                                                        const bounded = atLimit ? next.slice(0, organizeLimit.tagsPerLink!) : next;
+                                                        setSelectedTagIds(bounded as number[]);
+                                                        await assignTagsToLink(link.id, bounded as number[]);
+                                                        await fetchLinks();
+                                                    }}
+                                                    placeholder={t('organizeTagsPlaceholder')}
+                                                />
+                                            </motion.div>
+                                        )}
 
-                                    {/* Group dropdown */}
-                                    {!isGuest && groups.length > 0 && (
-                                        <motion.div
-                                            initial={{ opacity: 0, x: 20 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: 0.2, duration: 0.4, ease: "backInOut" }}
-                                            className='flex flex-col gap-1'
-                                        >
-                                            <span className='text-xs font-semibold text-dark/40 flex items-center gap-1'><TbFolder size={12} /> {t('organizeGroupTitle')}</span>
-                                            <div className='relative inline-block' ref={groupDropdownRef}>
-                                                <button
-                                                    type='button'
-                                                    onClick={() => setGroupDropdownOpen(v => !v)}
-                                                    className='flex items-center gap-2 px-3 py-1.5 rounded-xl bg-dark/5 hover:bg-dark/10 border border-dark/10 text-sm transition-colors cursor-pointer'
-                                                >
-                                                    {selectedGroupId === null ? (
-                                                        <>
-                                                            <TbFolderOff size={14} className='text-dark/40 flex-shrink-0' />
-                                                            <span className='text-dark/60 text-xs'>{t('organizeNoGroup')}</span>
-                                                        </>
-                                                    ) : (() => {
-                                                        const g = groups.find(g => g.id === selectedGroupId);
-                                                        const color = g?.color ?? '#6b7280';
-                                                        return (
-                                                            <>
-                                                                <span className='w-2 h-2 rounded-full flex-shrink-0' style={{ backgroundColor: color }} />
-                                                                <span className='text-dark/80 text-xs font-medium'>{g?.name}</span>
-                                                            </>
-                                                        );
-                                                    })()}
-                                                    <TbChevronDown size={14} className={`flex-shrink-0 text-dark/40 transition-transform duration-200 ${groupDropdownOpen ? 'rotate-180' : ''}`} />
-                                                </button>
-                                                <AnimatePresence>
-                                                    {groupDropdownOpen && (
-                                                        <motion.div
-                                                            initial={{ opacity: 0, scale: 0.95, y: -6 }}
-                                                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                                                            exit={{ opacity: 0, scale: 0.95, y: -6 }}
-                                                            transition={{ duration: 0.15, ease: 'backOut' }}
-                                                            style={{ transformOrigin: 'top left' }}
-                                                            className='absolute top-full left-0 mt-1 z-50 bg-light border border-dark/10 rounded-2xl overflow-hidden py-1 min-w-40'
-                                                        >
-                                                            <button
-                                                                type='button'
-                                                                onClick={async () => {
-                                                                    if (!link.id || !link.group?.id) { setGroupDropdownOpen(false); return; }
-                                                                    setSelectedGroupId(null);
-                                                                    await removeLinkFromGroup(link.group.id, link.id);
-                                                                    await fetchLinks();
-                                                                    setGroupDropdownOpen(false);
-                                                                }}
-                                                                className='w-full flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-dark/5 transition-colors text-dark/40'
-                                                            >
-                                                                <TbFolderOff size={14} className='flex-shrink-0' />
-                                                                <span className='flex-1 text-left'>{t('organizeNoGroup')}</span>
-                                                                {selectedGroupId === null && <TbX size={12} className='flex-shrink-0' />}
-                                                            </button>
-                                                            {groups.map(group => {
-                                                                const selected = selectedGroupId === group.id;
-                                                                const color = group.color ?? '#6b7280';
-                                                                return (
-                                                                    <button
-                                                                        key={group.id}
-                                                                        type='button'
-                                                                        onClick={async () => {
-                                                                            if (!link.id) return;
-                                                                            setSelectedGroupId(group.id);
-                                                                            await moveLinkToGroup(group.id, link.id);
-                                                                            await fetchLinks();
-                                                                            setGroupDropdownOpen(false);
-                                                                        }}
-                                                                        className='w-full flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-dark/5 transition-colors font-medium'
-                                                                    >
-                                                                        <span className='w-2 h-2 rounded-full flex-shrink-0' style={{ backgroundColor: color }} />
-                                                                        <span className='flex-1 text-left'>{group.name}</span>
-                                                                        {selected && <TbX size={12} className='text-dark/30 flex-shrink-0' />}
-                                                                    </button>
-                                                                );
-                                                            })}
-                                                        </motion.div>
-                                                    )}
-                                                </AnimatePresence>
-                                            </div>
-                                        </motion.div>
-                                    )}
+                                        {/* Group dropdown */}
+                                        {!isGuest && groups.length > 0 && (
+                                            <motion.div
+                                                initial={{ opacity: 0, x: 20 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                transition={{ delay: 0.2, duration: 0.4, ease: "backInOut" }}
+                                                className='flex flex-col gap-1'
+                                            >
+                                                <span className='text-xs font-semibold text-dark/40 flex items-center gap-1'><TbFolder size={12} /> {t('organizeGroupTitle')}</span>
+                                                <SelectDropdown
+                                                    mode="single"
+                                                    options={groups.map(g => ({ label: g.name, value: g.id, color: g.color ?? '#6b7280' }))}
+                                                    value={selectedGroupId}
+                                                    onChange={async (val) => {
+                                                        if (!link.id) return;
+                                                        if (val === null) {
+                                                            if (link.group?.id) await removeLinkFromGroup(link.group.id, link.id);
+                                                            setSelectedGroupId(null);
+                                                        } else {
+                                                            setSelectedGroupId(val as number);
+                                                            await moveLinkToGroup(val as number, link.id);
+                                                        }
+                                                        await fetchLinks();
+                                                    }}
+                                                    placeholder={t('organizeNoGroup')}
+                                                    showNoneOption
+                                                    noneLabel={t('organizeNoGroup')}
+                                                />
+                                            </motion.div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 

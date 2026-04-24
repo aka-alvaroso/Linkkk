@@ -186,6 +186,7 @@
     "filters": "Filtros",
     "filtersActive": "Filtros activos",
     "organize": "Organizar",
+    "organizeBadge": "Nuevo",
     "manageGroups": "Grupos",
     "manageTags": "Etiquetas",
     "newLink": "Nuevo link",
@@ -402,8 +403,12 @@
     "statusInactive": "Inactivos",
     "groupLabel": "Grupo",
     "groupAll": "Todos los grupos",
+    "groupPlaceholder": "Seleccionar grupos...",
     "tagLabel": "Etiqueta",
     "tagAll": "Todas las etiquetas",
+    "tagPlaceholder": "Seleccionar etiquetas...",
+    "selectAll": "Todos",
+    "selectNone": "Ninguno",
     "applyFilters": "Aplicar Filtros"
   },
   "ManageTags": {
