@@ -1,9 +1,10 @@
 module.exports = {
   apps: [
     {
-      name: "linkkk-backend-4000",
-      script: "./v2.js",
-      cwd: "/var/www/linkkk/backend",
+      name: "linkkk-frontend-3000",
+      script: "node_modules/next/dist/bin/next",
+      args: "start -p 3000",
+      cwd: "/var/www/linkkk/frontend",
       instances: 1,
       exec_mode: "fork",
 
@@ -15,11 +16,10 @@ module.exports = {
         NODE_ENV: "production",
       },
 
-      error_file: "~/.pm2/logs/linkkk-backend-4000-error.log",
-      out_file: "~/.pm2/logs/linkkk-backend-4000-out.log",
+      error_file: "~/.pm2/logs/linkkk-frontend-3000-error.log",
+      out_file: "~/.pm2/logs/linkkk-frontend-3000-out.log",
       log_date_format: "YYYY-MM-DD HH:mm:ss Z",
       merge_logs: true,
-      time: false,
     },
   ],
 };
