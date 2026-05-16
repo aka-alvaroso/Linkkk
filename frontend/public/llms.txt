@@ -1,0 +1,35 @@
+# Linkkk
+
+> Linkkk is a smart, open-source link management platform. Create short URLs, define conditional redirect rules, track analytics, and generate QR codes — all without writing code.
+
+## What Linkkk does
+
+Linkkk goes beyond simple URL shortening. Every link can have rules: redirect mobile users differently, block bots, require a password, schedule expiration, trigger webhooks, or serve different destinations based on country. The rules engine is visual and requires no coding knowledge.
+
+## Key features
+
+- **Smart rules**: Condition-based redirects by country, device, VPN detection, bot filtering, time schedule, and more.
+- **Analytics**: Click tracking with device, browser, country, and referrer breakdowns.
+- **QR codes**: Auto-generated, downloadable QR codes for every link.
+- **Password protection**: Lock links behind a password.
+- **Webhooks**: Trigger external integrations on every click.
+- **Self-hostable**: Fully open source under MIT license.
+
+## Plans
+
+- **Free**: Up to 10 links with rules, analytics, and QR codes. No credit card required.
+- **Pro**: Unlimited links, advanced analytics, priority support.
+
+## Docs
+
+- Getting started: https://linkkk.dev/docs/getting-started
+- Links guide: https://linkkk.dev/docs/links
+- Rules guide: https://linkkk.dev/docs/rules
+- Analytics: https://linkkk.dev/docs/analytics
+- QR codes: https://linkkk.dev/docs/qr
+- Plans: https://linkkk.dev/docs/plans
+- Security: https://linkkk.dev/docs/security
+
+## Source code
+
+https://github.com/aka-alvaroso/Linkkk
