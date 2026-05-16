@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { TbGripVertical, TbX, TbChevronDown, TbPlus, TbTrash, TbCircleDashed, TbCircleDashedCheck, TbPencil } from 'react-icons/tb';
 import Button from '../ui/Button/Button';
 import { LinkRule as LinkRuleType, RuleCondition as RuleConditionType, MatchType, ActionType, ActionSettings } from '@/app/types/linkRules';

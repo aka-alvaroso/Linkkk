@@ -4,7 +4,7 @@
  */
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { LinkRule } from './LinkRule';
 import Button from '../ui/Button/Button';
 import { TbPlus, TbRocket, TbCube } from 'react-icons/tb';
