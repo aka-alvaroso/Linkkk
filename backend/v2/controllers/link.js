@@ -404,9 +404,25 @@ const redirectLink = async (req, res) => {
   const source = req.query.src === "qr" ? "qr" : "direct";
 
   try {
-    // Fetch link with rules
+    // Resolve owner from custom domain if request comes from one
+    let customDomainUserId = null;
+    const host = (req.headers["host"] || "").split(":")[0].toLowerCase();
+    if (host && host !== "linkkk.dev" && !host.endsWith(".linkkk.dev")) {
+      const customDomain = await prisma.customDomain.findFirst({
+        where: { domain: host, status: "ACTIVE" },
+      });
+      if (!customDomain) {
+        return res.redirect(`${config.frontend.url}/404?url=${shortUrl}`);
+      }
+      customDomainUserId = customDomain.userId;
+    }
+
+    // Fetch link with rules — scope to domain owner when using a custom domain
     const link = await prisma.link.findUnique({
-      where: { shortUrl },
+      where: {
+        shortUrl,
+        ...(customDomainUserId !== null ? { userId: customDomainUserId } : {}),
+      },
       include: {
         rules: {
           where: { enabled: true },

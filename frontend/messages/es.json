@@ -623,7 +623,31 @@
     "toastLinksDeleteFailed": "Error al eliminar los links",
     "toastAccountDeleted": "Cuenta eliminada exitosamente",
     "toastAccountDeleteFailed": "Error al eliminar la cuenta",
-    "toastError": "Ocurrió un error"
+    "toastError": "Ocurrió un error",
+    "tabDomains": "Dominios"
+  },
+  "CustomDomains": {
+    "title": "Dominio Personalizado",
+    "description": "Usa un subdominio dedicado para tus enlaces acortados. Crea un registro CNAME apuntando a {target} y añádelo abajo.",
+    "subdomainNote": "Debe ser un subdominio — por ejemplo go.tudominio.com. Los dominios raíz no están soportados.",
+    "dnsType": "Tipo",
+    "dnsName": "Nombre",
+    "dnsValue": "Valor",
+    "placeholder": "go.tudominio.com",
+    "loading": "Cargando dominios…",
+    "empty": "Todavía no hay dominios personalizados.",
+    "statusPending": "Pendiente",
+    "statusVerifying": "Verificando…",
+    "statusActive": "Activo",
+    "statusError": "Error",
+    "btnVerify": "Verificar DNS",
+    "btnRemove": "Eliminar dominio",
+    "toastVerifySuccess": "Dominio verificado correctamente",
+    "toastVerifyFailed": "La verificación DNS falló. Comprueba tu registro CNAME e inténtalo de nuevo.",
+    "toastAddFailed": "Error al añadir el dominio",
+    "toastRemoveFailed": "Error al eliminar el dominio",
+    "proOnly": "Los dominios personalizados son una función PRO.",
+    "upgradePrompt": "Actualiza a PRO para usar tu propio dominio."
   },
   "NotFound": {
     "title": "Página No Encontrada",

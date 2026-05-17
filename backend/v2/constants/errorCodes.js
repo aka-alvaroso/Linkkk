@@ -301,6 +301,52 @@ const ERRORS = {
   },
 
   // ============================================================================
+  // CUSTOM DOMAIN ERRORS
+  // ============================================================================
+  DOMAIN_NOT_FOUND: {
+    code: "DOMAIN_NOT_FOUND",
+    message: "Domain not found",
+    userMessage: "The domain you're looking for doesn't exist",
+    statusCode: 404,
+    retryable: false,
+  },
+  DOMAIN_ACCESS_DENIED: {
+    code: "DOMAIN_ACCESS_DENIED",
+    message: "Access denied to domain",
+    userMessage: "You don't have permission to access this domain",
+    statusCode: 403,
+    retryable: false,
+  },
+  DOMAIN_ALREADY_EXISTS: {
+    code: "DOMAIN_ALREADY_EXISTS",
+    message: "Domain already registered",
+    userMessage: "This domain is already registered in Linkkk",
+    statusCode: 400,
+    retryable: false,
+  },
+  DOMAIN_INVALID: {
+    code: "DOMAIN_INVALID",
+    message: "Invalid domain format",
+    userMessage: "The domain format is invalid",
+    statusCode: 400,
+    retryable: false,
+  },
+  DOMAIN_DNS_FAILED: {
+    code: "DOMAIN_DNS_FAILED",
+    message: "DNS verification failed",
+    userMessage: "DNS verification failed. Make sure your CNAME record is pointing to linkkk.dev and try again",
+    statusCode: 400,
+    retryable: true,
+  },
+  DOMAIN_LIMIT_EXCEEDED: {
+    code: "DOMAIN_LIMIT_EXCEEDED",
+    message: "Domain limit exceeded",
+    userMessage: "You've reached your custom domain limit. Upgrade your plan to add more domains",
+    statusCode: 400,
+    retryable: false,
+  },
+
+  // ============================================================================
   // SYSTEM ERRORS
   // ============================================================================
   INTERNAL_ERROR: {

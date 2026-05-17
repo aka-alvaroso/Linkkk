@@ -27,12 +27,14 @@ import CancelSubscriptionModal from "@/app/components/Modal/CancelSubscriptionMo
 import SelectPlanModal from "@/app/components/Modal/SelectPlanModal";
 import { HttpError } from "@/app/utils/errors";
 import LanguageSwitcher from "@/app/components/ui/LanguageSwitcher/LanguageSwitcher";
+import CustomDomains from "@/app/components/CustomDomains/CustomDomains";
+import { TbWorld } from "react-icons/tb";
 
 import { API_CONFIG } from "@/app/config/api";
 
 const API_BASE_URL = API_CONFIG.BASE_URL;
 
-type SettingsTab = "account" | "security" | "danger";
+type SettingsTab = "account" | "security" | "domains" | "danger";
 
 interface SettingsTabConfig {
   id: SettingsTab;
@@ -56,6 +58,7 @@ export default function SettingsPage() {
   const settingsTabs: SettingsTabConfig[] = [
     { id: "account", label: t('tabAccount'), icon: TbUser },
     { id: "security", label: t('tabSecurity'), icon: TbLock },
+    { id: "domains", label: t('tabDomains'), icon: TbWorld },
     { id: "danger", label: t('tabDangerZone'), icon: TbAlertTriangle },
   ];
 
@@ -328,6 +331,8 @@ export default function SettingsPage() {
                   activeColor = "bg-primary text-dark border border-dark shadow-[4px_4px_0_var(--color-dark)]";
                 } else if (tab.id === "security") {
                   activeColor = "bg-secondary text-light border border-dark shadow-[4px_4px_0_var(--color-dark)]";
+                } else if (tab.id === "domains") {
+                  activeColor = "bg-dark text-light border border-dark shadow-[4px_4px_0_var(--color-dark)]";
                 } else if (tab.id === "danger") {
                   activeColor = "bg-danger text-light border border-dark shadow-[4px_4px_0_var(--color-dark)]";
                 }
@@ -366,6 +371,8 @@ export default function SettingsPage() {
                     activeColor = "bg-primary text-dark border border-dark shadow-[4px_4px_0_var(--color-dark)]";
                   } else if (tab.id === "security") {
                     activeColor = "bg-secondary text-light border border-dark shadow-[4px_4px_0_var(--color-dark)]";
+                  } else if (tab.id === "domains") {
+                    activeColor = "bg-dark text-light border border-dark shadow-[4px_4px_0_var(--color-dark)]";
                   } else if (tab.id === "danger") {
                     activeColor = "bg-danger text-light border border-dark shadow-[4px_4px_0_var(--color-dark)]";
                   }
@@ -636,6 +643,8 @@ export default function SettingsPage() {
                   </div>
                 </div>
               )}
+
+              {activeTab === "domains" && <CustomDomains />}
 
               {activeTab === "danger" && (
                 <div className="space-y-6">

@@ -622,7 +622,31 @@
     "toastLinksDeleteFailed": "Failed to delete links",
     "toastAccountDeleted": "Account deleted successfully",
     "toastAccountDeleteFailed": "Failed to delete account",
-    "toastError": "An error occurred"
+    "toastError": "An error occurred",
+    "tabDomains": "Domains"
+  },
+  "CustomDomains": {
+    "title": "Custom Domain",
+    "description": "Use a dedicated subdomain for your shortened links. Create a CNAME record pointing to {target} and then add it below.",
+    "subdomainNote": "Must be a subdomain — e.g. go.yourdomain.com. Root domains are not supported.",
+    "dnsType": "Type",
+    "dnsName": "Name",
+    "dnsValue": "Value",
+    "placeholder": "go.yourdomain.com",
+    "loading": "Loading domains…",
+    "empty": "No custom domains added yet.",
+    "statusPending": "Pending",
+    "statusVerifying": "Verifying…",
+    "statusActive": "Active",
+    "statusError": "Error",
+    "btnVerify": "Verify DNS",
+    "btnRemove": "Remove domain",
+    "toastVerifySuccess": "Domain verified successfully",
+    "toastVerifyFailed": "DNS verification failed. Check your CNAME record and try again.",
+    "toastAddFailed": "Failed to add domain",
+    "toastRemoveFailed": "Failed to remove domain",
+    "proOnly": "Custom domains are a PRO feature.",
+    "upgradePrompt": "Upgrade to PRO to use your own domain."
   },
   "NotFound": {
     "title": "Page Not Found",
