@@ -1,0 +1,55 @@
+# =============================================================================
+# Caddyfile — linkkk.dev
+# =============================================================================
+# On-demand TLS lets Caddy auto-provision certs for custom user domains.
+# Before issuing a cert, Caddy asks /internal/check-domain to verify the
+# domain is registered and active in the database.
+# =============================================================================
+
+{
+    on_demand_tls {
+        ask http://localhost:4000/internal/check-domain
+        interval 2m
+        burst 5
+    }
+}
+
+# ── Main app ─────────────────────────────────────────────────────────────────
+linkkk.dev, www.linkkk.dev {
+    # Frontend (Next.js)
+    reverse_proxy * localhost:3000
+
+    # Backend API
+    reverse_proxy /api/* localhost:4000
+
+    encode gzip
+}
+
+# ── Custom user domains (on-demand TLS) ──────────────────────────────────────
+# Accepts any domain that Caddy doesn't already handle above.
+# Cert is requested on first visit and cached automatically.
+:443 {
+    tls {
+        on_demand
+    }
+
+    encode gzip
+
+    # Rewrite bare slugs to /r/:slug so the backend redirect handler picks them up.
+    # The only exceptions are Linkkk's own UI pages that the backend redirects to
+    # (password gate, blocked, 404, disabled) — those go to Next.js.
+    @frontend path /password* /blocked* /404* /disabled* /error*
+    reverse_proxy @frontend localhost:3000
+
+    @slug {
+        not path /password* /blocked* /404* /disabled* /error* /r/*
+    }
+    rewrite @slug /r{path}
+
+    reverse_proxy /r/* localhost:4000
+}
+
+# Redirect plain HTTP to HTTPS for custom domains
+:80 {
+    redir https://{host}{uri} permanent
+}

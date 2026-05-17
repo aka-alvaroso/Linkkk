@@ -22,6 +22,7 @@ model User {
   oauthId       String?
   groups        Group[]
   tags          Tag[]
+  customDomains CustomDomain[]
 
   @@unique([oauthProvider, oauthId])
 }
@@ -304,4 +305,26 @@ enum DotsStyle {
 enum CornersStyle {
   square
   rounded
+}
+
+enum CustomDomainStatus {
+  PENDING
+  VERIFYING
+  ACTIVE
+  ERROR
+}
+
+model CustomDomain {
+  id         Int                @id @default(autoincrement())
+  userId     Int
+  user       User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  domain     String             @unique
+  status     CustomDomainStatus @default(PENDING)
+  errorMsg   String?
+  verifiedAt DateTime?
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+
+  @@index([userId])
+  @@index([domain, status])
 }

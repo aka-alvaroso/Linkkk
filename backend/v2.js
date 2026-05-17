@@ -23,9 +23,11 @@ const userRouter = require("./v2/routers/user");
 const subscriptionRouter = require("./v2/routers/subscription");
 const tagRouter = require("./v2/routers/tag");
 const groupRouter = require("./v2/routers/group");
+const domainRouter = require("./v2/routers/domain");
 
 // Controllers
 const { redirectLink } = require("./v2/controllers/link");
+const { checkDomainForCaddy } = require("./v2/controllers/domain");
 
 const app = express();
 const PORT = config.server.port;
@@ -221,6 +223,17 @@ app.use("/subscription", (req, res, next) => {
   }
   return csrfProtection(req, res, next);
 }, subscriptionRouter);
+
+app.use("/domain", csrfProtection, domainRouter);
+
+// Internal endpoint for Caddy on-demand TLS — only reachable from localhost
+app.get("/internal/check-domain", (req, res, next) => {
+  const ip = req.ip || "";
+  if (ip !== "127.0.0.1" && ip !== "::1" && ip !== "::ffff:127.0.0.1") {
+    return res.sendStatus(403);
+  }
+  return next();
+}, checkDomainForCaddy);
 
 // Public redirect endpoint (LAST - catches everything else)
 app.get("/r/:shortUrl", redirectLink);

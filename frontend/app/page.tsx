@@ -1143,41 +1143,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ==================== SEO CONTENT SECTION ==================== */}
-      <section className="bg-light py-16 px-6 border-t border-dark/10">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-2xl font-black italic text-dark mb-4">About Linkkk</h2>
-          <p className="text-dark/70 leading-relaxed mb-6">
-            Linkkk is a free, open-source link management platform built for creators, marketers, and developers
-            who need more than a simple URL shortener. Every short link you create can have conditional redirect
-            rules — route mobile users to your app store listing, block bots from polluting your analytics,
-            require a password before revealing the destination, or schedule a link to expire automatically.
-            The rules engine requires no coding knowledge: pick conditions, choose actions, and save.
-          </p>
-          <p className="text-dark/70 leading-relaxed mb-8">
-            All plans include real-time <Link href="/docs/analytics" className="text-primary font-bold hover:underline">click analytics</Link> with
-            country, device, browser, and referrer breakdowns, plus auto-generated{" "}
-            <Link href="/docs/qr" className="text-primary font-bold hover:underline">QR codes</Link> for every link.
-            Linkkk is self-hostable under an MIT license — read the{" "}
-            <a href="https://github.com/aka-alvaroso/Linkkk" target="_blank" rel="noopener noreferrer" className="text-primary font-bold hover:underline">source code on GitHub</a>.
-            GDPR-compliant by design: IPs are anonymized, passwords are hashed with{" "}
-            <a href="https://en.wikipedia.org/wiki/Bcrypt" target="_blank" rel="noopener noreferrer" className="text-primary font-bold hover:underline">bcrypt</a>,
-            and we never sell your data.
-          </p>
-          <div className="flex flex-wrap gap-4 text-sm">
-            <Link href="/docs/getting-started" className="text-primary font-bold hover:underline">
-              Getting started guide →
-            </Link>
-            <Link href="/docs/rules" className="text-primary font-bold hover:underline">
-              How rules work →
-            </Link>
-            <Link href="/docs/plans" className="text-primary font-bold hover:underline">
-              Compare plans →
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {/* ==================== FOOTER ==================== */}
       <footer className="relative bg-dark py-16 pb-24 md:py-24 px-6 overflow-hidden">
         {/* Decorative watermark */}
