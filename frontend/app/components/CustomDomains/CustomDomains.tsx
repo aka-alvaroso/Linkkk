@@ -116,8 +116,8 @@ export default function CustomDomains() {
           <h3 className="text-xl font-bold">{t("title")}</h3>
         </div>
         <p className="text-sm text-dark/60 mb-1">
-          {t("description", {
-            target: (
+          {t.rich("description", {
+            target: () => (
               <button
                 key="cname-target"
                 onClick={handleCopy}
