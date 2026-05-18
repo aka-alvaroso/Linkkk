@@ -32,11 +32,27 @@ const createLink = async (req, res) => {
     return errorResponse(res, ERRORS.INVALID_DATA, issues);
   }
 
-  const { longUrl, status, customSuffix } = validate.data;
+  const { longUrl, status, customSuffix, customDomainId } = validate.data;
 
   // Custom suffix only allowed for authenticated users (not guests)
   if (customSuffix && isGuest) {
     return errorResponse(res, ERRORS.UNAUTHORIZED);
+  }
+
+  // Custom domain only allowed for authenticated users
+  if (customDomainId && isGuest) {
+    return errorResponse(res, ERRORS.UNAUTHORIZED);
+  }
+
+  // Validate that the custom domain belongs to this user and is ACTIVE
+  if (customDomainId && user) {
+    const domain = await prisma.customDomain.findUnique({ where: { id: customDomainId } });
+    if (!domain || domain.userId !== user.id) {
+      return errorResponse(res, ERRORS.DOMAIN_NOT_FOUND);
+    }
+    if (domain.status !== "ACTIVE") {
+      return errorResponse(res, ERRORS.INVALID_DATA, [{ field: "customDomainId", message: "Custom domain is not active" }]);
+    }
   }
 
   // Check link limit (skip if unlimited - null)
@@ -85,8 +101,9 @@ const createLink = async (req, res) => {
         status: status ?? true,
         shortUrl,
         groupId: groupId || null,
+        customDomainId: customDomainId || null,
       },
-      include: { tags: { include: { tag: true } } },
+      include: { tags: { include: { tag: true } }, customDomain: true },
     });
     return successResponse(res, link, 201);
   } catch (error) {
@@ -182,6 +199,7 @@ const getAllLinks = async (req, res) => {
       include: {
         tags: { include: { tag: true } },
         group: true,
+        customDomain: true,
       },
       orderBy: { createdAt: "desc" },
     });
@@ -207,6 +225,7 @@ const getAllLinks = async (req, res) => {
         scanCount: link.scanCount || 0,
         group: link.group,
         tags: link.tags.map((lt) => lt.tag),
+        customDomain: link.customDomain,
       };
     });
 
@@ -239,11 +258,22 @@ const updateLink = async (req, res) => {
     return errorResponse(res, ERRORS.INVALID_DATA, issues);
   }
 
-  const { longUrl, status, newShortUrl } = validatedData.data;
+  const { longUrl, status, newShortUrl, customDomainId } = validatedData.data;
 
   // Custom suffix change only allowed for authenticated users (not guests)
   if (newShortUrl !== undefined && guest) {
     return errorResponse(res, ERRORS.UNAUTHORIZED);
+  }
+
+  // Validate custom domain if provided
+  if (customDomainId && user) {
+    const domain = await prisma.customDomain.findUnique({ where: { id: customDomainId } });
+    if (!domain || domain.userId !== user.id) {
+      return errorResponse(res, ERRORS.DOMAIN_NOT_FOUND);
+    }
+    if (domain.status !== "ACTIVE") {
+      return errorResponse(res, ERRORS.INVALID_DATA, [{ field: "customDomainId", message: "Custom domain is not active" }]);
+    }
   }
 
   try {
@@ -281,6 +311,7 @@ const updateLink = async (req, res) => {
     if (longUrl !== undefined) updateData.longUrl = longUrl;
     if (status !== undefined) updateData.status = status;
     if (newShortUrl !== undefined) updateData.shortUrl = newShortUrl;
+    if (customDomainId !== undefined) updateData.customDomainId = customDomainId ?? null;
 
     // groupId: allow null to ungroup, or a valid group id (auth users only)
     if (req.body.groupId !== undefined && user) {
@@ -297,7 +328,7 @@ const updateLink = async (req, res) => {
     const updatedLink = await prisma.link.update({
       where: { shortUrl },
       data: updateData,
-      include: { tags: { include: { tag: true } }, group: true },
+      include: { tags: { include: { tag: true } }, group: true, customDomain: true },
     });
 
     return successResponse(res, {
@@ -307,6 +338,7 @@ const updateLink = async (req, res) => {
       createdAt: updatedLink.createdAt,
       group: updatedLink.group,
       tags: updatedLink.tags.map((lt) => lt.tag),
+      customDomain: updatedLink.customDomain,
     });
   } catch (error) {
     if (error.code === "P2002") {

@@ -73,9 +73,12 @@ model Link {
   scanCount      Int          @default(0)
   createdAt      DateTime     @default(now())
 
-  user           User?        @relation(fields: [userId], references: [id])
+  customDomainId Int?
+
+  user           User?         @relation(fields: [userId], references: [id])
   guestSession   GuestSession? @relation(fields: [guestSessionId], references: [id])
-  group          Group?       @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  group          Group?        @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  customDomain   CustomDomain? @relation(fields: [customDomainId], references: [id], onDelete: SetNull)
   accesses       Access[]
   rules          LinkRule[]
   qrConfig       QRConfig?
@@ -83,6 +86,7 @@ model Link {
 
   @@index([shortUrl])
   @@index([userId, groupId])
+  @@index([customDomainId])
 }
 
 model Group {
@@ -324,6 +328,7 @@ model CustomDomain {
   verifiedAt DateTime?
   createdAt  DateTime           @default(now())
   updatedAt  DateTime           @updatedAt
+  links      Link[]
 
   @@index([userId])
   @@index([domain, status])

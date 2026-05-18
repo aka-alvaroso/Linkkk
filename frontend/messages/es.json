@@ -306,7 +306,11 @@
     "customSuffixHint": "Solo letras, números, - y _. Mínimo 3 caracteres.",
     "customSuffixInvalid": "Solo letras, números, guiones y guiones bajos. Mínimo 3.",
     "toastSuffixTaken": "Error al crear el link",
-    "toastSuffixTakenDesc": "Ese sufijo ya está en uso. Prueba con otro."
+    "toastSuffixTakenDesc": "Ese sufijo ya está en uso. Prueba con otro.",
+    "customDomain": "Dominio personalizado",
+    "customDomainOptional": "opcional",
+    "customDomainNone": "linkkk.dev (por defecto)",
+    "customDomainProOnly": "Los dominios personalizados son una función PRO"
   },
   "StatsDrawer": {
     "retentionTitle": "Historial de 30 días:",
@@ -377,6 +381,9 @@
     "customSuffixInvalid": "Solo letras, números, guiones y guiones bajos. Mínimo 3.",
     "toastSuffixTaken": "Error al actualizar el link",
     "toastSuffixTakenDesc": "Ese sufijo ya está en uso. Prueba con otro.",
+    "customDomain": "Dominio personalizado",
+    "customDomainOptional": "opcional",
+    "customDomainNone": "linkkk.dev (por defecto)",
     "clickToEdit": "Haz clic para editar",
     "closeConfirmMessage": "Tienes cambios sin guardar. ¿Cerrar igualmente?",
     "keepEditing": "Seguir editando",

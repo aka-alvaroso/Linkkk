@@ -306,7 +306,11 @@
     "customSuffixHint": "Letters, numbers, - and _ only. Min 3 characters.",
     "customSuffixInvalid": "Letters, numbers, hyphens and underscores only. Min 3.",
     "toastSuffixTaken": "Error creating link",
-    "toastSuffixTakenDesc": "That suffix is already taken. Try a different one."
+    "toastSuffixTakenDesc": "That suffix is already taken. Try a different one.",
+    "customDomain": "Custom domain",
+    "customDomainOptional": "optional",
+    "customDomainNone": "linkkk.dev (default)",
+    "customDomainProOnly": "Custom domains are a PRO feature"
   },
   "StatsDrawer": {
     "retentionTitle": "30-day history:",
@@ -376,6 +380,9 @@
     "customSuffixInvalid": "Letters, numbers, hyphens and underscores only. Min 3.",
     "toastSuffixTaken": "Error updating link",
     "toastSuffixTakenDesc": "That suffix is already taken. Try a different one.",
+    "customDomain": "Custom domain",
+    "customDomainOptional": "optional",
+    "customDomainNone": "linkkk.dev (default)",
     "clickToEdit": "Click to edit",
     "closeConfirmMessage": "You have unsaved changes. Close anyway?",
     "keepEditing": "Keep editing",
