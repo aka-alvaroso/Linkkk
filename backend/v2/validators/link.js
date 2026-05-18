@@ -36,12 +36,14 @@ const createLinkSchema = z.object({
   longUrl: longUrlSchema,
   status: z.boolean().default(true),
   customSuffix: customSuffixSchema.optional(),
+  customDomainId: z.number().int().positive().optional().nullable(),
 });
 
 const updateLinkSchema = z.object({
   longUrl: longUrlSchema.optional(),
   status: z.boolean().optional(),
   newShortUrl: customSuffixSchema.optional(),
+  customDomainId: z.number().int().positive().optional().nullable(),
 });
 
 module.exports = {

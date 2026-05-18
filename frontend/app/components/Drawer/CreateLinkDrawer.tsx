@@ -14,6 +14,8 @@ import { useAuth } from '@/app/hooks';
 import { PLAN_LIMITS } from '@/app/constants/limits';
 import AnimatedText, { AnimatedTextRef } from '../ui/AnimatedText';
 import { useTranslations } from 'next-intl';
+import { domainService, CustomDomain } from '@/app/services/api/domainService';
+import SelectDropdown from '@/app/components/ui/Select/SelectDropdown';
 
 interface CreateLinkDrawerProps {
     open: boolean;
@@ -32,11 +34,13 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
         longUrl: '',
         status: true,
         customSuffix: '',
+        customDomainId: null as number | null,
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [suffixError, setSuffixError] = useState('');
     const [localRules, setLocalRules] = useState<LinkRuleType[]>([]);
+    const [activeDomains, setActiveDomains] = useState<CustomDomain[]>([]);
 
     // Ref for animated text
     const statusButtonTextRef = useRef<AnimatedTextRef>(null);
@@ -55,6 +59,14 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
             setShowStatusBar("none");
         }
     }, [newLink]);
+
+    useEffect(() => {
+        if (open && !isGuest && user?.role === 'PRO') {
+            domainService.getAll().then(domains => {
+                setActiveDomains(domains.filter(d => d.status === 'ACTIVE'));
+            }).catch(() => {});
+        }
+    }, [open, isGuest, user?.role]);
 
     // Process conditions to convert country string to array and filter "always"
     const processConditions = (conditions: RuleCondition[]) => {
@@ -93,6 +105,7 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
             longUrl: newLink.longUrl,
             status: newLink.status,
             ...(newLink.customSuffix && { customSuffix: newLink.customSuffix }),
+            ...(newLink.customDomainId && { customDomainId: newLink.customDomainId }),
         });
 
         if (response.success && response.data) {
@@ -134,6 +147,7 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
                 longUrl: '',
                 status: true,
                 customSuffix: '',
+                customDomainId: null,
             });
             setLocalRules([]);
             onClose();
@@ -320,9 +334,34 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
                             <p className='text-xs text-danger'>{suffixError}</p>
                         ) : (
                             <p className='text-xs text-dark/40 font-mono'>
-                                linkkk.dev/r/<span className='text-dark/70'>{newLink.customSuffix || t('customSuffixPlaceholder')}</span>
+                                {newLink.customDomainId
+                                    ? activeDomains.find(d => d.id === newLink.customDomainId)?.domain
+                                    : 'linkkk.dev'}/r/<span className='text-dark/70'>{newLink.customSuffix || t('customSuffixPlaceholder')}</span>
                             </p>
                         )}
+                    </motion.div>
+                )}
+
+                {/* Custom Domain (PRO users only) */}
+                {isAuthenticated && !isGuest && user?.role === 'PRO' && (
+                    <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.25, duration: 0.4, ease: "backInOut" }}
+                        className='w-full flex flex-col gap-1.5'
+                    >
+                        <p className='text-xs font-semibold text-dark/40 uppercase tracking-wide'>
+                            {t('customDomain')} <span className='normal-case font-normal'>({t('customDomainOptional')})</span>
+                        </p>
+                        <SelectDropdown
+                            mode="single"
+                            options={activeDomains.map(d => ({ label: d.domain, value: d.id }))}
+                            value={newLink.customDomainId}
+                            onChange={(val) => setNewLink({ ...newLink, customDomainId: val as number | null })}
+                            placeholder={t('customDomainNone')}
+                            showNoneOption
+                            noneLabel={t('customDomainNone')}
+                        />
                     </motion.div>
                 )}
 
@@ -439,6 +478,7 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
                                                 longUrl: '',
                                                 status: true,
                                                 customSuffix: '',
+                                                customDomainId: null,
                                             });
                                             setLocalRules([]);
                                             setSuffixError('');

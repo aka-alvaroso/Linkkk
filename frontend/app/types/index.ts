@@ -46,6 +46,13 @@ export interface UpdateGroupDTO {
   order?: number;
 }
 
+// CustomDomain type (minimal, for link associations)
+export interface CustomDomain {
+  id: number;
+  domain: string;
+  status: "PENDING" | "VERIFYING" | "ACTIVE" | "ERROR";
+}
+
 // Link types
 export interface Link {
   id?: number;
@@ -57,6 +64,7 @@ export interface Link {
   scanCount?: number;
   group?: Group | null;
   tags?: Tag[];
+  customDomain?: CustomDomain | null;
 }
 
 export interface CreateLinkDTO {
@@ -64,6 +72,7 @@ export interface CreateLinkDTO {
   status?: boolean;
   customSuffix?: string;
   groupId?: number | null;
+  customDomainId?: number | null;
 }
 
 export interface UpdateLinkDTO {
@@ -71,6 +80,7 @@ export interface UpdateLinkDTO {
   status?: boolean;
   newShortUrl?: string;
   groupId?: number | null;
+  customDomainId?: number | null;
 }
 
 // Filter types
