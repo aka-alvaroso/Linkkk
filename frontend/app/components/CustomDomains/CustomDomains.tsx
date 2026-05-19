@@ -10,9 +10,12 @@ import {
   TbCopy,
   TbLoader2,
   TbSparkles,
+  TbAlertTriangle,
+  TbNetwork,
 } from "react-icons/tb";
 import { useTranslations } from "next-intl";
 import Button from "@/app/components/ui/Button/Button";
+import Modal from "@/app/components/ui/Modal/Modal";
 import { domainService, type CustomDomain } from "@/app/services/api/domainService";
 import { HttpError } from "@/app/utils/errors";
 import { useToast } from "@/app/hooks/useToast";
@@ -34,6 +37,9 @@ export default function CustomDomains() {
   const [deleting, setDeleting] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
 
+  // DNS modal state
+  const [dnsModalDomain, setDnsModalDomain] = useState<string | null>(null);
+
   const STATUS_CONFIG = {
     PENDING: { label: t("statusPending"), color: "bg-dark/10 text-dark", icon: TbLoader2, spin: false },
     VERIFYING: { label: t("statusVerifying"), color: "bg-secondary/20 text-secondary", icon: TbLoader2, spin: true },
@@ -46,6 +52,8 @@ export default function CustomDomains() {
     domainService.getAll().then(setDomains).finally(() => setLoading(false));
   }, [isPro]);
 
+  const hasPendingDomains = domains.some((d) => d.status !== "ACTIVE");
+
   const handleAdd = async () => {
     if (!newDomain.trim()) return;
     setAdding(true);
@@ -53,6 +61,8 @@ export default function CustomDomains() {
       const created = await domainService.add(newDomain.trim());
       setDomains((prev) => [created, ...prev]);
       setNewDomain("");
+      // Show DNS instructions modal after adding
+      setDnsModalDomain(created.domain);
     } catch (error) {
       toast.error(error instanceof HttpError ? error.message : t("toastAddFailed"));
     } finally {
@@ -89,8 +99,8 @@ export default function CustomDomains() {
     }
   };
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(CNAME_TARGET);
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -109,43 +119,25 @@ export default function CustomDomains() {
 
   return (
     <div className="space-y-6">
+
+      {/* Pending DNS banner */}
+      {!loading && hasPendingDomains && (
+        <div className="flex items-start gap-3 p-4 bg-warning/10 border border-warning rounded-2xl">
+          <TbAlertTriangle size={20} className="text-warning flex-shrink-0 mt-0.5" />
+          <div className="min-w-0">
+            <p className="font-bold text-sm">{t("pendingBannerTitle")}</p>
+            <p className="text-sm text-dark/60 mt-0.5">{t("pendingBannerDesc")}</p>
+          </div>
+        </div>
+      )}
+
       {/* Add domain */}
       <div className="p-4 bg-dark/5 rounded-2xl border-2 border-dashed border-transparent focus-within:border-dark transition-colors">
         <div className="flex items-center gap-2 mb-3">
           <TbWorld size={20} />
           <h3 className="text-xl font-bold">{t("title")}</h3>
         </div>
-        <p className="text-sm text-dark/60 mb-1">
-          {t.rich("description", {
-            target: () => (
-              <button
-                key="cname-target"
-                onClick={handleCopy}
-                className="inline-flex items-center gap-1 font-mono font-bold text-primary hover:underline"
-              >
-                {CNAME_TARGET}
-                {copied ? <TbCheck size={14} /> : <TbCopy size={14} />}
-              </button>
-            ),
-          })}
-        </p>
         <p className="text-xs text-dark/40 mb-4">{t("subdomainNote")}</p>
-
-        {/* DNS instructions box */}
-        <div className="mb-4 p-3 bg-dark/5 rounded-xl border border-dashed border-dark/20 font-mono text-sm grid grid-cols-3 gap-2">
-          <div>
-            <p className="text-dark/40 text-xs mb-1">{t("dnsType")}</p>
-            <p className="font-bold">CNAME</p>
-          </div>
-          <div>
-            <p className="text-dark/40 text-xs mb-1">{t("dnsName")}</p>
-            <p className="font-bold">go</p>
-          </div>
-          <div>
-            <p className="text-dark/40 text-xs mb-1">{t("dnsValue")}</p>
-            <p className="font-bold">{CNAME_TARGET}</p>
-          </div>
-        </div>
 
         <div className="flex gap-2">
           <input
@@ -162,7 +154,7 @@ export default function CustomDomains() {
             rounded="xl"
             onClick={handleAdd}
             disabled={adding || !newDomain.trim()}
-            className="bg-dark hover:bg-primary hover:text-dark border border-dark"
+            className="bg-dark hover:bg-info hover:text-light border border-dark"
           >
             {adding ? <TbLoader2 className="animate-spin" size={18} /> : <TbPlus size={18} />}
           </Button>
@@ -176,7 +168,21 @@ export default function CustomDomains() {
           <span>{t("loading")}</span>
         </div>
       ) : domains.length === 0 ? (
-        <p className="text-center text-dark/40 py-6 text-sm">{t("empty")}</p>
+        /* Empty state */
+        <div className="flex flex-col items-center justify-center py-16 gap-6">
+          {/* Stacked card illustration */}
+          <div className="relative w-48 h-32">
+            <div className="absolute inset-0 bg-dark/5 rounded-2xl rotate-6 scale-95" />
+            <div className="absolute inset-0 bg-dark/5 rounded-2xl -rotate-3 scale-97" />
+            <div className="absolute inset-0 bg-white border border-dark/10 rounded-2xl shadow-sm flex items-center justify-center">
+              <TbWorld size={48} className="text-dark/20" />
+            </div>
+          </div>
+          <div className="text-center space-y-1">
+            <p className="font-black italic text-xl">{t("empty")}</p>
+            <p className="text-sm text-dark/50">{t("emptyDescription")}</p>
+          </div>
+        </div>
       ) : (
         <div className="space-y-3">
           {domains.map((domain) => {
@@ -201,14 +207,23 @@ export default function CustomDomains() {
                   </span>
 
                   {domain.status !== "ACTIVE" && (
-                    <button
-                      onClick={() => handleVerify(domain.id)}
-                      disabled={verifying === domain.id}
-                      title={t("btnVerify")}
-                      className="p-2 rounded-xl bg-dark/5 hover:bg-secondary hover:text-light transition-colors disabled:opacity-50"
-                    >
-                      <TbRefresh size={16} className={verifying === domain.id ? "animate-spin" : ""} />
-                    </button>
+                    <>
+                      <button
+                        onClick={() => setDnsModalDomain(domain.domain)}
+                        title={t("btnDnsInfo")}
+                        className="p-2 rounded-xl bg-dark/5 hover:bg-info hover:text-light transition-colors"
+                      >
+                        <TbNetwork size={16} />
+                      </button>
+                      <button
+                        onClick={() => handleVerify(domain.id)}
+                        disabled={verifying === domain.id}
+                        title={t("btnVerify")}
+                        className="p-2 rounded-xl bg-dark/5 hover:bg-secondary hover:text-light transition-colors disabled:opacity-50"
+                      >
+                        <TbRefresh size={16} className={verifying === domain.id ? "animate-spin" : ""} />
+                      </button>
+                    </>
                   )}
 
                   <button
@@ -225,6 +240,70 @@ export default function CustomDomains() {
           })}
         </div>
       )}
+
+      {/* DNS Instructions Modal */}
+      <Modal
+        open={!!dnsModalDomain}
+        onClose={() => setDnsModalDomain(null)}
+        size="lg"
+        position="center"
+        rounded="3xl"
+        closeOnOverlayClick
+      >
+        <div className="p-6 space-y-5">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-info/10 rounded-2xl">
+              <TbNetwork size={28} className="text-info" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-black italic">{t("dnsModalTitle")}</h2>
+              <p className="text-sm text-dark/50 mt-0.5">
+                {t("dnsModalDesc", { domain: dnsModalDomain ?? "" })}
+              </p>
+            </div>
+          </div>
+
+          {/* DNS record table */}
+          <div className="p-4 bg-dark/5 rounded-2xl border border-dashed border-dark/20 font-mono text-sm grid grid-cols-3 gap-4">
+            <div>
+              <p className="text-dark/40 text-xs mb-1">{t("dnsType")}</p>
+              <p className="font-bold">CNAME</p>
+            </div>
+            <div>
+              <p className="text-dark/40 text-xs mb-1">{t("dnsName")}</p>
+              <p className="font-bold truncate">
+                {dnsModalDomain ? dnsModalDomain.split(".").slice(0, -2).join(".") || dnsModalDomain : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-dark/40 text-xs mb-1">{t("dnsValue")}</p>
+              <div className="flex items-center gap-1">
+                <p className="font-bold">{CNAME_TARGET}</p>
+                <button
+                  onClick={() => handleCopy(CNAME_TARGET)}
+                  className="text-dark/40 hover:text-dark transition-colors"
+                >
+                  {copied ? <TbCheck size={14} className="text-primary" /> : <TbCopy size={14} />}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <p className="text-xs text-dark/50">{t("dnsModalNote")}</p>
+
+          <div className="flex justify-end">
+            <Button
+              variant="solid"
+              size="md"
+              rounded="2xl"
+              onClick={() => setDnsModalDomain(null)}
+              className="bg-info text-light border border-dark hover:shadow-[4px_4px_0_var(--color-dark)]"
+            >
+              {t("dnsModalClose")}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

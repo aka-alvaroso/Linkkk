@@ -99,7 +99,9 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
     const cancelQRRef = useRef<(() => void) | null>(null);
     const tQR = useTranslations('QRCodeEditor');
     const { config: qrConfig, fetchConfig: fetchQRConfig } = useQRConfig(link.shortUrl);
-    const qrUrl = `https://linkkk.dev/r/${link.shortUrl}?src=qr`;
+    const qrUrl = link.customDomain
+        ? `https://${link.customDomain.domain}/${link.shortUrl}?src=qr`
+        : `https://linkkk.dev/r/${link.shortUrl}?src=qr`;
 
     useEffect(() => {
         setNewLink({ ...link });
@@ -108,6 +110,11 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
         setSuffixError('');
         setSelectedTagIds((link.tags ?? []).map(t => t.id));
         setSelectedGroupId(link.group?.id ?? null);
+        // Sync the animated short URL text with the actual link data
+        const urlText = link.customDomain
+            ? `${link.customDomain.domain}/${link.shortUrl}`
+            : `linkkk.dev/r/${link.shortUrl}`;
+        shortUrlTextRef.current?.setText(urlText);
     }, [link]);
 
     useEffect(() => {
@@ -334,7 +341,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                     <div className='flex flex-col gap-1'>
                                         <div className='flex items-center gap-1'>
                                             <span className='text-xl md:text-2xl italic font-black text-dark/40 whitespace-nowrap'>
-                                                {newLink.customDomain?.domain ?? 'linkkk.dev'}/r/
+                                                {newLink.customDomain ? newLink.customDomain.domain : 'linkkk.dev/r'}/
                                             </span>
                                             <input
                                                 autoFocus
@@ -368,7 +375,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                         >
                                             <AnimatedText
                                                 ref={shortUrlTextRef}
-                                                initialText={`${newLink.customDomain?.domain ?? 'linkkk.dev'}/r/${newLink.shortUrl}`}
+                                                initialText={newLink.customDomain ? `${newLink.customDomain.domain}/${newLink.shortUrl}` : `linkkk.dev/r/${newLink.shortUrl}`}
                                                 animationType="slide"
                                                 triggerMode="none"
                                             />

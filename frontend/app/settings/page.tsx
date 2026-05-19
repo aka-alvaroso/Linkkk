@@ -332,7 +332,7 @@ export default function SettingsPage() {
                 } else if (tab.id === "security") {
                   activeColor = "bg-secondary text-light border border-dark shadow-[4px_4px_0_var(--color-dark)]";
                 } else if (tab.id === "domains") {
-                  activeColor = "bg-dark text-light border border-dark shadow-[4px_4px_0_var(--color-dark)]";
+                  activeColor = "bg-info text-light border border-dark shadow-[4px_4px_0_var(--color-dark)]";
                 } else if (tab.id === "danger") {
                   activeColor = "bg-danger text-light border border-dark shadow-[4px_4px_0_var(--color-dark)]";
                 }
