@@ -235,8 +235,16 @@ app.get("/internal/check-domain", (req, res, next) => {
   return next();
 }, checkDomainForCaddy);
 
-// Public redirect endpoint (LAST - catches everything else)
+// Public redirect endpoint via linkkk.dev/r/:shortUrl
 app.get("/r/:shortUrl", redirectLink);
+
+// Custom domain redirect — catches /:shortUrl when the request comes from a
+// non-linkkk.dev host. Registered after /r/ so it never conflicts.
+app.get("/:shortUrl", (req, res, next) => {
+  const host = (req.headers["host"] || "").split(":")[0].toLowerCase();
+  if (host === "linkkk.dev" || host.endsWith(".linkkk.dev")) return next();
+  return redirectLink(req, res, next);
+});
 
 // ============================================================================
 // ERROR HANDLING MIDDLEWARE

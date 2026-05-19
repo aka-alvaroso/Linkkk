@@ -463,11 +463,18 @@ const redirectLink = async (req, res) => {
           },
           orderBy: { priority: "asc" },
         },
+        customDomain: true,
       },
     });
 
     if (!link) {
       return res.redirect(`${config.frontend.url}/404?url=${shortUrl}`);
+    }
+
+    // If the link has a custom domain assigned but the request came through
+    // linkkk.dev/r/, redirect to the canonical custom domain URL instead.
+    if (link.customDomain && customDomainUserId === null) {
+      return res.redirect(301, `https://${link.customDomain.domain}/${shortUrl}`);
     }
 
     // Check status
