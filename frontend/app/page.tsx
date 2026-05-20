@@ -858,9 +858,9 @@ export default function Landing() {
             <div className="flex flex-wrap justify-center gap-3 relative">
               <RulePill icon={TbWorld} label={t("RulesSection.pillCountry")} color="bg-primary text-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillCountryDesc")} />
               <RulePill icon={TbDeviceMobile} label={t("RulesSection.pillDevice")} color="bg-warning text-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillDeviceDesc")} />
-              <RulePill icon={TbDots} label={t("RulesSection.pillIP")} color="bg-info text-light border-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillIPDesc")} />
+              <RulePill icon={TbDots} label={t("RulesSection.pillIP")} color="bg-info text-dark border-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillIPDesc")} />
               <RulePill icon={TbShieldLock} label={t("RulesSection.pillVPN")} color="bg-secondary text-light border-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillVPNDesc")} />
-              <RulePill icon={TbClick} label={t("RulesSection.pillClicks")} color="bg-info text-light border-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillClicksDesc")} />
+              <RulePill icon={TbClick} label={t("RulesSection.pillClicks")} color="bg-info text-dark border-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillClicksDesc")} />
               <RulePill icon={TbCalendar} label={t("RulesSection.pillDate")} color="bg-primary text-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillDateDesc")} />
               <RulePill icon={TbRobot} label={t("RulesSection.pillBot")} color="bg-danger text-light border-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillBotDesc")} />
             </div>
@@ -873,7 +873,7 @@ export default function Landing() {
               <RulePill icon={TbArrowFork} label={t("RulesSection.pillRedirect")} color="bg-primary text-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillRedirectDesc")} />
               <RulePill icon={TbForbid2} label={t("RulesSection.pillBlock")} color="bg-danger text-light border-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillBlockDesc")} />
               <RulePill icon={TbLock} label={t("RulesSection.pillPassword")} color="bg-warning text-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillPasswordDesc")} />
-              <RulePill icon={TbWebhook} label={t("RulesSection.pillWebhook")} color="bg-info text-light border-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillWebhookDesc")} />
+              <RulePill icon={TbWebhook} label={t("RulesSection.pillWebhook")} color="bg-info text-dark border-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillWebhookDesc")} />
             </div>
           </div>
 

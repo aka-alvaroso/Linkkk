@@ -98,7 +98,7 @@ export default function TopNavbar({ showCreate = false }: TopNavbarProps) {
               rounded='xl'
               leftIcon={<TbSparkles size={20} />}
               expandOnHover="text"
-              className="bg-primary text-dark hover:bg-info hover:text-light hover:shadow-[_4px_4px_0_var(--color-dark)] leading-5"
+              className="bg-primary text-dark hover:bg-info hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)] leading-5"
               onClick={() => setShowSelectPlanModal(true)}
             >
               <p className="font-black italic">{t('upgradeToPro')}</p>
