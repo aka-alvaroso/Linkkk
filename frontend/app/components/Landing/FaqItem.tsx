@@ -22,9 +22,9 @@ export default function FaqItem({
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between gap-4 px-5 py-4 cursor-pointer"
       >
-        <span className="font-black italic text-sm md:text-base text-dark text-left">
+        <h3 className="font-black italic text-sm md:text-base text-dark text-left m-0">
           {question}
-        </span>
+        </h3>
         <motion.span
           animate={{ rotate: open ? 180 : 0 }}
           transition={{ duration: 0.25, ease: "easeInOut" }}

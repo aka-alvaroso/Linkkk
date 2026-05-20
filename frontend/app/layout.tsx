@@ -155,6 +155,15 @@ export default async function RootLayout({
     <html lang={locale}>
       <head>
         <meta name="view-transition" content="same-origin" />
+        {/* Explicit canonical + OG — duplicated here because Next.js metadata-generated tags
+            are not always picked up by AI crawlers; the JSON-LD approach (manual <head>) is. */}
+        <link rel="canonical" href="https://linkkk.dev" />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="Linkkk" />
+        <meta property="og:title" content="Linkkk - Smart Link Management Platform" />
+        <meta property="og:description" content="Create short links, track analytics, and manage your URLs with custom rules. Free and open-source link management platform." />
+        <meta property="og:image" content="https://linkkk.dev/og-image.png" />
+        <meta property="og:url" content="https://linkkk.dev" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}

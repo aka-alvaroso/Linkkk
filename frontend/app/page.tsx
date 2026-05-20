@@ -1143,6 +1143,96 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* ==================== ABOUT / SEO SECTION ==================== */}
+      <section className="bg-light py-16 px-6 md:px-20 border-t border-dark/10">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-2xl md:text-3xl font-black italic text-dark mb-6">
+            What is Linkkk?
+          </h2>
+          <div className="space-y-4 text-sm md:text-base text-dark/70 leading-relaxed">
+            <p>
+              Linkkk is an open-source smart link management platform that goes far beyond simple URL shortening.
+              While tools like Bitly give you a shorter URL, Linkkk gives your links <em>behavior</em>.
+              You define conditions — country, device type, IP range, VPN detection, click count, schedule, or bot
+              detection — and actions that fire when those conditions match: redirect to a different URL, block
+              access entirely, require a password, or trigger a webhook to your own backend.
+            </p>
+            <p>
+              A single Linkkk URL can serve a localized landing page to visitors in Spain, show a mobile-optimized
+              experience to smartphone users, block scrapers and bots automatically, and redirect everyone else to
+              your default destination — all in one link, without touching your codebase.
+            </p>
+            <p>
+              The platform is built for creators, marketers, developers, and businesses that need granular control
+              over where their traffic goes. Whether you run affiliate campaigns that need geo-targeting, manage a
+              digital product with region-specific pricing, protect downloads behind a password, or want to
+              understand your audience with detailed{" "}
+              <Link href="/docs/analytics" className="text-primary underline underline-offset-2 hover:text-dark transition-colors">
+                click analytics
+              </Link>
+              , Linkkk has you covered.
+            </p>
+            <p>
+              Every link comes with{" "}
+              <Link href="/docs/qr-codes" className="text-primary underline underline-offset-2 hover:text-dark transition-colors">
+                dynamic QR codes
+              </Link>{" "}
+              that update automatically — change the destination, and the QR code continues to work without
+              reprinting. Combine QR codes with rules to create smart print materials that adapt based on the
+              viewer&apos;s location or device.
+            </p>
+            <p>
+              The{" "}
+              <Link href="/docs/rules" className="text-primary underline underline-offset-2 hover:text-dark transition-colors">
+                visual rules engine
+              </Link>{" "}
+              requires zero coding knowledge. Select your conditions from dropdowns, choose an action, and save.
+              Rules are evaluated in priority order so complex conditional logic is straightforward to set up and
+              maintain. You can combine up to multiple conditions using AND / OR logic, and each rule supports an
+              optional &quot;else&quot; action as a fallback.
+            </p>
+            <p>
+              Linkkk is{" "}
+              <a
+                href="https://github.com/aka-alvaroso/Linkkk"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary underline underline-offset-2 hover:text-dark transition-colors"
+              >
+                fully open-source on GitHub
+              </a>
+              . You can self-host it on your own infrastructure using Next.js and a standard database — your
+              links and your data belong to you. The free plan includes rules, analytics, QR codes, and up to
+              10 active links with no credit card required. PRO removes limits and adds priority support.
+            </p>
+            <p>
+              Redirects are processed in under 50 milliseconds so visitors experience zero perceptible delay.
+              All passwords are hashed using industry-standard{" "}
+              <a
+                href="https://en.wikipedia.org/wiki/Bcrypt"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary underline underline-offset-2 hover:text-dark transition-colors"
+              >
+                bcrypt encryption
+              </a>
+              , IP addresses are anonymized for GDPR compliance, and no data is ever sold to third parties.
+            </p>
+            <p>
+              Get started in seconds — no email required to try. Read the{" "}
+              <Link href="/docs/getting-started" className="text-primary underline underline-offset-2 hover:text-dark transition-colors">
+                getting started guide
+              </Link>{" "}
+              or compare features on the{" "}
+              <Link href="/docs/plans" className="text-primary underline underline-offset-2 hover:text-dark transition-colors">
+                plans page
+              </Link>
+              .
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ==================== FOOTER ==================== */}
       <footer className="relative bg-dark py-16 pb-24 md:py-24 px-6 overflow-hidden">
         {/* Decorative watermark */}
