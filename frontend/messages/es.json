@@ -645,6 +645,11 @@
     "empty": "Todavía no hay dominios",
     "emptyDescription": "Añade tu primer dominio personalizado para usarlo en tus enlaces cortos.",
     "emptyAction": "Añadir dominio",
+    "modalStep1Title": "Añadir un dominio personalizado",
+    "modalStep1Desc": "Usa tu propio dominio para los enlaces cortos en lugar de linkkk.dev",
+    "modalNext": "Siguiente",
+    "modalBack": "Atrás",
+    "modalAdd": "Añadir dominio",
     "dnsModalTitle": "¡Casi! Configura tu DNS",
     "dnsModalDesc": "Para activar {domain}, añade el siguiente registro CNAME en tu proveedor DNS:",
     "dnsModalNote": "Los cambios DNS pueden tardar hasta 48 horas en propagarse. Cuando esté listo, pulsa Verificar DNS.",
@@ -663,7 +668,11 @@
     "toastAddFailed": "Error al añadir el dominio",
     "toastRemoveFailed": "Error al eliminar el dominio",
     "proOnly": "Los dominios personalizados son una función PRO.",
-    "upgradePrompt": "Actualiza a PRO para usar tu propio dominio."
+    "upgradePrompt": "Actualiza a PRO para usar tu propio dominio.",
+    "myDomains": "Mis dominios",
+    "proGateTitle": "Dominios Personalizados",
+    "proGateDesc": "Usa tu propio dominio para los enlaces cortos en lugar de linkkk.dev",
+    "proGateUpgrade": "Actualizar a PRO"
   },
   "NotFound": {
     "title": "Página No Encontrada",

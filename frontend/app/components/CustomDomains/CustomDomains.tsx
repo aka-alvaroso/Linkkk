@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import {
   TbWorld,
   TbPlus,
@@ -12,16 +13,30 @@ import {
   TbSparkles,
   TbAlertTriangle,
   TbNetwork,
+  TbArrowRight,
+  TbArrowLeft,
 } from "react-icons/tb";
 import { useTranslations } from "next-intl";
+import * as motion from "motion/react-client";
+import { AnimatePresence } from "motion/react";
 import Button from "@/app/components/ui/Button/Button";
 import Modal from "@/app/components/ui/Modal/Modal";
+import SelectPlanModal from "@/app/components/Modal/SelectPlanModal";
 import { domainService, type CustomDomain } from "@/app/services/api/domainService";
 import { HttpError } from "@/app/utils/errors";
 import { useToast } from "@/app/hooks/useToast";
 import { useAuth } from "@/app/hooks";
 
 const CNAME_TARGET = "linkkk.dev";
+
+const itemVariants = {
+  hidden: { opacity: 0, x: 20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    x: 0,
+    transition: { delay: i * 0.07, duration: 0.4, ease: "backOut" as const },
+  }),
+};
 
 export default function CustomDomains() {
   const t = useTranslations("CustomDomains");
@@ -30,15 +45,19 @@ export default function CustomDomains() {
   const isPro = user?.role === "PRO";
 
   const [domains, setDomains] = useState<CustomDomain[]>([]);
-  const [newDomain, setNewDomain] = useState("");
   const [loading, setLoading] = useState(true);
-  const [adding, setAdding] = useState(false);
   const [verifying, setVerifying] = useState<number | null>(null);
   const [deleting, setDeleting] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
 
-  // DNS modal state
-  const [dnsModalDomain, setDnsModalDomain] = useState<string | null>(null);
+  // Add-domain modal state
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalStep, setModalStep] = useState<1 | 2>(1);
+  const [newDomain, setNewDomain] = useState("");
+  const [adding, setAdding] = useState(false);
+
+  // PRO gate modal
+  const [showProModal, setShowProModal] = useState(false);
 
   const STATUS_CONFIG = {
     PENDING: { label: t("statusPending"), color: "bg-dark/10 text-dark", icon: TbLoader2, spin: false },
@@ -54,15 +73,25 @@ export default function CustomDomains() {
 
   const hasPendingDomains = domains.some((d) => d.status !== "ACTIVE");
 
+  const openModal = () => {
+    setNewDomain("");
+    setModalStep(1);
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setNewDomain("");
+    setModalStep(1);
+  };
+
   const handleAdd = async () => {
     if (!newDomain.trim()) return;
     setAdding(true);
     try {
       const created = await domainService.add(newDomain.trim());
       setDomains((prev) => [created, ...prev]);
-      setNewDomain("");
-      // Show DNS instructions modal after adding
-      setDnsModalDomain(created.domain);
+      closeModal();
     } catch (error) {
       toast.error(error instanceof HttpError ? error.message : t("toastAddFailed"));
     } finally {
@@ -105,92 +134,129 @@ export default function CustomDomains() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // PRO gate
+  // Extract subdomain label for DNS Name field (e.g. "go.yourdomain.com" → "go")
+  const dnsNameLabel = newDomain
+    ? newDomain.split(".").slice(0, -2).join(".") || newDomain
+    : "go";
+
+  // Shared empty state UI (used for both PRO and non-PRO)
+  const EmptyState = ({ onAction }: { onAction: () => void }) => (
+    <div className="flex flex-col items-center justify-center py-12 gap-6">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.85 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.05, duration: 0.5, ease: "backOut" }}
+      >
+        <Image
+          src="/domains_empty_state.svg"
+          alt="No custom domains"
+          width={220}
+          height={160}
+          priority
+        />
+      </motion.div>
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15, duration: 0.4, ease: "backOut" }}
+        className="text-center space-y-1"
+      >
+        <p className="font-black italic text-xl">{t("empty")}</p>
+        <p className="text-sm text-dark/50">{t("emptyDescription")}</p>
+      </motion.div>
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.25, duration: 0.4, ease: "backOut" }}
+      >
+        <Button
+          variant="solid"
+          size="md"
+          rounded="2xl"
+          leftIcon={<TbPlus size={20} />}
+          onClick={onAction}
+          className="bg-info text-dark border border-dark hover:shadow-[4px_4px_0_var(--color-dark)]"
+        >
+          {t("emptyAction")}
+        </Button>
+      </motion.div>
+    </div>
+  );
+
+  // Non-PRO gate: same empty state but opens PRO modal
   if (!isPro) {
     return (
-      <div className="p-6 bg-dark/5 rounded-2xl border-2 border-dashed border-dark/20 flex flex-col items-center text-center gap-3">
-        <TbSparkles size={32} className="text-primary" />
-        <h3 className="text-xl font-bold">{t("title")}</h3>
-        <p className="text-dark/60 text-sm">{t("proOnly")}</p>
-        <p className="text-dark/40 text-sm">{t("upgradePrompt")}</p>
-      </div>
+      <>
+        <EmptyState onAction={() => setShowProModal(true)} />
+        <SelectPlanModal
+          open={showProModal}
+          onClose={() => setShowProModal(false)}
+        />
+      </>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
 
       {/* Pending DNS banner */}
-      {!loading && hasPendingDomains && (
-        <div className="flex items-start gap-3 p-4 bg-warning/10 border border-warning rounded-2xl">
-          <TbAlertTriangle size={20} className="text-warning flex-shrink-0 mt-0.5" />
-          <div className="min-w-0">
-            <p className="font-bold text-sm">{t("pendingBannerTitle")}</p>
-            <p className="text-sm text-dark/60 mt-0.5">{t("pendingBannerDesc")}</p>
-          </div>
-        </div>
-      )}
-
-      {/* Add domain */}
-      <div className="p-4 bg-dark/5 rounded-2xl border-2 border-dashed border-transparent focus-within:border-dark transition-colors">
-        <div className="flex items-center gap-2 mb-3">
-          <TbWorld size={20} />
-          <h3 className="text-xl font-bold">{t("title")}</h3>
-        </div>
-        <p className="text-xs text-dark/40 mb-4">{t("subdomainNote")}</p>
-
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={newDomain}
-            onChange={(e) => setNewDomain(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleAdd()}
-            placeholder={t("placeholder")}
-            className="flex-1 p-3 bg-dark/5 rounded-xl border-2 border-dashed border-transparent focus:border-dark outline-none transition-colors font-mono text-sm"
-          />
-          <Button
-            variant="solid"
-            size="sm"
-            rounded="xl"
-            onClick={handleAdd}
-            disabled={adding || !newDomain.trim()}
-            className="bg-dark hover:bg-info hover:text-light border border-dark"
+      <AnimatePresence>
+        {!loading && hasPendingDomains && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.3, ease: "backOut" }}
+            className="flex items-start gap-3 p-4 bg-warning/10 border border-warning rounded-2xl"
           >
-            {adding ? <TbLoader2 className="animate-spin" size={18} /> : <TbPlus size={18} />}
-          </Button>
-        </div>
-      </div>
+            <TbAlertTriangle size={20} className="text-warning flex-shrink-0 mt-0.5" />
+            <div className="min-w-0">
+              <p className="font-bold text-sm">{t("pendingBannerTitle")}</p>
+              <p className="text-sm text-dark/60 mt-0.5">{t("pendingBannerDesc")}</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Domain list */}
+      {/* Content */}
       {loading ? (
-        <div className="flex items-center justify-center py-8 text-dark/40">
+        <div className="flex items-center justify-center py-16 text-dark/40">
           <TbLoader2 className="animate-spin mr-2" size={20} />
           <span>{t("loading")}</span>
         </div>
       ) : domains.length === 0 ? (
-        /* Empty state */
-        <div className="flex flex-col items-center justify-center py-16 gap-6">
-          {/* Stacked card illustration */}
-          <div className="relative w-48 h-32">
-            <div className="absolute inset-0 bg-dark/5 rounded-2xl rotate-6 scale-95" />
-            <div className="absolute inset-0 bg-dark/5 rounded-2xl -rotate-3 scale-97" />
-            <div className="absolute inset-0 bg-white border border-dark/10 rounded-2xl shadow-sm flex items-center justify-center">
-              <TbWorld size={48} className="text-dark/20" />
-            </div>
-          </div>
-          <div className="text-center space-y-1">
-            <p className="font-black italic text-xl">{t("empty")}</p>
-            <p className="text-sm text-dark/50">{t("emptyDescription")}</p>
-          </div>
-        </div>
+        /* ── Empty state ── */
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: "backOut" }}
+        >
+          <EmptyState onAction={openModal} />
+        </motion.div>
       ) : (
+        /* ── Domain list ── */
         <div className="space-y-3">
-          {domains.map((domain) => {
+
+          {/* "My domains" label */}
+          <motion.p
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0, duration: 0.4, ease: "backOut" }}
+            className="text-sm font-black italic text-dark/50 px-1"
+          >
+            {t("myDomains")}
+          </motion.p>
+
+          {domains.map((domain, i) => {
             const cfg = STATUS_CONFIG[domain.status];
             const StatusIcon = cfg.icon;
             return (
-              <div
+              <motion.div
                 key={domain.id}
+                custom={i + 1}
+                variants={itemVariants}
+                initial="hidden"
+                animate="visible"
                 className="flex items-center justify-between gap-3 p-4 bg-dark/5 rounded-2xl"
               >
                 <div className="min-w-0">
@@ -209,9 +275,13 @@ export default function CustomDomains() {
                   {domain.status !== "ACTIVE" && (
                     <>
                       <button
-                        onClick={() => setDnsModalDomain(domain.domain)}
+                        onClick={() => {
+                          setNewDomain(domain.domain);
+                          setModalStep(2);
+                          setModalOpen(true);
+                        }}
                         title={t("btnDnsInfo")}
-                        className="p-2 rounded-xl bg-dark/5 hover:bg-info hover:text-light transition-colors"
+                        className="p-2 rounded-xl bg-dark/5 hover:bg-info hover:text-dark transition-colors"
                       >
                         <TbNetwork size={16} />
                       </button>
@@ -235,73 +305,173 @@ export default function CustomDomains() {
                     <TbTrash size={16} />
                   </button>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
+
+          {/* Add button at bottom — dark, compact, hover primary */}
+          <motion.div
+            custom={domains.length + 1}
+            variants={itemVariants}
+            initial="hidden"
+            animate="visible"
+            className="flex justify-center pt-1"
+          >
+            <button
+              onClick={openModal}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-dark text-light font-bold text-sm hover:bg-primary hover:text-dark hover:shadow-[4px_4px_0_var(--color-dark)] border border-dark transition-all duration-200"
+            >
+              <TbPlus size={18} />
+              {t("emptyAction")}
+            </button>
+          </motion.div>
         </div>
       )}
 
-      {/* DNS Instructions Modal */}
+      {/* ── Add domain modal (2 steps) ── */}
       <Modal
-        open={!!dnsModalDomain}
-        onClose={() => setDnsModalDomain(null)}
-        size="lg"
+        open={modalOpen}
+        onClose={closeModal}
+        size="md"
         position="center"
         rounded="3xl"
         closeOnOverlayClick
+        showCloseButton={false}
       >
         <div className="p-6 space-y-5">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-info/10 rounded-2xl">
-              <TbNetwork size={28} className="text-info" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-black italic">{t("dnsModalTitle")}</h2>
-              <p className="text-sm text-dark/50 mt-0.5">
-                {t("dnsModalDesc", { domain: dnsModalDomain ?? "" })}
-              </p>
-            </div>
+
+          {/* Step indicators */}
+          <div className="flex items-center gap-2">
+            <div className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${modalStep >= 1 ? 'bg-info' : 'bg-dark/10'}`} />
+            <div className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${modalStep >= 2 ? 'bg-info' : 'bg-dark/10'}`} />
           </div>
 
-          {/* DNS record table */}
-          <div className="p-4 bg-dark/5 rounded-2xl border border-dashed border-dark/20 font-mono text-sm grid grid-cols-3 gap-4">
-            <div>
-              <p className="text-dark/40 text-xs mb-1">{t("dnsType")}</p>
-              <p className="font-bold">CNAME</p>
-            </div>
-            <div>
-              <p className="text-dark/40 text-xs mb-1">{t("dnsName")}</p>
-              <p className="font-bold truncate">
-                {dnsModalDomain ? dnsModalDomain.split(".").slice(0, -2).join(".") || dnsModalDomain : "—"}
-              </p>
-            </div>
-            <div>
-              <p className="text-dark/40 text-xs mb-1">{t("dnsValue")}</p>
-              <div className="flex items-center gap-1">
-                <p className="font-bold">{CNAME_TARGET}</p>
-                <button
-                  onClick={() => handleCopy(CNAME_TARGET)}
-                  className="text-dark/40 hover:text-dark transition-colors"
-                >
-                  {copied ? <TbCheck size={14} className="text-primary" /> : <TbCopy size={14} />}
-                </button>
-              </div>
-            </div>
-          </div>
+          <AnimatePresence mode="wait">
+            {modalStep === 1 ? (
+              /* ── Step 1: Enter domain ── */
+              <motion.div
+                key="step1"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.25, ease: "easeInOut" }}
+                className="space-y-4"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-3 bg-info/10 rounded-2xl">
+                    <TbWorld size={26} className="text-info" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-black italic">{t("modalStep1Title")}</h2>
+                    <p className="text-sm text-dark/50">{t("modalStep1Desc")}</p>
+                  </div>
+                </div>
 
-          <p className="text-xs text-dark/50">{t("dnsModalNote")}</p>
+                <p className="text-sm text-dark/60">{t("subdomainNote")}</p>
 
-          <div className="flex justify-end">
-            <Button
-              variant="solid"
-              size="md"
-              rounded="2xl"
-              onClick={() => setDnsModalDomain(null)}
-              className="bg-info text-light border border-dark hover:shadow-[4px_4px_0_var(--color-dark)]"
-            >
-              {t("dnsModalClose")}
-            </Button>
-          </div>
+                <input
+                  type="text"
+                  autoFocus
+                  value={newDomain}
+                  onChange={(e) => setNewDomain(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && newDomain.trim() && setModalStep(2)}
+                  placeholder={t("placeholder")}
+                  className="w-full p-3 bg-dark/5 rounded-xl border-2 border-dashed border-transparent focus:border-info outline-none transition-colors font-mono text-sm"
+                />
+
+                <div className="flex justify-between items-center pt-1">
+                  <Button variant="ghost" size="sm" rounded="xl" onClick={closeModal} className="text-dark/50">
+                    {t("dnsModalClose")}
+                  </Button>
+                  <Button
+                    variant="solid"
+                    size="sm"
+                    rounded="xl"
+                    rightIcon={<TbArrowRight size={16} />}
+                    disabled={!newDomain.trim()}
+                    onClick={() => setModalStep(2)}
+                    className="bg-info text-dark border border-dark disabled:opacity-40 hover:shadow-[3px_3px_0_var(--color-dark)]"
+                  >
+                    {t("modalNext")}
+                  </Button>
+                </div>
+              </motion.div>
+            ) : (
+              /* ── Step 2: DNS instructions ── */
+              <motion.div
+                key="step2"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.25, ease: "easeInOut" }}
+                className="space-y-4"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-3 bg-info/10 rounded-2xl">
+                    <TbNetwork size={26} className="text-info" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-black italic">{t("dnsModalTitle")}</h2>
+                    <p className="text-sm text-dark/50 font-mono">{newDomain}</p>
+                  </div>
+                </div>
+
+                <p className="text-sm text-dark/60">
+                  {t("dnsModalDesc", { domain: newDomain })}
+                </p>
+
+                {/* DNS record table */}
+                <div className="p-4 bg-dark/5 rounded-2xl border border-dashed border-dark/20 font-mono text-sm grid grid-cols-3 gap-4">
+                  <div>
+                    <p className="text-dark/40 text-xs mb-1">{t("dnsType")}</p>
+                    <p className="font-bold">CNAME</p>
+                  </div>
+                  <div>
+                    <p className="text-dark/40 text-xs mb-1">{t("dnsName")}</p>
+                    <p className="font-bold truncate">{dnsNameLabel}</p>
+                  </div>
+                  <div>
+                    <p className="text-dark/40 text-xs mb-1">{t("dnsValue")}</p>
+                    <div className="flex items-center gap-1">
+                      <p className="font-bold">{CNAME_TARGET}</p>
+                      <button
+                        onClick={() => handleCopy(CNAME_TARGET)}
+                        className="text-dark/40 hover:text-dark transition-colors"
+                      >
+                        {copied ? <TbCheck size={14} className="text-primary" /> : <TbCopy size={14} />}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <p className="text-xs text-dark/50">{t("dnsModalNote")}</p>
+
+                <div className="flex justify-between items-center pt-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    rounded="xl"
+                    leftIcon={<TbArrowLeft size={16} />}
+                    onClick={() => setModalStep(1)}
+                    className="text-dark/50"
+                  >
+                    {t("modalBack")}
+                  </Button>
+                  <Button
+                    variant="solid"
+                    size="sm"
+                    rounded="xl"
+                    leftIcon={adding ? <TbLoader2 size={16} className="animate-spin" /> : <TbPlus size={16} />}
+                    disabled={adding}
+                    onClick={handleAdd}
+                    className="bg-info text-dark border border-dark hover:shadow-[3px_3px_0_var(--color-dark)] disabled:opacity-60"
+                  >
+                    {t("modalAdd")}
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </Modal>
     </div>

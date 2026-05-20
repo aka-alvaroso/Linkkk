@@ -644,6 +644,11 @@
     "empty": "No custom domains yet",
     "emptyDescription": "Add your first custom domain to use it on your short links.",
     "emptyAction": "Add Domain",
+    "modalStep1Title": "Add a custom domain",
+    "modalStep1Desc": "Use your own domain for short links instead of linkkk.dev",
+    "modalNext": "Next",
+    "modalBack": "Back",
+    "modalAdd": "Add domain",
     "dnsModalTitle": "Almost there! Configure your DNS",
     "dnsModalDesc": "To activate {domain}, add the following CNAME record in your DNS provider:",
     "dnsModalNote": "DNS changes can take up to 48 hours to propagate. Once done, hit Verify DNS.",
@@ -662,7 +667,11 @@
     "toastAddFailed": "Failed to add domain",
     "toastRemoveFailed": "Failed to remove domain",
     "proOnly": "Custom domains are a PRO feature.",
-    "upgradePrompt": "Upgrade to PRO to use your own domain."
+    "upgradePrompt": "Upgrade to PRO to use your own domain.",
+    "myDomains": "My domains",
+    "proGateTitle": "Custom Domains",
+    "proGateDesc": "Use your own domain for short links instead of linkkk.dev",
+    "proGateUpgrade": "Upgrade to PRO"
   },
   "NotFound": {
     "title": "Page Not Found",
