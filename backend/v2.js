@@ -202,8 +202,29 @@ app.use(csrfTokenGenerator);
 // Endpoint to get CSRF token (for SPAs)
 app.get("/csrf-token", getCsrfToken);
 
-app.get("/status", (req, res) => {
-  res.send("Server running");
+app.get("/status", async (req, res) => {
+  const startTime = Date.now();
+  let dbStatus = "ok";
+  let dbLatency = null;
+
+  try {
+    const prisma = require("./v2/prisma/client");
+    const dbStart = Date.now();
+    await prisma.$queryRaw`SELECT 1`;
+    dbLatency = Date.now() - dbStart;
+  } catch {
+    dbStatus = "error";
+  }
+
+  res.json({
+    status: dbStatus === "ok" ? "ok" : "degraded",
+    uptime: Math.floor(process.uptime()),
+    timestamp: new Date().toISOString(),
+    services: {
+      api: { status: "ok" },
+      database: { status: dbStatus, latency: dbLatency },
+    },
+  });
 });
 
 // API routes (must be before redirect catch-all)

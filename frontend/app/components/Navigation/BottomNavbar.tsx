@@ -4,7 +4,6 @@ import { usePathname } from "next/navigation";
 import { TbHome, TbLayoutGrid, TbUser, TbPlus, TbSettings, TbSparkles, TbBook } from "react-icons/tb";
 import * as motion from "motion/react-client";
 import CreateLinkDrawer from "../Drawer/CreateLinkDrawer";
-import SelectPlanModal from "../Modal/SelectPlanModal";
 import { useAuth } from "@/app/hooks";
 import { useTranslations } from 'next-intl';
 
@@ -13,7 +12,6 @@ export default function BottomNavbar() {
   const { isAuthenticated, user } = useAuth();
   const isLandingPage = pathname === "/";
   const [createLinkDrawer, setCreateLinkDrawer] = useState(false);
-  const [showSelectPlanModal, setShowSelectPlanModal] = useState(false);
   const t = useTranslations('Navigation');
 
   const navigationItems = isAuthenticated
@@ -94,11 +92,6 @@ export default function BottomNavbar() {
         onClose={() => setCreateLinkDrawer(false)}
       />
 
-      {/* Select Plan Modal */}
-      <SelectPlanModal
-        open={showSelectPlanModal}
-        onClose={() => setShowSelectPlanModal(false)}
-      />
     </>
   );
 }

@@ -24,7 +24,6 @@ import { subscriptionService } from "@/app/services/api/subscriptionService";
 import { userService } from "@/app/services/api/userService";
 import { useTranslations } from 'next-intl';
 import CancelSubscriptionModal from "@/app/components/Modal/CancelSubscriptionModal";
-import SelectPlanModal from "@/app/components/Modal/SelectPlanModal";
 import { HttpError } from "@/app/utils/errors";
 import LanguageSwitcher from "@/app/components/ui/LanguageSwitcher/LanguageSwitcher";
 import CustomDomains from "@/app/components/CustomDomains/CustomDomains";
@@ -78,8 +77,6 @@ export default function SettingsPage() {
   // Cancel subscription modal
   const [showCancelModal, setShowCancelModal] = useState(false);
 
-  // Select plan modal
-  const [showSelectPlanModal, setShowSelectPlanModal] = useState(false);
 
   // Subscription state
   const [subscriptionInfo, setSubscriptionInfo] = useState<Subscription | null>(null);
@@ -245,7 +242,7 @@ export default function SettingsPage() {
   };
 
   const handleUpgradeToPro = () => {
-    setShowSelectPlanModal(true);
+    window.location.href = "/pricing";
   };
 
   const handleManageSubscription = async () => {
@@ -604,11 +601,6 @@ export default function SettingsPage() {
         loading={loading}
       />
 
-      {/* Select Plan Modal */}
-      <SelectPlanModal
-        open={showSelectPlanModal}
-        onClose={() => setShowSelectPlanModal(false)}
-      />
     </RouteGuard>
   );
 }

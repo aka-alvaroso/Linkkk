@@ -21,7 +21,6 @@ import * as motion from "motion/react-client";
 import { AnimatePresence } from "motion/react";
 import Button from "@/app/components/ui/Button/Button";
 import Modal from "@/app/components/ui/Modal/Modal";
-import SelectPlanModal from "@/app/components/Modal/SelectPlanModal";
 import { domainService, type CustomDomain } from "@/app/services/api/domainService";
 import { HttpError } from "@/app/utils/errors";
 import { useToast } from "@/app/hooks/useToast";
@@ -57,7 +56,6 @@ export default function CustomDomains() {
   const [adding, setAdding] = useState(false);
 
   // PRO gate modal
-  const [showProModal, setShowProModal] = useState(false);
 
   const STATUS_CONFIG = {
     PENDING: { label: t("statusPending"), color: "bg-dark/10 text-dark", icon: TbLoader2, spin: false },
@@ -183,17 +181,9 @@ export default function CustomDomains() {
     </div>
   );
 
-  // Non-PRO gate: same empty state but opens PRO modal
+  // Non-PRO gate: redirect to pricing page
   if (!isPro) {
-    return (
-      <>
-        <EmptyState onAction={() => setShowProModal(true)} />
-        <SelectPlanModal
-          open={showProModal}
-          onClose={() => setShowProModal(false)}
-        />
-      </>
-    );
+    return <EmptyState onAction={() => { window.location.href = "/pricing"; }} />;
   }
 
   return (
