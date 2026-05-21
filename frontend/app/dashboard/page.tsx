@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { TbFilterPlus, TbPlus, TbArrowLeft, TbTag, TbFolder, TbLayoutGrid, TbChevronDown } from "react-icons/tb";
 import Dropdown from "@/app/components/ui/Dropdown/Dropdown";
 import Link from "next/link";
@@ -19,7 +19,6 @@ import SubscriptionSuccessModal from "@/app/components/Modal/SubscriptionSuccess
 import Alert from "@/app/components/ui/Alert/Alert";
 import * as motion from 'motion/react-client';
 import { useMotionValue, animate, AnimatePresence } from 'motion/react';
-import AnimatedText, { AnimatedTextRef } from "@/app/components/ui/AnimatedText";
 import { useTranslations } from 'next-intl';
 
 import { API_CONFIG } from "@/app/config/api";
@@ -27,35 +26,19 @@ import { API_CONFIG } from "@/app/config/api";
 const API_BASE_URL = API_CONFIG.BASE_URL;
 function AnimatedCounter({ value, delay = 0 }: { value: number; delay?: number }) {
   const count = useMotionValue(0);
-  const textRef = useRef<AnimatedTextRef>(null);
-  const [currentValue, setCurrentValue] = useState(0);
+  const [display, setDisplay] = useState(0);
 
   useEffect(() => {
     const controls = animate(count, value, {
-      duration: 0.1,
+      duration: 1.2,
       delay,
-      ease: "easeOut",
-      onUpdate: (latest) => {
-        const newValue = Math.round(latest);
-        if (newValue !== currentValue) {
-          setCurrentValue(newValue);
-          textRef.current?.setText(newValue.toString());
-        }
-      }
+      ease: [0.33, 1, 0.68, 1],
+      onUpdate: (latest) => setDisplay(Math.round(latest)),
     });
-
     return controls.stop;
-  }, [count, value, delay, currentValue]);
+  }, [value]);
 
-  return (
-    <AnimatedText
-      ref={textRef}
-      initialText={currentValue.toString()}
-      animationType="slide"
-      slideDirection="up"
-      triggerMode="none"
-    />
-  );
+  return <span>{display}</span>;
 }
 
 export default function Dashboard() {
