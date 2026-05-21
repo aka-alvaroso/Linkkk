@@ -7,6 +7,7 @@ const planLimits = {
     groups: 0,
     tags: 0,
     tagsPerLink: 0,
+    customDomains: 0,
     linkAnalytics: {
       linkCharts: false,
       linkAccesses: 0,
@@ -21,6 +22,7 @@ const planLimits = {
     groups: 5,
     tags: 20,
     tagsPerLink: 5,
+    customDomains: 0,
     linkAnalytics: {
       linkCharts: true,
       linkAccesses: null,
@@ -35,6 +37,7 @@ const planLimits = {
     groups: null,
     tags: null,
     tagsPerLink: null,
+    customDomains: 1,
     linkAnalytics: {
       linkCharts: true,
       linkAccesses: null,

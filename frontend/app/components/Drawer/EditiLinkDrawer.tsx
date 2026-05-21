@@ -4,6 +4,7 @@ import { FiCornerDownRight } from 'react-icons/fi';
 import { TbCircleDashed, TbCircleDashedCheck, TbCopy, TbList, TbPalette, TbCategory, TbPuzzle, TbQrcode, TbPencil, TbClick, TbWorld, TbShieldX, TbRobot, TbTag, TbFolder } from 'react-icons/tb';
 import Button from '../ui/Button/Button';
 import { useLinks, useAuth, useTags, useGroups } from '@/app/hooks';
+import { domainService, CustomDomain } from '@/app/services/api/domainService';
 import SelectDropdown from '@/app/components/ui/Select/SelectDropdown';
 import { PLAN_LIMITS } from '@/app/constants/limits';
 import type { Link } from '@/app/types';
@@ -87,6 +88,9 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
     const [selectedGroupId, setSelectedGroupId] = useState<number | null>(link.group?.id ?? null);
     const organizeLimit = user?.role === 'PRO' ? PLAN_LIMITS.pro : PLAN_LIMITS.user;
 
+    // Custom domain state
+    const [activeDomains, setActiveDomains] = useState<CustomDomain[]>([]);
+
     // QR state
     const [isDownloadingQR, setIsDownloadingQR] = useState(false);
     const [hasQRChanges, setHasQRChanges] = useState(false);
@@ -95,7 +99,9 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
     const cancelQRRef = useRef<(() => void) | null>(null);
     const tQR = useTranslations('QRCodeEditor');
     const { config: qrConfig, fetchConfig: fetchQRConfig } = useQRConfig(link.shortUrl);
-    const qrUrl = `https://linkkk.dev/r/${link.shortUrl}?src=qr`;
+    const qrUrl = link.customDomain
+        ? `https://${link.customDomain.domain}/${link.shortUrl}?src=qr`
+        : `https://linkkk.dev/r/${link.shortUrl}?src=qr`;
 
     useEffect(() => {
         setNewLink({ ...link });
@@ -104,6 +110,11 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
         setSuffixError('');
         setSelectedTagIds((link.tags ?? []).map(t => t.id));
         setSelectedGroupId(link.group?.id ?? null);
+        // Sync the animated short URL text with the actual link data
+        const urlText = link.customDomain
+            ? `${link.customDomain.domain}/${link.shortUrl}`
+            : `linkkk.dev/r/${link.shortUrl}`;
+        shortUrlTextRef.current?.setText(urlText);
     }, [link]);
 
     useEffect(() => {
@@ -111,8 +122,13 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
             fetchQRConfig();
             fetchTags();
             fetchGroups();
+            if (user?.role === 'PRO') {
+                domainService.getAll().then(domains => {
+                    setActiveDomains(domains.filter(d => d.status === 'ACTIVE'));
+                }).catch(() => {});
+            }
         }
-    }, [open, isGuest, fetchQRConfig, fetchTags, fetchGroups]);
+    }, [open, isGuest, user?.role, fetchQRConfig, fetchTags, fetchGroups]);
 
 
 
@@ -181,6 +197,9 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                 longUrl: newLink.longUrl,
                 status: newLink.status,
                 ...(newLink.shortUrl !== link.shortUrl && { newShortUrl: newLink.shortUrl }),
+                ...((newLink.customDomain?.id ?? null) !== (link.customDomain?.id ?? null) && {
+                    customDomainId: newLink.customDomain?.id ?? null,
+                }),
             });
 
             if (!response.success) {
@@ -225,7 +244,8 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                 const hasChanges =
                     link.status !== newLink.status ||
                     link.longUrl !== newLink.longUrl ||
-                    link.shortUrl !== newLink.shortUrl;
+                    link.shortUrl !== newLink.shortUrl ||
+                    (link.customDomain?.id ?? null) !== (newLink.customDomain?.id ?? null);
                 if (hasChanges) {
                     e.preventDefault();
                     setShowStatusBar("loading");
@@ -249,7 +269,8 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
         const hasLinkChanges =
             link.status !== newLink.status ||
             link.longUrl !== newLink.longUrl ||
-            link.shortUrl !== newLink.shortUrl;
+            link.shortUrl !== newLink.shortUrl ||
+            (link.customDomain?.id ?? null) !== (newLink.customDomain?.id ?? null);
 
         const hasChanges = hasLinkChanges || hasRulesChanges || hasQRChanges;
 
@@ -319,7 +340,9 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                 {editingShortUrl ? (
                                     <div className='flex flex-col gap-1'>
                                         <div className='flex items-center gap-1'>
-                                            <span className='text-xl md:text-2xl italic font-black text-dark/40 whitespace-nowrap'>linkkk.dev/r/</span>
+                                            <span className='text-xl md:text-2xl italic font-black text-dark/40 whitespace-nowrap'>
+                                                {newLink.customDomain ? newLink.customDomain.domain : 'linkkk.dev/r'}/
+                                            </span>
                                             <input
                                                 autoFocus
                                                 value={newLink.shortUrl}
@@ -352,7 +375,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                         >
                                             <AnimatedText
                                                 ref={shortUrlTextRef}
-                                                initialText={`linkkk.dev/r/${newLink.shortUrl}`}
+                                                initialText={newLink.customDomain ? `${newLink.customDomain.domain}/${newLink.shortUrl}` : `linkkk.dev/r/${newLink.shortUrl}`}
                                                 animationType="slide"
                                                 triggerMode="none"
                                             />
@@ -368,7 +391,8 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                                 className='text-dark/30 hover:text-dark/70'
                                                 onMouseDown={(e) => {
                                                     e.preventDefault();
-                                                    navigator.clipboard.writeText(`https://linkkk.dev/r/${newLink.shortUrl}`);
+                                                    const domain = newLink.customDomain?.domain ?? 'linkkk.dev';
+                                                    navigator.clipboard.writeText(`https://${domain}/r/${newLink.shortUrl}`);
                                                     shortUrlTextRef.current?.setText(t('copied'));
                                                     setTimeout(() => shortUrlTextRef.current?.reset(), 2000);
                                                 }}
@@ -541,6 +565,30 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                                     placeholder={t('organizeNoGroup')}
                                                     showNoneOption
                                                     noneLabel={t('organizeNoGroup')}
+                                                />
+                                            </motion.div>
+                                        )}
+
+                                        {/* Custom domain dropdown (PRO only) */}
+                                        {!isGuest && user?.role === 'PRO' && activeDomains.length > 0 && (
+                                            <motion.div
+                                                initial={{ opacity: 0, x: 20 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                transition={{ delay: 0.25, duration: 0.4, ease: "backInOut" }}
+                                                className='flex flex-col gap-1'
+                                            >
+                                                <span className='text-xs font-semibold text-dark/40 flex items-center gap-1'><TbWorld size={12} /> {t('customDomain')}</span>
+                                                <SelectDropdown
+                                                    mode="single"
+                                                    options={activeDomains.map(d => ({ label: d.domain, value: d.id }))}
+                                                    value={newLink.customDomain?.id ?? null}
+                                                    onChange={(val) => {
+                                                        const domain = val ? activeDomains.find(d => d.id === val) ?? null : null;
+                                                        setNewLink(prev => ({ ...prev, customDomain: domain }));
+                                                    }}
+                                                    placeholder={t('customDomainNone')}
+                                                    showNoneOption
+                                                    noneLabel={t('customDomainNone')}
                                                 />
                                             </motion.div>
                                         )}

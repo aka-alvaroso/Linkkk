@@ -21,14 +21,18 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  webpack: (config) => {
+  webpack: (config, { isServer }) => {
     // Force a single React instance to prevent duplicate module errors
     // caused by pnpm resolving paths with different casing on Windows.
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      react: path.resolve('./node_modules/react'),
-      'react-dom': path.resolve('./node_modules/react-dom'),
-    };
+    // Only applied on the client bundle — next-devtools (server/edge) manages
+    // its own React context and breaks if we override its resolution.
+    if (!isServer) {
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        react: path.resolve('./node_modules/react'),
+        'react-dom': path.resolve('./node_modules/react-dom'),
+      };
+    }
     return config;
   },
 };

@@ -24,15 +24,16 @@ import { subscriptionService } from "@/app/services/api/subscriptionService";
 import { userService } from "@/app/services/api/userService";
 import { useTranslations } from 'next-intl';
 import CancelSubscriptionModal from "@/app/components/Modal/CancelSubscriptionModal";
-import SelectPlanModal from "@/app/components/Modal/SelectPlanModal";
 import { HttpError } from "@/app/utils/errors";
 import LanguageSwitcher from "@/app/components/ui/LanguageSwitcher/LanguageSwitcher";
+import CustomDomains from "@/app/components/CustomDomains/CustomDomains";
+import { TbWorld } from "react-icons/tb";
 
 import { API_CONFIG } from "@/app/config/api";
 
 const API_BASE_URL = API_CONFIG.BASE_URL;
 
-type SettingsTab = "account" | "security" | "danger";
+type SettingsTab = "account" | "security" | "domains" | "danger";
 
 interface SettingsTabConfig {
   id: SettingsTab;
@@ -56,6 +57,7 @@ export default function SettingsPage() {
   const settingsTabs: SettingsTabConfig[] = [
     { id: "account", label: t('tabAccount'), icon: TbUser },
     { id: "security", label: t('tabSecurity'), icon: TbLock },
+    { id: "domains", label: t('tabDomains'), icon: TbWorld },
     { id: "danger", label: t('tabDangerZone'), icon: TbAlertTriangle },
   ];
 
@@ -75,8 +77,6 @@ export default function SettingsPage() {
   // Cancel subscription modal
   const [showCancelModal, setShowCancelModal] = useState(false);
 
-  // Select plan modal
-  const [showSelectPlanModal, setShowSelectPlanModal] = useState(false);
 
   // Subscription state
   const [subscriptionInfo, setSubscriptionInfo] = useState<Subscription | null>(null);
@@ -242,7 +242,7 @@ export default function SettingsPage() {
   };
 
   const handleUpgradeToPro = () => {
-    setShowSelectPlanModal(true);
+    window.location.href = "/pricing";
   };
 
   const handleManageSubscription = async () => {
@@ -311,79 +311,67 @@ export default function SettingsPage() {
           </motion.h1>
 
           {/* Mobile Tab Selector - Above content on mobile */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1, duration: 0.4, ease: "backInOut" }}
-            className="md:hidden px-2 flex gap-2 overflow-x-auto scrollbar-hide pb-2"
-          >
-            {settingsTabs.map((tab) => {
+          <div className="md:hidden px-2 flex gap-2 overflow-x-auto scrollbar-hide pb-2">
+            {settingsTabs.map((tab, i) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
               const bgColor = "bg-dark/5";
               let activeColor = "";
 
               if (isActive) {
-                if (tab.id === "account") {
-                  activeColor = "bg-primary text-dark border border-dark shadow-[4px_4px_0_var(--color-dark)]";
-                } else if (tab.id === "security") {
-                  activeColor = "bg-secondary text-light border border-dark shadow-[4px_4px_0_var(--color-dark)]";
-                } else if (tab.id === "danger") {
-                  activeColor = "bg-danger text-light border border-dark shadow-[4px_4px_0_var(--color-dark)]";
-                }
+                if (tab.id === "account") activeColor = "bg-primary text-dark border border-dark shadow-[4px_4px_0_var(--color-dark)]";
+                else if (tab.id === "security") activeColor = "bg-secondary text-light border border-dark shadow-[4px_4px_0_var(--color-dark)]";
+                else if (tab.id === "domains") activeColor = "bg-info text-dark border border-dark shadow-[4px_4px_0_var(--color-dark)]";
+                else if (tab.id === "danger") activeColor = "bg-danger text-light border border-dark shadow-[4px_4px_0_var(--color-dark)]";
               }
 
               return (
-                <button
+                <motion.button
                   key={tab.id}
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.08 + i * 0.07, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-xl font-bold whitespace-nowrap transition-all ${isActive ? activeColor : bgColor
-                    }`}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-xl font-bold whitespace-nowrap transition-all ${isActive ? activeColor : bgColor}`}
                 >
                   <Icon size={20} />
                   <span className="text-sm">{tab.label}</span>
-                </button>
+                </motion.button>
               );
             })}
-          </motion.div>
+          </div>
 
           <div className="flex gap-6">
             {/* Desktop Sidebar */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.1, duration: 0.4, ease: "backInOut" }}
-              className="hidden md:flex flex-col gap-2 min-w-[200px]"
-            >
-              {settingsTabs.map((tab) => {
+            <div className="hidden md:flex flex-col gap-2 min-w-[200px]">
+              {settingsTabs.map((tab, i) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
                 const bgColor = "bg-dark/5 hover:bg-dark/10";
                 let activeColor = "";
 
                 if (isActive) {
-                  if (tab.id === "account") {
-                    activeColor = "bg-primary text-dark border border-dark shadow-[4px_4px_0_var(--color-dark)]";
-                  } else if (tab.id === "security") {
-                    activeColor = "bg-secondary text-light border border-dark shadow-[4px_4px_0_var(--color-dark)]";
-                  } else if (tab.id === "danger") {
-                    activeColor = "bg-danger text-light border border-dark shadow-[4px_4px_0_var(--color-dark)]";
-                  }
+                  if (tab.id === "account") activeColor = "bg-primary text-dark border border-dark shadow-[4px_4px_0_var(--color-dark)]";
+                  else if (tab.id === "security") activeColor = "bg-secondary text-light border border-dark shadow-[4px_4px_0_var(--color-dark)]";
+                  else if (tab.id === "domains") activeColor = "bg-info text-dark border border-dark shadow-[4px_4px_0_var(--color-dark)]";
+                  else if (tab.id === "danger") activeColor = "bg-danger text-light border border-dark shadow-[4px_4px_0_var(--color-dark)]";
                 }
 
                 return (
-                  <button
+                  <motion.button
                     key={tab.id}
+                    initial={{ opacity: 0, x: -16 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.08 + i * 0.07, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-2 px-4 py-3 rounded-xl font-bold transition-all ${isActive ? activeColor : bgColor
-                      }`}
+                    className={`flex items-center gap-2 px-4 py-3 rounded-xl font-bold transition-all ${isActive ? activeColor : bgColor}`}
                   >
                     <Icon size={20} />
                     <span>{tab.label}</span>
-                  </button>
+                  </motion.button>
                 );
               })}
-            </motion.div>
+            </div>
 
             {/* Content Area */}
             <motion.div
@@ -395,184 +383,87 @@ export default function SettingsPage() {
             >
               {activeTab === "account" && (
                 <div className="space-y-6">
-                  {/* Username Section */}
-                  <div className="p-4 bg-dark/5 rounded-2xl border-2 border-dashed border-transparent focus-within:border-dark transition-colors">
-                    <div className="flex items-center gap-2 mb-3">
-                      <TbUser size={20} />
-                      <h3 className="text-xl font-bold">{t('username')}</h3>
-                    </div>
-                    <input
-                      type="text"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      placeholder={t('usernamePlaceholder')}
-                      className="w-full p-3 bg-dark/5 rounded-xl border-2 border-dashed border-transparent focus:border-dark outline-none transition-colors"
-                    />
-                    <Button
-                      variant="solid"
-                      size="sm"
-                      rounded="xl"
-                      onClick={handleUpdateUsername}
-                      disabled={loading}
-                      className="mt-3 bg-dark hover:bg-primary hover:text-dark border border-dark"
-                    >
-                      {t('updateUsername')}
-                    </Button>
-                  </div>
-
-                  {/* Email Section */}
-                  <div className="p-4 bg-dark/5 rounded-2xl border-2 border-dashed border-transparent focus-within:border-dark transition-colors">
-                    <div className="flex items-center gap-2 mb-3">
-                      <TbMail size={20} />
-                      <h3 className="text-xl font-bold">{t('email')}</h3>
-                    </div>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder={t('emailPlaceholder')}
-                      className="w-full p-3 bg-dark/5 rounded-xl border-2 border-dashed border-transparent focus:border-dark outline-none transition-colors"
-                    />
-                    <Button
-                      variant="solid"
-                      size="sm"
-                      rounded="xl"
-                      onClick={handleUpdateEmail}
-                      disabled={loading}
-                      className="mt-3 bg-dark hover:bg-secondary hover:text-light border border-dark"
-                    >
-                      {t('updateEmail')}
-                    </Button>
-                  </div>
-
-                  {/* Plan Section */}
-                  <div className={`p-4 rounded-2xl border-2 ${user?.role === 'PRO' ? 'border-secondary shadow-[4px_4px_0_var(--color-secondary)]' : 'bg-dark/5 border-dashed border-transparent'}`}>
-                    <div className="flex items-center gap-2 mb-3">
-                      {user?.role === 'PRO' ? <TbSparkles size={20} /> : <TbStar size={20} />}
-                      <h3 className="text-xl font-bold">{t('plan')}</h3>
-                      <span className={`px-2 py-0.5 text-xs font-black italic rounded-full border border-dark shadow-[2px_2px_0_var(--color-dark)] ${user?.role === 'PRO' ? 'bg-secondary text-light' : 'bg-dark/10 text-dark'}`}>
-                        {user?.role === 'PRO' ? 'PRO' : 'STANDARD'}
-                      </span>
-                    </div>
-                    {user?.role === 'STANDARD' ? (
-                      <Button
-                        variant="solid"
-                        size="md"
-                        rounded="xl"
-                        leftIcon={<TbSparkles size={20} />}
-                        onClick={handleUpgradeToPro}
-                        disabled={loading}
-                        className="bg-warning hover:bg-warning/90 text-dark border border-dark hover:shadow-[4px_4px_0_var(--color-dark)] font-bold"
-                      >
-                        <p className="font-black italic">
-                          {t('upgradeToPro')}
-                        </p>
-                      </Button>
-                    ) : (
-                      <div className="space-y-4">
-                        {/* Subscription Status */}
-                        {subscriptionInfo && (
-                          <div className="space-y-3">
-                            {/* Status Badge */}
-                            <div>
-                              <p className="text-sm font-bold text-dark/70 mb-2">{t('subscriptionStatus')}</p>
-                              <span className={`inline-block px-2 py-0.5 text-xs font-black italic rounded-full border border-dark shadow-[2px_2px_0_var(--color-dark)] ${
-                                subscriptionInfo.status === 'ACTIVE' ? 'bg-primary text-dark' :
-                                subscriptionInfo.status === 'TRIALING' ? 'bg-info text-light' :
-                                subscriptionInfo.status === 'PAST_DUE' ? 'bg-warning text-dark' :
-                                subscriptionInfo.status === 'CANCELED' ? 'bg-danger text-light' :
-                                'bg-dark/10 text-dark'
-                              }`}>
-                                {subscriptionInfo.status}
-                              </span>
-                            </div>
-
-                            {/* Warning for PAST_DUE */}
-                            {subscriptionInfo.status === 'PAST_DUE' && (
-                              <p className="text-sm text-dark/70">
-                                ⚠️ {t('paymentIssue')}
-                              </p>
-                            )}
-
-                            {/* Cancellation Notice */}
-                            {subscriptionInfo.cancelAtPeriodEnd && subscriptionInfo.currentPeriodEnd && (
-                              <p className="text-sm text-dark/70">
-                                {t('cancellationNoticeBefore')}{' '}
-                                <span className="underline decoration-2 underline-offset-2">
-                                  {new Date(subscriptionInfo.currentPeriodEnd).toLocaleDateString()}
-                                </span>
-                                {t('cancellationNoticeAfter')}
-                              </p>
-                            )}
-
-                            {/* Renewal Information */}
-                            {subscriptionInfo.currentPeriodEnd && !subscriptionInfo.cancelAtPeriodEnd && subscriptionInfo.status === 'ACTIVE' && (
-                              <div>
-                                <p className="text-sm font-bold text-dark/70 mb-1">
-                                  {t('renewsOn')}
-                                </p>
-                                <p className="text-base font-bold">
-                                  {new Date(subscriptionInfo.currentPeriodEnd).toLocaleDateString()}
-                                </p>
-                                <p className="text-sm text-dark/60 mt-1">
-                                  {t('daysUntilRenewal', {
-                                    days: Math.ceil(
-                                      (new Date(subscriptionInfo.currentPeriodEnd).getTime() - Date.now()) /
-                                        (1000 * 60 * 60 * 24)
-                                    ),
-                                  })}
-                                </p>
-                              </div>
-                            )}
-                          </div>
-                        )}
-
-                        {/* Manage Subscription Button */}
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          rounded="xl"
-                          onClick={handleManageSubscription}
-                          disabled={loading}
-                          className="bg-transparent hover:bg-danger hover:text-light border border-dark"
-                        >
-                          {t('manageSubscription')}
-                        </Button>
+                  {[
+                    /* Username */
+                    <div key="username" className="p-4 bg-dark/5 rounded-2xl border-2 border-dashed border-transparent focus-within:border-dark transition-colors">
+                      <div className="flex items-center gap-2 mb-3">
+                        <TbUser size={20} />
+                        <h3 className="text-xl font-bold">{t('username')}</h3>
                       </div>
-                    )}
-                  </div>
+                      <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder={t('usernamePlaceholder')} className="w-full p-3 bg-dark/5 rounded-xl border-2 border-dashed border-transparent focus:border-dark outline-none transition-colors" />
+                      <Button variant="solid" size="sm" rounded="xl" onClick={handleUpdateUsername} disabled={loading} className="mt-3 bg-dark hover:bg-primary hover:text-dark border border-dark">{t('updateUsername')}</Button>
+                    </div>,
 
-                  {/* Language Section */}
-                  <div className="p-4 bg-dark/5 rounded-2xl">
-                    <div className="flex items-center gap-2 mb-3">
-                      <h3 className="text-xl font-bold">{t('language')}</h3>
-                    </div>
-                    <p className="text-sm text-dark/60 mb-3">
-                      {t('languageDescription')}
-                    </p>
-                    <LanguageSwitcher />
-                  </div>
+                    /* Email */
+                    <div key="email" className="p-4 bg-dark/5 rounded-2xl border-2 border-dashed border-transparent focus-within:border-dark transition-colors">
+                      <div className="flex items-center gap-2 mb-3">
+                        <TbMail size={20} />
+                        <h3 className="text-xl font-bold">{t('email')}</h3>
+                      </div>
+                      <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t('emailPlaceholder')} className="w-full p-3 bg-dark/5 rounded-xl border-2 border-dashed border-transparent focus:border-dark outline-none transition-colors" />
+                      <Button variant="solid" size="sm" rounded="xl" onClick={handleUpdateEmail} disabled={loading} className="mt-3 bg-dark hover:bg-secondary hover:text-light border border-dark">{t('updateEmail')}</Button>
+                    </div>,
 
-                  {/* Logout Button */}
-                  <div className="p-4 bg-dark/5 rounded-2xl">
-                    <div className="flex items-center gap-2 mb-3">
-                      <TbLogout size={20} />
-                      <h3 className="text-xl font-bold">{t('signOut')}</h3>
-                    </div>
-                    <p className="text-sm text-dark/60 mb-3">
-                      {t('signOutDescription')}
-                    </p>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      rounded="xl"
-                      leftIcon={<TbLogout size={20} />}
-                      onClick={handleLogout}
-                      className="mt-3 bg-dark text-light hover:bg-danger hover:text-light border border-dark"
+                    /* Plan */
+                    <div key="plan" className={`p-4 rounded-2xl border-2 ${user?.role === 'PRO' ? 'border-secondary shadow-[4px_4px_0_var(--color-secondary)]' : 'bg-dark/5 border-dashed border-transparent'}`}>
+                      <div className="flex items-center gap-2 mb-3">
+                        {user?.role === 'PRO' ? <TbSparkles size={20} /> : <TbStar size={20} />}
+                        <h3 className="text-xl font-bold">{t('plan')}</h3>
+                        <span className={`px-2 py-0.5 text-xs font-black italic rounded-full border border-dark shadow-[2px_2px_0_var(--color-dark)] ${user?.role === 'PRO' ? 'bg-secondary text-light' : 'bg-dark/10 text-dark'}`}>{user?.role === 'PRO' ? 'PRO' : 'STANDARD'}</span>
+                      </div>
+                      {user?.role === 'STANDARD' ? (
+                        <Button variant="solid" size="md" rounded="xl" leftIcon={<TbSparkles size={20} />} onClick={handleUpgradeToPro} disabled={loading} className="bg-warning hover:bg-warning/90 text-dark border border-dark hover:shadow-[4px_4px_0_var(--color-dark)] font-bold">
+                          <p className="font-black italic">{t('upgradeToPro')}</p>
+                        </Button>
+                      ) : (
+                        <div className="space-y-4">
+                          {subscriptionInfo && (
+                            <div className="space-y-3">
+                              <div>
+                                <p className="text-sm font-bold text-dark/70 mb-2">{t('subscriptionStatus')}</p>
+                                <span className={`inline-block px-2 py-0.5 text-xs font-black italic rounded-full border border-dark shadow-[2px_2px_0_var(--color-dark)] ${subscriptionInfo.status === 'ACTIVE' ? 'bg-primary text-dark' : subscriptionInfo.status === 'TRIALING' ? 'bg-info text-dark' : subscriptionInfo.status === 'PAST_DUE' ? 'bg-warning text-dark' : subscriptionInfo.status === 'CANCELED' ? 'bg-danger text-light' : 'bg-dark/10 text-dark'}`}>{subscriptionInfo.status}</span>
+                              </div>
+                              {subscriptionInfo.status === 'PAST_DUE' && <p className="text-sm text-dark/70">⚠️ {t('paymentIssue')}</p>}
+                              {subscriptionInfo.cancelAtPeriodEnd && subscriptionInfo.currentPeriodEnd && (
+                                <p className="text-sm text-dark/70">{t('cancellationNoticeBefore')}{' '}<span className="underline decoration-2 underline-offset-2">{new Date(subscriptionInfo.currentPeriodEnd).toLocaleDateString()}</span>{t('cancellationNoticeAfter')}</p>
+                              )}
+                              {subscriptionInfo.currentPeriodEnd && !subscriptionInfo.cancelAtPeriodEnd && subscriptionInfo.status === 'ACTIVE' && (
+                                <div>
+                                  <p className="text-sm font-bold text-dark/70 mb-1">{t('renewsOn')}</p>
+                                  <p className="text-base font-bold">{new Date(subscriptionInfo.currentPeriodEnd).toLocaleDateString()}</p>
+                                  <p className="text-sm text-dark/60 mt-1">{t('daysUntilRenewal', { days: Math.ceil((new Date(subscriptionInfo.currentPeriodEnd).getTime() - Date.now()) / (1000 * 60 * 60 * 24)) })}</p>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          <Button variant="outline" size="sm" rounded="xl" onClick={handleManageSubscription} disabled={loading} className="bg-transparent hover:bg-danger hover:text-light border border-dark">{t('manageSubscription')}</Button>
+                        </div>
+                      )}
+                    </div>,
+
+                    /* Language */
+                    <div key="language" className="p-4 bg-dark/5 rounded-2xl">
+                      <div className="flex items-center gap-2 mb-3"><h3 className="text-xl font-bold">{t('language')}</h3></div>
+                      <p className="text-sm text-dark/60 mb-3">{t('languageDescription')}</p>
+                      <LanguageSwitcher />
+                    </div>,
+
+                    /* Logout */
+                    <div key="logout" className="p-4 bg-dark/5 rounded-2xl">
+                      <div className="flex items-center gap-2 mb-3"><TbLogout size={20} /><h3 className="text-xl font-bold">{t('signOut')}</h3></div>
+                      <p className="text-sm text-dark/60 mb-3">{t('signOutDescription')}</p>
+                      <Button variant="outline" size="sm" rounded="xl" leftIcon={<TbLogout size={20} />} onClick={handleLogout} className="mt-3 bg-dark text-light hover:bg-danger hover:text-light border border-dark">{t('logout')}</Button>
+                    </div>,
+                  ].map((block, i) => (
+                    <motion.div
+                      key={block.key}
+                      initial={{ opacity: 0, y: 18 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.08, duration: 0.4, ease: "backOut" }}
                     >
-                      {t('logout')}
-                    </Button>
-                  </div>
+                      {block}
+                    </motion.div>
+                  ))}
                 </div>
               )}
 
@@ -637,51 +528,64 @@ export default function SettingsPage() {
                 </div>
               )}
 
+              {activeTab === "domains" && <CustomDomains />}
+
               {activeTab === "danger" && (
                 <div className="space-y-6">
-                  {/* Delete All Links */}
-                  <div className="p-4 bg-danger/5 rounded-2xl border border-danger shadow-[4px_4px_0_var(--color-danger)]">
-                    <div className="flex items-center gap-2 mb-3">
-                      <TbTrash size={20} className="text-dark" />
-                      <h3 className="text-xl font-bold text-dark">{t('deleteAllLinks')}</h3>
-                    </div>
-                    <p className="text-sm text-dark/70 mb-3">
-                      {t('deleteAllLinksDescription')}
-                    </p>
-                    <Button
-                      variant="solid"
-                      size="sm"
-                      rounded="xl"
-                      leftIcon={<TbTrash size={20} />}
-                      onClick={handleDeleteAllLinks}
-                      disabled={loading}
-                      className="mt-3 bg-danger hover:text-light border border-dark"
-                    >
-                      {t('deleteAllLinks')}
-                    </Button>
-                  </div>
+                  {[
+                    /* Delete All Links */
+                    <div key="delete-links" className="p-4 bg-danger/5 rounded-2xl border border-danger shadow-[4px_4px_0_var(--color-danger)]">
+                      <div className="flex items-center gap-2 mb-3">
+                        <TbTrash size={20} className="text-dark" />
+                        <h3 className="text-xl font-bold text-dark">{t('deleteAllLinks')}</h3>
+                      </div>
+                      <p className="text-sm text-dark/70 mb-3">
+                        {t('deleteAllLinksDescription')}
+                      </p>
+                      <Button
+                        variant="solid"
+                        size="sm"
+                        rounded="xl"
+                        leftIcon={<TbTrash size={20} />}
+                        onClick={handleDeleteAllLinks}
+                        disabled={loading}
+                        className="mt-3 bg-danger hover:text-light border border-dark"
+                      >
+                        {t('deleteAllLinks')}
+                      </Button>
+                    </div>,
 
-                  {/* Delete Account */}
-                  <div className="p-4 bg-danger/5 rounded-2xl border border-danger shadow-[4px_4px_0_var(--color-danger)]">
-                    <div className="flex items-center gap-2 mb-3">
-                      <TbAlertTriangle size={20} className="text-dark" />
-                      <h3 className="text-xl font-bold text-dark">{t('deleteAccount')}</h3>
-                    </div>
-                    <p className="text-sm text-dark/70 mb-3">
-                      {t('deleteAccountDescription')}
-                    </p>
-                    <Button
-                      variant="solid"
-                      size="sm"
-                      rounded="xl"
-                      leftIcon={<TbAlertTriangle size={20} />}
-                      onClick={handleDeleteAccount}
-                      disabled={loading}
-                      className="mt-3 bg-danger hover:text-light border border-dark"
+                    /* Delete Account */
+                    <div key="delete-account" className="p-4 bg-danger/5 rounded-2xl border border-danger shadow-[4px_4px_0_var(--color-danger)]">
+                      <div className="flex items-center gap-2 mb-3">
+                        <TbAlertTriangle size={20} className="text-dark" />
+                        <h3 className="text-xl font-bold text-dark">{t('deleteAccount')}</h3>
+                      </div>
+                      <p className="text-sm text-dark/70 mb-3">
+                        {t('deleteAccountDescription')}
+                      </p>
+                      <Button
+                        variant="solid"
+                        size="sm"
+                        rounded="xl"
+                        leftIcon={<TbAlertTriangle size={20} />}
+                        onClick={handleDeleteAccount}
+                        disabled={loading}
+                        className="mt-3 bg-danger hover:text-light border border-dark"
+                      >
+                        {t('deleteAccount')}
+                      </Button>
+                    </div>,
+                  ].map((block, i) => (
+                    <motion.div
+                      key={block.key}
+                      initial={{ opacity: 0, y: 18 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.08, duration: 0.4, ease: "backOut" }}
                     >
-                      {t('deleteAccount')}
-                    </Button>
-                  </div>
+                      {block}
+                    </motion.div>
+                  ))}
                 </div>
               )}
             </motion.div>
@@ -697,11 +601,6 @@ export default function SettingsPage() {
         loading={loading}
       />
 
-      {/* Select Plan Modal */}
-      <SelectPlanModal
-        open={showSelectPlanModal}
-        onClose={() => setShowSelectPlanModal(false)}
-      />
     </RouteGuard>
   );
 }

@@ -23,9 +23,11 @@ const userRouter = require("./v2/routers/user");
 const subscriptionRouter = require("./v2/routers/subscription");
 const tagRouter = require("./v2/routers/tag");
 const groupRouter = require("./v2/routers/group");
+const domainRouter = require("./v2/routers/domain");
 
 // Controllers
 const { redirectLink } = require("./v2/controllers/link");
+const { checkDomainForCaddy } = require("./v2/controllers/domain");
 
 const app = express();
 const PORT = config.server.port;
@@ -200,8 +202,29 @@ app.use(csrfTokenGenerator);
 // Endpoint to get CSRF token (for SPAs)
 app.get("/csrf-token", getCsrfToken);
 
-app.get("/status", (req, res) => {
-  res.send("Server running");
+app.get("/status", async (req, res) => {
+  const startTime = Date.now();
+  let dbStatus = "ok";
+  let dbLatency = null;
+
+  try {
+    const prisma = require("./v2/prisma/client");
+    const dbStart = Date.now();
+    await prisma.$queryRaw`SELECT 1`;
+    dbLatency = Date.now() - dbStart;
+  } catch {
+    dbStatus = "error";
+  }
+
+  res.json({
+    status: dbStatus === "ok" ? "ok" : "degraded",
+    uptime: Math.floor(process.uptime()),
+    timestamp: new Date().toISOString(),
+    services: {
+      api: { status: "ok" },
+      database: { status: dbStatus, latency: dbLatency },
+    },
+  });
 });
 
 // API routes (must be before redirect catch-all)
@@ -222,8 +245,27 @@ app.use("/subscription", (req, res, next) => {
   return csrfProtection(req, res, next);
 }, subscriptionRouter);
 
-// Public redirect endpoint (LAST - catches everything else)
+app.use("/domain", csrfProtection, domainRouter);
+
+// Internal endpoint for Caddy on-demand TLS — only reachable from localhost
+app.get("/internal/check-domain", (req, res, next) => {
+  const ip = req.ip || "";
+  if (ip !== "127.0.0.1" && ip !== "::1" && ip !== "::ffff:127.0.0.1") {
+    return res.sendStatus(403);
+  }
+  return next();
+}, checkDomainForCaddy);
+
+// Public redirect endpoint via linkkk.dev/r/:shortUrl
 app.get("/r/:shortUrl", redirectLink);
+
+// Custom domain redirect — catches /:shortUrl when the request comes from a
+// non-linkkk.dev host. Registered after /r/ so it never conflicts.
+app.get("/:shortUrl", (req, res, next) => {
+  const host = (req.headers["host"] || "").split(":")[0].toLowerCase();
+  if (host === "linkkk.dev" || host.endsWith(".linkkk.dev")) return next();
+  return redirectLink(req, res, next);
+});
 
 // ============================================================================
 // ERROR HANDLING MIDDLEWARE

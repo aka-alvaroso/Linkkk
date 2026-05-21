@@ -34,7 +34,6 @@ import {
   TbLock,
   TbWebhook,
   TbUser,
-  TbBrandGithub,
   TbAppWindow,
   TbInfoCircle,
   TbChevronDown,
@@ -858,9 +857,9 @@ export default function Landing() {
             <div className="flex flex-wrap justify-center gap-3 relative">
               <RulePill icon={TbWorld} label={t("RulesSection.pillCountry")} color="bg-primary text-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillCountryDesc")} />
               <RulePill icon={TbDeviceMobile} label={t("RulesSection.pillDevice")} color="bg-warning text-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillDeviceDesc")} />
-              <RulePill icon={TbDots} label={t("RulesSection.pillIP")} color="bg-info text-light border-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillIPDesc")} />
+              <RulePill icon={TbDots} label={t("RulesSection.pillIP")} color="bg-info text-dark border-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillIPDesc")} />
               <RulePill icon={TbShieldLock} label={t("RulesSection.pillVPN")} color="bg-secondary text-light border-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillVPNDesc")} />
-              <RulePill icon={TbClick} label={t("RulesSection.pillClicks")} color="bg-info text-light border-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillClicksDesc")} />
+              <RulePill icon={TbClick} label={t("RulesSection.pillClicks")} color="bg-info text-dark border-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillClicksDesc")} />
               <RulePill icon={TbCalendar} label={t("RulesSection.pillDate")} color="bg-primary text-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillDateDesc")} />
               <RulePill icon={TbRobot} label={t("RulesSection.pillBot")} color="bg-danger text-light border-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillBotDesc")} />
             </div>
@@ -873,7 +872,7 @@ export default function Landing() {
               <RulePill icon={TbArrowFork} label={t("RulesSection.pillRedirect")} color="bg-primary text-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillRedirectDesc")} />
               <RulePill icon={TbForbid2} label={t("RulesSection.pillBlock")} color="bg-danger text-light border-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillBlockDesc")} />
               <RulePill icon={TbLock} label={t("RulesSection.pillPassword")} color="bg-warning text-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillPasswordDesc")} />
-              <RulePill icon={TbWebhook} label={t("RulesSection.pillWebhook")} color="bg-info text-light border-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillWebhookDesc")} />
+              <RulePill icon={TbWebhook} label={t("RulesSection.pillWebhook")} color="bg-info text-dark border-dark" activePill={activePill} setActivePill={setActivePill} description={t("RulesSection.pillWebhookDesc")} />
             </div>
           </div>
 
@@ -970,11 +969,11 @@ export default function Landing() {
               />
             </div>
 
-            {/* Código abierto — bottom right */}
+            {/* Tu dominio — bottom right */}
             <div className="bento-cell bg-secondary/10 rounded-3xl p-2 relative overflow-hidden">
               <h3 className="font-black italic text-sm md:text-2xl text-secondary">{t("Bento.cell5Title")}</h3>
               <p className="text-xs md:text-base text-secondary mt-1">{t("Bento.cell5Subtitle")}</p>
-              <TbBrandGithub size={100} className="absolute -bottom-4 -right-6 -rotate-28 text-secondary/25" />
+              <span className="absolute -bottom-4 -right-3 text-[7rem] md:text-[9rem] font-black italic leading-none text-secondary/20 select-none">@</span>
             </div>
 
           </div>
@@ -1073,6 +1072,7 @@ export default function Landing() {
                   <li>● {t("Pricing.proFeature4")}</li>
                   <li>● {t("Pricing.proFeature5")}</li>
                   <li>● {t("Pricing.proFeature6")}</li>
+                  <li>● {t("Pricing.proFeature7")}</li>
                 </ul>
               </div>
 
@@ -1139,44 +1139,14 @@ export default function Landing() {
               question={t("FAQ.q7")}
               answer={t("FAQ.a7")}
             />
+            <FaqItem
+              question={t("FAQ.q8")}
+              answer={t("FAQ.a8")}
+            />
           </div>
         </div>
       </section>
 
-      {/* ==================== SEO CONTENT SECTION ==================== */}
-      <section className="bg-light py-16 px-6 border-t border-dark/10">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-2xl font-black italic text-dark mb-4">About Linkkk</h2>
-          <p className="text-dark/70 leading-relaxed mb-6">
-            Linkkk is a free, open-source link management platform built for creators, marketers, and developers
-            who need more than a simple URL shortener. Every short link you create can have conditional redirect
-            rules — route mobile users to your app store listing, block bots from polluting your analytics,
-            require a password before revealing the destination, or schedule a link to expire automatically.
-            The rules engine requires no coding knowledge: pick conditions, choose actions, and save.
-          </p>
-          <p className="text-dark/70 leading-relaxed mb-8">
-            All plans include real-time <Link href="/docs/analytics" className="text-primary font-bold hover:underline">click analytics</Link> with
-            country, device, browser, and referrer breakdowns, plus auto-generated{" "}
-            <Link href="/docs/qr" className="text-primary font-bold hover:underline">QR codes</Link> for every link.
-            Linkkk is self-hostable under an MIT license — read the{" "}
-            <a href="https://github.com/aka-alvaroso/Linkkk" target="_blank" rel="noopener noreferrer" className="text-primary font-bold hover:underline">source code on GitHub</a>.
-            GDPR-compliant by design: IPs are anonymized, passwords are hashed with{" "}
-            <a href="https://en.wikipedia.org/wiki/Bcrypt" target="_blank" rel="noopener noreferrer" className="text-primary font-bold hover:underline">bcrypt</a>,
-            and we never sell your data.
-          </p>
-          <div className="flex flex-wrap gap-4 text-sm">
-            <Link href="/docs/getting-started" className="text-primary font-bold hover:underline">
-              Getting started guide →
-            </Link>
-            <Link href="/docs/rules" className="text-primary font-bold hover:underline">
-              How rules work →
-            </Link>
-            <Link href="/docs/plans" className="text-primary font-bold hover:underline">
-              Compare plans →
-            </Link>
-          </div>
-        </div>
-      </section>
 
       {/* ==================== FOOTER ==================== */}
       <footer className="relative bg-dark py-16 pb-24 md:py-24 px-6 overflow-hidden">

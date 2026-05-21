@@ -22,6 +22,7 @@ model User {
   oauthId       String?
   groups        Group[]
   tags          Tag[]
+  customDomains CustomDomain[]
 
   @@unique([oauthProvider, oauthId])
 }
@@ -72,9 +73,12 @@ model Link {
   scanCount      Int          @default(0)
   createdAt      DateTime     @default(now())
 
-  user           User?        @relation(fields: [userId], references: [id])
+  customDomainId Int?
+
+  user           User?         @relation(fields: [userId], references: [id])
   guestSession   GuestSession? @relation(fields: [guestSessionId], references: [id])
-  group          Group?       @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  group          Group?        @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  customDomain   CustomDomain? @relation(fields: [customDomainId], references: [id], onDelete: SetNull)
   accesses       Access[]
   rules          LinkRule[]
   qrConfig       QRConfig?
@@ -82,6 +86,7 @@ model Link {
 
   @@index([shortUrl])
   @@index([userId, groupId])
+  @@index([customDomainId])
 }
 
 model Group {
@@ -304,4 +309,27 @@ enum DotsStyle {
 enum CornersStyle {
   square
   rounded
+}
+
+enum CustomDomainStatus {
+  PENDING
+  VERIFYING
+  ACTIVE
+  ERROR
+}
+
+model CustomDomain {
+  id         Int                @id @default(autoincrement())
+  userId     Int
+  user       User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  domain     String             @unique
+  status     CustomDomainStatus @default(PENDING)
+  errorMsg   String?
+  verifiedAt DateTime?
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+  links      Link[]
+
+  @@index([userId])
+  @@index([domain, status])
 }

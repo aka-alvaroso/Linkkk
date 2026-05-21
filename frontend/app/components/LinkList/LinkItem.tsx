@@ -40,7 +40,8 @@ export default function LinkItem({ view, data }: LinkItemProps) {
                             className='text-dark/40 hover:text-info hover:bg-info/10'
                             onClick={(e) => {
                                 e.stopPropagation();
-                                navigator.clipboard.writeText(`https://linkkk.dev/r/${data.shortUrl}`);
+                                const domain = data.customDomain ? data.customDomain.domain : 'linkkk.dev/r';
+                                navigator.clipboard.writeText(`https://${domain}/${data.shortUrl}`);
                             }}
                         />
                         <Button
@@ -80,7 +81,9 @@ export default function LinkItem({ view, data }: LinkItemProps) {
                             {/* URLs */}
                             <div className='flex flex-col w-full sm:max-w-1/2 gap-1'>
                                 <div className='flex items-center gap-2'>
-                                    <p className='text-lg italic'>linkkk.dev/r/<span className='font-bold'>{data.shortUrl}</span></p>
+                                    <p className='text-lg italic'>
+                                        {data.customDomain ? data.customDomain.domain : 'linkkk.dev/r'}/<span className='font-bold'>{data.shortUrl}</span>
+                                    </p>
                                     {/* Group badge */}
                                     {data.group && (
                                         <div className='flex items-center gap-1 text-sm px-2 py-1 rounded-full border' style={{ color: data.group.color ?? '#6b7280', backgroundColor: (data.group.color ?? '#6b7280') + '22' }}>
