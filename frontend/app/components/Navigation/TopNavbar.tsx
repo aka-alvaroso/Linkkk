@@ -3,7 +3,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import CreateLinkDrawer from "../Drawer/CreateLinkDrawer";
-import SelectPlanModal from "../Modal/SelectPlanModal";
 import { useAuth } from "@/app/hooks";
 import { useToast } from "@/app/hooks/useToast";
 import { TbPlus, TbLogin, TbUser, TbSparkles, TbBook } from "react-icons/tb";
@@ -22,7 +21,6 @@ export default function TopNavbar({ showCreate = false }: TopNavbarProps) {
   const pathname = usePathname();
   const isLandingPage = pathname === "/";
   const [createLinkDrawer, setCreateLinkDrawer] = useState(false);
-  const [showSelectPlanModal, setShowSelectPlanModal] = useState(false);
   const toast = useToast();
   const t = useTranslations('Navigation');
 
@@ -99,7 +97,7 @@ export default function TopNavbar({ showCreate = false }: TopNavbarProps) {
               leftIcon={<TbSparkles size={20} />}
               expandOnHover="text"
               className="bg-primary text-dark hover:bg-info hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)] leading-5"
-              onClick={() => setShowSelectPlanModal(true)}
+              onClick={() => window.location.href = "/pricing"}
             >
               <p className="font-black italic">{t('upgradeToPro')}</p>
             </Button>
@@ -148,11 +146,6 @@ export default function TopNavbar({ showCreate = false }: TopNavbarProps) {
         onClose={() => setCreateLinkDrawer(false)}
       />
 
-      {/* Select Plan Modal */}
-      <SelectPlanModal
-        open={showSelectPlanModal}
-        onClose={() => setShowSelectPlanModal(false)}
-      />
     </>
   );
 }
