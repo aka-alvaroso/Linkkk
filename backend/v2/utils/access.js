@@ -73,8 +73,7 @@ const defineIsVPN = async (ip) => {
     const isVpn =
       data.risk.is_vpn ||
       data.risk.is_tor ||
-      data.risk.is_proxy ||
-      data.risk.is_datacenter;
+      data.risk.is_proxy;
 
     // Cache the result
     ipCache.set(cacheKey, isVpn);
