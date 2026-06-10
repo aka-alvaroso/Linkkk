@@ -1,4 +1,4 @@
-import { RuleCondition, ActionType, ActionSettings, RedirectSettings } from '@/app/types/linkRules';
+import { RuleCondition, ActionType, ActionSettings, RedirectSettings, NotifySettings } from '@/app/types/linkRules';
 
 /**
  * Returns a human-readable summary of a single condition
@@ -48,8 +48,13 @@ export const getActionSummary = (actionType: ActionType, settings: ActionSetting
       return 'Block access';
     case 'password_gate':
       return 'Password gate';
-    case 'notify':
-      return 'Notify';
+    case 'notify': {
+      const ns = settings as NotifySettings;
+      const parts: string[] = [];
+      if (ns.sendEmail) parts.push('email');
+      if (ns.webhookUrl) parts.push('webhook');
+      return parts.length > 0 ? `Notify via ${parts.join(' + ')}` : 'Notify';
+    }
     default:
       return actionType;
   }

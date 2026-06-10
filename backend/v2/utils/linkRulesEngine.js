@@ -363,6 +363,7 @@ const evaluateAction = async (action, link) => {
         type: "notify",
         webhookUrl: settings?.webhookUrl,
         message: settings?.message,
+        sendEmail: settings?.sendEmail === true,
       };
 
     default:

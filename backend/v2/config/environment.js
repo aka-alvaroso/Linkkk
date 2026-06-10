@@ -60,8 +60,10 @@ const config = {
       ? [
           "http://localhost:3000",
           "http://localhost:3001",
+          "http://localhost:3099",
           "http://127.0.0.1:3000",
           "http://127.0.0.1:3001",
+          "http://127.0.0.1:3099",
         ]
       : [process.env.FRONTEND_URL],
   },
@@ -115,6 +117,12 @@ const config = {
     apiSecret: process.env.CLOUDINARY_API_SECRET,
     cloudName: process.env.CLOUDINARY_CLOUD_NAME,
     url: process.env.CLOUDINARY_URL
+  },
+
+  // Resend (email notifications)
+  resend: {
+    apiKey: process.env.RESEND_API_KEY || null,
+    fromEmail: process.env.RESEND_FROM_EMAIL || "notifications@linkkk.dev",
   }
 };
 
@@ -195,6 +203,10 @@ if (!isTest) {
       config.cloudinary.url ? "✓ Set" : "✗ Missing"
     }`
   );
+  console.log(
+    `   Resend API Key: ${config.resend.apiKey ? "✓ Set" : "✗ Missing (email notifications disabled)"}`
+  );
+  console.log(`   Resend From: ${config.resend.fromEmail}`);
 }
 
 module.exports = config;

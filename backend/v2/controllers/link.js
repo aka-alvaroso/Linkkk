@@ -11,6 +11,8 @@ const config = require("../config/environment");
 const { defineCountry, defineIsVPN } = require("../utils/access");
 const { evaluateLinkRules, detectDevice } = require("../utils/linkRulesEngine");
 const { comparePassword } = require("../utils/password");
+const { sanitizeQueryParams } = require("../utils/queryParamsSanitizer");
+const { sendRuleNotificationEmail } = require("../services/emailService");
 
 // 1. Create link
 const createLink = async (req, res) => {
@@ -439,7 +441,8 @@ const redirectLink = async (req, res) => {
     // Resolve owner from custom domain if request comes from one
     let customDomainUserId = null;
     const host = (req.headers["host"] || "").split(":")[0].toLowerCase();
-    if (host && host !== "linkkk.dev" && !host.endsWith(".linkkk.dev")) {
+    const isLocalHost = host === "localhost" || host === "127.0.0.1";
+    if (host && !isLocalHost && host !== "linkkk.dev" && !host.endsWith(".linkkk.dev")) {
       const customDomain = await prisma.customDomain.findFirst({
         where: { domain: host, status: "ACTIVE" },
       });
@@ -464,6 +467,8 @@ const redirectLink = async (req, res) => {
           orderBy: { priority: "asc" },
         },
         customDomain: true,
+        // Only select email — nothing else is needed for notifications
+        user: { select: { email: true } },
       },
     });
 
@@ -488,6 +493,16 @@ const redirectLink = async (req, res) => {
     const device = detectDevice(userAgent);
     const isBot = isbot(userAgent);
 
+    // Sanitize query params before including in context.
+    // 'src' is reserved and filtered out by the sanitizer automatically.
+    const { params: queryParams, droppedCount } = sanitizeQueryParams(req.query);
+    if (droppedCount > 0) {
+      logger.warn("[SECURITY] Query params dropped during sanitization", {
+        shortUrl,
+        droppedCount,
+      });
+    }
+
     const context = {
       country,
       device,
@@ -496,6 +511,7 @@ const redirectLink = async (req, res) => {
       isBot,
       currentDate: new Date(),
       accessCount: link.accessCount,
+      queryParams,
     };
 
     // Evaluate link rules with timeout protection
@@ -609,6 +625,12 @@ const redirectLink = async (req, res) => {
                 isBot,
                 isVPN: isVpn,
                 accessCount: link.accessCount,
+                // Query params captured from the access URL.
+                // Values are sanitized: control chars stripped, template
+                // injection blocked, limited to 10 params / 500 chars each.
+                // Callers rendering these in HTML must apply HTML-escaping
+                // (use escapeParamsForHtml from queryParamsSanitizer).
+                queryParams: Object.keys(queryParams).length > 0 ? queryParams : undefined,
               },
               customMessage: action.message || null,
             };
@@ -631,6 +653,35 @@ const redirectLink = async (req, res) => {
               });
             });
           }
+        }
+
+        // Send email notification to link owner (non-blocking)
+        if (action.sendEmail && link.user?.email) {
+          // Find the matched rule id so the throttle can track it per-rule.
+          // evaluateLinkRules returns the action but not the rule id, so we
+          // locate the first enabled notify rule to use as the throttle key.
+          const notifyRule = link.rules.find(
+            (r) => r.enabled && (r.actionType === "notify" || r.elseActionType === "notify")
+          );
+          sendRuleNotificationEmail({
+            ruleId: notifyRule?.id ?? link.id,
+            toEmail: link.user.email,
+            shortUrl: link.shortUrl,
+            longUrl: link.longUrl,
+            country,
+            device,
+            ip,
+            isBot,
+            isVPN: isVpn,
+            accessCount: link.accessCount + 1,
+            queryParams,
+            message: action.message || undefined,
+          }).catch((err) => {
+            logger.warn("[EMAIL] Unexpected error sending rule notification", {
+              shortUrl: link.shortUrl,
+              error: err.message,
+            });
+          });
         }
 
         // Continue with normal redirect (notify is non-blocking)

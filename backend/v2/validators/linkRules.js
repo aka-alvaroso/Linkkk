@@ -187,6 +187,9 @@ const notifySettingsSchema = z.object({
     .max(1000)
     .transform((text) => validator.escape(text)) // SECURITY: Sanitize to prevent XSS
     .optional(),
+  // Send an email notification to the link owner when this rule triggers.
+  // Only works for authenticated users (guests have no account email).
+  sendEmail: z.boolean().optional(),
 });
 
 // Password gate action settings

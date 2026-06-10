@@ -526,7 +526,9 @@
     "passwordPlaceholder": "Password",
     "hintPlaceholder": "Hint (optional)",
     "webhookPlaceholder": "Webhook URL (optional)",
-    "messagePlaceholder": "Message (optional)"
+    "messagePlaceholder": "Message (optional)",
+    "sendEmailLabel": "Email owner",
+    "sendEmailTooltip": "Send an email to your account address when this rule triggers"
   },
   "AccessesList": {
     "loadingAccesses": "Loading accesses...",
@@ -699,6 +701,12 @@
     "reason": "Reason:",
     "goToHome": "Go to Home",
     "errorContactOwner": "If you believe this is an error, please contact the link owner.",
+    "poweredBy": "Powered by"
+  },
+  "Page429": {
+    "title": "Too Many Requests",
+    "description": "You've made too many requests in a short time. Please wait a moment before trying again.",
+    "goToHome": "Go to Home",
     "poweredBy": "Powered by"
   },
   "PageDisabled": {

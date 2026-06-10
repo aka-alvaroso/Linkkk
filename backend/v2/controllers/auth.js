@@ -358,8 +358,13 @@ const googleCallback = async (req, res) => {
     const { code, state } = req.query;
     const storedState = req.cookies.oauth_state;
 
-    // Verify state parameter (CSRF protection)
-    if (!state || !storedState || state !== storedState) {
+    // Verify state parameter (CSRF protection) — constant-time comparison
+    const stateValid =
+      state &&
+      storedState &&
+      state.length === storedState.length &&
+      crypto.timingSafeEqual(Buffer.from(state), Buffer.from(storedState));
+    if (!stateValid) {
       logger.warn("OAuth state mismatch", {
         type: "OAUTH",
         receivedState: state,
@@ -577,8 +582,13 @@ const githubCallback = async (req, res) => {
     const { code, state } = req.query;
     const storedState = req.cookies.oauth_state;
 
-    // Verify state parameter (CSRF protection)
-    if (!state || !storedState || state !== storedState) {
+    // Verify state parameter (CSRF protection) — constant-time comparison
+    const stateValid =
+      state &&
+      storedState &&
+      state.length === storedState.length &&
+      crypto.timingSafeEqual(Buffer.from(state), Buffer.from(storedState));
+    if (!stateValid) {
       logger.warn("OAuth state mismatch", {
         type: "OAUTH",
         receivedState: state,

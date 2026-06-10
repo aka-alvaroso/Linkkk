@@ -527,7 +527,9 @@
     "passwordPlaceholder": "Contraseña",
     "hintPlaceholder": "Pista (opcional)",
     "webhookPlaceholder": "URL del Webhook (opcional)",
-    "messagePlaceholder": "Mensaje (opcional)"
+    "messagePlaceholder": "Mensaje (opcional)",
+    "sendEmailLabel": "Email al propietario",
+    "sendEmailTooltip": "Envía un email a tu dirección de cuenta cuando esta regla se active"
   },
   "AccessesList": {
     "loadingAccesses": "Cargando accesos...",
@@ -700,6 +702,12 @@
     "reason": "Razón:",
     "goToHome": "Ir al Inicio",
     "errorContactOwner": "Si crees que esto es un error, contacta con el dueño del link.",
+    "poweredBy": "Desarrollado por"
+  },
+  "Page429": {
+    "title": "Demasiadas Peticiones",
+    "description": "Has realizado demasiadas peticiones en poco tiempo. Espera un momento antes de intentarlo de nuevo.",
+    "goToHome": "Ir al Inicio",
     "poweredBy": "Desarrollado por"
   },
   "PageDisabled": {
