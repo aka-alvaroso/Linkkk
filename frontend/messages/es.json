@@ -527,7 +527,9 @@
     "passwordPlaceholder": "Contraseña",
     "hintPlaceholder": "Pista (opcional)",
     "webhookPlaceholder": "URL del Webhook (opcional)",
-    "messagePlaceholder": "Mensaje (opcional)"
+    "messagePlaceholder": "Mensaje (opcional)",
+    "sendEmailLabel": "Email al propietario",
+    "sendEmailTooltip": "Envía un email a tu dirección de cuenta cuando esta regla se active"
   },
   "AccessesList": {
     "loadingAccesses": "Cargando accesos...",

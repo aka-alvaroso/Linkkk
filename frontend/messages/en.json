@@ -526,7 +526,9 @@
     "passwordPlaceholder": "Password",
     "hintPlaceholder": "Hint (optional)",
     "webhookPlaceholder": "Webhook URL (optional)",
-    "messagePlaceholder": "Message (optional)"
+    "messagePlaceholder": "Message (optional)",
+    "sendEmailLabel": "Email owner",
+    "sendEmailTooltip": "Send an email to your account address when this rule triggers"
   },
   "AccessesList": {
     "loadingAccesses": "Loading accesses...",
