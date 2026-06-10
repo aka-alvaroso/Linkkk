@@ -11,6 +11,7 @@ const config = require("../config/environment");
 const { defineCountry, defineIsVPN } = require("../utils/access");
 const { evaluateLinkRules, detectDevice } = require("../utils/linkRulesEngine");
 const { comparePassword } = require("../utils/password");
+const { sanitizeQueryParams } = require("../utils/queryParamsSanitizer");
 
 // 1. Create link
 const createLink = async (req, res) => {
@@ -488,6 +489,16 @@ const redirectLink = async (req, res) => {
     const device = detectDevice(userAgent);
     const isBot = isbot(userAgent);
 
+    // Sanitize query params before including in context.
+    // 'src' is reserved and filtered out by the sanitizer automatically.
+    const { params: queryParams, droppedCount } = sanitizeQueryParams(req.query);
+    if (droppedCount > 0) {
+      logger.warn("[SECURITY] Query params dropped during sanitization", {
+        shortUrl,
+        droppedCount,
+      });
+    }
+
     const context = {
       country,
       device,
@@ -496,6 +507,7 @@ const redirectLink = async (req, res) => {
       isBot,
       currentDate: new Date(),
       accessCount: link.accessCount,
+      queryParams,
     };
 
     // Evaluate link rules with timeout protection
@@ -609,6 +621,12 @@ const redirectLink = async (req, res) => {
                 isBot,
                 isVPN: isVpn,
                 accessCount: link.accessCount,
+                // Query params captured from the access URL.
+                // Values are sanitized: control chars stripped, template
+                // injection blocked, limited to 10 params / 500 chars each.
+                // Callers rendering these in HTML must apply HTML-escaping
+                // (use escapeParamsForHtml from queryParamsSanitizer).
+                queryParams: Object.keys(queryParams).length > 0 ? queryParams : undefined,
               },
               customMessage: action.message || null,
             };
