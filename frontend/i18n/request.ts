@@ -1,9 +1,8 @@
 import { getRequestConfig } from 'next-intl/server';
+import { locales, defaultLocale } from './config';
 
-export const locales = ['es', 'en'] as const;
-export type Locale = (typeof locales)[number];
-
-export const defaultLocale: Locale = 'es';
+export { locales, defaultLocale };
+export type { Locale } from './config';
 
 export default getRequestConfig(async ({ requestLocale }) => {
   // This will be the locale from the provider or 'es' as fallback
