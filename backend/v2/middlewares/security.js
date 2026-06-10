@@ -234,6 +234,21 @@ const feedbackLimiter = rateLimit({
   handler: rateLimitHandler,
 });
 
+// Public redirect endpoint — generous limit to allow viral traffic, but
+// stops scrapers/bots from flooding the DB with fake Access records and
+// triggering rule webhooks/emails at scale.
+const redirectLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: config.env.isDevelopment ? 10000 : 120, // 2 redirects/sec per IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => req.ip,
+  handler: (req, res) => {
+    const shortUrl = req.params.shortUrl || "";
+    return res.redirect(302, `${config.frontend.url}/429?url=${shortUrl}`);
+  },
+});
+
 // Logo upload rate limiter - stricter limits for file uploads
 const logoUploadLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
@@ -267,4 +282,5 @@ module.exports = {
   updateTagLimiter,
   createGroupLimiter,
   updateGroupLimiter,
+  redirectLimiter,
 };
