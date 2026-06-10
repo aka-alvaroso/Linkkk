@@ -441,7 +441,8 @@ const redirectLink = async (req, res) => {
     // Resolve owner from custom domain if request comes from one
     let customDomainUserId = null;
     const host = (req.headers["host"] || "").split(":")[0].toLowerCase();
-    if (host && host !== "linkkk.dev" && !host.endsWith(".linkkk.dev")) {
+    const isLocalHost = host === "localhost" || host === "127.0.0.1";
+    if (host && !isLocalHost && host !== "linkkk.dev" && !host.endsWith(".linkkk.dev")) {
       const customDomain = await prisma.customDomain.findFirst({
         where: { domain: host, status: "ACTIVE" },
       });
