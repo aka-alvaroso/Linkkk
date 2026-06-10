@@ -154,7 +154,7 @@ const buildEmailHtml = ({
           <tr>
             <td align="center" style="padding-bottom:24px;">
               <a href="${esc(frontendUrl)}" style="text-decoration:none;">
-                <span style="font-size:22px;font-weight:700;color:#1a1a2e;letter-spacing:-0.5px;">linkkk</span>
+                <img src="${esc(frontendUrl)}/linkkk-logo-noBg.png" alt="linkkk" height="36" style="display:block;border:0;" />
               </a>
             </td>
           </tr>

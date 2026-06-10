@@ -673,7 +673,7 @@ const redirectLink = async (req, res) => {
             ip,
             isBot,
             isVPN: isVpn,
-            accessCount: link.accessCount,
+            accessCount: link.accessCount + 1,
             queryParams,
             message: action.message || undefined,
           }).catch((err) => {
