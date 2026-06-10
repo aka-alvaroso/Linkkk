@@ -1,0 +1,82 @@
+"use client";
+import RouteGuard from '@/app/components/RouteGuard/RouteGuard';
+import Link from 'next/link';
+import Button from '@/app/components/ui/Button/Button';
+import { TbClock, TbHome } from 'react-icons/tb';
+import * as motion from 'motion/react-client';
+import { useTranslations } from 'next-intl';
+
+export default function TooManyRequestsPage() {
+  const t = useTranslations('Page429');
+
+  return (
+    <RouteGuard type="public" title={`${t('title')} - Linkkk`}>
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.5, ease: "backOut" }}
+          className="max-w-xl w-full bg-light rounded-3xl p-8 text-center"
+        >
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2, duration: 0.5, type: "spring", bounce: 0.5 }}
+            className="w-24 h-24 mx-auto flex items-center justify-center"
+          >
+            <TbClock size={56} className="text-warning" />
+          </motion.div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.3 }}
+            className="text-4xl md:text-5xl font-black italic mb-4 text-dark"
+          >
+            {t('title')}
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.3 }}
+            className="text-dark/70 mb-6"
+          >
+            {t('description')}
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.3 }}
+          >
+            <Link href="/">
+              <Button
+                variant="solid"
+                size="lg"
+                rounded="2xl"
+                leftIcon={<TbHome size={22} />}
+                className="w-full bg-primary border border-dark text-dark hover:bg-primary/90 hover:shadow-[4px_4px_0_var(--color-dark)] transition-all"
+              >
+                <p className='font-black italic'>
+                  {t('goToHome')}
+                </p>
+              </Button>
+            </Link>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6, duration: 0.3 }}
+            className="mt-8 pt-6"
+          >
+            <Link href="/" className="text-sm text-dark/50">
+              {t('poweredBy')} <span className="font-black italic">Linkkk.</span>
+            </Link>
+          </motion.div>
+        </motion.div>
+      </div>
+    </RouteGuard>
+  );
+}

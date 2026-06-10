@@ -703,6 +703,12 @@
     "errorContactOwner": "If you believe this is an error, please contact the link owner.",
     "poweredBy": "Powered by"
   },
+  "Page429": {
+    "title": "Too Many Requests",
+    "description": "You've made too many requests in a short time. Please wait a moment before trying again.",
+    "goToHome": "Go to Home",
+    "poweredBy": "Powered by"
+  },
   "PageDisabled": {
     "title": "Link Disabled",
     "ownerDisabled": "This link has been temporarily disabled by its owner.",
