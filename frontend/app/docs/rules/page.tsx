@@ -103,14 +103,34 @@ export default function RulesDoc() {
         </div>
       </motion.div>
 
+      {/* Query parameters */}
+      <motion.div {...fadeUp} transition={s(5)} id="query-params">
+        <h2 className="text-xl font-black italic text-dark mb-3">{t("queryParamsTitle")}</h2>
+        <p className="text-sm text-dark/70 leading-relaxed mb-4">{t("queryParamsDesc")}</p>
+        <div className="bg-dark/5 rounded-2xl p-4 font-mono text-sm mb-4">
+          <p className="text-dark/40 text-xs mb-1">e.g.</p>
+          <p className="font-bold text-dark/70 break-all">{t("queryParamsExample")}</p>
+        </div>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="p-4 rounded-2xl border border-dark/10">
+            <p className="font-black italic text-dark mb-1">{t("queryParamsWebhookLabel")}</p>
+            <p className="text-sm text-dark/60">{t("queryParamsWebhookDesc")}</p>
+          </div>
+          <div className="p-4 rounded-2xl border border-dark/10">
+            <p className="font-black italic text-dark mb-1">{t("queryParamsEmailLabel")}</p>
+            <p className="text-sm text-dark/60">{t("queryParamsEmailDesc")}</p>
+          </div>
+        </div>
+      </motion.div>
+
       {/* Priority */}
-      <motion.div {...fadeUp} transition={s(5)}>
+      <motion.div {...fadeUp} transition={s(6)}>
         <h2 className="text-xl font-black italic text-dark mb-3">{t("priorityTitle")}</h2>
         <p className="text-sm text-dark/70 leading-relaxed">{t("priorityDesc")}</p>
       </motion.div>
 
       {/* Limits */}
-      <motion.div {...fadeUp} transition={s(6)}>
+      <motion.div {...fadeUp} transition={s(7)}>
         <h2 className="text-xl font-black italic text-dark mb-3">{t("limitsTitle")}</h2>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -143,7 +163,7 @@ export default function RulesDoc() {
       </motion.div>
 
       {/* Navigation */}
-      <motion.div {...fadeUp} transition={s(7)} className="border-t border-dark/10 pt-6 flex justify-between gap-4">
+      <motion.div {...fadeUp} transition={s(8)} className="border-t border-dark/10 pt-6 flex justify-between gap-4">
         <Link href="/docs/links"
           className="flex items-center gap-2 p-4 rounded-xl bg-dark/5 hover:bg-dark/10 transition-colors group">
           <TbArrowLeft size={18} className="text-dark/30 group-hover:text-dark group-hover:-translate-x-1 transition-all" />

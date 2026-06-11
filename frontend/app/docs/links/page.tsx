@@ -120,10 +120,10 @@ export default function LinksDoc() {
         </div>
         <p className="text-sm text-dark/70 leading-relaxed mb-4">{t("customDomainsDesc")}</p>
         <div className="bg-dark/5 rounded-2xl p-4 font-mono text-sm mb-4">
-          <p className="text-dark/40 text-xs mb-1">antes</p>
+          <p className="text-dark/40 text-xs mb-1">{t("customDomainsBefore")}</p>
           <p className="font-bold text-dark/50">linkkk.dev/<span className="text-dark/40">xyz</span></p>
-          <p className="text-dark/40 text-xs mt-3 mb-1">con dominio propio</p>
-          <p className="font-bold">go.tumarca.com/<span className="text-primary">xyz</span></p>
+          <p className="text-dark/40 text-xs mt-3 mb-1">{t("customDomainsWithDomain")}</p>
+          <p className="font-bold">{t("customDomainsExampleDomain")}/<span className="text-primary">xyz</span></p>
         </div>
         <h3 className="font-black italic text-dark mb-3">{t("customDomainsSetupTitle")}</h3>
         <ol className="space-y-2">

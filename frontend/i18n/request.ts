@@ -1,8 +1,7 @@
 import { getRequestConfig } from 'next-intl/server';
-import { locales, defaultLocale } from './config';
+import { locales, defaultLocale, type Locale } from './config';
 
-export { locales, defaultLocale };
-export type { Locale } from './config';
+export { locales, defaultLocale, type Locale };
 
 export default getRequestConfig(async ({ requestLocale }) => {
   // This will be the locale from the provider or 'es' as fallback

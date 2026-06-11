@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import Link from 'next/link';
 import Select from '../ui/Select/Select';
 import Input from '../ui/Input/Input';
 import {
@@ -154,7 +155,7 @@ export function RuleAction({
         };
 
         return (
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2 flex-wrap basis-full">
             {/* Channel selector */}
             <div className="flex items-center rounded-lg border border-dark/10 overflow-hidden text-xs">
               <button
@@ -206,13 +207,13 @@ export function RuleAction({
             />
 
             {/* Query params info */}
-            <span
-              className="flex items-center gap-1 text-xs text-dark/40 whitespace-nowrap cursor-default"
-              title={t('queryParamsTooltip')}
+            <Link
+              href="/docs/rules#query-params"
+              className="flex items-center gap-1 text-xs text-dark/40 hover:text-dark/70 whitespace-nowrap underline underline-offset-2 transition-colors"
             >
               <TbInfoCircle size={13} />
               {t('queryParamsInfo')}
-            </span>
+            </Link>
           </div>
         );
 
