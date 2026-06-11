@@ -487,7 +487,10 @@
     "addElseAction": "Añadir acción \"Si no\"",
     "removeElseAction": "Eliminar acción alternativa",
     "maxConditionsTitle": "Máximo {count} {plural} permitidas",
-    "condition": "condición"
+    "condition": "condición",
+    "alwaysConfirmMessage": "Cambiar a \"Siempre\" eliminará el resto de condiciones.",
+    "alwaysConfirmAccept": "Confirmar",
+    "alwaysConfirmDeny": "Cancelar"
   },
   "RuleCondition": {
     "fieldAlways": "Siempre",

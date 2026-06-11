@@ -486,7 +486,10 @@
     "addElseAction": "Add \"Else\" action",
     "removeElseAction": "Remove otherwise action",
     "maxConditionsTitle": "Maximum {count} {plural} allowed",
-    "condition": "condition"
+    "condition": "condition",
+    "alwaysConfirmMessage": "Switching to \"Always\" will remove the remaining conditions.",
+    "alwaysConfirmAccept": "Confirm",
+    "alwaysConfirmDeny": "Cancel"
   },
   "RuleCondition": {
     "fieldAlways": "Always",

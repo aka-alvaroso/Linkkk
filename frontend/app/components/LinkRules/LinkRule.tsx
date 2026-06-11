@@ -3,9 +3,9 @@
  * Compact summary view of a rule with expandable inline editor
  */
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { TbGripVertical, TbX, TbChevronDown, TbPlus, TbTrash, TbCircleDashed, TbCircleDashedCheck, TbPencil } from 'react-icons/tb';
+import { TbGripVertical, TbX, TbChevronDown, TbPlus, TbTrash, TbCircleDashed, TbCircleDashedCheck, TbPencil, TbAlertTriangle } from 'react-icons/tb';
 import Button from '../ui/Button/Button';
 import { LinkRule as LinkRuleType, RuleCondition as RuleConditionType, MatchType, ActionType, ActionSettings } from '@/app/types/linkRules';
 import { useTranslations } from 'next-intl';
@@ -38,6 +38,20 @@ export function LinkRule({ rule, priority, onChange, onDelete, maxConditions, is
   const displayName = rule.name || `${t('rule')} ${priority}`;
   const [editingName, setEditingName] = useState(false);
   const [draftName, setDraftName] = useState('');
+
+  // Always-condition confirmation state
+  const [alwaysConfirmPending, setAlwaysConfirmPending] = useState(false);
+  const [alwaysPendingIndex, setAlwaysPendingIndex] = useState<number | null>(null);
+  const [alwaysPreviousCondition, setAlwaysPreviousCondition] = useState<RuleConditionType | null>(null);
+
+  // Refs so useEffect callbacks always see fresh values
+  const ruleRef = useRef(rule);
+  ruleRef.current = rule;
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
+
+  const hasAlwaysCondition = rule.conditions.some(c => c.field === 'always');
+  const isAlwaysOnly = hasAlwaysCondition && rule.conditions.length === 1;
 
   const startEditingName = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -117,6 +131,68 @@ export function LinkRule({ rule, priority, onChange, onDelete, maxConditions, is
       elseActionType: 'redirect',
       elseActionSettings: { url: '' }
     });
+  };
+
+  // When "always" becomes the sole condition, strip any lingering else action
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (isAlwaysOnly && ruleRef.current.elseActionType) {
+      onChangeRef.current({ ...ruleRef.current, elseActionType: null, elseActionSettings: null });
+    }
+  }, [isAlwaysOnly]);
+
+  // If panel collapses while confirmation is pending → treat as confirm
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!isExpanded && alwaysConfirmPending) {
+      const alwaysCondition = ruleRef.current.conditions.find(c => c.field === 'always');
+      if (alwaysCondition) {
+        onChangeRef.current({
+          ...ruleRef.current,
+          conditions: [alwaysCondition],
+          elseActionType: null,
+          elseActionSettings: null,
+        });
+      }
+      setAlwaysConfirmPending(false);
+      setAlwaysPendingIndex(null);
+      setAlwaysPreviousCondition(null);
+    }
+  }, [isExpanded, alwaysConfirmPending]);
+
+  // Wrap condition change to intercept "always" when other conditions exist
+  const handleConditionChangeIntercepted = (index: number, condition: RuleConditionType) => {
+    if (condition.field === 'always' && rule.conditions.length > 1 && !alwaysConfirmPending) {
+      setAlwaysPendingIndex(index);
+      setAlwaysPreviousCondition(rule.conditions[index]);
+      setAlwaysConfirmPending(true);
+    } else if (condition.field !== 'always' && alwaysConfirmPending) {
+      setAlwaysConfirmPending(false);
+      setAlwaysPendingIndex(null);
+      setAlwaysPreviousCondition(null);
+    }
+    handleConditionChange(index, condition);
+  };
+
+  const handleAlwaysConfirm = () => {
+    const alwaysCondition = rule.conditions.find(c => c.field === 'always')!;
+    onChange({ ...rule, conditions: [alwaysCondition], elseActionType: null, elseActionSettings: null });
+    setAlwaysConfirmPending(false);
+    setAlwaysPendingIndex(null);
+    setAlwaysPreviousCondition(null);
+  };
+
+  const handleAlwaysDeny = () => {
+    if (alwaysPendingIndex !== null && alwaysPreviousCondition) {
+      const newConditions = [...rule.conditions];
+      newConditions[alwaysPendingIndex] = alwaysPreviousCondition;
+      onChange({ ...rule, conditions: newConditions });
+    } else {
+      onChange({ ...rule, conditions: rule.conditions.filter(c => c.field !== 'always') });
+    }
+    setAlwaysConfirmPending(false);
+    setAlwaysPendingIndex(null);
+    setAlwaysPreviousCondition(null);
   };
 
   return (
@@ -310,23 +386,44 @@ export function LinkRule({ rule, priority, onChange, onDelete, maxConditions, is
 
                         <RuleCondition
                           condition={condition}
-                          onChange={(newCondition) => handleConditionChange(index, newCondition)}
+                          onChange={(newCondition) => handleConditionChangeIntercepted(index, newCondition)}
                           onDelete={() => handleDeleteCondition(index)}
                         />
                       </motion.div>
                     ))}
                   </AnimatePresence>
 
-                  {/* Add Condition Button */}
-                  <button
-                    onClick={handleAddCondition}
-                    disabled={maxConditions !== null && rule.conditions.length >= maxConditions}
-                    className="inline-flex items-center gap-1 ml-6 px-3 py-1 text-sm text-dark/40 hover:text-dark/70 border border-dashed border-dark/20 rounded-lg hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:bg-dark/5 transition-colors"
-                    title={maxConditions !== null && rule.conditions.length >= maxConditions ? t('maxConditionsTitle', { count: maxConditions, plural: maxConditions === 1 ? t('condition') : t('conditions') }) : ''}
-                  >
-                    <TbPlus size={14} />
-                    <span>{t('addCondition')}</span>
-                  </button>
+                  {/* Add Condition Button / Always Confirmation */}
+                  {alwaysConfirmPending ? (
+                    <div className="ml-6 flex items-center gap-2 flex-wrap py-0.5">
+                      <span className="flex items-center gap-1 text-xs text-warning font-medium">
+                        <TbAlertTriangle size={13} />
+                        {t('alwaysConfirmMessage')}
+                      </span>
+                      <button
+                        onClick={handleAlwaysConfirm}
+                        className="px-2 py-0.5 text-xs rounded-md bg-danger/10 text-danger hover:bg-danger/20 transition-colors font-medium"
+                      >
+                        {t('alwaysConfirmAccept')}
+                      </button>
+                      <button
+                        onClick={handleAlwaysDeny}
+                        className="px-2 py-0.5 text-xs rounded-md bg-dark/5 text-dark/50 hover:bg-dark/10 transition-colors"
+                      >
+                        {t('alwaysConfirmDeny')}
+                      </button>
+                    </div>
+                  ) : !isAlwaysOnly ? (
+                    <button
+                      onClick={handleAddCondition}
+                      disabled={maxConditions !== null && rule.conditions.length >= maxConditions}
+                      className="inline-flex items-center gap-1 ml-6 px-3 py-1 text-sm text-dark/40 hover:text-dark/70 border border-dashed border-dark/20 rounded-lg hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:bg-dark/5 transition-colors"
+                      title={maxConditions !== null && rule.conditions.length >= maxConditions ? t('maxConditionsTitle', { count: maxConditions, plural: maxConditions === 1 ? t('condition') : t('conditions') }) : ''}
+                    >
+                      <TbPlus size={14} />
+                      <span>{t('addCondition')}</span>
+                    </button>
+                  ) : null}
                 </div>
               </div>
 
@@ -347,8 +444,8 @@ export function LinkRule({ rule, priority, onChange, onDelete, maxConditions, is
                 </div>
               </div>
 
-              {/* Else Action (Optional) */}
-              <div>
+              {/* Else Action (Optional) — hidden when always condition is active */}
+              {!hasAlwaysCondition && <div>
                 {rule.elseActionType ? (
                   <div className="flex items-start gap-2 flex-wrap">
                     <span className="text-sm font-black italic text-dark uppercase tracking-wide py-2">
@@ -376,7 +473,7 @@ export function LinkRule({ rule, priority, onChange, onDelete, maxConditions, is
                     <span>{t('addElseAction')}</span>
                   </button>
                 )}
-              </div>
+              </div>}
             </div>
           </motion.div>
         )}
