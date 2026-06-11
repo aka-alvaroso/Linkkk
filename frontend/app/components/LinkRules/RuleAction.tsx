@@ -223,7 +223,7 @@ export function RuleAction({
   };
 
   return (
-    <div className="flex items-center gap-2 flex-wrap">
+    <div className={`flex items-center gap-2 flex-wrap${actionType === 'notify' ? ' basis-full' : ''}`}>
       <Select
         options={ACTION_TYPE_OPTIONS}
         value={actionType}
