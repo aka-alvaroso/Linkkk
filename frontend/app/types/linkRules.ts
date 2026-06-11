@@ -62,6 +62,7 @@ export interface PasswordGateSettings {
 }
 
 export interface NotifySettings {
+  notifyType?: 'webhook' | 'email';
   webhookUrl?: string;
   message?: string;
   sendEmail?: boolean;

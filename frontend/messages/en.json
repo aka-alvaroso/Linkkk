@@ -525,10 +525,12 @@
     "blockReasonPlaceholder": "Block reason (optional)",
     "passwordPlaceholder": "Password",
     "hintPlaceholder": "Hint (optional)",
-    "webhookPlaceholder": "Webhook URL (optional)",
+    "notifyTypeWebhook": "Webhook",
+    "notifyTypeEmail": "Email",
+    "webhookPlaceholder": "Webhook URL",
     "messagePlaceholder": "Message (optional)",
-    "sendEmailLabel": "Email owner",
-    "sendEmailTooltip": "Send an email to your account address when this rule triggers"
+    "queryParamsInfo": "Includes query params",
+    "queryParamsTooltip": "When this rule fires, any query params from the access URL (e.g. ?utm_source=email) will be included in the notification payload"
   },
   "AccessesList": {
     "loadingAccesses": "Loading accesses...",

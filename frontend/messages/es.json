@@ -526,10 +526,12 @@
     "blockReasonPlaceholder": "Razón del bloqueo (opcional)",
     "passwordPlaceholder": "Contraseña",
     "hintPlaceholder": "Pista (opcional)",
-    "webhookPlaceholder": "URL del Webhook (opcional)",
+    "notifyTypeWebhook": "Webhook",
+    "notifyTypeEmail": "Email",
+    "webhookPlaceholder": "URL del Webhook",
     "messagePlaceholder": "Mensaje (opcional)",
-    "sendEmailLabel": "Email al propietario",
-    "sendEmailTooltip": "Envía un email a tu dirección de cuenta cuando esta regla se active"
+    "queryParamsInfo": "Incluye query params",
+    "queryParamsTooltip": "Cuando esta regla se active, los query params de la URL de acceso (ej. ?utm_source=email) se incluirán en la notificación"
   },
   "AccessesList": {
     "loadingAccesses": "Cargando accesos...",

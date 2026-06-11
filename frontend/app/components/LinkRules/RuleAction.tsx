@@ -6,7 +6,6 @@
 import React from 'react';
 import Select from '../ui/Select/Select';
 import Input from '../ui/Input/Input';
-import Switch from '../ui/Switch/Switch';
 import {
   ActionType,
   ActionSettings,
@@ -16,7 +15,7 @@ import {
   NotifySettings
 } from '@/app/types/linkRules';
 import { useTranslations } from 'next-intl';
-import { TbArrowFork, TbForbid2, TbWebhook, TbLock, TbMail } from 'react-icons/tb';
+import { TbArrowFork, TbForbid2, TbWebhook, TbLock, TbMail, TbInfoCircle } from 'react-icons/tb';
 
 interface RuleActionProps {
   actionType: ActionType;
@@ -63,7 +62,7 @@ export function RuleAction({
         defaultSettings = { passwordHash: '', hint: '' } as PasswordGateSettings;
         break;
       case 'notify':
-        defaultSettings = { webhookUrl: '', message: '' } as NotifySettings;
+        defaultSettings = { notifyType: 'webhook', webhookUrl: '', message: '' } as NotifySettings;
         break;
     }
 
@@ -133,16 +132,70 @@ export function RuleAction({
 
       case 'notify':
         const notifySettings = actionSettings as NotifySettings;
+        // Derive notifyType from legacy settings for backwards compat
+        const notifyType = notifySettings.notifyType
+          ?? (notifySettings.sendEmail ? 'email' : 'webhook');
+
+        const handleNotifyTypeChange = (type: 'webhook' | 'email') => {
+          if (type === 'webhook') {
+            onChange(actionType, {
+              ...notifySettings,
+              notifyType: 'webhook',
+              sendEmail: false,
+            } as NotifySettings);
+          } else {
+            onChange(actionType, {
+              ...notifySettings,
+              notifyType: 'email',
+              webhookUrl: '',
+              sendEmail: true,
+            } as NotifySettings);
+          }
+        };
+
         return (
           <div className="flex items-center gap-2 flex-wrap">
-            <Input
-              placeholder={t('webhookPlaceholder')}
-              value={notifySettings.webhookUrl || ''}
-              onChange={(e) => handleSettingChange('webhookUrl', e.target.value)}
-              size="sm"
-              rounded="lg"
-              className='bg-light border border-dark/10 px-2 py-1 rounded-lg hover:border-dark/20'
-            />
+            {/* Channel selector */}
+            <div className="flex items-center rounded-lg border border-dark/10 overflow-hidden text-xs">
+              <button
+                type="button"
+                onClick={() => handleNotifyTypeChange('webhook')}
+                className={`flex items-center gap-1 px-2 py-1 transition-colors whitespace-nowrap ${
+                  notifyType === 'webhook'
+                    ? 'bg-dark text-light'
+                    : 'bg-light text-dark/50 hover:text-dark/80'
+                }`}
+              >
+                <TbWebhook size={13} />
+                {t('notifyTypeWebhook')}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleNotifyTypeChange('email')}
+                className={`flex items-center gap-1 px-2 py-1 transition-colors whitespace-nowrap ${
+                  notifyType === 'email'
+                    ? 'bg-dark text-light'
+                    : 'bg-light text-dark/50 hover:text-dark/80'
+                }`}
+              >
+                <TbMail size={13} />
+                {t('notifyTypeEmail')}
+              </button>
+            </div>
+
+            {/* Webhook URL — only when webhook selected */}
+            {notifyType === 'webhook' && (
+              <Input
+                placeholder={t('webhookPlaceholder')}
+                value={notifySettings.webhookUrl || ''}
+                onChange={(e) => handleSettingChange('webhookUrl', e.target.value)}
+                size="sm"
+                rounded="lg"
+                className='bg-light border border-dark/10 px-2 py-1 rounded-lg hover:border-dark/20'
+              />
+            )}
+
+            {/* Message — shared between both channels */}
             <Input
               placeholder={t('messagePlaceholder')}
               value={notifySettings.message || ''}
@@ -151,18 +204,15 @@ export function RuleAction({
               rounded="lg"
               className='bg-light border border-dark/10 px-2 py-1 rounded-lg hover:border-dark/20'
             />
-            <span className="text-dark/20 select-none">|</span>
-            <label className="flex items-center gap-1.5 cursor-pointer" title={t('sendEmailTooltip')}>
-              <Switch
-                checked={notifySettings.sendEmail ?? false}
-                onChange={(checked) => handleSettingChange('sendEmail', checked)}
-                size="sm"
-              />
-              <span className="flex items-center gap-1 text-xs text-dark/60 whitespace-nowrap">
-                <TbMail size={13} />
-                {t('sendEmailLabel')}
-              </span>
-            </label>
+
+            {/* Query params info */}
+            <span
+              className="flex items-center gap-1 text-xs text-dark/40 whitespace-nowrap cursor-default"
+              title={t('queryParamsTooltip')}
+            >
+              <TbInfoCircle size={13} />
+              {t('queryParamsInfo')}
+            </span>
           </div>
         );
 
