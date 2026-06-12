@@ -8,7 +8,7 @@ const ERRORS = require("../constants/errorCodes");
 const logger = require("../utils/logger");
 const config = require("../config/environment");
 
-const { defineCountry, defineIsVPN } = require("../utils/access");
+const { defineCountry, defineIsVPN, getClientIp } = require("../utils/access");
 const { evaluateLinkRules, detectDevice } = require("../utils/linkRulesEngine");
 const { comparePassword } = require("../utils/password");
 const { sanitizeQueryParams } = require("../utils/queryParamsSanitizer");
@@ -434,7 +434,7 @@ const generateShortCode = async () => {
 const redirectLink = async (req, res) => {
   const { shortUrl } = req.params;
   const userAgent = req.headers["user-agent"];
-  const ip = req.ip === "::1" ? "127.0.0.1" : req.ip;
+  const ip = getClientIp(req);
   const source = req.query.src === "qr" ? "qr" : "direct";
 
   try {
@@ -759,7 +759,7 @@ const verifyPasswordGate = async (req, res) => {
   const { shortUrl } = req.params;
   const { password } = req.body;
   const userAgent = req.headers["user-agent"];
-  const ip = req.ip === "::1" ? "127.0.0.1" : req.ip;
+  const ip = getClientIp(req);
   const source = req.body.src === "qr" ? "qr" : "direct";
 
   try {

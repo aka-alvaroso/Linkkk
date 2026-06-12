@@ -94,7 +94,25 @@ const defineIsVPN = async (ip) => {
   }
 };
 
+// Extracts the real client IP when behind Cloudflare + nginx.
+// CF-Connecting-IP is set by Cloudflare to the true client IP and cannot be
+// spoofed (Cloudflare strips any pre-existing header before setting its own).
+const getClientIp = (req) => {
+  const cfIp = req.headers["cf-connecting-ip"];
+  if (cfIp) return cfIp.trim();
+
+  const xForwardedFor = req.headers["x-forwarded-for"];
+  if (xForwardedFor) {
+    const firstIp = xForwardedFor.split(",")[0].trim();
+    if (firstIp) return firstIp;
+  }
+
+  const ip = req.ip || "";
+  return ip === "::1" ? "127.0.0.1" : ip;
+};
+
 module.exports = {
   defineCountry,
   defineIsVPN,
+  getClientIp,
 };
