@@ -2,8 +2,8 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import Drawer from '@/app/components/ui/Drawer/Drawer';
 import Input from '@/app/components/ui/Input/Input';
 import Button from '@/app/components/ui/Button/Button';
-import { TbCircleDashed, TbCircleDashedCheck, TbRocket, TbPlus } from 'react-icons/tb';
-import { useLinks } from '@/app/hooks';
+import { TbCircleDashed, TbCircleDashedCheck, TbRocket, TbPlus, TbTag, TbFolder } from 'react-icons/tb';
+import { useLinks, useTags, useGroups } from '@/app/hooks';
 import { useToast } from '@/app/hooks/useToast';
 import * as motion from 'motion/react-client';
 import { AnimatePresence } from 'motion/react';
@@ -16,6 +16,9 @@ import AnimatedText, { AnimatedTextRef } from '../ui/AnimatedText';
 import { useTranslations } from 'next-intl';
 import { domainService, CustomDomain } from '@/app/services/api/domainService';
 import SelectDropdown from '@/app/components/ui/Select/SelectDropdown';
+import { useTagStore } from '@/app/stores/tagStore';
+import { useGroupStore } from '@/app/stores/groupStore';
+import { useLinkStore } from '@/app/stores/linkStore';
 
 interface CreateLinkDrawerProps {
     open: boolean;
@@ -28,6 +31,11 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
     const { createLink } = useLinks();
     const { createRule } = useLinkRules();
     const { isAuthenticated, isGuest, user } = useAuth();
+    const { fetchTags, assignTagsToLink } = useTags();
+    const { fetchGroups } = useGroups();
+    const { tags } = useTagStore();
+    const { groups } = useGroupStore();
+    const { updateLinkInStore } = useLinkStore();
     const toast = useToast();
     const [statusBar, setShowStatusBar] = useState("none");
     const [newLink, setNewLink] = useState({
@@ -36,6 +44,8 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
         customSuffix: '',
         customDomainId: null as number | null,
     });
+    const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
+    const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [suffixError, setSuffixError] = useState('');
@@ -67,6 +77,13 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
             }).catch(() => {});
         }
     }, [open, isGuest, user?.role]);
+
+    useEffect(() => {
+        if (open && isAuthenticated && !isGuest) {
+            fetchTags();
+            fetchGroups();
+        }
+    }, [open, isAuthenticated, isGuest, fetchTags, fetchGroups]);
 
     // Process conditions to convert country string to array and filter "always"
     const processConditions = (conditions: RuleCondition[]) => {
@@ -106,9 +123,21 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
             status: newLink.status,
             ...(newLink.customSuffix && { customSuffix: newLink.customSuffix }),
             ...(newLink.customDomainId && { customDomainId: newLink.customDomainId }),
+            ...(selectedGroupId && { groupId: selectedGroupId }),
         });
 
         if (response.success && response.data) {
+            // Assign tags if any
+            if (selectedTagIds.length > 0 && response.data.id) {
+                try {
+                    await assignTagsToLink(response.data.id, selectedTagIds);
+                    const tagObjects = tags.filter(t => selectedTagIds.includes(t.id));
+                    updateLinkInStore(response.data.shortUrl, { tags: tagObjects });
+                } catch {
+                    toast.error(t('toastTagsFailed'), { showIcon: false });
+                }
+            }
+
             // Create rules if any exist
             if (localRules.length > 0) {
                 for (const rule of localRules) {
@@ -150,6 +179,8 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
                 customDomainId: null,
             });
             setLocalRules([]);
+            setSelectedTagIds([]);
+            setSelectedGroupId(null);
             onClose();
 
             // Call onSuccess callback if provided (e.g., redirect to dashboard)
@@ -190,7 +221,7 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
 
         setLoading(false);
         setShowStatusBar("none");
-    }, [createLink, createRule, newLink.longUrl, newLink.status, localRules, onClose, toast]);
+    }, [createLink, createRule, newLink.longUrl, newLink.status, localRules, onClose, toast, selectedGroupId, selectedTagIds, assignTagsToLink, tags, updateLinkInStore]);
 
     // Handle adding a new rule
     const handleAddRule = () => {
@@ -365,11 +396,62 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
                     </motion.div>
                 )}
 
+                {/* Group (authenticated non-guest users only) */}
+                {isAuthenticated && !isGuest && groups.length > 0 && (
+                    <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.28, duration: 0.4, ease: "backInOut" }}
+                        className='w-full flex flex-col gap-1.5'
+                    >
+                        <p className='text-xs font-semibold text-dark/40 uppercase tracking-wide flex items-center gap-1'>
+                            <TbFolder size={13} /> {t('group')} <span className='normal-case font-normal'>({t('groupOptional')})</span>
+                        </p>
+                        <SelectDropdown
+                            mode="single"
+                            options={groups.map(g => ({ label: g.name, value: g.id, color: g.color ?? '#6b7280' }))}
+                            value={selectedGroupId}
+                            onChange={(val) => setSelectedGroupId(val as number | null)}
+                            placeholder={t('groupPlaceholder')}
+                            showNoneOption
+                            noneLabel={t('groupNone')}
+                        />
+                    </motion.div>
+                )}
+
+                {/* Tags (authenticated non-guest users only) */}
+                {isAuthenticated && !isGuest && tags.length > 0 && (
+                    <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.3, duration: 0.4, ease: "backInOut" }}
+                        className='w-full flex flex-col gap-1.5'
+                    >
+                        <p className='text-xs font-semibold text-dark/40 uppercase tracking-wide flex items-center gap-1'>
+                            <TbTag size={13} /> {t('tags')} <span className='normal-case font-normal'>({t('tagsOptional')})</span>
+                        </p>
+                        <SelectDropdown
+                            mode="multi"
+                            options={tags.map(tag => ({ label: tag.name, value: tag.id, color: tag.color ?? '#6b7280' }))}
+                            values={selectedTagIds}
+                            onChangeMulti={(next) => {
+                                const bounded = limits.tagsPerLink !== null && next.length > limits.tagsPerLink
+                                    ? next.slice(0, limits.tagsPerLink)
+                                    : next;
+                                setSelectedTagIds(bounded as number[]);
+                            }}
+                            placeholder={t('tagsPlaceholder')}
+                            showNoneOption
+                            noneLabel={t('tagsNone')}
+                        />
+                    </motion.div>
+                )}
+
                 {/* Link Rules Section */}
                 <motion.div
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.3, duration: 0.4, ease: "backInOut" }}
+                    transition={{ delay: 0.35, duration: 0.4, ease: "backInOut" }}
                     className='w-full'
                 >
                     <div className="space-y-4">
@@ -481,6 +563,8 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
                                                 customDomainId: null,
                                             });
                                             setLocalRules([]);
+                                            setSelectedTagIds([]);
+                                            setSelectedGroupId(null);
                                             setSuffixError('');
                                             setShowStatusBar("none");
                                             onClose();

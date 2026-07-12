@@ -89,6 +89,8 @@ export interface LinkFilters {
   status: "all" | "active" | "inactive";
   tagIds?: number[];
   groupIds?: number[];
+  tagMode?: 'include' | 'exclude';
+  groupMode?: 'include' | 'exclude';
 }
 
 // Stats types

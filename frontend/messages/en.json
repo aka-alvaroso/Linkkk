@@ -313,7 +313,16 @@
     "customDomain": "Custom domain",
     "customDomainOptional": "optional",
     "customDomainNone": "linkkk.dev (default)",
-    "customDomainProOnly": "Custom domains are a PRO feature"
+    "customDomainProOnly": "Custom domains are a PRO feature",
+    "group": "Group",
+    "groupOptional": "optional",
+    "groupPlaceholder": "Select a group...",
+    "groupNone": "No group",
+    "tags": "Tags",
+    "tagsOptional": "optional",
+    "tagsPlaceholder": "Select tags...",
+    "tagsNone": "No tags",
+    "toastTagsFailed": "Link created but tags could not be assigned"
   },
   "StatsDrawer": {
     "retentionTitle": "30-day history:",
@@ -418,7 +427,9 @@
     "tagPlaceholder": "Select tags...",
     "selectAll": "All",
     "selectNone": "None",
-    "applyFilters": "Apply Filters"
+    "applyFilters": "Apply Filters",
+    "include": "Include",
+    "except": "Except"
   },
   "ManageTags": {
     "title": "Tags",

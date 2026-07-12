@@ -110,18 +110,30 @@ export const useLinkStore = create<LinkStore>((set, get) => ({
       );
     }
 
-    // Group filter (multi-select: link must belong to one of the selected groups)
+    // Group filter
     if (filters.groupIds && filters.groupIds.length > 0) {
-      filtered = filtered.filter((link) =>
-        filters.groupIds!.includes(link.group?.id ?? -1)
-      );
+      if (filters.groupMode === 'exclude') {
+        filtered = filtered.filter((link) =>
+          !filters.groupIds!.includes(link.group?.id ?? -1)
+        );
+      } else {
+        filtered = filtered.filter((link) =>
+          filters.groupIds!.includes(link.group?.id ?? -1)
+        );
+      }
     }
 
-    // Tag filter (multi-select: link must have ALL selected tags)
+    // Tag filter
     if (filters.tagIds && filters.tagIds.length > 0) {
-      filtered = filtered.filter((link) =>
-        filters.tagIds!.every((tagId) => link.tags?.some((tag) => tag.id === tagId))
-      );
+      if (filters.tagMode === 'exclude') {
+        filtered = filtered.filter((link) =>
+          !filters.tagIds!.some((tagId) => link.tags?.some((tag) => tag.id === tagId))
+        );
+      } else {
+        filtered = filtered.filter((link) =>
+          filters.tagIds!.every((tagId) => link.tags?.some((tag) => tag.id === tagId))
+        );
+      }
     }
 
     set({ filteredLinks: filtered });

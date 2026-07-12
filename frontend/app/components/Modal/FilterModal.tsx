@@ -28,6 +28,8 @@ const defaultFilters: LinkFilters = {
   status: 'all',
   tagIds: [],
   groupIds: [],
+  tagMode: 'include',
+  groupMode: 'include',
 };
 
 export default function FilterModal({
@@ -83,6 +85,31 @@ export default function FilterModal({
       (filters.tagIds?.length ?? 0) > 0 ||
       (filters.groupIds?.length ?? 0) > 0;
   };
+
+  const ModeToggle = ({ mode, onChange }: { mode: 'include' | 'exclude'; onChange: (m: 'include' | 'exclude') => void }) => (
+    <div className="inline-flex items-center gap-1 rounded-2xl bg-dark/5 p-1">
+      <button
+        type="button"
+        onClick={() => onChange('include')}
+        className={`px-2.5 py-1 rounded-xl border text-xs font-medium transition-all duration-200 hover:cursor-pointer ${mode === 'include'
+          ? 'bg-primary border-dark hover:shadow-[2px_2px_0_var(--color-dark)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]'
+          : 'bg-transparent border-transparent text-dark/50 hover:text-dark'
+          }`}
+      >
+        {t('include')}
+      </button>
+      <button
+        type="button"
+        onClick={() => onChange('exclude')}
+        className={`px-2.5 py-1 rounded-xl border text-xs font-medium transition-all duration-200 hover:cursor-pointer ${mode === 'exclude'
+          ? 'bg-danger border-dark text-light hover:shadow-[2px_2px_0_var(--color-dark)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]'
+          : 'bg-transparent border-transparent text-dark/50 hover:text-dark'
+          }`}
+      >
+        {t('except')}
+      </button>
+    </div>
+  );
 
   return (
     <Modal
@@ -207,14 +234,20 @@ export default function FilterModal({
         {/* Group filter */}
         {groups.length > 0 && (
           <div className="flex flex-col gap-2">
-            <motion.label
+            <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2, ease: "backInOut" }}
-              className="text-lg font-semibold flex items-center gap-2"
+              className="flex items-center justify-between"
             >
-              <TbFolder size={18} /> {t('groupLabel')}
-            </motion.label>
+              <label className="text-lg font-semibold flex items-center gap-2">
+                <TbFolder size={18} /> {t('groupLabel')}
+              </label>
+              <ModeToggle
+                mode={filters.groupMode ?? 'include'}
+                onChange={(m) => setFilters({ ...filters, groupMode: m })}
+              />
+            </motion.div>
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -237,14 +270,20 @@ export default function FilterModal({
         {/* Tag filter */}
         {tags.length > 0 && (
           <div className="flex flex-col gap-2">
-            <motion.label
+            <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.25, ease: "backInOut" }}
-              className="text-lg font-semibold flex items-center gap-2"
+              className="flex items-center justify-between"
             >
-              <TbTag size={18} /> {t('tagLabel')}
-            </motion.label>
+              <label className="text-lg font-semibold flex items-center gap-2">
+                <TbTag size={18} /> {t('tagLabel')}
+              </label>
+              <ModeToggle
+                mode={filters.tagMode ?? 'include'}
+                onChange={(m) => setFilters({ ...filters, tagMode: m })}
+              />
+            </motion.div>
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}

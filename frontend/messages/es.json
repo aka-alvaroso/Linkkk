@@ -313,7 +313,16 @@
     "customDomain": "Dominio personalizado",
     "customDomainOptional": "opcional",
     "customDomainNone": "linkkk.dev (por defecto)",
-    "customDomainProOnly": "Los dominios personalizados son una función PRO"
+    "customDomainProOnly": "Los dominios personalizados son una función PRO",
+    "group": "Grupo",
+    "groupOptional": "opcional",
+    "groupPlaceholder": "Seleccionar grupo...",
+    "groupNone": "Sin grupo",
+    "tags": "Etiquetas",
+    "tagsOptional": "opcional",
+    "tagsPlaceholder": "Seleccionar etiquetas...",
+    "tagsNone": "Sin etiquetas",
+    "toastTagsFailed": "Link creado pero no se pudieron asignar las etiquetas"
   },
   "StatsDrawer": {
     "retentionTitle": "Historial de 30 días:",
@@ -419,7 +428,9 @@
     "tagPlaceholder": "Seleccionar etiquetas...",
     "selectAll": "Todos",
     "selectNone": "Ninguno",
-    "applyFilters": "Aplicar Filtros"
+    "applyFilters": "Aplicar Filtros",
+    "include": "Incluir",
+    "except": "Excepto"
   },
   "ManageTags": {
     "title": "Etiquetas",

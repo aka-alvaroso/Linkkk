@@ -113,7 +113,9 @@ export default function Dashboard() {
 
   const hasActiveFilters = () => {
     return filters.search !== '' ||
-      filters.status !== 'all';
+      filters.status !== 'all' ||
+      (filters.tagIds?.length ?? 0) > 0 ||
+      (filters.groupIds?.length ?? 0) > 0;
   };
 
   return (
