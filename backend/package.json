@@ -36,6 +36,7 @@
     "node-cache": "^5.1.2",
     "node-cron": "^3.0.3",
     "pg": "^8.14.0",
+    "proxy-addr": "^2.0.7",
     "qrcode": "^1.5.4",
     "resend": "^6.12.4",
     "stripe": "^18.2.1",

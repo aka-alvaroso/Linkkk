@@ -1,4 +1,9 @@
 const NodeCache = require("node-cache");
+const config = require("../config/environment");
+const proxyaddr = require("proxy-addr");
+
+const isTrustedProxy = proxyaddr.compile(config.security.trustedProxies);
+
 
 // Cache for IP geolocation data (1 hour TTL)
 // This prevents excessive API calls and improves performance
@@ -94,14 +99,28 @@ const defineIsVPN = async (ip) => {
   }
 };
 
-// Devuelve la IP real del cliente. Confía en req.ip, que Express calcula con la
-// lista "trust proxy" (loopback + Cloudflare). NO leemos cf-connecting-ip ni
-// x-forwarded-for crudos: son falsificables en peticiones directas al origen.
+// Devuelve la IP real del cliente.
+// - Si la conexión viene de un proxy de confianza (Cloudflare), nos fiamos de
+//   CF-Connecting-IP, que Cloudflare fija y que un cliente no puede falsificar
+//   porque su tráfico pasa por Cloudflare.
+// - Si viene directa al origen (no es Cloudflare), ignoramos las cabeceras
+//   (falsificables) y usamos req.ip, que es la IP real de quien conectó.
 const getClientIp = (req) => {
-  const ip = req.ip || "";
-  if (ip === "::1" || ip === "::ffff:127.0.0.1") return "127.0.0.1";
-  // req.ip puede venir como IPv4 mapeada en IPv6 (::ffff:1.2.3.4); normalizamos.
-  return ip.startsWith("::ffff:") ? ip.slice(7) : ip;
+  const normalize = (ip) => {
+    if (!ip) return "";
+    if (ip === "::1" || ip === "::ffff:127.0.0.1") return "127.0.0.1";
+    return ip.startsWith("::ffff:") ? ip.slice(7) : ip;
+  };
+
+  // req.ip lo calcula Express validando la cadena de proxies de confianza.
+  // Si cae en rangos de Cloudflare, la conexión vino por Cloudflare y podemos
+  // fiarnos de CF-Connecting-IP. Si no, es tráfico directo: usamos req.ip crudo.
+  if (isTrustedProxy(req.ip)) {
+    const cfIp = req.headers["cf-connecting-ip"];
+    if (cfIp) return normalize(cfIp.trim());
+  }
+
+  return normalize(req.ip);
 };
 
 module.exports = {

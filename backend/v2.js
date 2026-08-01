@@ -33,7 +33,7 @@ const app = express();
 const PORT = config.server.port;
 
 // Trust proxy - Required when behind nginx reverse proxy
-app.set("trust proxy", config.security.trustedProxies);
+app.set("trust proxy", config.security.trustedProxies); 
 
 // Sentry request handler - MUST be first middleware
 app.use(sentryService.requestHandler());
