@@ -364,7 +364,7 @@ if (!config.env.isTest) {
   startCleanupJob();
   startSyncJob();
 
-  app.listen(PORT, () => {
+  app.listen(PORT, "127.0.0.1", () => {
     console.log(`\n🚀 Server running on port ${PORT}`);
     console.log(`📝 Environment: ${config.env.nodeEnv}`);
     console.log(`🌐 Frontend: ${config.frontend.url}`);
