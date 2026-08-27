@@ -283,8 +283,8 @@ export function LinkRule({ rule, priority, onChange, onDelete, maxConditions, is
               <span>{actionSummary}</span>
               {elseActionSummary && (
                 <>
-                  <span className="mx-1 text-dark/40">|</span>
-                  <span className="text-dark/40">{t('else')}: {elseActionSummary}</span>
+                  <span className="mx-1 text-dark/60">|</span>
+                  <span className="text-dark/60">{t('else')}: {elseActionSummary}</span>
                 </>
               )}
             </div>
@@ -417,7 +417,7 @@ export function LinkRule({ rule, priority, onChange, onDelete, maxConditions, is
                     <button
                       onClick={handleAddCondition}
                       disabled={maxConditions !== null && rule.conditions.length >= maxConditions}
-                      className="inline-flex items-center gap-1 ml-6 px-3 py-1 text-sm text-dark/40 hover:text-dark/70 border border-dashed border-dark/20 rounded-lg hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:bg-dark/5 transition-colors"
+                      className="inline-flex items-center gap-1 ml-6 px-3 py-1 text-sm text-dark/60 hover:text-dark/70 border border-dashed border-dark/20 rounded-lg hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:bg-dark/5 transition-colors"
                       title={maxConditions !== null && rule.conditions.length >= maxConditions ? t('maxConditionsTitle', { count: maxConditions, plural: maxConditions === 1 ? t('condition') : t('conditions') }) : ''}
                     >
                       <TbPlus size={14} />
@@ -467,7 +467,7 @@ export function LinkRule({ rule, priority, onChange, onDelete, maxConditions, is
                 ) : (
                   <button
                     onClick={handleAddElseAction}
-                    className="inline-flex items-center gap-1 ml-6 px-3 py-1 text-sm text-dark/40 hover:text-dark/70 border border-dashed border-dark/20 rounded-lg hover:cursor-pointer hover:bg-dark/5 transition-colors"
+                    className="inline-flex items-center gap-1 ml-6 px-3 py-1 text-sm text-dark/60 hover:text-dark/70 border border-dashed border-dark/20 rounded-lg hover:cursor-pointer hover:bg-dark/5 transition-colors"
                   >
                     <TbPlus size={14} />
                     <span>{t('addElseAction')}</span>

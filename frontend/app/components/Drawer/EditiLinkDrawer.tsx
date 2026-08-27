@@ -367,7 +367,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                 {editingShortUrl ? (
                                     <div className='flex flex-col gap-1'>
                                         <div className='flex items-center gap-1'>
-                                            <span className='text-xl md:text-2xl italic font-black text-dark/40 whitespace-nowrap'>
+                                            <span className='text-xl md:text-2xl italic font-black text-dark/60 whitespace-nowrap'>
                                                 {newLink.customDomain ? newLink.customDomain.domain : 'linkkk.dev/r'}/
                                             </span>
                                             <input
@@ -390,7 +390,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                             />
                                         </div>
                                         {suffixError && <p className='text-xs text-danger'>{suffixError}</p>}
-                                        <p className='text-xs text-dark/40'>{t('customSuffixHint')}</p>
+                                        <p className='text-xs text-dark/60'>{t('customSuffixHint')}</p>
                                     </div>
                                 ) : (
                                     <div className='flex items-start md:flex-row md:items-center gap-2'>
@@ -546,7 +546,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                                 transition={{ delay: 0.15, duration: 0.4, ease: "backInOut" }}
                                                 className='flex flex-col gap-1'
                                             >
-                                                <span className='text-xs font-semibold text-dark/40 flex items-center gap-1'><TbTag size={12} /> {t('organizeTagsTitle')}</span>
+                                                <span className='text-xs font-semibold text-dark/60 flex items-center gap-1'><TbTag size={12} /> {t('organizeTagsTitle')}</span>
                                                 <SelectDropdown
                                                     triggerClassName=''
                                                     mode="multi"
@@ -573,7 +573,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                                 transition={{ delay: 0.2, duration: 0.4, ease: "backInOut" }}
                                                 className='flex flex-col gap-1'
                                             >
-                                                <span className='text-xs font-semibold text-dark/40 flex items-center gap-1'><TbFolder size={12} /> {t('organizeGroupTitle')}</span>
+                                                <span className='text-xs font-semibold text-dark/60 flex items-center gap-1'><TbFolder size={12} /> {t('organizeGroupTitle')}</span>
                                                 <SelectDropdown
                                                     mode="single"
                                                     options={groups.map(g => ({ label: g.name, value: g.id, color: g.color ?? '#6b7280' }))}
@@ -604,7 +604,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                                 transition={{ delay: 0.25, duration: 0.4, ease: "backInOut" }}
                                                 className='flex flex-col gap-1'
                                             >
-                                                <span className='text-xs font-semibold text-dark/40 flex items-center gap-1'><TbWorld size={12} /> {t('customDomain')}</span>
+                                                <span className='text-xs font-semibold text-dark/60 flex items-center gap-1'><TbWorld size={12} /> {t('customDomain')}</span>
                                                 <SelectDropdown
                                                     mode="single"
                                                     options={activeDomains.map(d => ({ label: d.domain, value: d.id }))}

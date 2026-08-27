@@ -62,7 +62,7 @@ export default function RulesDoc() {
                   <span className="text-dark font-black italic mr-2">{t(c.nameKey)}:</span>
                   {t(c.descKey)}
                 </p>
-                <p className="text-xs text-dark/40 mt-1">{t("conditionOperatorsLabel")}: {t(c.opsKey)}</p>
+                <p className="text-xs text-dark/60 mt-1">{t("conditionOperatorsLabel")}: {t(c.opsKey)}</p>
               </div>
             </div>
           ))}
@@ -108,7 +108,7 @@ export default function RulesDoc() {
         <h2 className="text-xl font-black italic text-dark mb-3">{t("queryParamsTitle")}</h2>
         <p className="text-sm text-dark/70 leading-relaxed mb-4">{t("queryParamsDesc")}</p>
         <div className="bg-dark/5 rounded-2xl p-4 font-mono text-sm mb-4">
-          <p className="text-dark/40 text-xs mb-1">e.g.</p>
+          <p className="text-dark/60 text-xs mb-1">e.g.</p>
           <p className="font-bold text-dark/70 break-all">{t("queryParamsExample")}</p>
         </div>
         <div className="grid md:grid-cols-2 gap-4">
@@ -168,14 +168,14 @@ export default function RulesDoc() {
           className="flex items-center gap-2 p-4 rounded-xl bg-dark/5 hover:bg-dark/10 transition-colors group">
           <TbArrowLeft size={18} className="text-dark/30 group-hover:text-dark group-hover:-translate-x-1 transition-all" />
           <div>
-            <p className="text-xs text-dark/40">{ts("previous")}</p>
+            <p className="text-xs text-dark/60">{ts("previous")}</p>
             <p className="font-black italic text-sm text-dark">{t("navPrevTitle")}</p>
           </div>
         </Link>
         <Link href="/docs/analytics"
           className="flex items-center gap-2 p-4 rounded-xl bg-dark/5 hover:bg-dark/10 transition-colors group text-right">
           <div>
-            <p className="text-xs text-dark/40">{ts("next")}</p>
+            <p className="text-xs text-dark/60">{ts("next")}</p>
             <p className="font-black italic text-sm text-dark">{t("navNextTitle")}</p>
           </div>
           <TbArrowRight size={18} className="text-dark/30 group-hover:text-dark group-hover:translate-x-1 transition-all" />

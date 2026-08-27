@@ -129,9 +129,9 @@ export default function ManageTagsModal({ open, onClose }: ManageTagsModalProps)
         {/* Tag list */}
         <div className="max-h-72 overflow-y-auto overflow-x-hidden scrollbar-hide">
           <div className={`flex flex-wrap gap-2 ${editingId === null ? 'py-2 px-1' : ''}`}>
-          {isLoading && tags.length === 0 && <p className="text-sm text-dark/40">{t("loading")}</p>}
+          {isLoading && tags.length === 0 && <p className="text-sm text-dark/60">{t("loading")}</p>}
           {!isLoading && tags.length === 0 && (
-            <p className="text-sm text-dark/40 text-center py-4 w-full">{t("empty")}</p>
+            <p className="text-sm text-dark/60 text-center py-4 w-full">{t("empty")}</p>
           )}
           <AnimatePresence mode="popLayout">
             {tags.map((tag, i) => (

@@ -108,7 +108,7 @@ export default function DocsLayout({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.05, duration: 0.4 }}
-              className="text-xs font-black italic text-dark/40 uppercase tracking-wider mb-4 px-4"
+              className="text-xs font-black italic text-dark/60 uppercase tracking-wider mb-4 px-4"
             >
               {t("documents")}
             </motion.p>

@@ -108,14 +108,14 @@ export default function AnalyticsDoc() {
           className="flex items-center gap-2 p-4 rounded-xl bg-dark/5 hover:bg-dark/10 transition-colors group">
           <TbArrowLeft size={18} className="text-dark/30 group-hover:text-dark group-hover:-translate-x-1 transition-all" />
           <div>
-            <p className="text-xs text-dark/40">{ts("previous")}</p>
+            <p className="text-xs text-dark/60">{ts("previous")}</p>
             <p className="font-black italic text-sm text-dark">{t("navPrevTitle")}</p>
           </div>
         </Link>
         <Link href="/docs/qr-codes"
           className="flex items-center gap-2 p-4 rounded-xl bg-dark/5 hover:bg-dark/10 transition-colors group text-right">
           <div>
-            <p className="text-xs text-dark/40">{ts("next")}</p>
+            <p className="text-xs text-dark/60">{ts("next")}</p>
             <p className="font-black italic text-sm text-dark">{t("navNextTitle")}</p>
           </div>
           <TbArrowRight size={18} className="text-dark/30 group-hover:text-dark group-hover:translate-x-1 transition-all" />

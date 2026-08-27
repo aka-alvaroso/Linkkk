@@ -166,7 +166,7 @@ export default function LinkMetadataEditor({
       >
         <div className="flex flex-col">
           <span className="text-sm font-medium text-dark">{t('enabledLabel')}</span>
-          <span className="text-xs text-dark/50">{t('enabledHint')}</span>
+          <span className="text-xs text-dark/65">{t('enabledHint')}</span>
         </div>
         <Switch
           checked={config.enabled}
@@ -186,7 +186,7 @@ export default function LinkMetadataEditor({
           >
             <div className="flex items-center justify-between">
               <label className="text-sm font-medium text-dark/70">{t('ogTitleLabel')}</label>
-              <span className="text-xs text-dark/40">
+              <span className="text-xs text-dark/60">
                 {(config.ogTitle?.length ?? 0)}/{OG_TITLE_MAX}
               </span>
             </div>
@@ -198,7 +198,7 @@ export default function LinkMetadataEditor({
               rounded="xl"
               maxLength={OG_TITLE_MAX}
             />
-            <p className="text-xs text-dark/50">{t('ogTitleHint')}</p>
+            <p className="text-xs text-dark/65">{t('ogTitleHint')}</p>
           </motion.div>
 
           {/* Description */}
@@ -210,7 +210,7 @@ export default function LinkMetadataEditor({
           >
             <div className="flex items-center justify-between">
               <label className="text-sm font-medium text-dark/70">{t('ogDescriptionLabel')}</label>
-              <span className="text-xs text-dark/40">
+              <span className="text-xs text-dark/60">
                 {(config.ogDescription?.length ?? 0)}/{OG_DESCRIPTION_MAX}
               </span>
             </div>
@@ -224,7 +224,7 @@ export default function LinkMetadataEditor({
               maxLength={OG_DESCRIPTION_MAX}
               rows={3}
             />
-            <p className="text-xs text-dark/50">{t('ogDescriptionHint')}</p>
+            <p className="text-xs text-dark/65">{t('ogDescriptionHint')}</p>
           </motion.div>
 
           {/* Image */}

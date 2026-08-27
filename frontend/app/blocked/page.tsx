@@ -89,7 +89,7 @@ export default function BlockedPage() {
               </Button>
             </Link>
 
-            <p className="text-xs text-dark/50 mt-2">
+            <p className="text-xs text-dark/65 mt-2">
               {t('errorContactOwner')}
             </p>
           </motion.div>
@@ -101,7 +101,7 @@ export default function BlockedPage() {
             transition={{ delay: 0.7, duration: 0.3 }}
             className="mt-8 pt-6"
           >
-            <Link href="/" className="text-sm text-dark/50">
+            <Link href="/" className="text-sm text-dark/65">
               {t('poweredBy')} <span className="font-black italic">Linkkk.</span>
             </Link>
           </motion.div>

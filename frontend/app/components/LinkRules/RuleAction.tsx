@@ -209,7 +209,7 @@ export function RuleAction({
             {/* Query params info */}
             <Link
               href="/docs/rules#query-params"
-              className="flex items-center gap-1 text-xs text-dark/40 hover:text-dark/70 whitespace-nowrap underline underline-offset-2 transition-colors"
+              className="flex items-center gap-1 text-xs text-dark/60 hover:text-dark/70 whitespace-nowrap underline underline-offset-2 transition-colors"
             >
               <TbInfoCircle size={13} />
               {t('queryParamsInfo')}

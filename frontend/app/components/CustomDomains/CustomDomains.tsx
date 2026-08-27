@@ -210,7 +210,7 @@ export default function CustomDomains() {
 
       {/* Content */}
       {loading ? (
-        <div className="flex items-center justify-center py-16 text-dark/40">
+        <div className="flex items-center justify-center py-16 text-dark/60">
           <TbLoader2 className="animate-spin mr-2" size={20} />
           <span>{t("loading")}</span>
         </div>
@@ -413,15 +413,15 @@ export default function CustomDomains() {
                 {/* DNS record table */}
                 <div className="p-4 bg-dark/5 rounded-2xl border border-dashed border-dark/20 font-mono text-sm grid grid-cols-3 gap-4">
                   <div>
-                    <p className="text-dark/40 text-xs mb-1">{t("dnsType")}</p>
+                    <p className="text-dark/60 text-xs mb-1">{t("dnsType")}</p>
                     <p className="font-bold">CNAME</p>
                   </div>
                   <div>
-                    <p className="text-dark/40 text-xs mb-1">{t("dnsName")}</p>
+                    <p className="text-dark/60 text-xs mb-1">{t("dnsName")}</p>
                     <p className="font-bold truncate">{dnsNameLabel}</p>
                   </div>
                   <div>
-                    <p className="text-dark/40 text-xs mb-1">{t("dnsValue")}</p>
+                    <p className="text-dark/60 text-xs mb-1">{t("dnsValue")}</p>
                     <div className="flex items-center gap-1">
                       <p className="font-bold">{CNAME_TARGET}</p>
                       <button

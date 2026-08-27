@@ -153,7 +153,7 @@ export default function SelectDropdown({
   return (
     <div ref={containerRef} className={cn("relative inline-block", className)}>
       {label && (
-        <span className="block mb-1 text-xs font-semibold text-dark/40">{label}</span>
+        <span className="block mb-1 text-xs font-semibold text-dark/60">{label}</span>
       )}
 
       {/* ── Trigger ── */}
@@ -218,7 +218,7 @@ export default function SelectDropdown({
                 type="button"
                 onClick={() => handleSingleSelect(null)}
                 className={cn(
-                  "w-full flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-dark/5 transition-colors text-dark/40",
+                  "w-full flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-dark/5 transition-colors text-dark/60",
                   "border-b border-dark/5 mb-1"
                 )}
               >

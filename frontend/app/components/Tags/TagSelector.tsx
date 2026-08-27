@@ -52,7 +52,7 @@ export default function TagSelector({ tags, selectedTagIds, onChange, maxTags = 
         )}
       >
         {selectedTags.length === 0 ? (
-          <span className="text-dark/40 text-sm flex-1">{placeholder}</span>
+          <span className="text-dark/60 text-sm flex-1">{placeholder}</span>
         ) : (
           selectedTags.map((tag) => (
             <TagChip
@@ -69,9 +69,9 @@ export default function TagSelector({ tags, selectedTagIds, onChange, maxTags = 
       {open && (
         <div className="absolute z-50 mt-1 w-full bg-light border border-dark/15 rounded-2xl shadow-lg overflow-hidden">
           {availableTags.length === 0 && !atLimit ? (
-            <p className="px-3 py-2 text-sm text-dark/40">No more tags available</p>
+            <p className="px-3 py-2 text-sm text-dark/60">No more tags available</p>
           ) : atLimit ? (
-            <p className="px-3 py-2 text-sm text-dark/40">Tag limit reached ({maxTags})</p>
+            <p className="px-3 py-2 text-sm text-dark/60">Tag limit reached ({maxTags})</p>
           ) : null}
           {availableTags.map((tag) => (
             <button
@@ -87,7 +87,7 @@ export default function TagSelector({ tags, selectedTagIds, onChange, maxTags = 
           ))}
           {selectedTags.length > 0 && (
             <div className="border-t border-dark/10 px-3 py-1.5">
-              <p className="text-xs text-dark/40">{selectedTags.length} selected{maxTags !== null ? ` / ${maxTags} max` : ""}</p>
+              <p className="text-xs text-dark/60">{selectedTags.length} selected{maxTags !== null ? ` / ${maxTags} max` : ""}</p>
             </div>
           )}
         </div>

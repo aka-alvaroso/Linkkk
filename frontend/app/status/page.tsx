@@ -66,7 +66,7 @@ function ServiceRow({ name, icon, service, delay }: {
       </div>
       <div className="flex items-center gap-3">
         {service?.latency != null && (
-          <span className="text-xs text-dark/40 font-mono">{service.latency}ms</span>
+          <span className="text-xs text-dark/60 font-mono">{service.latency}ms</span>
         )}
         {service === null ? (
           <span className="w-5 h-5 rounded-full bg-dark/10 animate-pulse" />
@@ -172,7 +172,7 @@ export default function StatusPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5, duration: 0.3 }}
-              className="flex items-center gap-5 text-sm text-dark/40 mb-6"
+              className="flex items-center gap-5 text-sm text-dark/60 mb-6"
             >
               <span className="flex items-center gap-1.5">
                 <TbClock size={15} />

@@ -33,8 +33,8 @@ export default function LanguageSwitcher({ variant = 'light' }: LanguageSwitcher
                   ? 'bg-light/15 text-light'
                   : 'bg-dark/10 text-dark'
                 : variant === 'dark'
-                  ? 'text-light/40 hover:text-light/70'
-                  : 'text-dark/40 hover:text-dark/70'
+                  ? 'text-light/60 hover:text-light/70'
+                  : 'text-dark/60 hover:text-dark/70'
             }`}
           >
             {languageLabels[locale]}

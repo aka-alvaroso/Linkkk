@@ -508,7 +508,7 @@ export default function Landing() {
               </Button>
             </div>
 
-            <p className="hero-fade text-xs text-dark/50 mt-4">
+            <p className="hero-fade text-xs text-dark/65 mt-4">
               {t("Hero.note")}
             </p>
           </motion.div>
@@ -847,7 +847,7 @@ export default function Landing() {
           </h2>
 
           {/* Subtitle */}
-          <p className="rules-subtitle text-sm md:text-xl italic font-black text-dark/50 mb-16 md:mb-20 max-w-2xl mx-auto">
+          <p className="rules-subtitle text-sm md:text-xl italic font-black text-dark/65 mb-16 md:mb-20 max-w-2xl mx-auto">
             {t("RulesSection.subtitle")}
           </p>
 
@@ -877,7 +877,7 @@ export default function Landing() {
           </div>
 
           {/* Hint */}
-          <p className="text-sm text-dark/30 italic mt-12">
+          <p className="text-sm text-dark/60 italic mt-12">
             {t("RulesSection.hint")}
           </p>
         </div>
@@ -1020,9 +1020,9 @@ export default function Landing() {
             {/* STANDARD / Free */}
             <div className="pricing-card flex-1 max-w-md bg-dark/10 rounded-3xl p-4 flex flex-col justify-between">
               <div>
-                <p className="text-sm md:text-base font-black italic text-dark/50 uppercase tracking-wider mb-1">{t("Pricing.freeLabel")}</p>
+                <p className="text-sm md:text-base font-black italic text-dark/65 uppercase tracking-wider mb-1">{t("Pricing.freeLabel")}</p>
                 <h3 className="text-3xl font-black italic text-dark mb-3">{t("Pricing.freePrice")}</h3>
-                <p className="text-xs md:text-sm text-dark/50 mb-6">
+                <p className="text-xs md:text-sm text-dark/65 mb-6">
                   {t("Pricing.freeDesc")}
                 </p>
 
@@ -1055,12 +1055,12 @@ export default function Landing() {
             {/* PRO */}
             <div className="pricing-card flex-1 max-w-md bg-primary rounded-3xl p-4 flex flex-col justify-between">
               <div>
-                <p className="text-sm md:text-base font-black italic text-dark/50 uppercase tracking-wider mb-1">{t("Pricing.proLabel")}</p>
+                <p className="text-sm md:text-base font-black italic text-dark/65 uppercase tracking-wider mb-1">{t("Pricing.proLabel")}</p>
                 <h3 className="text-3xl font-black italic text-dark mb-3">
                   {billingPeriod === "monthly" ? t("Pricing.proPriceMonthly") : t("Pricing.proPriceYearly")}
-                  <span className="text-lg font-bold text-dark/50 ml-1">{t("Pricing.proPeriod")}</span>
+                  <span className="text-lg font-bold text-dark/65 ml-1">{t("Pricing.proPeriod")}</span>
                 </h3>
-                <p className="text-xs md:text-sm text-dark/50 mb-6">
+                <p className="text-xs md:text-sm text-dark/65 mb-6">
                   {t("Pricing.proDesc")}
                 </p>
 

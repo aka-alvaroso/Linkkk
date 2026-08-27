@@ -46,7 +46,7 @@ export default function LinksDoc() {
         <div className="bg-dark/5 rounded-2xl p-4 font-mono text-sm">
           <p className="font-bold">linkkk.dev/r/<span className="text-primary">my-offer</span></p>
         </div>
-        <p className="text-xs text-dark/40 mt-3 italic">{t("suffixNote")}</p>
+        <p className="text-xs text-dark/60 mt-3 italic">{t("suffixNote")}</p>
       </motion.div>
 
       {/* Link states */}
@@ -120,9 +120,9 @@ export default function LinksDoc() {
         </div>
         <p className="text-sm text-dark/70 leading-relaxed mb-4">{t("customDomainsDesc")}</p>
         <div className="bg-dark/5 rounded-2xl p-4 font-mono text-sm mb-4">
-          <p className="text-dark/40 text-xs mb-1">{t("customDomainsBefore")}</p>
-          <p className="font-bold text-dark/50">linkkk.dev/<span className="text-dark/40">xyz</span></p>
-          <p className="text-dark/40 text-xs mt-3 mb-1">{t("customDomainsWithDomain")}</p>
+          <p className="text-dark/60 text-xs mb-1">{t("customDomainsBefore")}</p>
+          <p className="font-bold text-dark/65">linkkk.dev/<span className="text-dark/60">xyz</span></p>
+          <p className="text-dark/60 text-xs mt-3 mb-1">{t("customDomainsWithDomain")}</p>
           <p className="font-bold">{t("customDomainsExampleDomain")}/<span className="text-primary">xyz</span></p>
         </div>
         <h3 className="font-black italic text-dark mb-3">{t("customDomainsSetupTitle")}</h3>
@@ -134,7 +134,7 @@ export default function LinksDoc() {
             </li>
           ))}
         </ol>
-        <p className="text-xs text-dark/40 mt-4 italic">{t("customDomainsNote")}</p>
+        <p className="text-xs text-dark/60 mt-4 italic">{t("customDomainsNote")}</p>
       </motion.div>
 
       {/* Groups & Tags */}
@@ -159,14 +159,14 @@ export default function LinksDoc() {
           className="flex items-center gap-2 p-4 rounded-xl bg-dark/5 hover:bg-dark/10 transition-colors group">
           <TbArrowLeft size={18} className="text-dark/30 group-hover:text-dark group-hover:-translate-x-1 transition-all" />
           <div>
-            <p className="text-xs text-dark/40">{ts("previous")}</p>
+            <p className="text-xs text-dark/60">{ts("previous")}</p>
             <p className="font-black italic text-sm text-dark">{t("navPrevTitle")}</p>
           </div>
         </Link>
         <Link href="/docs/rules"
           className="flex items-center gap-2 p-4 rounded-xl bg-dark/5 hover:bg-dark/10 transition-colors group text-right">
           <div>
-            <p className="text-xs text-dark/40">{ts("next")}</p>
+            <p className="text-xs text-dark/60">{ts("next")}</p>
             <p className="font-black italic text-sm text-dark">{t("navNextTitle")}</p>
           </div>
           <TbArrowRight size={18} className="text-dark/30 group-hover:text-dark group-hover:translate-x-1 transition-all" />

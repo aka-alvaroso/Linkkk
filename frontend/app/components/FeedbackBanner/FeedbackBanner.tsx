@@ -86,7 +86,7 @@ export default function FeedbackBanner() {
               placeholder={t("placeholder")}
               rows={2}
               maxLength={1000}
-              className="flex-1 text-xs bg-dark/10 border-2 border-transparent focus:border-dark rounded-xl p-2 resize-none focus:outline-none transition-colors placeholder:text-dark/40"
+              className="flex-1 text-xs bg-dark/10 border-2 border-transparent focus:border-dark rounded-xl p-2 resize-none focus:outline-none transition-colors placeholder:text-dark/60"
             />
             <AnimatePresence>
               {hasText && (

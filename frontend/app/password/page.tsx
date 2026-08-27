@@ -131,7 +131,7 @@ export default function PasswordPage() {
                 className="flex items-center gap-2 justify-center"
               >
                 <TbKey size={14} className='text-dark/40' />
-                <p className="text-xs text-dark/50 italic">{hint}</p>
+                <p className="text-xs text-dark/65 italic">{hint}</p>
               </motion.div>
             )}
 
@@ -182,7 +182,7 @@ export default function PasswordPage() {
             transition={{ delay: 0.7, duration: 0.3 }}
             className="mt-4 pt-6 text-center"
           >
-            <Link href="/" className="text-sm text-dark/50">
+            <Link href="/" className="text-sm text-dark/65">
               {t('poweredBy')} <span className="font-black italic">Linkkk.</span>
             </Link>
           </motion.div>

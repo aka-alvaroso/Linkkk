@@ -249,7 +249,7 @@ export default function MetadataImageUploader({
                   </button>
                 </p>
               </div>
-              <p className="text-xs text-dark/40">
+              <p className="text-xs text-dark/60">
                 PNG, JPG, GIF, WEBP - Max 2MB - Recommended 1200x630px
               </p>
             </div>

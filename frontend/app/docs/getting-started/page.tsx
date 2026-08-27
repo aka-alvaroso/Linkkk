@@ -82,7 +82,7 @@ export default function GettingStarted() {
 
       {/* Next steps */}
       <motion.div {...fadeUp} transition={s(4)} className="border-t border-dark/10 pt-6">
-        <p className="text-xs font-black italic text-dark/40 uppercase tracking-wider mb-3">{ts("next")}</p>
+        <p className="text-xs font-black italic text-dark/60 uppercase tracking-wider mb-3">{ts("next")}</p>
         <Link href="/docs/links"
           className="flex items-center justify-between p-4 rounded-xl bg-dark/5 hover:bg-dark/10 transition-colors group">
           <div>

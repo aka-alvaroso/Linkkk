@@ -175,7 +175,7 @@ export default function Dashboard() {
               <p className='text-end text-5xl font-black italic flex items-end justify-end gap-1'>
                 <AnimatedCounter value={totalLinks} delay={0.15} />
                 {linkLimit !== null && (
-                  <span className='text-lg text-dark/40 font-normal'>/{linkLimit}</span>
+                  <span className='text-lg text-dark/60 font-normal'>/{linkLimit}</span>
                 )}
               </p>
             </motion.div>
