@@ -57,6 +57,50 @@ const uploadLogo = async (fileBuffer, userId, shortUrl) => {
 };
 
 /**
+ * Upload a link's social-preview (Open Graph) image to Cloudinary.
+ * Unlike the QR logo (which must stay square and un-cropped to fit inside a QR
+ * code), an OG image is displayed at a fixed 1.91:1 ratio by social platforms,
+ * so it's intentionally normalized with a `fill` crop instead of `limit`.
+ * @param {Buffer} fileBuffer - The file buffer to upload
+ * @param {string} userId - The user ID for folder organization
+ * @param {string} shortUrl - The short URL for unique naming
+ * @returns {Promise<{url: string, publicId: string}>}
+ */
+const uploadMetadataImage = async (fileBuffer, userId, shortUrl) => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder: `linkkk/metadata-images/${userId}`,
+        public_id: `meta_${shortUrl}_${Date.now()}`,
+        resource_type: 'image',
+        transformation: [
+          { width: 1200, height: 630, crop: 'fill', gravity: 'auto' },
+          { quality: 'auto:good' },
+          { fetch_format: 'auto' },
+        ],
+        allowed_formats: ['png', 'jpg', 'jpeg', 'gif', 'webp'],
+      },
+      (error, result) => {
+        if (error) {
+          logger.error('Cloudinary upload failed', {
+            error: error.message,
+            userId,
+            shortUrl,
+          });
+          return reject(error);
+        }
+        resolve({
+          url: result.secure_url,
+          publicId: result.public_id,
+        });
+      }
+    );
+
+    uploadStream.end(fileBuffer);
+  });
+};
+
+/**
  * Delete a logo from Cloudinary
  * @param {string} publicId - The public ID of the image to delete
  * @throws {Error} If deletion fails
@@ -81,6 +125,7 @@ const deleteLogo = async (publicId) => {
 
 module.exports = {
   uploadLogo,
+  uploadMetadataImage,
   deleteLogo,
   cloudinary,
 };

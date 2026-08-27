@@ -11,8 +11,14 @@ const config = require("../config/environment");
 const { defineCountry, defineIsVPN, getClientIp } = require("../utils/access");
 const { evaluateLinkRules, detectDevice } = require("../utils/linkRulesEngine");
 const { comparePassword } = require("../utils/password");
-const { sanitizeQueryParams } = require("../utils/queryParamsSanitizer");
+const { sanitizeQueryParams, escapeParamForHtml } = require("../utils/queryParamsSanitizer");
 const { sendRuleNotificationEmail } = require("../services/emailService");
+const {
+  DEFAULT_OG_TITLE,
+  DEFAULT_OG_DESCRIPTION,
+  DEFAULT_OG_IMAGE,
+  DEFAULT_OG_SITE_NAME,
+} = require("../constants/defaultMetadata");
 
 // 1. Create link
 const createLink = async (req, res) => {
@@ -467,6 +473,7 @@ const redirectLink = async (req, res) => {
           orderBy: { priority: "asc" },
         },
         customDomain: true,
+        metadata: true,
         // Only select email — nothing else is needed for notifications
         user: { select: { email: true } },
       },
@@ -549,6 +556,16 @@ const redirectLink = async (req, res) => {
         type: "redirect",
         url: link.longUrl,
       };
+    }
+
+    // Bots/crawlers never get redirected — they get a metadata preview page
+    // instead, so social platforms never see the destination site's own OG
+    // tags. `action` (already resolved above) is only used to compute the
+    // fallback link for a human whose client ignores the meta-refresh; no
+    // Access row is written and no notify webhook/email fires for this hit,
+    // since crawler preview fetches aren't real visits (see plan doc).
+    if (isBot) {
+      return serveBotPreview(res, link, action, { shortUrl, host, customDomainUserId });
     }
 
     // Apply action based on type
@@ -752,6 +769,86 @@ const redirectLink = async (req, res) => {
     });
     return res.redirect(`${config.frontend.url}/error`);
   }
+};
+
+/**
+ * Render a minimal HTML page with Open Graph / Twitter Card metadata for
+ * bots and crawlers, instead of redirecting them. This is what lets a link
+ * owner control what social platforms show as a preview: their own custom
+ * metadata if configured and enabled, otherwise Linkkk's site defaults —
+ * never the destination URL's real metadata (which is what a raw redirect
+ * would otherwise leak, since crawlers generally follow redirects).
+ *
+ * A human whose client got misidentified as a bot isn't stuck: the page
+ * meta-refreshes immediately to the resolved destination and also shows a
+ * visible "Continue" link, using the same `action` the normal redirect path
+ * already computed (so is_bot-conditioned rules still apply to where a human
+ * actually ends up, only the initial bot-facing response differs).
+ */
+const serveBotPreview = (res, link, action, { shortUrl, host, customDomainUserId }) => {
+  const metadata = link.metadata;
+  const hasCustomMetadata =
+    metadata &&
+    metadata.enabled &&
+    (metadata.ogTitle || metadata.ogDescription || metadata.ogImageUrl);
+
+  const title = (hasCustomMetadata && metadata.ogTitle) || DEFAULT_OG_TITLE;
+  const description = (hasCustomMetadata && metadata.ogDescription) || DEFAULT_OG_DESCRIPTION;
+  const image = (hasCustomMetadata && metadata.ogImageUrl) || DEFAULT_OG_IMAGE;
+
+  const canonicalUrl =
+    customDomainUserId !== null && link.customDomain
+      ? `https://${link.customDomain.domain}/${shortUrl}`
+      : `https://${host || "linkkk.dev"}/r/${shortUrl}`;
+
+  // Resolve the fallback destination from the already-evaluated action —
+  // mirrors the URLs the normal switch(action.type) block below would send
+  // a human to, without exposing that logic twice.
+  let fallbackUrl;
+  switch (action.type) {
+    case "block":
+      fallbackUrl = `${config.frontend.url}/blocked?url=${shortUrl}&reason=${encodeURIComponent(action.reason || "")}`;
+      break;
+    case "password_gate":
+      fallbackUrl = `${config.frontend.url}/password?shortUrl=${shortUrl}${action.hint ? `&hint=${encodeURIComponent(action.hint)}` : ""}`;
+      break;
+    case "redirect":
+    case "notify":
+    default:
+      fallbackUrl = action.url || link.longUrl;
+      break;
+  }
+
+  const safeTitle = escapeParamForHtml(title);
+  const safeDescription = escapeParamForHtml(description);
+  const safeImage = escapeParamForHtml(image);
+  const safeCanonicalUrl = escapeParamForHtml(canonicalUrl);
+  const safeFallbackUrl = escapeParamForHtml(fallbackUrl);
+  const cardType = image ? "summary_large_image" : "summary";
+
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>${safeTitle}</title>
+<meta name="description" content="${safeDescription}">
+<meta property="og:type" content="website">
+<meta property="og:title" content="${safeTitle}">
+<meta property="og:description" content="${safeDescription}">
+<meta property="og:url" content="${safeCanonicalUrl}">
+${image ? `<meta property="og:image" content="${safeImage}">\n` : ""}<meta property="og:site_name" content="${escapeParamForHtml(DEFAULT_OG_SITE_NAME)}">
+<meta name="twitter:card" content="${cardType}">
+<meta name="twitter:title" content="${safeTitle}">
+<meta name="twitter:description" content="${safeDescription}">
+${image ? `<meta name="twitter:image" content="${safeImage}">\n` : ""}<meta http-equiv="refresh" content="0;url=${safeFallbackUrl}">
+</head>
+<body>
+<p><a href="${safeFallbackUrl}">Continue to ${escapeParamForHtml(shortUrl)}</a></p>
+</body>
+</html>`;
+
+  res.set("Content-Type", "text/html; charset=utf-8");
+  return res.status(200).send(html);
 };
 
 // 7. Verify password for password_gate action
