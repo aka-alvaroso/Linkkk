@@ -18,7 +18,7 @@ import { useQRConfig } from '@/app/hooks/useQRConfig';
 import LinkMetadataEditor from '../LinkMetadata/LinkMetadataEditor';
 import AnimatedText, { AnimatedTextRef } from '../ui/AnimatedText';
 import { useTranslations } from 'next-intl';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area, CartesianGrid } from 'recharts';
 
 // Aggregate daily click data into weekly or monthly buckets when there are many data points
 function aggregateClickData(data: { date: string; count: number }[]): { date: string; count: number; isWeekly?: boolean; isMonthly?: boolean }[] {
@@ -692,6 +692,15 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                             const aggregated = aggregateClickData(stats.clicksByDay);
                                             const isWeekly = aggregated[0]?.isWeekly;
                                             const isMonthly = aggregated[0]?.isMonthly;
+                                            const lowData = stats.totalClicks <= 2;
+                                            const lastIndex = aggregated.length - 1;
+                                            const renderClicksDot = (dotProps: unknown) => {
+                                                const { cx, cy, index } = dotProps as { cx?: number; cy?: number; index?: number };
+                                                if (index !== lastIndex || cx == null || cy == null) {
+                                                    return <g key={`clicks-dot-${index}`} />;
+                                                }
+                                                return <circle key={`clicks-dot-${index}`} cx={cx} cy={cy} r={3.5} fill='#72d763' stroke='#fff' strokeWidth={2} />;
+                                            };
                                             const formatTick = (d: string) => {
                                                 if (isMonthly) {
                                                     const [y, m] = d.split('-');
@@ -725,6 +734,11 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                                             <span className='text-[10px] text-dark/30 font-medium mb-0.5'>{isMonthly ? 'monthly' : 'weekly'}</span>
                                                         )}
                                                     </div>
+                                                    {lowData ? (
+                                                        <div className='flex items-center justify-center text-center' style={{ height: 110 }}>
+                                                            <p className='text-xs text-dark/60 max-w-[220px]'>{t('lowDataHint')}</p>
+                                                        </div>
+                                                    ) : (
                                                     <ResponsiveContainer width='100%' height={110}>
                                                         <AreaChart data={aggregated} margin={{ top: 8, right: 0, left: -36, bottom: 0 }}>
                                                             <defs>
@@ -733,6 +747,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                                                     <stop offset='100%' stopColor='#72d763' stopOpacity={0} />
                                                                 </linearGradient>
                                                             </defs>
+                                                            <CartesianGrid vertical={false} stroke='rgba(27,27,27,0.08)' />
                                                             <XAxis dataKey='date' tickFormatter={formatTick} tick={{ fontSize: 9, fill: 'rgba(0,0,0,0.3)' }} interval='preserveStartEnd' axisLine={false} tickLine={false} />
                                                             <YAxis tick={{ fontSize: 9, fill: 'rgba(0,0,0,0.3)' }} allowDecimals={false} axisLine={false} tickLine={false} />
                                                             <Tooltip
@@ -741,9 +756,10 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                                                 formatter={(v) => [v ?? 0, t('statClicks')]}
                                                                 cursor={{ stroke: 'rgba(27,27,27,0.15)', strokeWidth: 1 }}
                                                             />
-                                                            <Area type='monotone' dataKey='count' stroke='#72d763' strokeWidth={1.5} fill='url(#lg)' dot={false} activeDot={{ r: 3, fill: '#72d763', stroke: '#fff', strokeWidth: 2 }} />
+                                                            <Area type='monotone' dataKey='count' stroke='#72d763' strokeWidth={1.5} fill='url(#lg)' dot={renderClicksDot} activeDot={{ r: 3, fill: '#72d763', stroke: '#fff', strokeWidth: 2 }} />
                                                         </AreaChart>
                                                     </ResponsiveContainer>
+                                                    )}
                                                 </motion.div>
                                             );
                                         })()}
@@ -770,7 +786,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                                                                 initial={{ width: 0 }}
                                                                                 animate={{ width: `${pct}%` }}
                                                                                 transition={{ delay: 0.15 + idx * 0.04, duration: 0.5, ease: 'easeOut' }}
-                                                                                className={`h-full rounded-full ${idx === 0 ? 'bg-primary' : 'bg-dark/15'}`}
+                                                                                className={`h-full rounded-full ${idx === 0 ? 'bg-primary' : 'bg-dark/70'}`}
                                                                             />
                                                                         </div>
                                                                         <span className='text-xs font-bold text-dark/50 w-5 text-right flex-shrink-0 tabular-nums'>{count}</span>
@@ -832,7 +848,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
 
                                             {/* Browsers — horizontal stacked bar, full width */}
                                             {stats.browserBreakdown.length > 0 && (() => {
-                                                    const browserColors = ['#72d763', '#FDC344', '#279AF1', '#7F2CCB', '#1B1B1B'];
+                                                    const browserColors = ['#72d763', 'rgba(27,27,27,0.7)', 'rgba(27,27,27,0.55)', 'rgba(27,27,27,0.4)', 'rgba(27,27,27,0.25)'];
                                                     const total = stats.totalClicks || stats.browserBreakdown.reduce((s, b) => s + b.count, 0);
                                                     const barData = [stats.browserBreakdown.reduce((obj, { browser, count }) => ({ ...obj, [browser]: count }), {} as Record<string, number>)];
                                                     return (

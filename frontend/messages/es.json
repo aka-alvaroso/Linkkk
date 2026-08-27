@@ -387,6 +387,7 @@
     "bot": "Bot",
     "human": "Humano",
     "noData": "Sin datos aún",
+    "lowDataHint": "Comparte tu enlace para empezar a ver datos",
     "customSuffix": "Sufijo personalizado",
     "customSuffixOptional": "opcional",
     "customSuffixPlaceholder": "mi-enlace",

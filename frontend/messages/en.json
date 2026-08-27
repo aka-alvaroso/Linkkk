@@ -386,6 +386,7 @@
     "bot": "Bot",
     "human": "Human",
     "noData": "No data yet",
+    "lowDataHint": "Share your link to start seeing data",
     "customSuffix": "Custom suffix",
     "customSuffixOptional": "optional",
     "customSuffixPlaceholder": "my-link",
