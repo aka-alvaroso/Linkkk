@@ -23,7 +23,7 @@ const linkMetadataSchema = z.object({
         message: "Image URL must use HTTPS",
       })
       .refine((url) => isValidLogoUrl(url), {
-        message: "Image URL must be a valid HTTPS image URL (jpg, png, gif, webp, svg) and cannot point to private/internal addresses",
+        message: "Image URL must be a valid HTTPS URL and cannot point to private/internal addresses",
       })
       .optional()
       .nullable()

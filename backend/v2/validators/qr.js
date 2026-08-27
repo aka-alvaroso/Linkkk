@@ -47,14 +47,14 @@ const isValidLogoUrl = (url) => {
       return false;
     }
 
-    // SECURITY: Validate file extension to ensure it's an image
-    const pathname = parsed.pathname.toLowerCase();
-    const validExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'];
-    const hasValidExtension = validExtensions.some(ext => pathname.endsWith(ext));
-
-    if (!hasValidExtension) {
-      return false;
-    }
+    // NOTE: we intentionally do NOT require a recognizable image file
+    // extension in the path. Many legitimate image CDNs (Unsplash, Twitter/X,
+    // Google-hosted images, WordPress media, etc.) serve images via
+    // extensionless URLs and content negotiation / query params instead
+    // (e.g. https://images.unsplash.com/photo-xxx?auto=format&fit=crop).
+    // The actual security boundary is HTTPS + the private-IP/metadata
+    // blocklist above; if the URL doesn't point to a real image it just
+    // won't render, which isn't a security issue.
 
     return true;
   } catch {
@@ -79,7 +79,7 @@ const qrConfigSchema = z.object({
       message: "Logo URL must use HTTPS",
     })
     .refine((url) => isValidLogoUrl(url), {
-      message: "Logo URL must be a valid HTTPS image URL (jpg, png, gif, webp, svg) and cannot point to private/internal addresses",
+      message: "Logo URL must be a valid HTTPS URL and cannot point to private/internal addresses",
     })
     .optional()
     .nullable(),
