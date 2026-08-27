@@ -84,6 +84,12 @@ export default function Landing() {
   // Pricing toggle
   const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">("monthly");
 
+  // Respect the user's reduced-motion preference for GSAP-driven layout
+  const [reducedMotion, setReducedMotion] = useState(false);
+  useEffect(() => {
+    setReducedMotion(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  }, []);
+
   const handleUpgradePro = async () => {
     if (!isAuthenticated) {
       window.location.href = "/auth/login";
@@ -98,6 +104,16 @@ export default function Landing() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
+      // Respect prefers-reduced-motion: skip all animations and leave content
+      // in its final, visible state (no residual opacity:0 / transforms).
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        gsap.set(
+          ".anim-word, .hero-fade, .anim-sticker, .step-card, .steps-cta, .rules-subtitle, .rule-pill, .bento-cell, .pricing-card",
+          { opacity: 1, clearProps: "transform" }
+        );
+        return;
+      }
+
       if (!controlWordRef.current || !heroContentRef.current || !triggerRef.current || !heroSectionRef.current) return;
 
       // --- Hero zoom animation ---
@@ -514,15 +530,22 @@ export default function Landing() {
           </motion.div>
         </section>
 
-        <div className="h-[150vh]" />
+        <div className={reducedMotion ? "hidden" : "h-[150vh]"} />
       </div>
 
       {/* ==================== HORIZONTAL SCROLL SECTION ==================== */}
-      <div ref={horizontalSectionRef} className="bg-dark overflow-hidden relative pt-px">
+      <div
+        ref={horizontalSectionRef}
+        className={`bg-dark relative pt-px ${reducedMotion ? "" : "overflow-hidden"}`}
+      >
         {/* Floating section title */}
         <h2
           ref={sectionTitleRef}
-          className="absolute left-1/2 -translate-x-1/2 top-1/2 pt-96 -translate-y-1/2 z-10 text-4xl md:text-6xl font-black italic text-light text-center leading-tight whitespace-nowrap will-change-transform"
+          className={
+            reducedMotion
+              ? "relative z-10 text-4xl md:text-6xl font-black italic text-light text-center leading-tight px-4 pt-24 pb-4 will-change-transform"
+              : "absolute left-1/2 -translate-x-1/2 top-1/2 pt-96 -translate-y-1/2 z-10 text-4xl md:text-6xl font-black italic text-light text-center leading-tight whitespace-nowrap will-change-transform"
+          }
         >
           <SplitWords>{t("Problems.title")}</SplitWords>{" "}
           <span className="inline-block overflow-hidden">
@@ -537,13 +560,13 @@ export default function Landing() {
 
         <div
           ref={horizontalTrackRef}
-          className="flex h-screen items-center will-change-transform"
+          className={`flex items-center will-change-transform ${reducedMotion ? "flex-col h-auto" : "h-screen"}`}
         >
           {/* Spacer: first "screen" is just the title */}
-          <div className="flex-shrink-0 w-screen h-full" />
+          <div className={reducedMotion ? "hidden" : "flex-shrink-0 w-screen h-full"} />
 
           {/* --- Slide 1: Bots --- */}
-          <div className="h-slide flex-shrink-0 w-screen h-full flex items-center px-8 md:px-20 pt-24 md:pt-32">
+          <div className={`h-slide flex-shrink-0 flex items-center px-8 md:px-20 ${reducedMotion ? "w-full py-12" : "w-screen h-full pt-24 md:pt-32"}`}>
             <div className="flex flex-col md:flex-row items-center gap-8 md:gap-16 w-full max-w-5xl mx-auto">
               <div className="anim-sticker flex-shrink-0">
                 <Image
@@ -569,7 +592,7 @@ export default function Landing() {
           </div>
 
           {/* --- Slide 2: Affiliate / Geo --- */}
-          <div className="h-slide flex-shrink-0 w-screen h-full flex items-center px-8 md:px-20 pt-24 md:pt-32">
+          <div className={`h-slide flex-shrink-0 flex items-center px-8 md:px-20 ${reducedMotion ? "w-full py-12" : "w-screen h-full pt-24 md:pt-32"}`}>
             <div className="flex flex-col md:flex-row items-center gap-8 md:gap-16 w-full max-w-5xl mx-auto">
               <div className="anim-sticker flex-shrink-0 relative">
                 <Image
@@ -602,7 +625,7 @@ export default function Landing() {
           </div>
 
           {/* --- Slide 3: Mobile user --- */}
-          <div className="h-slide flex-shrink-0 w-screen h-full flex items-center px-8 md:px-20 pt-24 md:pt-32">
+          <div className={`h-slide flex-shrink-0 flex items-center px-8 md:px-20 ${reducedMotion ? "w-full py-12" : "w-screen h-full pt-24 md:pt-32"}`}>
             <div className="flex flex-col md:flex-row items-center gap-8 md:gap-16 w-full max-w-5xl mx-auto">
               <div className="anim-sticker flex-shrink-0">
                 <Image
@@ -628,7 +651,7 @@ export default function Landing() {
           </div>
 
           {/* --- Slide 4: Public link --- */}
-          <div className="h-slide flex-shrink-0 w-screen h-full flex items-center px-8 md:px-20 pt-24 md:pt-32">
+          <div className={`h-slide flex-shrink-0 flex items-center px-8 md:px-20 ${reducedMotion ? "w-full py-12" : "w-screen h-full pt-24 md:pt-32"}`}>
             <div className="flex flex-col md:flex-row items-center gap-8 md:gap-16 w-full max-w-5xl mx-auto">
               <div className="anim-sticker flex-shrink-0">
                 <Image
