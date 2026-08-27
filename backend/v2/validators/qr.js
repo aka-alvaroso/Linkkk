@@ -94,4 +94,5 @@ const qrConfigSchema = z.object({
 
 module.exports = {
   qrConfigSchema,
+  isValidLogoUrl,
 };

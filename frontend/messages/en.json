@@ -344,6 +344,7 @@
     "tabSettings": "Settings",
     "tabHistory": "History",
     "tabQR": "QR Code",
+    "tabMetadata": "Social Preview",
     "limitedViewTitle": "30-day history:",
     "limitedViewMessage": "Access records older than 30 days are automatically deleted on your plan.",
     "limitedViewUpgrade": "Upgrade to PRO to keep your full access history forever.",
@@ -827,6 +828,37 @@
       "apply": "Apply",
       "remove": "Remove logo"
     }
+  },
+  "LinkMetadataEditor": {
+    "enabledLabel": "Custom social preview",
+    "enabledHint": "When off, Linkkk's default preview is shown instead.",
+    "ogTitleLabel": "Title",
+    "ogTitlePlaceholder": "How your link should appear when shared",
+    "ogTitleHint": "Shown as the bold headline on social media and chat apps.",
+    "ogDescriptionLabel": "Description",
+    "ogDescriptionPlaceholder": "A short description of what people will find",
+    "ogDescriptionHint": "Shown below the title in the preview card.",
+    "imageLabel": "Preview image",
+    "imageUpload": {
+      "tabUpload": "Upload",
+      "tabUrl": "URL",
+      "dragDrop": "Drag and drop an image here",
+      "or": "or",
+      "browse": "browse files",
+      "uploading": "Uploading...",
+      "success": "Image uploaded successfully!",
+      "failed": "Failed to upload image",
+      "invalidType": "Only PNG, JPG, GIF, and WEBP files are allowed",
+      "fileTooLarge": "File size must be less than 2MB",
+      "httpsRequired": "Image URL must use HTTPS",
+      "invalidUrl": "Please enter a valid URL",
+      "apply": "Apply",
+      "remove": "Remove image"
+    },
+    "previewLabel": "Preview",
+    "previewFallbackTitle": "Your link title will appear here",
+    "toastSaveSuccess": "Social preview saved successfully!",
+    "toastSaveFailed": "Failed to save social preview"
   },
   "Docs": {
     "layout": {

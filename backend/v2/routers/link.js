@@ -45,6 +45,13 @@ const {
   deleteQRLogo,
 } = require("../controllers/qr");
 
+const {
+  getLinkMetadata,
+  updateLinkMetadata,
+  uploadMetadataImage,
+  deleteMetadataImage,
+} = require("../controllers/linkMetadata");
+
 // Link routes
 router.post("/", auth, createLinkLimiter, createLink);
 router.get("/:shortUrl", auth, getLinksLimiter, getLink);
@@ -88,5 +95,25 @@ router.post(
 
 // QR Logo delete route
 router.delete("/qr/logo", auth, authUser, deleteRuleLimiter, deleteQRLogo);
+
+// Link Metadata routes (registered users only — guests cannot access metadata)
+router.get("/:shortUrl/metadata", auth, authUser, getLinksLimiter, getLinkMetadata);
+router.put("/:shortUrl/metadata", auth, authUser, updateLinkLimiter, updateLinkMetadata);
+
+// Metadata image upload route
+router.post(
+  "/:shortUrl/metadata/image",
+  auth,
+  authUser,
+  logoUploadLimiter,
+  upload.single("image"),
+  handleMulterError,
+  validateRealMimeType,
+  validateImageDimensions,
+  uploadMetadataImage
+);
+
+// Metadata image delete route
+router.delete("/metadata/image", auth, authUser, deleteRuleLimiter, deleteMetadataImage);
 
 module.exports = router;

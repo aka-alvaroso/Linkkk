@@ -345,6 +345,7 @@
     "tabHistory": "Historial",
     "tabQRCode": "QR Code",
     "tabQR": "Código QR",
+    "tabMetadata": "Vista previa social",
     "limitedViewTitle": "Historial de 30 días:",
     "limitedViewMessage": "Los registros de acceso de más de 30 días se eliminan automáticamente en tu plan.",
     "limitedViewUpgrade": "Hazte PRO para conservar tu historial de accesos para siempre.",
@@ -828,6 +829,37 @@
       "apply": "Aplicar",
       "remove": "Eliminar logo"
     }
+  },
+  "LinkMetadataEditor": {
+    "enabledLabel": "Vista previa social personalizada",
+    "enabledHint": "Si está desactivado, se muestra la vista previa por defecto de Linkkk.",
+    "ogTitleLabel": "Título",
+    "ogTitlePlaceholder": "Cómo debe verse tu enlace al compartirlo",
+    "ogTitleHint": "Se muestra como titular en redes sociales y apps de mensajería.",
+    "ogDescriptionLabel": "Descripción",
+    "ogDescriptionPlaceholder": "Una breve descripción de lo que encontrarán",
+    "ogDescriptionHint": "Se muestra debajo del título en la tarjeta de vista previa.",
+    "imageLabel": "Imagen de vista previa",
+    "imageUpload": {
+      "tabUpload": "Subir",
+      "tabUrl": "URL",
+      "dragDrop": "Arrastra y suelta una imagen aquí",
+      "or": "o",
+      "browse": "selecciona un archivo",
+      "uploading": "Subiendo...",
+      "success": "¡Imagen subida correctamente!",
+      "failed": "Error al subir la imagen",
+      "invalidType": "Solo se permiten archivos PNG, JPG, GIF y WEBP",
+      "fileTooLarge": "El archivo debe ser menor a 2MB",
+      "httpsRequired": "La URL de la imagen debe usar HTTPS",
+      "invalidUrl": "Por favor introduce una URL válida",
+      "apply": "Aplicar",
+      "remove": "Eliminar imagen"
+    },
+    "previewLabel": "Vista previa",
+    "previewFallbackTitle": "Aquí aparecerá el título de tu enlace",
+    "toastSaveSuccess": "¡Vista previa social guardada!",
+    "toastSaveFailed": "Error al guardar la vista previa social"
   },
   "Docs": {
     "layout": {

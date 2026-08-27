@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Drawer from '@/app/components/ui/Drawer/Drawer';
 import { FiCornerDownRight } from 'react-icons/fi';
-import { TbCircleDashed, TbCircleDashedCheck, TbCopy, TbList, TbPalette, TbCategory, TbPuzzle, TbQrcode, TbPencil, TbClick, TbWorld, TbShieldX, TbRobot, TbTag, TbFolder } from 'react-icons/tb';
+import { TbCircleDashed, TbCircleDashedCheck, TbCopy, TbList, TbPalette, TbCategory, TbPuzzle, TbQrcode, TbPencil, TbClick, TbWorld, TbShieldX, TbRobot, TbTag, TbFolder, TbShare2 } from 'react-icons/tb';
 import Button from '../ui/Button/Button';
 import { useLinks, useAuth, useTags, useGroups } from '@/app/hooks';
 import { domainService, CustomDomain } from '@/app/services/api/domainService';
@@ -15,6 +15,7 @@ import { AnimatePresence } from 'motion/react';
 import { RulesManager } from '../LinkRules/RulesManager';
 import { QRCodePreview, downloadQRCode, QRCodeEditor } from '../QRCode';
 import { useQRConfig } from '@/app/hooks/useQRConfig';
+import LinkMetadataEditor from '../LinkMetadata/LinkMetadataEditor';
 import AnimatedText, { AnimatedTextRef } from '../ui/AnimatedText';
 import { useTranslations } from 'next-intl';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
@@ -98,6 +99,11 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
     const saveQRRef = useRef<(() => Promise<void>) | null>(null);
     const cancelQRRef = useRef<(() => void) | null>(null);
     const tQR = useTranslations('QRCodeEditor');
+
+    // Metadata (social preview) state
+    const [hasMetadataChanges, setHasMetadataChanges] = useState(false);
+    const saveMetadataRef = useRef<(() => Promise<void>) | null>(null);
+    const cancelMetadataRef = useRef<(() => void) | null>(null);
     const { config: qrConfig, fetchConfig: fetchQRConfig } = useQRConfig(link.shortUrl);
     const qrUrl = link.customDomain
         ? `https://${link.customDomain.domain}/${link.shortUrl}?src=qr`
@@ -185,6 +191,16 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
         cancelQRRef.current = cancelQR;
     }, []);
 
+    const handleMetadataChange = useCallback((
+        hasChanges: boolean,
+        saveMetadata: () => Promise<void>,
+        cancelMetadata: () => void
+    ) => {
+        setHasMetadataChanges(hasChanges);
+        saveMetadataRef.current = saveMetadata;
+        cancelMetadataRef.current = cancelMetadata;
+    }, []);
+
     const handleUpdateLink = useCallback(async () => {
         if (newLink.shortUrl !== link.shortUrl && !suffixRegex.test(newLink.shortUrl)) {
             setSuffixError(t('customSuffixInvalid'));
@@ -221,6 +237,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
 
             if (hasRulesChanges && saveRulesRef.current) await saveRulesRef.current();
             if (hasQRChanges && saveQRRef.current) await saveQRRef.current();
+            if (hasMetadataChanges && saveMetadataRef.current) await saveMetadataRef.current();
 
             toast.success(t('toastUpdateSuccess'));
             setShowStatusBar("none");
@@ -232,7 +249,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
             toast.error(t('toastSaveFailed'), { description: errorMessage });
             setShowStatusBar("none");
         }
-    }, [link, newLink, updateLink, fetchLinks, onClose, hasRulesChanges, hasQRChanges, toast, t]);
+    }, [link, newLink, updateLink, fetchLinks, onClose, hasRulesChanges, hasQRChanges, hasMetadataChanges, toast, t]);
 
     useEffect(() => {
         if (!open) return;
@@ -259,6 +276,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
             else if (e.key === '2') setTab('rules');
             else if (e.key === '3' && !isGuest) setTab('history');
             else if (e.key === '4' && !isGuest) setTab('qr');
+            else if (e.key === '5' && !isGuest) setTab('metadata');
         };
 
         document.addEventListener('keydown', handleKeyDown);
@@ -272,11 +290,11 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
             link.shortUrl !== newLink.shortUrl ||
             (link.customDomain?.id ?? null) !== (newLink.customDomain?.id ?? null);
 
-        const hasChanges = hasLinkChanges || hasRulesChanges || hasQRChanges;
+        const hasChanges = hasLinkChanges || hasRulesChanges || hasQRChanges || hasMetadataChanges;
 
         if (hasChanges) setShowStatusBar("confirm");
         else setShowStatusBar("none");
-    }, [newLink, link, hasRulesChanges, hasQRChanges]);
+    }, [newLink, link, hasRulesChanges, hasQRChanges, hasMetadataChanges]);
 
     return (
         <Drawer
@@ -322,6 +340,15 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                             disabled={isGuest}
                         >
                             {t('tabQR')}
+                        </Button>
+                    </motion.div>
+                    <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.4, ease: "backInOut" }} className="flex-shrink-0">
+                        <Button variant='ghost' size='sm' rounded='2xl' leftIcon={<TbShare2 size={20} />}
+                            className={`rounded-2xl ${tab === 'metadata' ? 'bg-dark text-light hover:bg-dark/90' : 'bg-dark/5 text-dark/50'}`}
+                            onClick={() => setTab('metadata')}
+                            disabled={isGuest}
+                        >
+                            {t('tabMetadata')}
                         </Button>
                     </motion.div>
                 </div>
@@ -886,6 +913,13 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                         <QRCodeEditor shortUrl={link.shortUrl} onConfigChange={handleQRChange} />
                     </div>
                 )}
+
+                {/* Metadata (social preview) */}
+                {tab === 'metadata' && (
+                    <div className='relative z-0 w-full flex flex-col gap-4 '>
+                        <LinkMetadataEditor shortUrl={link.shortUrl} onConfigChange={handleMetadataChange} />
+                    </div>
+                )}
             </div>
 
             {/* Floating bottom status bar */}
@@ -920,6 +954,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                         setEditingLongUrl(false);
                                         if (cancelRulesRef.current) cancelRulesRef.current();
                                         if (cancelQRRef.current) cancelQRRef.current();
+                                        if (cancelMetadataRef.current) cancelMetadataRef.current();
                                     }}
                                 >
                                     {t('discard')}

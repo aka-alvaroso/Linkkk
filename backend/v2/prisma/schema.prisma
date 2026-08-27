@@ -82,6 +82,7 @@ model Link {
   accesses       Access[]
   rules          LinkRule[]
   qrConfig       QRConfig?
+  metadata       LinkMetadata?
   tags           LinkTag[]
 
   @@index([shortUrl])
@@ -304,6 +305,21 @@ enum DotsStyle {
   square
   rounded
   dots
+}
+
+// Custom social-preview (Open Graph) metadata for links
+model LinkMetadata {
+  id            Int      @id @default(autoincrement())
+  linkId        Int      @unique
+  link          Link     @relation(fields: [linkId], references: [id], onDelete: Cascade)
+  ogTitle       String?
+  ogDescription String?
+  ogImageUrl    String?
+  enabled       Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([linkId])
 }
 
 enum CornersStyle {
