@@ -170,7 +170,7 @@ export default function Dashboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.05, duration: 0.4, ease: "backInOut" }}
-              className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
+              className='p-2 max-w-48 min-w-48 bg-dark/5 rounded-2xl md:max-w-full'>
               <h2 className='text-md'>{t('totalLinks')}</h2>
               <p className='text-end text-5xl font-black italic flex items-end justify-end gap-1'>
                 <AnimatedCounter value={totalLinks} delay={0.15} />
@@ -183,7 +183,7 @@ export default function Dashboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1, duration: 0.4, ease: "backInOut" }}
-              className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
+              className='p-2 max-w-48 min-w-48 bg-dark/5 rounded-2xl md:max-w-full'>
               <h2 className='text-md'>{t('totalClicks')}</h2>
               <p className='text-end text-5xl font-black italic'>
                 <AnimatedCounter value={totalClicks} delay={0.15} />
@@ -203,7 +203,7 @@ export default function Dashboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.4, ease: "backInOut" }}
-              className='p-2 max-w-48 min-w-48 bg-black/5 rounded-2xl md:max-w-full'>
+              className='p-2 max-w-48 min-w-48 bg-dark/5 rounded-2xl md:max-w-full'>
               <h2 className='text-md'>{t('totalScans')}</h2>
               <p className='text-end text-5xl font-black italic'>
                 <AnimatedCounter value={totalScans} delay={0.15} />
