@@ -47,7 +47,7 @@ const Switch = React.forwardRef<HTMLButtonElement, SwitchProps>(
           sizeClasses[size],
           checked
             ? 'bg-success text-dark hover:bg-success/90 '
-            : 'bg-danger text-light hover:bg-danger/90',
+            : 'bg-dark/10 text-dark/60 hover:bg-dark/20',
           disabled && 'opacity-50 cursor-not-allowed',
           !disabled && 'cursor-pointer',
           className
