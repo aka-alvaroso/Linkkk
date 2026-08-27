@@ -261,7 +261,7 @@ export default function Dashboard() {
                         className="relative border border-secondary"
                       >
                         {t('organize')}
-                        <span className="absolute -top-2 -right-4 rotate-20 text-xs bg-secondary text-light rounded-full py-0.5 px-2">{t('organizeBadge')}</span>
+                        <span className="absolute -top-2 -right-2 text-xs bg-secondary text-light rounded-full py-0.5 px-2">{t('organizeBadge')}</span>
                       </Button>
                     }
                     items={[

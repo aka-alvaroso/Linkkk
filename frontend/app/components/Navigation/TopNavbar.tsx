@@ -117,7 +117,7 @@ export default function TopNavbar({ showCreate = false }: TopNavbarProps) {
                 {user.username}
               </Button>
               {user.role === 'PRO' && (
-                <span className="absolute -top-3 -right-6 px-2 py-0.5 bg-secondary text-light text-xs font-black italic rounded-full border border-dark shadow-[2px_2px_0_var(--color-dark)]">
+                <span className="absolute -top-2 -right-2 px-2 py-0.5 bg-secondary text-light text-xs font-black italic rounded-full border border-dark shadow-[2px_2px_0_var(--color-dark)]">
                   PRO
                 </span>
               )}
