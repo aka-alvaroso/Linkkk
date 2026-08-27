@@ -4,7 +4,9 @@
  */
 
 const multer = require('multer');
-const { fileTypeFromBuffer } = require('file-type');
+// NOTE: installed file-type is v16.x (per package.json), whose API is
+// `fromBuffer` — not `fileTypeFromBuffer` (that name only exists in v17+).
+const { fromBuffer: fileTypeFromBuffer } = require('file-type');
 const { errorResponse } = require('../utils/response');
 
 // Allowed MIME types
