@@ -386,7 +386,7 @@
     "bot": "Bot",
     "human": "Human",
     "noData": "No data yet",
-    "lowDataHint": "Share your link to start seeing data",
+    "lowDataHint": "Not enough clicks yet for a trend chart ({count} so far) — check back after a few more",
     "customSuffix": "Custom suffix",
     "customSuffixOptional": "optional",
     "customSuffixPlaceholder": "my-link",

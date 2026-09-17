@@ -736,7 +736,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                                     </div>
                                                     {lowData ? (
                                                         <div className='flex items-center justify-center text-center' style={{ height: 110 }}>
-                                                            <p className='text-xs text-dark/60 max-w-[220px]'>{t('lowDataHint')}</p>
+                                                            <p className='text-xs text-dark/60 max-w-[220px]'>{t('lowDataHint', { count: stats.totalClicks })}</p>
                                                         </div>
                                                     ) : (
                                                     <ResponsiveContainer width='100%' height={110}>

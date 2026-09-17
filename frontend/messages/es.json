@@ -387,7 +387,7 @@
     "bot": "Bot",
     "human": "Humano",
     "noData": "Sin datos aún",
-    "lowDataHint": "Comparte tu enlace para empezar a ver datos",
+    "lowDataHint": "Aún no hay suficientes clics para un gráfico de tendencia ({count} hasta ahora) — vuelve a comprobarlo más adelante",
     "customSuffix": "Sufijo personalizado",
     "customSuffixOptional": "opcional",
     "customSuffixPlaceholder": "mi-enlace",
