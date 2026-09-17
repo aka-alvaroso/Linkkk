@@ -10,6 +10,7 @@ import { PLAN_LIMITS } from '@/app/constants/limits';
 import type { Link } from '@/app/types';
 import { AccessesList } from '../Accesses/accessesList';
 import { useToast } from '@/app/hooks/useToast';
+import { useLinkAccessEvent } from '@/app/hooks/useLinkAccessEvent';
 import * as motion from 'motion/react-client';
 import { AnimatePresence } from 'motion/react';
 import { RulesManager } from '../LinkRules/RulesManager';
@@ -138,14 +139,22 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
 
 
 
-    useEffect(() => {
-        if (!open || isGuest || tab !== 'overview') return;
+    const fetchStats = useCallback(() => {
+        if (isGuest) return;
         setStatsLoading(true);
         statsService.getLinkStats(link.shortUrl, statsPeriod)
             .then(setStats)
             .catch(console.error)
             .finally(() => setStatsLoading(false));
-    }, [open, tab, link.shortUrl, statsPeriod, isGuest]);
+    }, [link.shortUrl, statsPeriod, isGuest]);
+
+    useEffect(() => {
+        if (!open || tab !== 'overview') return;
+        fetchStats();
+    }, [open, tab, fetchStats]);
+
+    // Refresh the chart/breakdown as soon as a new access comes in for this link
+    useLinkAccessEvent(open && tab === 'overview' ? link.shortUrl : undefined, fetchStats);
 
     const handleDownloadQR = async () => {
         setIsDownloadingQR(true);

@@ -24,6 +24,7 @@ const subscriptionRouter = require("./v2/routers/subscription");
 const tagRouter = require("./v2/routers/tag");
 const groupRouter = require("./v2/routers/group");
 const domainRouter = require("./v2/routers/domain");
+const realtimeRouter = require("./v2/routers/realtime");
 
 // Controllers
 const { redirectLink } = require("./v2/controllers/link");
@@ -232,6 +233,7 @@ app.get("/status", async (req, res) => {
 app.use("/auth", csrfProtection, authRouter);
 app.use("/link", csrfProtection, linkRouter);
 app.use("/accesses", accessesRouter); // GET only, no CSRF needed
+app.use("/realtime", realtimeRouter); // GET only (SSE stream), no CSRF needed
 app.use("/user", csrfProtection, userRouter);
 app.use("/tags", csrfProtection, tagRouter);
 app.use("/groups", csrfProtection, groupRouter);

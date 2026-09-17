@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { TbShieldCheck, TbShieldX, TbRobot, TbUser, TbWifi, TbBrowser, TbLocationOff, TbShare3, TbQrcode, TbClick } from 'react-icons/tb';
 import * as motion from 'motion/react-client';
 import Button from '../ui/Button/Button';
 import { useToast } from "@/app/hooks/useToast";
+import { useLinkAccessEvent } from "@/app/hooks/useLinkAccessEvent";
 import { useTranslations } from 'next-intl';
 
 interface Access {
@@ -44,13 +45,17 @@ export const AccessesList = ({ shortUrl }: AccessesListProps) => {
         }
     };
 
-    useEffect(() => {
-        const fetchData = async () => {
-            const d = await getLinkAccesses(shortUrl);
-            setAccesses(d);
-        };
-        fetchData();
+    const fetchData = useCallback(async () => {
+        const d = await getLinkAccesses(shortUrl);
+        setAccesses(d);
     }, [shortUrl]);
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
+
+    // Prepend the new access as soon as it happens instead of waiting for a manual refresh
+    useLinkAccessEvent(shortUrl, fetchData);
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
