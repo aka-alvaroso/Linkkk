@@ -780,10 +780,19 @@ const redirectLink = async (req, res) => {
  * would otherwise leak, since crawlers generally follow redirects).
  *
  * A human whose client got misidentified as a bot isn't stuck: the page
- * meta-refreshes immediately to the resolved destination and also shows a
- * visible "Continue" link, using the same `action` the normal redirect path
- * already computed (so is_bot-conditioned rules still apply to where a human
- * actually ends up, only the initial bot-facing response differs).
+ * redirects instantly via JS, falls back to a delayed meta-refresh for
+ * clients without JS, and also shows a visible "Continue" link — using the
+ * same `action` the normal redirect path already computed (so is_bot-
+ * conditioned rules still apply to where a human actually ends up, only the
+ * initial bot-facing response differs).
+ *
+ * The meta-refresh is deliberately delayed (not 0s): social crawlers that
+ * don't execute JS (Facebook, WhatsApp, LinkedIn, Discord, X/Slack) never
+ * navigate off this page, so they see our OG tags. Telegram's crawler is a
+ * known exception — it follows `http-equiv="refresh"` when scraping for a
+ * preview, which made it pick up the destination's metadata instead of ours
+ * when this used `content="0;..."`. A several-second delay makes it read as
+ * a real page rather than a redirect stub, so it stops following it too.
  */
 const serveBotPreview = (res, link, action, { shortUrl, host, customDomainUserId }) => {
   const metadata = link.metadata;
@@ -824,6 +833,8 @@ const serveBotPreview = (res, link, action, { shortUrl, host, customDomainUserId
   const safeImage = escapeParamForHtml(image);
   const safeCanonicalUrl = escapeParamForHtml(canonicalUrl);
   const safeFallbackUrl = escapeParamForHtml(fallbackUrl);
+  // Prevents a fallbackUrl containing "</script>" from breaking out of the inline script below.
+  const jsFallbackUrl = JSON.stringify(fallbackUrl).replace(/</g, "\\u003c");
   const cardType = image ? "summary_large_image" : "summary";
 
   const html = `<!DOCTYPE html>
@@ -840,9 +851,10 @@ ${image ? `<meta property="og:image" content="${safeImage}">\n` : ""}<meta prope
 <meta name="twitter:card" content="${cardType}">
 <meta name="twitter:title" content="${safeTitle}">
 <meta name="twitter:description" content="${safeDescription}">
-${image ? `<meta name="twitter:image" content="${safeImage}">\n` : ""}<meta http-equiv="refresh" content="0;url=${safeFallbackUrl}">
+${image ? `<meta name="twitter:image" content="${safeImage}">\n` : ""}<meta http-equiv="refresh" content="8;url=${safeFallbackUrl}">
 </head>
 <body>
+<script>window.location.replace(${jsFallbackUrl});</script>
 <p><a href="${safeFallbackUrl}">Continue to ${escapeParamForHtml(shortUrl)}</a></p>
 </body>
 </html>`;
