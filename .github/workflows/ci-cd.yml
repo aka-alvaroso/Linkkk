@@ -1,0 +1,115 @@
+name: CI/CD
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  backend-tests:
+    name: Backend tests
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: linkkkv2_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/linkkkv2_ci
+      NODE_ENV: test
+      # Test-only dummy secrets — never used outside this ephemeral CI run.
+      V2_AUTH_SECRET_KEY: ${{ vars.CI_V2_AUTH_SECRET_KEY || '0000000000000000000000000000000000000000000000000000000000000000' }}
+      V2_GUEST_SECRET_KEY: ${{ vars.CI_V2_GUEST_SECRET_KEY || '1111111111111111111111111111111111111111111111111111111111111111' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: pnpm/action-setup@v4
+
+      - name: Install dependencies
+        working-directory: backend
+        run: pnpm install --frozen-lockfile
+
+      - name: Apply migrations
+        working-directory: backend
+        run: npx prisma migrate deploy --schema=v2/prisma/schema.prisma
+
+      - name: Run tests
+        working-directory: backend
+        run: pnpm test
+
+  frontend-checks:
+    name: Frontend typecheck & build
+    runs-on: ubuntu-latest
+
+    env:
+      # Public at runtime anyway — only needs to be a valid URL for the build to succeed.
+      NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL || 'https://api.linkkk.dev' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: pnpm/action-setup@v4
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        working-directory: frontend
+        run: npx tsc --noEmit
+
+      - name: Build
+        working-directory: frontend
+        run: pnpm run build
+
+  deploy:
+    name: Deploy to VPS
+    needs: [backend-tests, frontend-checks]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          script: |
+            set -e
+            cd /var/www/linkkk
+            git fetch origin main
+            git reset --hard origin/main
+
+            cd backend
+            pnpm install --frozen-lockfile
+            npx prisma generate --schema=v2/prisma/schema.prisma
+            npx prisma migrate deploy --schema=v2/prisma/schema.prisma
+            pm2 restart linkkk-backend-4001
+
+            cd ../frontend
+            pnpm install --frozen-lockfile
+            pnpm run build
+            pm2 restart linkkk-frontend-3001
