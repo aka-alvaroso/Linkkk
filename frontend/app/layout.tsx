@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import SessionProvider from "./components/SessionProvider";
+import RealtimeProvider from "./components/Realtime/RealtimeProvider";
 import { ToastProvider } from "./contexts/ToastContext";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
@@ -172,7 +173,9 @@ export default async function RootLayout({
       <body>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ToastProvider>
-            <SessionProvider>{children}</SessionProvider>
+            <SessionProvider>
+              <RealtimeProvider>{children}</RealtimeProvider>
+            </SessionProvider>
             <FeedbackBanner />
           </ToastProvider>
         </NextIntlClientProvider>

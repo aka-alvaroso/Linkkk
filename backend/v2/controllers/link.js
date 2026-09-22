@@ -13,12 +13,61 @@ const { evaluateLinkRules, detectDevice } = require("../utils/linkRulesEngine");
 const { comparePassword } = require("../utils/password");
 const { sanitizeQueryParams, escapeParamForHtml } = require("../utils/queryParamsSanitizer");
 const { sendRuleNotificationEmail } = require("../services/emailService");
+const { publish } = require("../realtime/broadcaster");
 const {
   DEFAULT_OG_TITLE,
   DEFAULT_OG_DESCRIPTION,
   DEFAULT_OG_IMAGE,
   DEFAULT_OG_SITE_NAME,
 } = require("../constants/defaultMetadata");
+
+/**
+ * Records an Access row and increments the link's click/scan counter
+ * atomically, then publishes the result to the link owner's realtime stream
+ * so an open dashboard can update without a refetch. Called from every place
+ * that tracks a real (non-bot) hit — redirect, notify, password-gate success,
+ * and the unknown-action fallback all shared this same block before.
+ *
+ * Guest-owned links have no userId, so there's nothing to publish to.
+ */
+const trackAccess = async (link, { userAgent, ip, country, isVpn, isBot, source, device }) => {
+  const counterField = source === "qr" ? "scanCount" : "accessCount";
+
+  const updatedLink = await prisma.$transaction(async (tx) => {
+    await tx.access.create({
+      data: {
+        linkId: link.id,
+        userAgent: userAgent || "Unknown",
+        ip,
+        country,
+        isVPN: isVpn,
+        isBot,
+        source,
+      },
+    });
+
+    return tx.link.update({
+      where: { id: link.id },
+      data: { [counterField]: { increment: 1 } },
+      select: { accessCount: true, scanCount: true },
+    });
+  });
+
+  if (link.userId) {
+    publish(link.userId, {
+      type: "access",
+      payload: {
+        shortUrl: link.shortUrl,
+        source,
+        country,
+        device,
+        accessCount: updatedLink.accessCount,
+        scanCount: updatedLink.scanCount,
+        createdAt: new Date().toISOString(),
+      },
+    });
+  }
+};
 
 // 1. Create link
 const createLink = async (req, res) => {
@@ -571,29 +620,7 @@ const redirectLink = async (req, res) => {
     // Apply action based on type
     switch (action.type) {
       case "redirect":
-        // Track access and increment counter atomically (prevents race condition)
-        await prisma.$transaction(async (tx) => {
-          await tx.access.create({
-            data: {
-              linkId: link.id,
-              userAgent: userAgent || "Unknown",
-              ip,
-              country,
-              isVPN: isVpn,
-              isBot,
-              source,
-            },
-          });
-
-          await tx.link.update({
-            where: { id: link.id },
-            data: {
-              ...(source === "qr"
-                ? { scanCount: { increment: 1 } }
-                : { accessCount: { increment: 1 } }),
-            },
-          });
-        });
+        await trackAccess(link, { userAgent, ip, country, isVpn, isBot, source, device });
 
         return res.redirect(302, action.url);
 
@@ -702,29 +729,7 @@ const redirectLink = async (req, res) => {
         }
 
         // Continue with normal redirect (notify is non-blocking)
-        // Track access and increment counter atomically (prevents race condition)
-        await prisma.$transaction(async (tx) => {
-          await tx.access.create({
-            data: {
-              linkId: link.id,
-              userAgent: userAgent || "Unknown",
-              ip,
-              country,
-              isVPN: isVpn,
-              isBot,
-              source,
-            },
-          });
-
-          await tx.link.update({
-            where: { id: link.id },
-            data: {
-              ...(source === "qr"
-                ? { scanCount: { increment: 1 } }
-                : { accessCount: { increment: 1 } }),
-            },
-          });
-        });
+        await trackAccess(link, { userAgent, ip, country, isVpn, isBot, source, device });
 
         return res.redirect(302, link.longUrl);
 
@@ -735,29 +740,7 @@ const redirectLink = async (req, res) => {
           shortUrl,
         });
 
-        // Track access and increment counter atomically (prevents race condition)
-        await prisma.$transaction(async (tx) => {
-          await tx.access.create({
-            data: {
-              linkId: link.id,
-              userAgent: userAgent || "Unknown",
-              ip,
-              country,
-              isVPN: isVpn,
-              isBot,
-              source,
-            },
-          });
-
-          await tx.link.update({
-            where: { id: link.id },
-            data: {
-              ...(source === "qr"
-                ? { scanCount: { increment: 1 } }
-                : { accessCount: { increment: 1 } }),
-            },
-          });
-        });
+        await trackAccess(link, { userAgent, ip, country, isVpn, isBot, source, device });
 
         return res.redirect(302, link.longUrl);
     }
@@ -1028,28 +1011,7 @@ const verifyPasswordGate = async (req, res) => {
 
     // Only track access and increment counter if not blocked
     if (accessAllowed) {
-      await prisma.$transaction(async (tx) => {
-        await tx.access.create({
-          data: {
-            linkId: link.id,
-            userAgent: userAgent || "Unknown",
-            ip,
-            country,
-            isVPN: isVpn,
-            isBot,
-            source,
-          },
-        });
-
-        await tx.link.update({
-          where: { id: link.id },
-          data: {
-            ...(source === "qr"
-              ? { scanCount: { increment: 1 } }
-              : { accessCount: { increment: 1 } }),
-          },
-        });
-      });
+      await trackAccess(link, { userAgent, ip, country, isVpn, isBot, source, device });
     }
 
     return successResponse(res, {

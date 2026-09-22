@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { TbClick, TbCopy, TbCircleDashedCheck, TbCircleDashed, TbQrcode, TbSettings, TbShare3, TbTrash, TbFolder } from 'react-icons/tb'
 import { FiCornerDownRight } from "react-icons/fi";
 import Button from '@/app/components/ui/Button/Button';
@@ -6,6 +6,7 @@ import Chip from '@/app/components/ui/Chip/Chip';
 import TagChip from '@/app/components/Tags/TagChip';
 import EditLinkDrawer from '@/app/components/Drawer/EditiLinkDrawer';
 import { useLinks } from '@/app/hooks';
+import { useLinkDrawerStore } from '@/app/stores/linkDrawerStore';
 import { Link } from '@/app/types';
 import { useTranslations } from 'next-intl';
 
@@ -20,6 +21,16 @@ export default function LinkItem({ view, data }: LinkItemProps) {
     const t = useTranslations('Dashboard');
     const { deleteLink } = useLinks();
     const [linkDetailsDrawer, setLinkDetailsDrawer] = useState(false);
+    const requestedShortUrl = useLinkDrawerStore((s) => s.requestedShortUrl);
+    const clearDrawerRequest = useLinkDrawerStore((s) => s.clearRequest);
+
+    // Lets a realtime toast (or anything outside this row) open this link's drawer
+    useEffect(() => {
+        if (requestedShortUrl === data.shortUrl) {
+            setLinkDetailsDrawer(true);
+            clearDrawerRequest();
+        }
+    }, [requestedShortUrl, data.shortUrl, clearDrawerRequest]);
 
 
     if (view === 'list') {
