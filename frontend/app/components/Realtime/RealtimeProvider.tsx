@@ -2,7 +2,8 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
+import { getCountryName } from '@/app/utils/countryName';
 import { useAuthStore } from '@/app/stores/authStore';
 import { useLinkStore } from '@/app/stores/linkStore';
 import { useLinkDrawerStore } from '@/app/stores/linkDrawerStore';
@@ -21,6 +22,7 @@ export default function RealtimeProvider({ children }: { children: React.ReactNo
   const sessionChecked = useAuthStore((state) => state.sessionChecked);
   const toast = useToast();
   const t = useTranslations('Realtime');
+  const locale = useLocale();
   const router = useRouter();
 
   useEffect(() => {
@@ -52,8 +54,10 @@ export default function RealtimeProvider({ children }: { children: React.ReactNo
         setTotalClicks(totalClicks + 1);
       }
 
+      const countryName = getCountryName(data.country, locale) ?? t('unknownCountry');
+
       toast.info(data.source === 'qr' ? t('newScan') : t('newClick'), {
-        description: t('fromCountry', { shortUrl: data.shortUrl, country: data.country }),
+        description: t('accessDetails', { shortUrl: data.shortUrl, country: countryName }),
         onClick: () => {
           useLinkDrawerStore.getState().requestOpen(data.shortUrl);
           if (window.location.pathname !== '/dashboard') {

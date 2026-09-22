@@ -112,7 +112,7 @@ const Toast: React.FC<ToastProps> = ({ toast, onRemove }) => {
             {toast.title}
           </p>
           {toast.description && (
-            <p className="text-sm mt-1 leading-tight">
+            <p className="text-sm mt-1 leading-tight whitespace-pre-line">
               {toast.description}
             </p>
           )}

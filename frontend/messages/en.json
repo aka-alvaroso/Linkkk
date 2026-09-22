@@ -551,7 +551,8 @@
   "Realtime": {
     "newClick": "New click",
     "newScan": "New QR scan",
-    "fromCountry": "{shortUrl} — {country}"
+    "unknownCountry": "Unknown",
+    "accessDetails": "Link: {shortUrl}\nCountry: {country}\nClick to view the link"
   },
   "AccessesList": {
     "loadingAccesses": "Loading accesses...",
