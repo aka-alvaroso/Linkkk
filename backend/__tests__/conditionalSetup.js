@@ -14,8 +14,10 @@ if (!isUnitTest) {
   // For unit tests, just mock Prisma
   jest.mock('../v2/prisma/client');
 
-  // Mock external geolocation API
+  // Mock external geolocation API (keeps every other real export, e.g.
+  // getClientIp, so the mock doesn't silently drift out of sync)
   jest.mock('../v2/utils/access', () => ({
+    ...jest.requireActual('../v2/utils/access'),
     defineCountry: async () => 'US',
     defineIsVPN: async () => false,
   }));

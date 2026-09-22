@@ -390,6 +390,7 @@ describe("Link Rules Engine", () => {
         type: "notify",
         webhookUrl: "https://api.example.com/webhook",
         message: "Access from Spain",
+        sendEmail: false,
       });
     });
   });
