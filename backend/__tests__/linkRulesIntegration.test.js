@@ -129,11 +129,14 @@ describe('Link Rules Integration (E2E)', () => {
       });
       expect(accessCount).toBe(0);
 
-      // Verify accessCount was still incremented
+      // Verify the link's accessCount wasn't incremented either — link.js
+      // deliberately skips it for blocked requests so an "access_count
+      // equals N → block" rule stays blocked instead of the counter
+      // creeping past the threshold on every subsequent hit.
       const updatedLink = await prisma.link.findUnique({
         where: { shortUrl: link.shortUrl },
       });
-      expect(updatedLink.accessCount).toBe(1);
+      expect(updatedLink.accessCount).toBe(0);
     });
   });
 

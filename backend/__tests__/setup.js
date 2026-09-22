@@ -6,8 +6,11 @@
 // Load environment variables for tests
 require('dotenv').config();
 
-// Mock external geolocation API (must be before any imports that use it)
+// Mock external geolocation API (must be before any imports that use it).
+// Keeps every other real export (e.g. getClientIp) so the mock doesn't
+// silently drift out of sync as utils/access.js grows.
 jest.mock('../v2/utils/access', () => ({
+  ...jest.requireActual('../v2/utils/access'),
   defineCountry: async () => 'US',
   defineIsVPN: async () => false,
 }));
