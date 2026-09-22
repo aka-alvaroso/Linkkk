@@ -550,10 +550,10 @@
     "queryParamsTooltip": "Cuando esta regla se active, los query params de la URL de acceso (ej. ?utm_source=email) se incluirán en la notificación"
   },
   "Realtime": {
-    "newClick": "Nuevo clic",
-    "newScan": "Nuevo escaneo QR",
+    "newClick": "Nuevo clic → Ver enlace",
+    "newScan": "Nuevo escaneo QR → Ver enlace",
     "unknownCountry": "Desconocido",
-    "accessDetails": "Enlace: {shortUrl} — País: {country}\nHaz clic para ver el enlace"
+    "accessDetails": "Enlace: {shortUrl} — País: {country}"
   },
   "AccessesList": {
     "loadingAccesses": "Cargando accesos...",
