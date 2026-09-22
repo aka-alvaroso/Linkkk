@@ -93,7 +93,10 @@ const Toast: React.FC<ToastProps> = ({ toast, onRemove }) => {
         overflow-hidden
         cursor-pointer
       `}
-      onClick={() => onRemove(toast.id)}
+      onClick={() => {
+        toast.onClick?.();
+        onRemove(toast.id);
+      }}
     >
       <div className="p-4 flex items-start gap-3">
         {/* Icon */}

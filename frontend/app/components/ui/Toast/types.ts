@@ -8,6 +8,7 @@ export interface ToastData {
   showIcon?: boolean;
   showCloseButton?: boolean;
   duration?: number; // milliseconds, default 4000
+  onClick?: () => void; // runs (in addition to dismissing) when the toast body is clicked
 }
 
 export interface ToastContextValue {

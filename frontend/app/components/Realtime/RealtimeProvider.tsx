@@ -1,9 +1,11 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useAuthStore } from '@/app/stores/authStore';
 import { useLinkStore } from '@/app/stores/linkStore';
+import { useLinkDrawerStore } from '@/app/stores/linkDrawerStore';
 import { useToast } from '@/app/hooks/useToast';
 import { dispatchLinkAccessEvent } from '@/app/hooks/useLinkAccessEvent';
 import { API_CONFIG } from '@/app/config/api';
@@ -19,6 +21,7 @@ export default function RealtimeProvider({ children }: { children: React.ReactNo
   const sessionChecked = useAuthStore((state) => state.sessionChecked);
   const toast = useToast();
   const t = useTranslations('Realtime');
+  const router = useRouter();
 
   useEffect(() => {
     if (!sessionChecked || !isAuthenticated) return;
@@ -51,6 +54,12 @@ export default function RealtimeProvider({ children }: { children: React.ReactNo
 
       toast.info(data.source === 'qr' ? t('newScan') : t('newClick'), {
         description: t('fromCountry', { shortUrl: data.shortUrl, country: data.country }),
+        onClick: () => {
+          useLinkDrawerStore.getState().requestOpen(data.shortUrl);
+          if (window.location.pathname !== '/dashboard') {
+            router.push('/dashboard');
+          }
+        },
       });
 
       dispatchLinkAccessEvent(data);

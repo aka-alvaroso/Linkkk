@@ -7,6 +7,7 @@ interface ToastOptions {
   description?: string;
   duration?: number;
   showIcon?: boolean;
+  onClick?: () => void;
 }
 
 export const useToast = () => {
@@ -29,6 +30,7 @@ export const useToast = () => {
       description: options?.description,
       duration: options?.duration,
       showIcon: options?.showIcon,
+      onClick: options?.onClick,
     });
   };
 
