@@ -552,7 +552,7 @@
     "newClick": "New click",
     "newScan": "New QR scan",
     "unknownCountry": "Unknown",
-    "accessDetails": "Link: {shortUrl}\nCountry: {country}\nClick to view the link"
+    "accessDetails": "Link: {shortUrl} — Country: {country}\nClick to view the link"
   },
   "AccessesList": {
     "loadingAccesses": "Loading accesses...",
