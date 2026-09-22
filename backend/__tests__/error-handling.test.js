@@ -10,8 +10,11 @@ const { app, prisma } = require('./helpers');
 describe('Error Handling', () => {
   describe('404 - Route Not Found', () => {
     it('should return 404 for non-existent route', async () => {
+      // A single path segment (e.g. /nonexistent) is caught by the
+      // custom-domain shortUrl redirect route (GET /:shortUrl in v2.js) before
+      // it ever reaches the 404 handler, so this needs a multi-segment path.
       const response = await request(app)
-        .get('/nonexistent')
+        .get('/nonexistent/route')
         .expect(404);
 
       expect(response.body).toEqual({
@@ -85,10 +88,13 @@ describe('Error Handling', () => {
 
       const cookies = guestResponse.headers['set-cookie'];
 
+      // A bare hostname like 'not-a-url' now gets normalized to a valid
+      // https:// URL (see normalizeUrl in v2/validators/link.js), so this
+      // needs something that still fails validation after normalization.
       const response = await request(app)
         .post('/link')
         .set('Cookie', cookies)
-        .send({ longUrl: 'not-a-url' })
+        .send({ longUrl: 'this is not a url' })
         .expect(400);
 
       expect(response.body.success).toBe(false);
@@ -147,8 +153,10 @@ describe('Error Handling', () => {
 
   describe('Error Response Format', () => {
     it('should have consistent error response structure', async () => {
+      // See the note on the 404 test above: needs a multi-segment path to
+      // avoid the GET /:shortUrl custom-domain redirect route.
       const response = await request(app)
-        .get('/nonexistent')
+        .get('/nonexistent/route')
         .expect(404);
 
       expect(response.body).toHaveProperty('success');

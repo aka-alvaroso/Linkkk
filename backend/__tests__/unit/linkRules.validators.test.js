@@ -222,10 +222,13 @@ describe("Link Rules Validators", () => {
     });
 
     it("should reject invalid date format", () => {
+      // dateValueSchema just checks `new Date(val)` doesn't produce Invalid
+      // Date, so it deliberately accepts anything JS can parse, including a
+      // bare date like "2025-12-31" — this needs a string JS can't parse at all.
       const invalid = {
         field: "date",
         operator: "before",
-        value: "2025-12-31", // Missing time
+        value: "not-a-real-date",
       };
 
       const result = dateConditionSchema.safeParse(invalid);
@@ -556,16 +559,17 @@ describe("Link Rules Validators", () => {
       expect(result.data.match).toBe("AND");
     });
 
-    it("should reject rule with more than 5 conditions", () => {
+    it("should reject rule with more than 10 conditions", () => {
+      // The schema's own ceiling is an absolute max of 10 (see
+      // v2/validators/linkRules.js) — the tighter, plan-specific limits
+      // (e.g. 2 for registered users) are enforced separately in the
+      // controller against the user's plan, not here.
       const invalid = {
-        conditions: [
-          { field: "country", operator: "in", value: ["ES"] },
-          { field: "device", operator: "equals", value: "mobile" },
-          { field: "is_vpn", operator: "equals", value: false },
-          { field: "is_bot", operator: "equals", value: false },
-          { field: "ip", operator: "equals", value: "127.0.0.1" },
-          { field: "access_count", operator: "less_than", value: 100 }, // 6th condition
-        ],
+        conditions: Array.from({ length: 11 }, () => ({
+          field: "country",
+          operator: "in",
+          value: ["ES"],
+        })),
         action: {
           type: "redirect",
           settings: { url: "https://example.com" },

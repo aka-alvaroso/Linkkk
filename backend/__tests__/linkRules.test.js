@@ -188,18 +188,18 @@ describe('Link Rules CRUD Operations', () => {
       expect(response.body.code).toBe('INVALID_DATA');
     });
 
-    it('should reject more than 5 conditions', async () => {
+    it('should reject more conditions than the plan allows', async () => {
       const { token, user } = await createTestUser('test_maxcond', 'maxcond@example.com');
       const link = await createTestLink(user.id, null, 'https://example.com');
 
+      // Registered users are capped at 2 conditions per rule (see
+      // planLimits.user.conditionsPerRule in v2/utils/limits.js) — exceeding
+      // it is a plan-limit check (403), not a schema validation error (400).
       const ruleData = {
         conditions: [
           { field: 'country', operator: 'in', value: ['ES'] },
           { field: 'device', operator: 'equals', value: 'mobile' },
-          { field: 'is_vpn', operator: 'equals', value: false },
-          { field: 'is_bot', operator: 'equals', value: false },
-          { field: 'ip', operator: 'equals', value: '127.0.0.1' },
-          { field: 'access_count', operator: 'less_than', value: 100 }, // 6th
+          { field: 'is_vpn', operator: 'equals', value: false }, // 3rd
         ],
         action: {
           type: 'redirect',
@@ -211,9 +211,9 @@ describe('Link Rules CRUD Operations', () => {
         .post(`/link/${link.shortUrl}/rules`)
         .set('Cookie', `token=${token}`)
         .send(ruleData)
-        .expect(400);
+        .expect(403);
 
-      expect(response.body.code).toBe('INVALID_DATA');
+      expect(response.body.code).toBe('CONDITION_LIMIT_EXCEEDED');
     });
   });
 

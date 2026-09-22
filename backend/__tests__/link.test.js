@@ -49,8 +49,8 @@ describe('Link CRUD Operations', () => {
     it('should respect guest link limit', async () => {
       const { cookies, guestSession } = await createGuestSession();
 
-      // Create 10 links (limit for guests)
-      for (let i = 0; i < 10; i++) {
+      // Create 3 links (limit for guests — see v2/utils/limits.js planLimits.guest.links)
+      for (let i = 0; i < 3; i++) {
         await request(app)
           .post('/link')
           .set('Cookie', cookies)
@@ -58,11 +58,11 @@ describe('Link CRUD Operations', () => {
           .expect(201);
       }
 
-      // 11th link should fail
+      // 4th link should fail
       const response = await request(app)
         .post('/link')
         .set('Cookie', cookies)
-        .send({ longUrl: 'https://limitest11.com' })
+        .send({ longUrl: 'https://limitest4.com' })
         .expect(400);
 
       expect(response.body.code).toBe('LINK_LIMIT_EXCEEDED');
@@ -196,10 +196,13 @@ describe('Link CRUD Operations', () => {
       const { cookies, guestSession } = await createGuestSession();
       const link = await createTestLink(null, guestSession.id, 'https://valid.com');
 
+      // A bare hostname like 'invalid-url' now gets normalized to a valid
+      // https:// URL (see normalizeUrl in v2/validators/link.js), so this
+      // needs something that still fails validation after normalization.
       const response = await request(app)
         .put(`/link/${link.shortUrl}`)
         .set('Cookie', cookies)
-        .send({ longUrl: 'invalid-url' })
+        .send({ longUrl: 'this is not a url' })
         .expect(400);
 
       expect(response.body.code).toBe('INVALID_DATA');
