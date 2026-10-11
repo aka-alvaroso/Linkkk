@@ -14,90 +14,61 @@ const ipCache = new NodeCache({
   checkperiod: 600,  // Check for expired keys every 10 minutes
 });
 
-const defineCountry = async (ip) => {
-  // Check cache first
-  const cacheKey = `country:${ip}`;
+// One ipquery.io lookup per IP feeds country, VPN and datacenter detection.
+// Failures are cached for 5 minutes so a degraded API isn't hammered.
+const inflight = new Map();
+
+const lookupIp = async (ip) => {
+  const cacheKey = `ipinfo:${ip}`;
   const cached = ipCache.get(cacheKey);
-  if (cached !== undefined) {
-    return cached;
-  }
+  if (cached !== undefined) return cached;
 
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 2000); // 2s timeout
+  // Concurrent hits from the same IP (e.g. a burst across links) share one request
+  if (inflight.has(ip)) return inflight.get(ip);
 
-    const r = await fetch(`https://api.ipquery.io/${ip}`, {
-      signal: controller.signal,
-    });
-    clearTimeout(timeout);
+  const request = (async () => {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 2000); // 2s timeout
+      const r = await fetch(`https://api.ipquery.io/${ip}`, {
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
 
-    if (!r.ok) throw new Error(`API returned ${r.status}`);
+      if (!r.ok) throw new Error(`API returned ${r.status}`);
 
-    const data = await r.json();
-    const country = data.location?.country_code || "UNKNOWN";
+      const data = await r.json();
+      const info = {
+        country: data.location?.country_code || "UNKNOWN",
+        isVPN: !!(data.risk?.is_vpn || data.risk?.is_tor || data.risk?.is_proxy),
+        isDatacenter: !!data.risk?.is_datacenter,
+      };
+      ipCache.set(cacheKey, info);
+      return info;
+    } catch (error) {
+      // SECURITY: Use proper logger instead of console.error (VUL-008 fix)
+      const { sanitizeIp } = require('./logSanitizer');
+      const logger = require('./logger');
+      logger.error('IP lookup API error', {
+        ip: sanitizeIp(ip),
+        error: error.message,
+        api: 'ipquery.io',
+      });
+      const fallback = { country: "UNKNOWN", isVPN: false, isDatacenter: false };
+      ipCache.set(cacheKey, fallback, 300); // 5 min cache for errors
+      return fallback;
+    } finally {
+      inflight.delete(ip);
+    }
+  })();
 
-    // Cache the result
-    ipCache.set(cacheKey, country);
-
-    return country;
-  } catch (error) {
-    // SECURITY: Use proper logger instead of console.error (VUL-008 fix)
-    const { sanitizeIp } = require('./logSanitizer');
-    const logger = require('./logger');
-    logger.error('Geolocation API error', {
-      ip: sanitizeIp(ip),
-      error: error.message,
-      api: 'ipquery.io',
-    });
-    // Cache the UNKNOWN result to avoid repeated failures
-    ipCache.set(cacheKey, "UNKNOWN", 300); // 5 min cache for errors
-    return "UNKNOWN";
-  }
+  inflight.set(ip, request);
+  return request;
 };
 
-const defineIsVPN = async (ip) => {
-  // Check cache first
-  const cacheKey = `vpn:${ip}`;
-  const cached = ipCache.get(cacheKey);
-  if (cached !== undefined) {
-    return cached;
-  }
-
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 2000); // 2s timeout
-
-    const r = await fetch(`https://api.ipquery.io/${ip}`, {
-      signal: controller.signal,
-    });
-    clearTimeout(timeout);
-
-    if (!r.ok) throw new Error(`API returned ${r.status}`);
-
-    const data = await r.json();
-    const isVpn =
-      data.risk.is_vpn ||
-      data.risk.is_tor ||
-      data.risk.is_proxy;
-
-    // Cache the result
-    ipCache.set(cacheKey, isVpn);
-
-    return isVpn;
-  } catch (error) {
-    // SECURITY: Use proper logger instead of console.error (VUL-008 fix)
-    const { sanitizeIp } = require('./logSanitizer');
-    const logger = require('./logger');
-    logger.error('VPN detection API error', {
-      ip: sanitizeIp(ip),
-      error: error.message,
-      api: 'ipquery.io',
-    });
-    // Cache false to avoid repeated failures
-    ipCache.set(cacheKey, false, 300); // 5 min cache for errors
-    return false;
-  }
-};
+const defineCountry = async (ip) => (await lookupIp(ip)).country;
+const defineIsVPN = async (ip) => (await lookupIp(ip)).isVPN;
+const defineIsDatacenter = async (ip) => (await lookupIp(ip)).isDatacenter;
 
 // Devuelve la IP real del cliente.
 // - Si la conexión viene de un proxy de confianza (Cloudflare), nos fiamos de
@@ -126,5 +97,6 @@ const getClientIp = (req) => {
 module.exports = {
   defineCountry,
   defineIsVPN,
+  defineIsDatacenter,
   getClientIp,
 };

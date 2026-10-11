@@ -123,6 +123,9 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
       if (condition.field === 'country' && Array.isArray(condition.value)) {
         return { ...condition, value: condition.value.join(', ') };
       }
+      if (condition.field === 'ip' && Array.isArray(condition.value)) {
+        return { ...condition, value: condition.value.join(', ') };
+      }
       if (condition.field === 'date' && typeof condition.value === 'string') {
         // Convert UTC ISO string to local datetime-local format (YYYY-MM-DDTHH:mm)
         const d = new Date(condition.value);
@@ -205,6 +208,14 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
             .map((c: string) => c.trim())
             .filter((c: string) => c.length > 0);
           return { ...condition, value: countries };
+        }
+        if (condition.field === 'ip' && (condition.operator === 'in' || condition.operator === 'not_in') && typeof condition.value === 'string') {
+          // Convert comma-separated IPs / CIDR ranges to array
+          const ips = condition.value
+            .split(',')
+            .map((c: string) => c.trim())
+            .filter((c: string) => c.length > 0);
+          return { ...condition, value: ips };
         }
         if (condition.field === 'date' && typeof condition.value === 'string') {
           // Convert local datetime-local to UTC ISO string

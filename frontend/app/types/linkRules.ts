@@ -14,6 +14,8 @@ export type FieldType =
   | 'ip'           // IP address
   | 'is_bot'       // Bot detection
   | 'is_vpn'       // VPN detection
+  | 'is_datacenter'// Hosting / cloud IP detection
+  | 'burst'        // Same IP hitting several of the owner's links in a short time
   | 'date'         // Date/time
   | 'access_count';// Number of accesses
 
@@ -39,11 +41,17 @@ export type DeviceType = 'mobile' | 'tablet' | 'desktop';
 
 // ===== VALUE TYPES =====
 
+export interface BurstValue {
+  links: number;   // distinct links requested (min 2)
+  seconds: number; // window in seconds (max 300)
+}
+
 export type ConditionValue =
   | string         // For: ip, date (ISO string)
   | string[]       // For: country codes (e.g., ['ES', 'US'])
   | number         // For: access_count
-  | boolean        // For: is_bot, is_vpn
+  | BurstValue     // For: burst
+  | boolean        // For: is_bot, is_vpn, is_datacenter
   | DeviceType;    // For: device
 
 // ===== ACTION SETTINGS =====

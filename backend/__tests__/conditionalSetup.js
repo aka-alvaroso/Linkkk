@@ -20,5 +20,6 @@ if (!isUnitTest) {
     ...jest.requireActual('../v2/utils/access'),
     defineCountry: async () => 'US',
     defineIsVPN: async () => false,
+    defineIsDatacenter: async () => false,
   }));
 }
