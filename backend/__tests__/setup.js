@@ -10,6 +10,7 @@ require('dotenv').config();
 jest.mock('../v2/utils/access', () => ({
   defineCountry: async () => 'US',
   defineIsVPN: async () => false,
+  defineIsDatacenter: async () => false,
 }));
 
 const prisma = require('../v2/prisma/client');

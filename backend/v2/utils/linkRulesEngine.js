@@ -37,6 +37,8 @@ const detectDevice = (userAgent) => {
   return "desktop";
 };
 
+const { distinctLinksWithin, MAX_WINDOW_SECONDS } = require("./burstTracker");
+
 // ============================================
 // CONDITION EVALUATORS
 // ============================================
@@ -66,6 +68,8 @@ const validateConditionStructure = (condition) => {
     "ip",
     "is_vpn",
     "is_bot",
+    "is_datacenter",
+    "burst",
     "date",
     "access_count",
   ];
@@ -77,9 +81,11 @@ const validateConditionStructure = (condition) => {
   const validOperators = {
     country: ["in", "not_in"],
     device: ["equals", "not_equals"],
-    ip: ["equals", "not_equals"],
+    ip: ["equals", "not_equals", "in", "not_in"],
     is_vpn: ["equals"],
     is_bot: ["equals"],
+    is_datacenter: ["equals"],
+    burst: ["equals"],
     date: ["before", "after", "equals"],
     access_count: ["equals", "greater_than", "less_than"],
   };
@@ -93,11 +99,31 @@ const validateConditionStructure = (condition) => {
     return false;
   }
 
+  if (field === "ip") {
+    const isList = operator === "in" || operator === "not_in";
+    if (isList ? !Array.isArray(value) : typeof value !== "string") {
+      return false;
+    }
+  }
+
   if (
-    (field === "is_vpn" || field === "is_bot") &&
+    (field === "is_vpn" || field === "is_bot" || field === "is_datacenter") &&
     typeof value !== "boolean"
   ) {
     return false;
+  }
+
+  if (field === "burst") {
+    const { links, seconds } = value || {};
+    if (
+      !Number.isInteger(links) ||
+      links < 2 ||
+      !Number.isInteger(seconds) ||
+      seconds < 1 ||
+      seconds > MAX_WINDOW_SECONDS
+    ) {
+      return false;
+    }
   }
 
   if (field === "access_count" && typeof value !== "number") {
@@ -141,6 +167,12 @@ const evaluateCondition = async (condition, context) => {
 
     case "is_bot":
       return evaluateBooleanCondition(operator, value, context.isBot);
+
+    case "is_datacenter":
+      return evaluateBooleanCondition(operator, value, context.isDatacenter);
+
+    case "burst":
+      return evaluateBurstCondition(value, context.recentHits);
 
     case "date":
       return evaluateDateCondition(operator, value, context.currentDate);
@@ -233,8 +265,22 @@ const evaluateIpCondition = (operator, value, contextIp) => {
   if (operator === "not_equals") {
     return !ipMatches(contextIp, value);
   }
+  if (operator === "in") {
+    return value.some((pattern) => ipMatches(contextIp, pattern));
+  }
+  if (operator === "not_in") {
+    return !value.some((pattern) => ipMatches(contextIp, pattern));
+  }
   return false;
 };
+
+/**
+ * Evaluates burst condition: true when the visitor's IP has requested at least
+ * `links` distinct links of the same owner within the last `seconds` seconds.
+ * The current hit counts, so { links: 3 } fires on the third distinct link.
+ */
+const evaluateBurstCondition = (value, recentHits) =>
+  distinctLinksWithin(recentHits, value.seconds) >= value.links;
 
 /**
  * Evaluates boolean condition (VPN, Bot)

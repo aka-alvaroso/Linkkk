@@ -16,11 +16,21 @@ export const getConditionSummary = (condition: RuleCondition): string => {
     case 'device':
       return `Device ${operator === 'equals' ? 'is' : 'is not'} ${value}`;
     case 'ip':
-      return `IP ${operator === 'equals' ? 'is' : 'is not'} ${value}`;
+    {
+      const ips = Array.isArray(value) ? value.join(', ') : value;
+      const negated = operator === 'not_equals' || operator === 'not_in';
+      return `IP ${negated ? 'is not' : 'is'} ${operator === 'in' || operator === 'not_in' ? 'one of ' : ''}${ips}`;
+    }
     case 'is_bot':
       return value ? 'Is a bot' : 'Is not a bot';
     case 'is_vpn':
       return value ? 'Using VPN' : 'Not using VPN';
+    case 'is_datacenter':
+      return value ? 'From a datacenter' : 'Not from a datacenter';
+    case 'burst': {
+      const { links, seconds } = value as { links: number; seconds: number };
+      return `Same IP hit ${links}+ links in ${seconds}s`;
+    }
     case 'date': {
       const dateStr = typeof value === 'string' ? new Date(value).toLocaleString() : String(value);
       return `Date ${operator === 'before' ? 'before' : 'after'} ${dateStr}`;

@@ -18,5 +18,6 @@ if (!isUnitTest) {
   jest.mock('../v2/utils/access', () => ({
     defineCountry: async () => 'US',
     defineIsVPN: async () => false,
+    defineIsDatacenter: async () => false,
   }));
 }

@@ -191,6 +191,8 @@ enum FieldType {
   ip
   is_bot
   is_vpn
+  is_datacenter
+  burst
   date
   access_count
 }

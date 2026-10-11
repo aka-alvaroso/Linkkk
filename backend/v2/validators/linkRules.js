@@ -13,6 +13,8 @@ const FieldTypeEnum = z.enum([
   "ip",
   "is_bot",
   "is_vpn",
+  "is_datacenter",
+  "burst",
   "date",
   "access_count",
 ]);
@@ -43,7 +45,34 @@ const ActionTypeEnum = z.enum([
 
 const countryValueSchema = z.array(z.string().length(2).toUpperCase());
 const deviceValueSchema = z.enum(["mobile", "tablet", "desktop"]);
-const ipValueSchema = z.string().ip();
+// Matches the patterns the rules engine understands: an exact IP (v4/v6),
+// an IPv4 CIDR range (45.138.12.0/24) or an IPv4 wildcard (45.138.*.*)
+const ipPatternSchema = z
+  .string()
+  .max(45)
+  .refine(
+    (val) => {
+      if (z.string().ip().safeParse(val).success) return true;
+      const cidr = val.match(/^(.+)\/(\d{1,2})$/);
+      if (cidr) {
+        return (
+          z.string().ip({ version: "v4" }).safeParse(cidr[1]).success &&
+          Number(cidr[2]) <= 32
+        );
+      }
+      return /^(\d{1,3}|\*)(\.(\d{1,3}|\*)){3}$/.test(val) &&
+        val.split(".").every((p) => p === "*" || Number(p) <= 255);
+    },
+    { message: "Must be an IP, a CIDR range (a.b.c.d/n) or a wildcard (a.b.*.*)" }
+  );
+const ipValueSchema = z.union([
+  ipPatternSchema,
+  z.array(ipPatternSchema).min(1).max(100),
+]);
+const burstValueSchema = z.object({
+  links: z.number().int().min(2).max(50),
+  seconds: z.number().int().min(1).max(300),
+});
 const booleanValueSchema = z.boolean();
 const dateValueSchema = z.string().refine(
   (val) => !isNaN(new Date(val).getTime()),
@@ -77,7 +106,7 @@ const deviceConditionSchema = baseConditionSchema.extend({
 // IP condition
 const ipConditionSchema = baseConditionSchema.extend({
   field: z.literal("ip"),
-  operator: z.enum(["equals", "not_equals"]),
+  operator: z.enum(["equals", "not_equals", "in", "not_in"]),
   value: ipValueSchema,
 });
 
@@ -93,6 +122,20 @@ const vpnConditionSchema = baseConditionSchema.extend({
   field: z.literal("is_vpn"),
   operator: z.enum(["equals"]),
   value: booleanValueSchema,
+});
+
+// Datacenter condition
+const datacenterConditionSchema = baseConditionSchema.extend({
+  field: z.literal("is_datacenter"),
+  operator: z.enum(["equals"]),
+  value: booleanValueSchema,
+});
+
+// Burst condition: the same IP hit N distinct links of the owner within X seconds
+const burstConditionSchema = baseConditionSchema.extend({
+  field: z.literal("burst"),
+  operator: z.enum(["equals"]),
+  value: burstValueSchema,
 });
 
 // Date condition
@@ -116,9 +159,25 @@ const ruleConditionSchema = z.discriminatedUnion("field", [
   ipConditionSchema,
   botConditionSchema,
   vpnConditionSchema,
+  datacenterConditionSchema,
+  burstConditionSchema,
   dateConditionSchema,
   accessCountConditionSchema,
-]);
+]).superRefine((condition, ctx) => {
+  // A list operator needs a list and a single-value operator needs a single value
+  if (condition.field === "ip") {
+    const isList = condition.operator === "in" || condition.operator === "not_in";
+    if (isList !== Array.isArray(condition.value)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["value"],
+        message: isList
+          ? "Operators 'in'/'not_in' require a list of IPs"
+          : "Operators 'equals'/'not_equals' require a single IP",
+      });
+    }
+  }
+});
 
 // ============================================
 // ACTION SETTINGS SCHEMAS
@@ -290,6 +349,8 @@ module.exports = {
   ipConditionSchema,
   botConditionSchema,
   vpnConditionSchema,
+  datacenterConditionSchema,
+  burstConditionSchema,
   dateConditionSchema,
   accessCountConditionSchema,
 

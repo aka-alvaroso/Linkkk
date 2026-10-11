@@ -8,7 +8,8 @@ const ERRORS = require("../constants/errorCodes");
 const logger = require("../utils/logger");
 const config = require("../config/environment");
 
-const { defineCountry, defineIsVPN, getClientIp } = require("../utils/access");
+const { defineCountry, defineIsVPN, defineIsDatacenter, getClientIp } = require("../utils/access");
+const { recordHit } = require("../utils/burstTracker");
 const { evaluateLinkRules, detectDevice } = require("../utils/linkRulesEngine");
 const { comparePassword } = require("../utils/password");
 const { sanitizeQueryParams, escapeParamForHtml } = require("../utils/queryParamsSanitizer");
@@ -497,8 +498,11 @@ const redirectLink = async (req, res) => {
     // Build evaluation context
     const country = await defineCountry(ip);
     const isVpn = await defineIsVPN(ip);
+    const isDatacenter = await defineIsDatacenter(ip);
     const device = detectDevice(userAgent);
     const isBot = isbot(userAgent);
+    // Hits from this IP on this owner's links, including the current one
+    const recentHits = recordHit(link, ip);
 
     // Sanitize query params before including in context.
     // 'src' is reserved and filtered out by the sanitizer automatically.
@@ -516,6 +520,8 @@ const redirectLink = async (req, res) => {
       ip,
       isVPN: isVpn,
       isBot,
+      isDatacenter,
+      recentHits,
       currentDate: new Date(),
       accessCount: link.accessCount,
       queryParams,
@@ -909,6 +915,7 @@ const verifyPasswordGate = async (req, res) => {
     // Build evaluation context to find which rule should apply
     const country = await defineCountry(ip);
     const isVpn = await defineIsVPN(ip);
+    const isDatacenter = await defineIsDatacenter(ip);
     const device = detectDevice(userAgent);
     const isBot = isbot(userAgent);
 
@@ -918,6 +925,9 @@ const verifyPasswordGate = async (req, res) => {
       ip,
       isVPN: isVpn,
       isBot,
+      isDatacenter,
+      // Submitting a password isn't a new visit, so it isn't added to the burst window
+      recentHits: [],
       currentDate: new Date(),
       accessCount: link.accessCount,
     };

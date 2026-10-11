@@ -6,8 +6,8 @@
 import React from 'react';
 import Select from '../ui/Select/Select';
 import Input from '../ui/Input/Input';
-import { TbTrash, TbCircleDashedCheck, TbWorld, TbDeviceMobile, TbRobot, TbShieldLock, TbCalendar, TbClick, TbDots } from 'react-icons/tb';
-import { RuleCondition as RuleConditionType, FieldType, OperatorType, DeviceType, ConditionValue } from '@/app/types/linkRules';
+import { TbTrash, TbCircleDashedCheck, TbWorld, TbDeviceMobile, TbRobot, TbShieldLock, TbCalendar, TbClick, TbDots, TbServer, TbBolt } from 'react-icons/tb';
+import { RuleCondition as RuleConditionType, FieldType, OperatorType, DeviceType, ConditionValue, BurstValue } from '@/app/types/linkRules';
 import { useTranslations } from 'next-intl';
 
 interface RuleConditionProps {
@@ -27,6 +27,8 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
     { label: t('fieldIp'), value: 'ip', leftIcon: <TbDots size={16} /> },
     { label: t('fieldIsBot'), value: 'is_bot', leftIcon: <TbRobot size={16} /> },
     { label: t('fieldIsVpn'), value: 'is_vpn', leftIcon: <TbShieldLock size={16} /> },
+    { label: t('fieldIsDatacenter'), value: 'is_datacenter', leftIcon: <TbServer size={16} /> },
+    { label: t('fieldBurst'), value: 'burst', leftIcon: <TbBolt size={16} /> },
     { label: t('fieldDate'), value: 'date', leftIcon: <TbCalendar size={16} /> },
     { label: t('fieldAccessCount'), value: 'access_count', leftIcon: <TbClick size={16} /> },
   ];
@@ -45,9 +47,13 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
     ip: [
       { label: t('operatorEquals'), value: 'equals' },
       { label: t('operatorNotEquals'), value: 'not_equals' },
+      { label: t('operatorIn'), value: 'in' },
+      { label: t('operatorNotIn'), value: 'not_in' },
     ],
     is_bot: [{ label: t('operatorEquals'), value: 'equals' }],
     is_vpn: [{ label: t('operatorEquals'), value: 'equals' }],
+    is_datacenter: [{ label: t('operatorEquals'), value: 'equals' }],
+    burst: [{ label: t('operatorBurst'), value: 'equals' }],
     date: [
       { label: t('operatorBefore'), value: 'before' },
       { label: t('operatorAfter'), value: 'after' },
@@ -86,7 +92,8 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
     if (fieldType === 'always') defaultValue = true;
     else if (fieldType === 'country') defaultValue = '';
     else if (fieldType === 'device') defaultValue = 'mobile';
-    else if (fieldType === 'is_bot' || fieldType === 'is_vpn') defaultValue = false;
+    else if (fieldType === 'is_bot' || fieldType === 'is_vpn' || fieldType === 'is_datacenter') defaultValue = false;
+    else if (fieldType === 'burst') defaultValue = { links: 3, seconds: 10 };
     else if (fieldType === 'access_count') defaultValue = 0;
 
     onChange({
@@ -159,6 +166,7 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
 
       case 'is_bot':
       case 'is_vpn':
+      case 'is_datacenter':
         return (
           <Select
             options={BOOLEAN_OPTIONS}
@@ -196,15 +204,44 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
           />
         );
 
+      case 'burst': {
+        const burst = (condition.value as BurstValue) ?? { links: 3, seconds: 10 };
+        const numberInputClass = 'bg-light border border-dark/10 text-sm px-2 py-1 rounded-lg w-16 hover:border-dark/20';
+        return (
+          <div className="flex items-center gap-1.5 whitespace-nowrap">
+            <Input
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              {...({ type: "number", min: "2", max: "50" } as any)}
+              value={burst.links}
+              onChange={(e) => handleValueChange({ ...burst, links: parseInt(e.target.value) || 2 })}
+              size="sm"
+              rounded="lg"
+              className={numberInputClass}
+            />
+            <span className="text-xs text-dark/60">{t('burstLinksIn')}</span>
+            <Input
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              {...({ type: "number", min: "1", max: "300" } as any)}
+              value={burst.seconds}
+              onChange={(e) => handleValueChange({ ...burst, seconds: parseInt(e.target.value) || 1 })}
+              size="sm"
+              rounded="lg"
+              className={numberInputClass}
+            />
+            <span className="text-xs text-dark/60">{t('burstSeconds')}</span>
+          </div>
+        );
+      }
+
       case 'ip':
         return (
           <Input
-            placeholder={t('ipPlaceholder')}
+            placeholder={condition.operator === 'in' || condition.operator === 'not_in' ? t('ipListPlaceholder') : t('ipPlaceholder')}
             value={condition.value as string}
             onChange={(e) => handleValueChange(e.target.value)}
             size="sm"
             rounded="lg"
-            className='bg-light border border-dark/10 text-sm px-2 py-1 rounded-lg w-32 hover:border-dark/20'
+            className={`bg-light border border-dark/10 text-sm px-2 py-1 rounded-lg hover:border-dark/20 ${condition.operator === 'in' || condition.operator === 'not_in' ? 'w-56' : 'w-32'}`}
           />
         );
 

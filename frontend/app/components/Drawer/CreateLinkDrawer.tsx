@@ -97,6 +97,13 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
                         .filter((c: string) => c.length > 0);
                     return { ...condition, value: countries };
                 }
+                if (condition.field === 'ip' && (condition.operator === 'in' || condition.operator === 'not_in') && typeof condition.value === 'string') {
+                    const ips = condition.value
+                        .split(',')
+                        .map((c: string) => c.trim())
+                        .filter((c: string) => c.length > 0);
+                    return { ...condition, value: ips };
+                }
                 return condition;
             });
     };
