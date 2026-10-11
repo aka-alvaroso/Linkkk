@@ -70,6 +70,98 @@ const trackAccess = async (link, { userAgent, ip, country, isVpn, isBot, source,
   }
 };
 
+/**
+ * Sends the non-terminal `notify` actions collected by evaluateLinkRules:
+ * webhook (SSRF-validated) and/or owner email. Fire-and-forget — failures are
+ * logged and never affect the response. Each notification carries the id of
+ * the rule that produced it, which keys the per-rule email throttle.
+ *
+ * `accessCount` is the count reported to the recipient (the hit being served,
+ * or the current total when the visit isn't going to be counted).
+ */
+const sendNotifications = (
+  link,
+  notifications,
+  { country, device, ip, isBot, isVpn, queryParams = {}, accessCount }
+) => {
+  for (const notification of notifications) {
+    if (notification.webhookUrl) {
+      const { isValidWebhookUrl } = require("../utils/webhookValidator");
+
+      // SECURITY: Validate webhook URL to prevent SSRF attacks
+      if (!isValidWebhookUrl(notification.webhookUrl)) {
+        logger.security("[SECURITY] Blocked SSRF attempt on webhook", {
+          webhookUrl: notification.webhookUrl,
+          shortUrl: link.shortUrl,
+        });
+      } else {
+        const webhookPayload = {
+          event: "link_accessed",
+          link: {
+            shortUrl: link.shortUrl,
+            longUrl: link.longUrl,
+          },
+          timestamp: new Date().toISOString(),
+          context: {
+            country,
+            device,
+            ip,
+            isBot,
+            isVPN: isVpn,
+            accessCount: link.accessCount,
+            // Query params captured from the access URL.
+            // Values are sanitized: control chars stripped, template
+            // injection blocked, limited to 10 params / 500 chars each.
+            // Callers rendering these in HTML must apply HTML-escaping
+            // (use escapeParamsForHtml from queryParamsSanitizer).
+            queryParams: Object.keys(queryParams).length > 0 ? queryParams : undefined,
+          },
+          customMessage: notification.message || null,
+        };
+
+        // Send webhook asynchronously (don't await, don't block the response)
+        fetch(notification.webhookUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "User-Agent": "Linkkk-Webhook/1.0",
+          },
+          body: JSON.stringify(webhookPayload),
+          signal: AbortSignal.timeout(5000), // 5 second timeout
+        }).catch((error) => {
+          logger.warn("[NOTIFY] Webhook failed", {
+            shortUrl: link.shortUrl,
+            webhookUrl: notification.webhookUrl,
+            error: error.message,
+          });
+        });
+      }
+    }
+
+    if (notification.sendEmail && link.user?.email) {
+      sendRuleNotificationEmail({
+        ruleId: notification.ruleId ?? link.id,
+        toEmail: link.user.email,
+        shortUrl: link.shortUrl,
+        longUrl: link.longUrl,
+        country,
+        device,
+        ip,
+        isBot,
+        isVPN: isVpn,
+        accessCount,
+        queryParams,
+        message: notification.message || undefined,
+      }).catch((err) => {
+        logger.warn("[EMAIL] Unexpected error sending rule notification", {
+          shortUrl: link.shortUrl,
+          error: err.message,
+        });
+      });
+    }
+  }
+};
+
 // 1. Create link
 const createLink = async (req, res) => {
   const user = req.user;
@@ -577,8 +669,8 @@ const redirectLink = async (req, res) => {
     };
 
     // Evaluate link rules with timeout protection
-    let allowed = true;
     let action = null;
+    let notifications = [];
 
     try {
       const RULE_EVALUATION_TIMEOUT = 5000; // 5 seconds max
@@ -595,8 +687,8 @@ const redirectLink = async (req, res) => {
         evaluationPromise,
         timeoutPromise,
       ]);
-      allowed = evaluationResult.allowed;
       action = evaluationResult.action;
+      notifications = evaluationResult.notifications;
     } catch (ruleError) {
       logger.error("[CRITICAL] Rule evaluation failed", {
         shortUrl,
@@ -623,7 +715,21 @@ const redirectLink = async (req, res) => {
       return serveBotPreview(res, link, action, { shortUrl, host, customDomainUserId });
     }
 
-    // Apply action based on type
+    // Notifications evaluated before the terminal action always fire, even
+    // when that action blocks or gates the visit. A visit that isn't counted
+    // (block, password gate) reports the current total instead of +1.
+    const countsAsAccess = action.type !== "block" && action.type !== "password_gate";
+    sendNotifications(link, notifications, {
+      country,
+      device,
+      ip,
+      isBot,
+      isVpn,
+      queryParams,
+      accessCount: link.accessCount + (countsAsAccess ? 1 : 0),
+    });
+
+    // Apply the terminal action
     switch (action.type) {
       case "redirect":
         await trackAccess(link, { userAgent, ip, country, isVpn, isBot, source, device });
@@ -647,97 +753,6 @@ const redirectLink = async (req, res) => {
             action.hint ? `&hint=${encodeURIComponent(action.hint)}` : ""
           }${source === "qr" ? "&src=qr" : ""}`,
         );
-
-      case "notify":
-        // Send webhook notification (non-blocking)
-        if (action.webhookUrl) {
-          const { isValidWebhookUrl } = require("../utils/webhookValidator");
-
-          // SECURITY: Validate webhook URL to prevent SSRF attacks
-          if (!isValidWebhookUrl(action.webhookUrl)) {
-            logger.security("[SECURITY] Blocked SSRF attempt on webhook", {
-              webhookUrl: action.webhookUrl,
-              shortUrl: link.shortUrl,
-            });
-            // Don't send webhook, but continue with access tracking and redirect below
-          } else {
-            const webhookPayload = {
-              event: "link_accessed",
-              link: {
-                shortUrl: link.shortUrl,
-                longUrl: link.longUrl,
-              },
-              timestamp: new Date().toISOString(),
-              context: {
-                country,
-                device,
-                ip,
-                isBot,
-                isVPN: isVpn,
-                accessCount: link.accessCount,
-                // Query params captured from the access URL.
-                // Values are sanitized: control chars stripped, template
-                // injection blocked, limited to 10 params / 500 chars each.
-                // Callers rendering these in HTML must apply HTML-escaping
-                // (use escapeParamsForHtml from queryParamsSanitizer).
-                queryParams: Object.keys(queryParams).length > 0 ? queryParams : undefined,
-              },
-              customMessage: action.message || null,
-            };
-
-            // Send webhook asynchronously (don't await, don't block redirect)
-            fetch(action.webhookUrl, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "User-Agent": "Linkkk-Webhook/1.0",
-              },
-              body: JSON.stringify(webhookPayload),
-              signal: AbortSignal.timeout(5000), // 5 second timeout
-            }).catch((error) => {
-              // Log error but don't fail the request
-              logger.warn("[NOTIFY] Webhook failed", {
-                shortUrl: link.shortUrl,
-                webhookUrl: action.webhookUrl,
-                error: error.message,
-              });
-            });
-          }
-        }
-
-        // Send email notification to link owner (non-blocking)
-        if (action.sendEmail && link.user?.email) {
-          // Find the matched rule id so the throttle can track it per-rule.
-          // evaluateLinkRules returns the action but not the rule id, so we
-          // locate the first enabled notify rule to use as the throttle key.
-          const notifyRule = link.rules.find(
-            (r) => r.enabled && (r.actionType === "notify" || r.elseActionType === "notify")
-          );
-          sendRuleNotificationEmail({
-            ruleId: notifyRule?.id ?? link.id,
-            toEmail: link.user.email,
-            shortUrl: link.shortUrl,
-            longUrl: link.longUrl,
-            country,
-            device,
-            ip,
-            isBot,
-            isVPN: isVpn,
-            accessCount: link.accessCount + 1,
-            queryParams,
-            message: action.message || undefined,
-          }).catch((err) => {
-            logger.warn("[EMAIL] Unexpected error sending rule notification", {
-              shortUrl: link.shortUrl,
-              error: err.message,
-            });
-          });
-        }
-
-        // Continue with normal redirect (notify is non-blocking)
-        await trackAccess(link, { userAgent, ip, country, isVpn, isBot, source, device });
-
-        return res.redirect(302, link.longUrl);
 
       default:
         // Unknown action type - fallback to redirect
@@ -878,6 +893,8 @@ const verifyPasswordGate = async (req, res) => {
           include: { conditions: true },
           orderBy: { priority: "asc" },
         },
+        // Only select email — needed for notify rules that send email
+        user: { select: { email: true } },
       },
     });
 
@@ -917,10 +934,12 @@ const verifyPasswordGate = async (req, res) => {
 
     // Evaluate rules to get the correct password_gate action
     let passwordHash = null;
-    let redirectUrl = link.longUrl;
+    // Rules that already notified when the gate was served (redirectLink)
+    let alreadyNotifiedRuleIds = [];
 
     try {
-      const { action } = await evaluateLinkRules(link, context);
+      const { action, notifications } = await evaluateLinkRules(link, context);
+      alreadyNotifiedRuleIds = notifications.map((n) => n.ruleId);
 
       if (action.type !== "password_gate") {
         // Don't reveal that link exists but has no password - use generic error
@@ -949,55 +968,29 @@ const verifyPasswordGate = async (req, res) => {
     let accessAllowed = true;
 
     try {
-      const { allowed, action } = await evaluateLinkRules(link, context, {
+      const { allowed, action, notifications } = await evaluateLinkRules(link, context, {
         skipActionTypes: ["password_gate"],
       });
       accessAllowed = allowed;
 
+      // Notify rules ahead of the gate already fired when the gate was served;
+      // only the ones that come after it are new.
+      sendNotifications(
+        link,
+        notifications.filter((n) => !alreadyNotifiedRuleIds.includes(n.ruleId)),
+        {
+          country,
+          device,
+          ip,
+          isBot,
+          isVpn,
+          accessCount: link.accessCount + (allowed ? 1 : 0),
+        }
+      );
+
       switch (action.type) {
         case "block":
           finalUrl = `${config.frontend.url}/blocked?url=${shortUrl}&reason=${encodeURIComponent(action.reason || "")}`;
-          break;
-
-        case "notify":
-          // Send webhook notification (non-blocking)
-          if (action.webhookUrl) {
-            const { isValidWebhookUrl } = require("../utils/webhookValidator");
-
-            if (isValidWebhookUrl(action.webhookUrl)) {
-              const webhookPayload = {
-                event: "link_accessed",
-                link: { shortUrl: link.shortUrl, longUrl: link.longUrl },
-                timestamp: new Date().toISOString(),
-                context: {
-                  country,
-                  device,
-                  ip,
-                  isBot,
-                  isVPN: isVpn,
-                  accessCount: link.accessCount,
-                },
-                customMessage: action.message || null,
-              };
-
-              fetch(action.webhookUrl, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  "User-Agent": "Linkkk-Webhook/1.0",
-                },
-                body: JSON.stringify(webhookPayload),
-                signal: AbortSignal.timeout(5000),
-              }).catch((error) => {
-                logger.warn("[NOTIFY] Webhook failed", {
-                  shortUrl: link.shortUrl,
-                  webhookUrl: action.webhookUrl,
-                  error: error.message,
-                });
-              });
-            }
-          }
-          finalUrl = link.longUrl;
           break;
 
         case "redirect":

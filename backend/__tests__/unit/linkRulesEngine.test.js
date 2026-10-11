@@ -419,6 +419,7 @@ describe("Link Rules Engine", () => {
             type: "redirect",
             url: "https://example.com",
           },
+          notifications: [],
         });
       });
     });
@@ -456,6 +457,7 @@ describe("Link Rules Engine", () => {
             type: "redirect",
             url: "https://es.example.com",
           },
+          notifications: [],
         });
       });
 
@@ -501,6 +503,7 @@ describe("Link Rules Engine", () => {
             type: "redirect",
             url: "https://example.com",
           },
+          notifications: [],
         });
       });
     });

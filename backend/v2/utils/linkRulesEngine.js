@@ -539,23 +539,41 @@ const replaceVariables = (url, link) => {
 // ============================================
 
 /**
- * Evaluates all rules for a link and returns the appropriate action
+ * Action types that only cause a side effect and let evaluation continue.
+ * Every other action decides where the visit ends up (redirect, block,
+ * password gate) and therefore stops the evaluation.
+ */
+const NON_TERMINAL_ACTION_TYPES = ["notify"];
+
+const isNonTerminalAction = (result) =>
+  NON_TERMINAL_ACTION_TYPES.includes(result.type);
+
+/**
+ * Evaluates all rules for a link, in priority order, and returns the first
+ * terminal action plus the non-terminal ones (notify) found before it.
+ * Rules placed after the terminal action are not evaluated.
  * @param {Object} link - Link object with rules
  * @param {Object} context - Context with user data (country, device, etc.)
- * @returns {Promise<Object>} - { allowed: boolean, action: Object }
+ * @param {Object} options - { skipActionTypes: string[] }
+ * @returns {Promise<Object>} - { allowed: boolean, action: Object, notifications: Object[] }
+ *   `notifications` entries are notify actions tagged with the `ruleId` that produced them.
  */
 const evaluateLinkRules = async (link, context, options = {}) => {
   const { skipActionTypes = [] } = options;
+  const notifications = [];
+
+  const defaultResult = () => ({
+    allowed: true,
+    action: {
+      type: "redirect",
+      url: link.longUrl,
+    },
+    notifications,
+  });
 
   // No rules = redirect to longUrl
   if (!link.rules || link.rules.length === 0) {
-    return {
-      allowed: true,
-      action: {
-        type: "redirect",
-        url: link.longUrl,
-      },
-    };
+    return defaultResult();
   }
 
   // Filter enabled rules and sort by priority (lower = higher priority)
@@ -571,55 +589,43 @@ const evaluateLinkRules = async (link, context, options = {}) => {
       context
     );
 
+    let actionType;
+    let actionSettings;
+
     if (conditionsMatch) {
-      // Skip if the primary action type is in the skip list (e.g. password_gate already verified)
-      if (skipActionTypes.includes(rule.actionType)) {
-        continue;
-      }
-
-      // Conditions match - execute primary action
-      const action = {
-        type: rule.actionType,
-        settings: rule.actionSettings || {},
-      };
-
-      const result = await evaluateAction(action, link);
-
-      // Check if action blocks access
-      const allowed = result.type !== "block";
-
-      return { allowed, action: result };
+      actionType = rule.actionType;
+      actionSettings = rule.actionSettings;
     } else if (rule.elseActionType) {
-      // Skip if the else action type is in the skip list
-      if (skipActionTypes.includes(rule.elseActionType)) {
-        continue;
-      }
-
-      // Conditions don't match - execute else action if exists
-      const elseAction = {
-        type: rule.elseActionType,
-        settings: rule.elseActionSettings || {},
-      };
-
-      const result = await evaluateAction(elseAction, link);
-
-      // Check if action blocks access
-      const allowed = result.type !== "block";
-
-      return { allowed, action: result };
+      actionType = rule.elseActionType;
+      actionSettings = rule.elseActionSettings;
+    } else {
+      // No match and no else action - continue to next rule
+      continue;
     }
 
-    // No match and no else action - continue to next rule
+    // Skip if the action type is in the skip list (e.g. password_gate already verified)
+    if (skipActionTypes.includes(actionType)) {
+      continue;
+    }
+
+    const result = await evaluateAction(
+      { type: actionType, settings: actionSettings || {} },
+      link
+    );
+
+    if (isNonTerminalAction(result)) {
+      notifications.push({ ...result, ruleId: rule.id });
+      continue;
+    }
+
+    // Check if action blocks access
+    const allowed = result.type !== "block";
+
+    return { allowed, action: result, notifications };
   }
 
-  // No rule matched - redirect to longUrl
-  return {
-    allowed: true,
-    action: {
-      type: "redirect",
-      url: link.longUrl,
-    },
-  };
+  // No terminal action - redirect to longUrl
+  return defaultResult();
 };
 
 // ============================================
