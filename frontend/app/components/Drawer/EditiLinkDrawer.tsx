@@ -316,7 +316,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
             className='h-full overflow-hidden flex flex-col'
         >
             {/* Tabs — outside scroll container so they never collapse */}
-                <div className='bg-light w-5/6 flex gap-2 px-4 pt-4 pb-0 overflow-x-auto scrollbar-hide flex-shrink-0' style={{ maskImage: 'linear-gradient(to right, black 75%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to right, black 75%, transparent 100%)' }}>
+                <div className='bg-light w-5/6 flex gap-2 pl-4 pr-10 pt-4 pb-0 overflow-x-auto scrollbar-hide flex-shrink-0' style={{ maskImage: 'linear-gradient(to right, black calc(100% - 2.5rem), transparent 100%)', WebkitMaskImage: 'linear-gradient(to right, black calc(100% - 2.5rem), transparent 100%)' }}>
                     <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: "backInOut" }} className="flex-shrink-0">
                         <Button variant='ghost' size='sm' rounded='2xl' leftIcon={<TbCategory size={20} />}
                             className={`rounded-2xl ${tab === 'overview' ? 'bg-dark text-light hover:bg-dark/90' : 'bg-dark/5 text-dark/50'}`}

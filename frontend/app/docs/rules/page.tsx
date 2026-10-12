@@ -1,5 +1,5 @@
 "use client";
-import { TbArrowRight, TbArrowLeft, TbWorld, TbClick, TbDeviceMobile, TbCalendar, TbRobot, TbShieldLock, TbDots, TbArrowFork, TbForbid2, TbLock, TbWebhook } from "react-icons/tb";
+import { TbArrowRight, TbArrowLeft, TbWorld, TbClick, TbDeviceMobile, TbCalendar, TbRobot, TbShieldLock, TbDots, TbArrowFork, TbForbid2, TbLock, TbWebhook, TbServer, TbBolt } from "react-icons/tb";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import * as motion from "motion/react-client";
@@ -18,6 +18,8 @@ export default function RulesDoc() {
     { nameKey: "conditionBotName", icon: <TbRobot size={20} />, color: "bg-danger/10 text-danger", descKey: "conditionBotDesc", opsKey: "conditionBotOperators" },
     { nameKey: "conditionDateName", icon: <TbCalendar size={20} />, color: "bg-secondary/10 text-secondary", descKey: "conditionDateDesc", opsKey: "conditionDateOperators" },
     { nameKey: "conditionIpName", icon: <TbDots size={20} />, color: "bg-dark/10 text-dark", descKey: "conditionIpDesc", opsKey: "conditionIpOperators" },
+    { nameKey: "conditionDatacenterName", icon: <TbServer size={20} />, color: "bg-info/10 text-info", descKey: "conditionDatacenterDesc", opsKey: "conditionDatacenterOperators" },
+    { nameKey: "conditionBurstName", icon: <TbBolt size={20} />, color: "bg-danger/10 text-danger", descKey: "conditionBurstDesc", opsKey: "conditionBurstOperators" },
     { nameKey: "conditionCountName", icon: <TbClick size={20} />, color: "bg-dark/10 text-dark", descKey: "conditionCountDesc", opsKey: "conditionCountOperators" },
   ] as const;
 
