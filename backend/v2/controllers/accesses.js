@@ -1,6 +1,7 @@
 const prisma = require("../prisma/client");
 const { successResponse, errorResponse } = require("../utils/response");
 const ERRORS = require("../constants/errorCodes");
+const { buildUtmBreakdown } = require("../utils/utmStats");
 
 const getLinkAccesses = async (req, res) => {
   const user = req.user;
@@ -131,7 +132,17 @@ const getLinkStats = async (req, res) => {
         linkId: link.id,
         ...(since && { createdAt: { gte: since } }),
       },
-      select: { createdAt: true, country: true, source: true, userAgent: true, isVPN: true, isBot: true },
+      select: {
+        createdAt: true,
+        country: true,
+        source: true,
+        userAgent: true,
+        isVPN: true,
+        isBot: true,
+        utmSource: true,
+        utmMedium: true,
+        utmCampaign: true,
+      },
       orderBy: { createdAt: 'asc' },
     });
 
@@ -180,6 +191,7 @@ const getLinkStats = async (req, res) => {
       topCountries,
       sourceBreakdown: { direct: directCount, qr: qrCount },
       browserBreakdown,
+      utmBreakdown: buildUtmBreakdown(accesses),
       vpnCount,
       botCount,
     });
