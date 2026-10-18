@@ -355,6 +355,8 @@
     "inactive": "Inactivo",
     "longUrl": "URL Larga",
     "urlPlaceholder": "https://ejemplo.com",
+    "forwardParamsLabel": "Pasar parámetros al destino",
+    "forwardParamsDesc": "Los parámetros como ?utm_source=email se añaden a la URL de destino. Si el destino ya tiene uno con el mismo nombre, prevalece el del destino.",
     "unsavedChanges": "Cambios Sin Guardar",
     "unsavedChangesDesc": "Tienes cambios que aún no se han guardado",
     "discard": "Descartar",

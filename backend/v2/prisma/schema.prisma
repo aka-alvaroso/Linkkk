@@ -71,6 +71,8 @@ model Link {
   status         Boolean      @default(true)
   accessCount    Int          @default(0)
   scanCount      Int          @default(0)
+  // When true, the visitor's query params are appended to the destination URL
+  forwardParams  Boolean      @default(false)
   createdAt      DateTime     @default(now())
 
   customDomainId Int?

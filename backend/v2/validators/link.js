@@ -37,6 +37,7 @@ const createLinkSchema = z.object({
   status: z.boolean().default(true),
   customSuffix: customSuffixSchema.optional(),
   customDomainId: z.number().int().positive().optional().nullable(),
+  forwardParams: z.boolean().default(false),
 });
 
 const updateLinkSchema = z.object({
@@ -44,6 +45,7 @@ const updateLinkSchema = z.object({
   status: z.boolean().optional(),
   newShortUrl: customSuffixSchema.optional(),
   customDomainId: z.number().int().positive().optional().nullable(),
+  forwardParams: z.boolean().optional(),
 });
 
 module.exports = {

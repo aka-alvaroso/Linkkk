@@ -59,6 +59,7 @@ export interface Link {
   shortUrl: string;
   longUrl: string;
   status: boolean;
+  forwardParams?: boolean;
   createdAt: string;
   accessCount?: number;
   scanCount?: number;
@@ -78,6 +79,7 @@ export interface CreateLinkDTO {
 export interface UpdateLinkDTO {
   longUrl?: string;
   status?: boolean;
+  forwardParams?: boolean;
   newShortUrl?: string;
   groupId?: number | null;
   customDomainId?: number | null;

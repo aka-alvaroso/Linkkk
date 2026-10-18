@@ -13,6 +13,7 @@ const { recordHit } = require("../utils/burstTracker");
 const { evaluateLinkRules, detectDevice } = require("../utils/linkRulesEngine");
 const { comparePassword } = require("../utils/password");
 const { sanitizeQueryParams, extractUtm, escapeParamForHtml } = require("../utils/queryParamsSanitizer");
+const { forwardedUrl } = require("../utils/forwardParams");
 const { sendRuleNotificationEmail } = require("../services/emailService");
 const { publish } = require("../realtime/broadcaster");
 const {
@@ -183,7 +184,7 @@ const createLink = async (req, res) => {
     return errorResponse(res, ERRORS.INVALID_DATA, issues);
   }
 
-  const { longUrl, status, customSuffix, customDomainId } = validate.data;
+  const { longUrl, status, customSuffix, customDomainId, forwardParams } = validate.data;
 
   // Custom suffix only allowed for authenticated users (not guests)
   if (customSuffix && isGuest) {
@@ -250,6 +251,7 @@ const createLink = async (req, res) => {
         guestSessionId: guest?.guestSessionId,
         longUrl,
         status: status ?? true,
+        forwardParams,
         shortUrl,
         groupId: groupId || null,
         customDomainId: customDomainId || null,
@@ -315,6 +317,7 @@ const getLink = async (req, res) => {
       shortUrl: link.shortUrl,
       longUrl: link.longUrl,
       status: link.status,
+      forwardParams: link.forwardParams,
       createdAt: link.createdAt,
       group: link.group,
       tags: link.tags.map((lt) => lt.tag),
@@ -371,6 +374,7 @@ const getAllLinks = async (req, res) => {
         shortUrl: link.shortUrl,
         longUrl: link.longUrl,
         status: link.status,
+        forwardParams: link.forwardParams,
         createdAt: link.createdAt,
         accessCount: link.accessCount,
         scanCount: link.scanCount || 0,
@@ -409,7 +413,7 @@ const updateLink = async (req, res) => {
     return errorResponse(res, ERRORS.INVALID_DATA, issues);
   }
 
-  const { longUrl, status, newShortUrl, customDomainId } = validatedData.data;
+  const { longUrl, status, newShortUrl, customDomainId, forwardParams } = validatedData.data;
 
   // Custom suffix change only allowed for authenticated users (not guests)
   if (newShortUrl !== undefined && guest) {
@@ -461,6 +465,7 @@ const updateLink = async (req, res) => {
     const updateData = {};
     if (longUrl !== undefined) updateData.longUrl = longUrl;
     if (status !== undefined) updateData.status = status;
+    if (forwardParams !== undefined) updateData.forwardParams = forwardParams;
     if (newShortUrl !== undefined) updateData.shortUrl = newShortUrl;
     if (customDomainId !== undefined) updateData.customDomainId = customDomainId ?? null;
 
@@ -486,6 +491,7 @@ const updateLink = async (req, res) => {
       shortUrl: updatedLink.shortUrl,
       longUrl: updatedLink.longUrl,
       status: updatedLink.status,
+      forwardParams: updatedLink.forwardParams,
       createdAt: updatedLink.createdAt,
       group: updatedLink.group,
       tags: updatedLink.tags.map((lt) => lt.tag),
@@ -718,7 +724,7 @@ const redirectLink = async (req, res) => {
     // Access row is written and no notify webhook/email fires for this hit,
     // since crawler preview fetches aren't real visits (see plan doc).
     if (isBot) {
-      return serveBotPreview(res, link, action, { shortUrl, host, customDomainUserId });
+      return serveBotPreview(res, link, action, { shortUrl, host, customDomainUserId, queryParams });
     }
 
     // Notifications evaluated before the terminal action always fire, even
@@ -740,7 +746,7 @@ const redirectLink = async (req, res) => {
       case "redirect":
         await trackAccess(link, { userAgent, ip, country, isVpn, isBot, source, device, utm });
 
-        return res.redirect(302, action.url);
+        return res.redirect(302, forwardedUrl(link, action.url, queryParams));
 
       case "block":
         // Do NOT increment counter for blocked requests
@@ -774,7 +780,7 @@ const redirectLink = async (req, res) => {
 
         await trackAccess(link, { userAgent, ip, country, isVpn, isBot, source, device, utm });
 
-        return res.redirect(302, link.longUrl);
+        return res.redirect(302, forwardedUrl(link, link.longUrl, queryParams));
     }
   } catch (error) {
     logger.error("Redirect error", {
@@ -809,7 +815,7 @@ const redirectLink = async (req, res) => {
  * when this used `content="0;..."`. A several-second delay makes it read as
  * a real page rather than a redirect stub, so it stops following it too.
  */
-const serveBotPreview = (res, link, action, { shortUrl, host, customDomainUserId }) => {
+const serveBotPreview = (res, link, action, { shortUrl, host, customDomainUserId, queryParams = {} }) => {
   const metadata = link.metadata;
   const hasCustomMetadata =
     metadata &&
@@ -839,7 +845,7 @@ const serveBotPreview = (res, link, action, { shortUrl, host, customDomainUserId
     case "redirect":
     case "notify":
     default:
-      fallbackUrl = action.url || link.longUrl;
+      fallbackUrl = forwardedUrl(link, action.url || link.longUrl, queryParams);
       break;
   }
 
@@ -1029,6 +1035,7 @@ const verifyPasswordGate = async (req, res) => {
 
     // Only track access and increment counter if not blocked
     if (accessAllowed) {
+      finalUrl = forwardedUrl(link, finalUrl, queryParams);
       await trackAccess(link, { userAgent, ip, country, isVpn, isBot, source, device, utm });
     }
 
