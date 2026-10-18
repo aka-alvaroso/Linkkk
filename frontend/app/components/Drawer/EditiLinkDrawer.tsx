@@ -922,6 +922,49 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                                     );
                                                 })()}
 
+                                            {/* Campaigns — utm_campaign / utm_source / utm_medium */}
+                                            {(() => {
+                                                const utm = stats.utmBreakdown;
+                                                const groups = [
+                                                    { key: 'campaigns', label: t('utmCampaigns'), items: utm?.campaigns ?? [] },
+                                                    { key: 'sources', label: t('utmSources'), items: utm?.sources ?? [] },
+                                                    { key: 'mediums', label: t('utmMediums'), items: utm?.mediums ?? [] },
+                                                ].filter(g => g.items.length > 0);
+                                                return (
+                                                    <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25, duration: 0.3, ease: 'easeOut' }} className='bg-white border border-dark/10 rounded-xl px-3 py-3 flex flex-col gap-2.5'>
+                                                        <p className='text-xs font-bold text-dark/40 flex items-center gap-1.5'><TbTag size={16} />{t('utmTitle')}</p>
+                                                        {groups.length === 0 ? (
+                                                            <p className='text-xs text-dark/50'>{t('utmEmptyHint')}</p>
+                                                        ) : (
+                                                            <>
+                                                                <p className='text-[10px] text-dark/40'>{t('utmShare', { count: utm.withUtm, total: stats.totalClicks })}</p>
+                                                                {groups.map(({ key, label, items }) => (
+                                                                    <div key={key} className='flex flex-col gap-1.5'>
+                                                                        <p className='text-[10px] font-bold uppercase tracking-wide text-dark/40'>{label}</p>
+                                                                        {items.slice(0, 5).map(({ value, count }, idx) => {
+                                                                            const pct = Math.round(count / items[0].count * 100);
+                                                                            return (
+                                                                                <div key={value} className='flex items-center gap-1.5'>
+                                                                                    <span className='text-xs font-bold text-dark/70 w-24 truncate flex-shrink-0' title={value}>{value}</span>
+                                                                                    <div className='flex-1 bg-dark/8 rounded-full h-1.5 overflow-hidden'>
+                                                                                        <motion.div
+                                                                                            initial={{ width: 0 }}
+                                                                                            animate={{ width: `${pct}%` }}
+                                                                                            transition={{ delay: 0.3 + idx * 0.04, duration: 0.5, ease: 'easeOut' }}
+                                                                                            className={`h-full rounded-full ${idx === 0 ? 'bg-primary' : 'bg-dark/70'}`}
+                                                                                        />
+                                                                                    </div>
+                                                                                    <span className='text-xs font-bold text-dark/50 w-6 text-right flex-shrink-0 tabular-nums'>{count}</span>
+                                                                                </div>
+                                                                            );
+                                                                        })}
+                                                                    </div>
+                                                                ))}
+                                                            </>
+                                                        )}
+                                                    </motion.div>
+                                                );
+                                            })()}
 
                                         </div>
                                     </>

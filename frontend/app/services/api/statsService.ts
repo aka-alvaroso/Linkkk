@@ -6,6 +6,14 @@ export interface DayCount { date: string; count: number; }
 export interface CountryCount { country: string; count: number; }
 export interface BrowserCount { browser: string; count: number; }
 
+export interface UtmValueCount { value: string; count: number; }
+export interface UtmBreakdown {
+  withUtm: number;
+  sources: UtmValueCount[];
+  mediums: UtmValueCount[];
+  campaigns: UtmValueCount[];
+}
+
 export interface LinkStats {
   totalClicks: number;
   totalScans: number;
@@ -13,6 +21,7 @@ export interface LinkStats {
   topCountries: CountryCount[];
   sourceBreakdown: { direct: number; qr: number };
   browserBreakdown: BrowserCount[];
+  utmBreakdown: UtmBreakdown;
   vpnCount: number;
   botCount: number;
 }
