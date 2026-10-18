@@ -145,10 +145,19 @@ class LinkService {
     });
   }
 
-  async verifyPassword(shortUrl: string, password: string, src?: string | null): Promise<{ success: boolean; url: string }> {
+  async verifyPassword(
+    shortUrl: string,
+    password: string,
+    src?: string | null,
+    params?: Record<string, string>,
+  ): Promise<{ success: boolean; url: string }> {
     return this.request<{ success: boolean; url: string }>(`${this.baseUrl}/${shortUrl}/verify-password`, {
       method: "POST",
-      body: JSON.stringify({ password, ...(src && { src }) }),
+      body: JSON.stringify({
+        password,
+        ...(src && { src }),
+        ...(params && Object.keys(params).length > 0 && { params }),
+      }),
     });
   }
 }

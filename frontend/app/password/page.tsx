@@ -40,7 +40,14 @@ export default function PasswordPage() {
     setError('');
 
     try {
-      const data = await linkService.verifyPassword(shortUrl, password, src);
+      // Everything that isn't the page's own state is the visitor's original
+      // query string (e.g. utm_*); relay it so the access keeps its attribution.
+      const params: Record<string, string> = {};
+      searchParams.forEach((value, key) => {
+        if (!['shortUrl', 'hint', 'src'].includes(key)) params[key] = value;
+      });
+
+      const data = await linkService.verifyPassword(shortUrl, password, src, params);
 
       // Password correct - redirect to the actual URL
       if (data.url) {

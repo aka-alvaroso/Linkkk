@@ -12,7 +12,7 @@ const { defineCountry, defineIsVPN, defineIsDatacenter, getClientIp } = require(
 const { recordHit } = require("../utils/burstTracker");
 const { evaluateLinkRules, detectDevice } = require("../utils/linkRulesEngine");
 const { comparePassword } = require("../utils/password");
-const { sanitizeQueryParams, escapeParamForHtml } = require("../utils/queryParamsSanitizer");
+const { sanitizeQueryParams, extractUtm, escapeParamForHtml } = require("../utils/queryParamsSanitizer");
 const { sendRuleNotificationEmail } = require("../services/emailService");
 const { publish } = require("../realtime/broadcaster");
 const {
@@ -31,7 +31,7 @@ const {
  *
  * Guest-owned links have no userId, so there's nothing to publish to.
  */
-const trackAccess = async (link, { userAgent, ip, country, isVpn, isBot, source, device }) => {
+const trackAccess = async (link, { userAgent, ip, country, isVpn, isBot, source, device, utm = {} }) => {
   const counterField = source === "qr" ? "scanCount" : "accessCount";
 
   const updatedLink = await prisma.$transaction(async (tx) => {
@@ -44,6 +44,7 @@ const trackAccess = async (link, { userAgent, ip, country, isVpn, isBot, source,
         isVPN: isVpn,
         isBot,
         source,
+        ...utm,
       },
     });
 
@@ -578,6 +579,9 @@ const generateShortCode = async () => {
   return shortCode;
 };
 
+// Keys the password page already uses for its own state
+const GATE_PAGE_KEYS = new Set(["shortUrl", "hint"]);
+
 // 5. Link redirect
 const redirectLink = async (req, res) => {
   const { shortUrl } = req.params;
@@ -654,6 +658,8 @@ const redirectLink = async (req, res) => {
         droppedCount,
       });
     }
+
+    const utm = extractUtm(queryParams);
 
     const context = {
       country,
@@ -732,7 +738,7 @@ const redirectLink = async (req, res) => {
     // Apply the terminal action
     switch (action.type) {
       case "redirect":
-        await trackAccess(link, { userAgent, ip, country, isVpn, isBot, source, device });
+        await trackAccess(link, { userAgent, ip, country, isVpn, isBot, source, device, utm });
 
         return res.redirect(302, action.url);
 
@@ -748,10 +754,15 @@ const redirectLink = async (req, res) => {
       case "password_gate":
         // DO NOT increment counter here - it will be incremented after successful password verification
         // This prevents counting failed password attempts as actual access
+        // Carry the sanitized query params through the gate so the visit keeps
+        // its UTM attribution once the password is verified.
         return res.redirect(
           `${config.frontend.url}/password?shortUrl=${shortUrl}${
             action.hint ? `&hint=${encodeURIComponent(action.hint)}` : ""
-          }${source === "qr" ? "&src=qr" : ""}`,
+          }${source === "qr" ? "&src=qr" : ""}${Object.entries(queryParams)
+            .filter(([key]) => !GATE_PAGE_KEYS.has(key))
+            .map(([key, value]) => `&${key}=${encodeURIComponent(value)}`)
+            .join("")}`,
         );
 
       default:
@@ -761,7 +772,7 @@ const redirectLink = async (req, res) => {
           shortUrl,
         });
 
-        await trackAccess(link, { userAgent, ip, country, isVpn, isBot, source, device });
+        await trackAccess(link, { userAgent, ip, country, isVpn, isBot, source, device, utm });
 
         return res.redirect(302, link.longUrl);
     }
@@ -874,6 +885,10 @@ const verifyPasswordGate = async (req, res) => {
   const userAgent = req.headers["user-agent"];
   const ip = getClientIp(req);
   const source = req.body.src === "qr" ? "qr" : "direct";
+  // Query params of the original visit, relayed by the password page; never
+  // trusted as-is, so they go through the same sanitizer as a live request.
+  const { params: queryParams } = sanitizeQueryParams(req.body.params);
+  const utm = extractUtm(queryParams);
 
   try {
     // Validate input
@@ -1014,7 +1029,7 @@ const verifyPasswordGate = async (req, res) => {
 
     // Only track access and increment counter if not blocked
     if (accessAllowed) {
-      await trackAccess(link, { userAgent, ip, country, isVpn, isBot, source, device });
+      await trackAccess(link, { userAgent, ip, country, isVpn, isBot, source, device, utm });
     }
 
     return successResponse(res, {
