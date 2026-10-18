@@ -559,6 +559,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                     >
                                         <Switch
                                             size='sm'
+                                            className='flex-shrink-0'
                                             checked={newLink.forwardParams ?? false}
                                             onChange={(checked) => setNewLink({ ...newLink, forwardParams: checked })}
                                         />
