@@ -7,6 +7,7 @@ import { useLinks, useAuth, useTags, useGroups } from '@/app/hooks';
 import { domainService, CustomDomain } from '@/app/services/api/domainService';
 import SelectDropdown from '@/app/components/ui/Select/SelectDropdown';
 import Switch from '@/app/components/ui/Switch/Switch';
+import UtmBuilder from './UtmBuilder';
 import { PLAN_LIMITS } from '@/app/constants/limits';
 import type { Link } from '@/app/types';
 import { AccessesList } from '../Accesses/accessesList';
@@ -567,6 +568,17 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                             <span className='text-xs text-dark/50'>{t('forwardParamsDesc')}</span>
                                         </div>
                                     </motion.div>
+
+                                    {/* UTM builder — ready-to-share URL variants (campaign stats are registered-only) */}
+                                    {!isGuest && (
+                                        <UtmBuilder
+                                            baseUrl={
+                                                link.customDomain
+                                                    ? `https://${link.customDomain.domain}/${link.shortUrl}`
+                                                    : `https://linkkk.dev/r/${link.shortUrl}`
+                                            }
+                                        />
+                                    )}
 
                                     <div className='flex items-center gap-2'>
                                         {/* Tags dropdown */}
