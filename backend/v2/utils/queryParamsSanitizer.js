@@ -175,6 +175,37 @@ const sanitizeQueryParams = (rawQuery) => {
 };
 
 // ============================================
+// UTM EXTRACTION
+// ============================================
+
+const UTM_KEYS = {
+  utm_source: "utmSource",
+  utm_medium: "utmMedium",
+  utm_campaign: "utmCampaign",
+  utm_term: "utmTerm",
+  utm_content: "utmContent",
+};
+
+const MAX_UTM_LENGTH = 255;
+
+/**
+ * Picks the five standard utm_* params out of an already-sanitized params map
+ * and returns them as Access column values. Values are lowercased so "Email"
+ * and "email" aggregate together; anything missing is null.
+ *
+ * @param {object} params - Output of sanitizeQueryParams().params
+ * @returns {{ utmSource, utmMedium, utmCampaign, utmTerm, utmContent }}
+ */
+const extractUtm = (params) => {
+  const utm = {};
+  for (const [param, column] of Object.entries(UTM_KEYS)) {
+    const value = params && typeof params[param] === "string" ? params[param] : "";
+    utm[column] = value ? value.toLowerCase().slice(0, MAX_UTM_LENGTH) : null;
+  }
+  return utm;
+};
+
+// ============================================
 // HTML ESCAPE HELPER (for callers rendering params into HTML, e.g. email templates)
 // ============================================
 
@@ -218,6 +249,7 @@ const escapeParamsForHtml = (params) => {
 
 module.exports = {
   sanitizeQueryParams,
+  extractUtm,
   escapeParamForHtml,
   escapeParamsForHtml,
 };
