@@ -6,6 +6,7 @@ import Button from '../ui/Button/Button';
 import { useLinks, useAuth, useTags, useGroups } from '@/app/hooks';
 import { domainService, CustomDomain } from '@/app/services/api/domainService';
 import SelectDropdown from '@/app/components/ui/Select/SelectDropdown';
+import Switch from '@/app/components/ui/Switch/Switch';
 import { PLAN_LIMITS } from '@/app/constants/limits';
 import type { Link } from '@/app/types';
 import { AccessesList } from '../Accesses/accessesList';
@@ -221,6 +222,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
             const response = await updateLink(link.shortUrl, {
                 longUrl: newLink.longUrl,
                 status: newLink.status,
+                forwardParams: newLink.forwardParams ?? false,
                 ...(newLink.shortUrl !== link.shortUrl && { newShortUrl: newLink.shortUrl }),
                 ...((newLink.customDomain?.id ?? null) !== (link.customDomain?.id ?? null) && {
                     customDomainId: newLink.customDomain?.id ?? null,
@@ -269,6 +271,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
             if (e.key === 'Enter' && !e.shiftKey) {
                 const hasChanges =
                     link.status !== newLink.status ||
+                    (link.forwardParams ?? false) !== (newLink.forwardParams ?? false) ||
                     link.longUrl !== newLink.longUrl ||
                     link.shortUrl !== newLink.shortUrl ||
                     (link.customDomain?.id ?? null) !== (newLink.customDomain?.id ?? null);
@@ -295,6 +298,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
     useEffect(() => {
         const hasLinkChanges =
             link.status !== newLink.status ||
+            (link.forwardParams ?? false) !== (newLink.forwardParams ?? false) ||
             link.longUrl !== newLink.longUrl ||
             link.shortUrl !== newLink.shortUrl ||
             (link.customDomain?.id ?? null) !== (newLink.customDomain?.id ?? null);
@@ -544,6 +548,24 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                                 className='cursor-pointer'
                                             />
                                         </Button>
+                                    </motion.div>
+
+                                    {/* Forward query params to the destination */}
+                                    <motion.div
+                                        initial={{ opacity: 0, x: 20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: 0.12, duration: 0.4, ease: "backInOut" }}
+                                        className='flex items-start gap-3 max-w-sm'
+                                    >
+                                        <Switch
+                                            size='sm'
+                                            checked={newLink.forwardParams ?? false}
+                                            onChange={(checked) => setNewLink({ ...newLink, forwardParams: checked })}
+                                        />
+                                        <div className='flex flex-col'>
+                                            <span className='text-xs font-semibold text-dark/70'>{t('forwardParamsLabel')}</span>
+                                            <span className='text-xs text-dark/50'>{t('forwardParamsDesc')}</span>
+                                        </div>
                                     </motion.div>
 
                                     <div className='flex items-center gap-2'>

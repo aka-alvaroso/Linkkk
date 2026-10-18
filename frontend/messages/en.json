@@ -354,6 +354,8 @@
     "inactive": "Inactive",
     "longUrl": "Long URL",
     "urlPlaceholder": "https://example.com",
+    "forwardParamsLabel": "Pass parameters to the destination",
+    "forwardParamsDesc": "Query params like ?utm_source=email are added to the destination URL. If the destination already has one with the same name, it wins.",
     "unsavedChanges": "Unsaved Changes",
     "unsavedChangesDesc": "You have changes that haven't been saved yet",
     "discard": "Discard",
