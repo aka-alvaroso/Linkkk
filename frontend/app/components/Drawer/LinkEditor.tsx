@@ -289,8 +289,7 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
             if (e.key === '1') setTab('overview');
             else if (e.key === '2') setTab('rules');
             else if (e.key === '3' && !isGuest) setTab('history');
-            else if (e.key === '4' && !isGuest) setTab('qr');
-            else if (e.key === '5' && !isGuest) setTab('metadata');
+            else if (e.key === '4' && !isGuest) setTab('share');
         };
 
         document.addEventListener('keydown', handleKeyDown);
@@ -518,17 +517,6 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
                                         </div>
                                     </motion.div>
 
-                                    {/* UTM builder — ready-to-share URL variants (campaign stats are registered-only) */}
-                                    {!isGuest && (
-                                        <UtmBuilder
-                                            baseUrl={
-                                                link.customDomain
-                                                    ? `https://${link.customDomain.domain}/${link.shortUrl}`
-                                                    : `https://linkkk.dev/r/${link.shortUrl}`
-                                            }
-                                        />
-                                    )}
-
                                     <LinkOrganizeFields
                                         isGuest={isGuest}
                                         isPro={user?.role === 'PRO'}
@@ -596,17 +584,29 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
                 )}
 
 
-                {/* QR */}
-                {tab === 'qr' && (
-                    <div className='relative z-0 w-full flex flex-col gap-4 '>
-                        <QRCodeEditor shortUrl={link.shortUrl} onConfigChange={handleQRChange} />
-                    </div>
-                )}
+                {/* Share: UTM builder, QR code and social preview */}
+                {tab === 'share' && (
+                    <div className='relative z-0 w-full flex flex-col gap-8'>
+                        <section className='flex flex-col gap-3'>
+                            <h2 className='text-base font-black italic text-dark'>{t('utmBuilderTitle')}</h2>
+                            <UtmBuilder
+                                baseUrl={
+                                    link.customDomain
+                                        ? `https://${link.customDomain.domain}/${link.shortUrl}`
+                                        : `https://linkkk.dev/r/${link.shortUrl}`
+                                }
+                            />
+                        </section>
 
-                {/* Metadata (social preview) */}
-                {tab === 'metadata' && (
-                    <div className='relative z-0 w-full flex flex-col gap-4 '>
-                        <LinkMetadataEditor shortUrl={link.shortUrl} onConfigChange={handleMetadataChange} />
+                        <section className='flex flex-col gap-3 pt-6 border-t border-dark/10'>
+                            <h2 className='text-base font-black italic text-dark'>{t('tabQR')}</h2>
+                            <QRCodeEditor shortUrl={link.shortUrl} onConfigChange={handleQRChange} />
+                        </section>
+
+                        <section className='flex flex-col gap-3 pt-6 border-t border-dark/10'>
+                            <h2 className='text-base font-black italic text-dark'>{t('tabMetadata')}</h2>
+                            <LinkMetadataEditor shortUrl={link.shortUrl} onConfigChange={handleMetadataChange} />
+                        </section>
                     </div>
                 )}
             </div>
