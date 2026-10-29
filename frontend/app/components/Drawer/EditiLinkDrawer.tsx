@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Drawer from '@/app/components/ui/Drawer/Drawer';
 import { FiCornerDownRight } from 'react-icons/fi';
-import { TbCircleDashed, TbCircleDashedCheck, TbCopy, TbList, TbPalette, TbCategory, TbPuzzle, TbPencil, TbWorld, TbRobot, TbTag, TbFolder, TbShare2 } from 'react-icons/tb';
+import { TbCircleDashed, TbCircleDashedCheck, TbCopy, TbPencil, TbRobot } from 'react-icons/tb';
 import Button from '../ui/Button/Button';
 import { useLinks, useAuth, useTags, useGroups } from '@/app/hooks';
 import { domainService, CustomDomain } from '@/app/services/api/domainService';
-import SelectDropdown from '@/app/components/ui/Select/SelectDropdown';
 import Switch from '@/app/components/ui/Switch/Switch';
 import UtmBuilder from './UtmBuilder';
+import LinkDrawerTabs from './LinkDrawerTabs';
+import LinkOrganizeFields from './LinkOrganizeFields';
 import { PLAN_LIMITS } from '@/app/constants/limits';
 import type { Link } from '@/app/types';
 import { AccessesList } from '../Accesses/accessesList';
@@ -186,6 +187,27 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
         cancelMetadataRef.current = cancelMetadata;
     }, []);
 
+    const handleTagsChange = async (next: (string | number)[]) => {
+        if (!link.id) return;
+        const atLimit = organizeLimit.tagsPerLink !== null && next.length > organizeLimit.tagsPerLink;
+        const bounded = atLimit ? next.slice(0, organizeLimit.tagsPerLink!) : next;
+        setSelectedTagIds(bounded as number[]);
+        await assignTagsToLink(link.id, bounded as number[]);
+        await fetchLinks();
+    };
+
+    const handleGroupChange = async (val: string | number | null) => {
+        if (!link.id) return;
+        if (val === null) {
+            if (link.group?.id) await removeLinkFromGroup(link.group.id, link.id);
+            setSelectedGroupId(null);
+        } else {
+            setSelectedGroupId(val as number);
+            await moveLinkToGroup(val as number, link.id);
+        }
+        await fetchLinks();
+    };
+
     const handleUpdateLink = useCallback(async () => {
         if (newLink.shortUrl !== link.shortUrl && !suffixRegex.test(newLink.shortUrl)) {
             setSuffixError(t('customSuffixInvalid'));
@@ -294,52 +316,7 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
             rounded='3xl'
             className='h-full overflow-hidden flex flex-col'
         >
-            {/* Tabs — outside scroll container so they never collapse */}
-                <div className='bg-light w-5/6 flex gap-2 pl-4 pr-10 pt-4 pb-0 overflow-x-auto scrollbar-hide flex-shrink-0' style={{ maskImage: 'linear-gradient(to right, black calc(100% - 2.5rem), transparent 100%)', WebkitMaskImage: 'linear-gradient(to right, black calc(100% - 2.5rem), transparent 100%)' }}>
-                    <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: "backInOut" }} className="flex-shrink-0">
-                        <Button variant='ghost' size='sm' rounded='2xl' leftIcon={<TbCategory size={20} />}
-                            className={`rounded-2xl ${tab === 'overview' ? 'bg-dark text-light hover:bg-dark/90' : 'bg-dark/5 text-dark/50'}`}
-                            onClick={() => setTab('overview')}
-                        >
-                            {t('tabOverview')}
-                        </Button>
-                    </motion.div>
-                    <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05, duration: 0.4, ease: "backInOut" }} className="flex-shrink-0">
-                        <Button variant='ghost' size='sm' rounded='2xl' leftIcon={<TbPuzzle size={20} />}
-                            className={`rounded-2xl ${tab === 'rules' ? 'bg-dark text-light hover:bg-dark/90' : 'bg-dark/5 text-dark/50'}`}
-                            onClick={() => setTab('rules')}
-                        >
-                            {t('tabRules')}
-                        </Button>
-                    </motion.div>
-                    <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.4, ease: "backInOut" }} className="flex-shrink-0">
-                        <Button variant='ghost' size='sm' rounded='2xl' leftIcon={<TbList size={20} />}
-                            className={`rounded-2xl ${tab === 'history' ? 'bg-dark text-light hover:bg-dark/90' : 'bg-dark/5 text-dark/50'}`}
-                            onClick={() => setTab('history')}
-                            disabled={isGuest}
-                        >
-                            {t('tabHistory')}
-                        </Button>
-                    </motion.div>
-                    <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15, duration: 0.4, ease: "backInOut" }} className="flex-shrink-0">
-                        <Button variant='ghost' size='sm' rounded='2xl' leftIcon={<TbPalette size={20} />}
-                            className={`rounded-2xl ${tab === 'qr' ? 'bg-dark text-light hover:bg-dark/90' : 'bg-dark/5 text-dark/50'}`}
-                            onClick={() => setTab('qr')}
-                            disabled={isGuest}
-                        >
-                            {t('tabQR')}
-                        </Button>
-                    </motion.div>
-                    <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.4, ease: "backInOut" }} className="flex-shrink-0">
-                        <Button variant='ghost' size='sm' rounded='2xl' leftIcon={<TbShare2 size={20} />}
-                            className={`rounded-2xl ${tab === 'metadata' ? 'bg-dark text-light hover:bg-dark/90' : 'bg-dark/5 text-dark/50'}`}
-                            onClick={() => setTab('metadata')}
-                            disabled={isGuest}
-                        >
-                            {t('tabMetadata')}
-                        </Button>
-                    </motion.div>
-                </div>
+            <LinkDrawerTabs tab={tab} onChange={setTab} isGuest={isGuest} />
 
                 <div className='flex-1 overflow-auto flex flex-col gap-2 p-4'>
 
@@ -554,89 +531,19 @@ export default function EditiLinkDrawer({ open, onClose, link }: EditiLinkDrawer
                                         />
                                     )}
 
-                                    <div className='flex items-center gap-2'>
-                                        {/* Tags dropdown */}
-                                        {!isGuest && tags.length > 0 && (
-                                            <motion.div
-                                                initial={{ opacity: 0, x: 20 }}
-                                                animate={{ opacity: 1, x: 0 }}
-                                                transition={{ delay: 0.15, duration: 0.4, ease: "backInOut" }}
-                                                className='flex flex-col gap-1'
-                                            >
-                                                <span className='text-xs font-semibold text-dark/60 flex items-center gap-1'><TbTag size={12} /> {t('organizeTagsTitle')}</span>
-                                                <SelectDropdown
-                                                    triggerClassName=''
-                                                    mode="multi"
-                                                    options={tags.map(tag => ({ label: tag.name, value: tag.id, color: tag.color ?? '#6b7280' }))}
-                                                    values={selectedTagIds}
-                                                    onChangeMulti={async (next) => {
-                                                        if (!link.id) return;
-                                                        const atLimit = organizeLimit.tagsPerLink !== null && next.length > organizeLimit.tagsPerLink;
-                                                        const bounded = atLimit ? next.slice(0, organizeLimit.tagsPerLink!) : next;
-                                                        setSelectedTagIds(bounded as number[]);
-                                                        await assignTagsToLink(link.id, bounded as number[]);
-                                                        await fetchLinks();
-                                                    }}
-                                                    placeholder={t('organizeTagsPlaceholder')}
-                                                />
-                                            </motion.div>
-                                        )}
-
-                                        {/* Group dropdown */}
-                                        {!isGuest && groups.length > 0 && (
-                                            <motion.div
-                                                initial={{ opacity: 0, x: 20 }}
-                                                animate={{ opacity: 1, x: 0 }}
-                                                transition={{ delay: 0.2, duration: 0.4, ease: "backInOut" }}
-                                                className='flex flex-col gap-1'
-                                            >
-                                                <span className='text-xs font-semibold text-dark/60 flex items-center gap-1'><TbFolder size={12} /> {t('organizeGroupTitle')}</span>
-                                                <SelectDropdown
-                                                    mode="single"
-                                                    options={groups.map(g => ({ label: g.name, value: g.id, color: g.color ?? '#6b7280' }))}
-                                                    value={selectedGroupId}
-                                                    onChange={async (val) => {
-                                                        if (!link.id) return;
-                                                        if (val === null) {
-                                                            if (link.group?.id) await removeLinkFromGroup(link.group.id, link.id);
-                                                            setSelectedGroupId(null);
-                                                        } else {
-                                                            setSelectedGroupId(val as number);
-                                                            await moveLinkToGroup(val as number, link.id);
-                                                        }
-                                                        await fetchLinks();
-                                                    }}
-                                                    placeholder={t('organizeNoGroup')}
-                                                    showNoneOption
-                                                    noneLabel={t('organizeNoGroup')}
-                                                />
-                                            </motion.div>
-                                        )}
-
-                                        {/* Custom domain dropdown (PRO only) */}
-                                        {!isGuest && user?.role === 'PRO' && activeDomains.length > 0 && (
-                                            <motion.div
-                                                initial={{ opacity: 0, x: 20 }}
-                                                animate={{ opacity: 1, x: 0 }}
-                                                transition={{ delay: 0.25, duration: 0.4, ease: "backInOut" }}
-                                                className='flex flex-col gap-1'
-                                            >
-                                                <span className='text-xs font-semibold text-dark/60 flex items-center gap-1'><TbWorld size={12} /> {t('customDomain')}</span>
-                                                <SelectDropdown
-                                                    mode="single"
-                                                    options={activeDomains.map(d => ({ label: d.domain, value: d.id }))}
-                                                    value={newLink.customDomain?.id ?? null}
-                                                    onChange={(val) => {
-                                                        const domain = val ? activeDomains.find(d => d.id === val) ?? null : null;
-                                                        setNewLink(prev => ({ ...prev, customDomain: domain }));
-                                                    }}
-                                                    placeholder={t('customDomainNone')}
-                                                    showNoneOption
-                                                    noneLabel={t('customDomainNone')}
-                                                />
-                                            </motion.div>
-                                        )}
-                                    </div>
+                                    <LinkOrganizeFields
+                                        isGuest={isGuest}
+                                        isPro={user?.role === 'PRO'}
+                                        tags={tags}
+                                        groups={groups}
+                                        activeDomains={activeDomains}
+                                        selectedTagIds={selectedTagIds}
+                                        selectedGroupId={selectedGroupId}
+                                        customDomainId={newLink.customDomain?.id ?? null}
+                                        onTagsChange={handleTagsChange}
+                                        onGroupChange={handleGroupChange}
+                                        onCustomDomainChange={(domain) => setNewLink(prev => ({ ...prev, customDomain: domain }))}
+                                    />
                                 </div>
                             </div>
 
