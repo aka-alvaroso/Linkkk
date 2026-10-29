@@ -73,6 +73,8 @@ model Link {
   scanCount      Int          @default(0)
   // When true, the visitor's query params are appended to the destination URL
   forwardParams  Boolean      @default(false)
+  // Parameters (UTM or custom) the owner appends when sharing the link: [{ key, value }]
+  utmParams      Json?
   createdAt      DateTime     @default(now())
 
   customDomainId Int?

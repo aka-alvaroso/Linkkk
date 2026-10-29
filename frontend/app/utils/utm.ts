@@ -1,3 +1,5 @@
+import type { UtmParam } from '@/app/types';
+
 export interface ParamRow {
   id: string;
   key: string;
@@ -67,20 +69,33 @@ export const rowIssue = (rows: ParamRow[], row: ParamRow): RowIssue => {
 const trimSeparators = (value: string): string => value.replace(/^[-_.]+|[-_.]+$/g, '');
 
 /**
- * Appends the filled-in params to a short URL. Rows with an empty key or
- * value, a reserved key or a repeated key are skipped, and at most
- * MAX_PARAMS are used. Returns the URL untouched when nothing is usable.
+ * The params a row list stands for: rows with an empty key or value, a reserved
+ * key or a repeated key are left out, and at most MAX_PARAMS are kept. This is
+ * also the shape saved with the link.
  */
-export const buildParamsUrl = (baseUrl: string, rows: ParamRow[]): string => {
-  const parts = rows
+export const paramsFromRows = (rows: ParamRow[]): UtmParam[] =>
+  rows
     .filter((row) => rowIssue(rows, row) === null)
     .map((row) => {
       const key = row.key.trim();
       const value = isUtmKey(key) ? trimSeparators(row.value) : row.value.trim();
-      return key && value ? `${key}=${encodeURIComponent(value)}` : '';
+      return { key, value };
     })
-    .filter(Boolean)
+    .filter((param) => param.key && param.value)
     .slice(0, MAX_PARAMS);
 
-  return parts.length > 0 ? `${baseUrl}?${parts.join('&')}` : baseUrl;
-};
+/** Rows to edit for a link: its saved params, or the starter UTM rows when it has none. */
+export const rowsFromParams = (params?: UtmParam[] | null): ParamRow[] =>
+  params && params.length > 0
+    ? params.map((param) => ({ ...createParamRow(param.key), value: param.value }))
+    : defaultParamRows();
+
+/** Appends params to a short URL; returned untouched when there are none. */
+export const buildUrlFromParams = (baseUrl: string, params: UtmParam[]): string =>
+  params.length > 0
+    ? `${baseUrl}?${params.map((p) => `${p.key}=${encodeURIComponent(p.value)}`).join('&')}`
+    : baseUrl;
+
+/** Appends the filled-in rows to a short URL. */
+export const buildParamsUrl = (baseUrl: string, rows: ParamRow[]): string =>
+  buildUrlFromParams(baseUrl, paramsFromRows(rows));

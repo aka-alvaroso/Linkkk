@@ -7,7 +7,7 @@ import { domainService, CustomDomain } from '@/app/services/api/domainService';
 import Switch from '@/app/components/ui/Switch/Switch';
 import UtmBuilder from './UtmBuilder';
 import InfoTip from '@/app/components/ui/InfoTip/InfoTip';
-import { defaultParamRows, type ParamRow } from '@/app/utils/utm';
+import { buildUrlFromParams, paramsFromRows, rowsFromParams, type ParamRow } from '@/app/utils/utm';
 import LinkDrawerTabs from './LinkDrawerTabs';
 import LinkOrganizeFields from './LinkOrganizeFields';
 import { PLAN_LIMITS } from '@/app/constants/limits';
@@ -45,9 +45,8 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
     const [tab, setTab] = useState('overview');
     // Link settings card is collapsed on small screens (always open from md up)
     const [settingsOpen, setSettingsOpen] = useState(false);
-    // UTM builder rows, shared by the quick panel in the overview and the Share tab
-    const [utmRows, setUtmRows] = useState<ParamRow[]>(defaultParamRows);
-    const [utmQuickOpen, setUtmQuickOpen] = useState(false);
+    // Params appended when sharing the link; edited in the Share tab and saved with the link
+    const [utmRows, setUtmRows] = useState<ParamRow[]>(() => rowsFromParams(link.utmParams));
     const [statusBar, setShowStatusBar] = useState("none");
     const [newLink, setNewLink] = useState({ ...link });
     // Inline editing
@@ -100,6 +99,7 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
 
     useEffect(() => {
         setNewLink({ ...link });
+        setUtmRows(rowsFromParams(link.utmParams));
         setEditingShortUrl(false);
         setEditingLongUrl(false);
         setSuffixError('');
@@ -219,6 +219,9 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
         await fetchLinks();
     };
 
+    const savedUtmParams = link.utmParams ?? [];
+    const utmDirty = JSON.stringify(paramsFromRows(utmRows)) !== JSON.stringify(savedUtmParams);
+
     const handleUpdateLink = useCallback(async () => {
         if (newLink.shortUrl !== link.shortUrl && !suffixRegex.test(newLink.shortUrl)) {
             setSuffixError(t('customSuffixInvalid'));
@@ -231,6 +234,7 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
                 longUrl: newLink.longUrl,
                 status: newLink.status,
                 forwardParams: newLink.forwardParams ?? false,
+                ...(utmDirty && { utmParams: paramsFromRows(utmRows) }),
                 ...(newLink.shortUrl !== link.shortUrl && { newShortUrl: newLink.shortUrl }),
                 ...((newLink.customDomain?.id ?? null) !== (link.customDomain?.id ?? null) && {
                     customDomainId: newLink.customDomain?.id ?? null,
@@ -269,7 +273,7 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
             toast.error(t('toastSaveFailed'), { description: errorMessage });
             setShowStatusBar("none");
         }
-    }, [link, newLink, updateLink, fetchLinks, onClose, isPage, onSaved, hasRulesChanges, hasQRChanges, hasMetadataChanges, toast, t]);
+    }, [link, newLink, utmDirty, utmRows, updateLink, fetchLinks, onClose, isPage, onSaved, hasRulesChanges, hasQRChanges, hasMetadataChanges, toast, t]);
 
     useEffect(() => {
         if (!open) return;
@@ -279,6 +283,7 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
 
             if (e.key === 'Enter' && !e.shiftKey) {
                 const hasChanges =
+                    utmDirty ||
                     link.status !== newLink.status ||
                     (link.forwardParams ?? false) !== (newLink.forwardParams ?? false) ||
                     link.longUrl !== newLink.longUrl ||
@@ -301,10 +306,11 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
 
         document.addEventListener('keydown', handleKeyDown);
         return () => document.removeEventListener('keydown', handleKeyDown);
-    }, [open, link, newLink, handleUpdateLink, isGuest]);
+    }, [open, link, newLink, utmDirty, handleUpdateLink, isGuest]);
 
     useEffect(() => {
         const hasLinkChanges =
+            utmDirty ||
             link.status !== newLink.status ||
             (link.forwardParams ?? false) !== (newLink.forwardParams ?? false) ||
             link.longUrl !== newLink.longUrl ||
@@ -315,7 +321,7 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
 
         if (hasChanges) setShowStatusBar("confirm");
         else setShowStatusBar("none");
-    }, [newLink, link, hasRulesChanges, hasQRChanges, hasMetadataChanges]);
+    }, [newLink, link, utmDirty, hasRulesChanges, hasQRChanges, hasMetadataChanges]);
 
     // Pieces of the overview, composed differently for the drawer and the page
     const shortUrlBlock = (
@@ -539,22 +545,32 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
         ? `https://${link.customDomain.domain}/${link.shortUrl}`
         : `https://linkkk.dev/r/${link.shortUrl}`;
 
-    const utmToggle = isGuest ? null : (
-        <button
-            type='button'
-            onClick={() => setUtmQuickOpen((v) => !v)}
-            aria-expanded={utmQuickOpen}
-            className='inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-dark/5 hover:bg-dark/10 text-xs font-bold text-dark/70 cursor-pointer'
-        >
-            <TbLink size={14} />
-            {t('utmQuickTitle')}
-            <TbChevronDown size={14} className={`transition-transform ${utmQuickOpen ? 'rotate-180' : ''}`} />
-        </button>
-    );
+    const chipClass = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-dark/5 hover:bg-dark/10 text-xs font-bold text-dark/70 cursor-pointer';
 
-    const utmQuickPanel = isGuest || !utmQuickOpen ? null : (
-        <div className='w-full max-w-xl bg-dark/5 rounded-xl p-3'>
-            <UtmBuilder baseUrl={utmBaseUrl} rows={utmRows} onRowsChange={setUtmRows} />
+    // Copy the link with the params saved on it, and jump to where they are configured
+    const utmActions = isGuest ? null : (
+        <div className='flex items-center gap-1.5'>
+            {savedUtmParams.length > 0 && (
+                <button
+                    type='button'
+                    className={chipClass}
+                    onClick={async () => {
+                        try {
+                            await navigator.clipboard.writeText(buildUrlFromParams(utmBaseUrl, savedUtmParams));
+                            toast.success(t('utmBuilderCopied'));
+                        } catch {
+                            toast.error(t('utmBuilderCopyError'));
+                        }
+                    }}
+                >
+                    <TbLink size={14} />
+                    {t('utmQuickTitle')}
+                </button>
+            )}
+            <button type='button' className={chipClass} onClick={() => setTab('share')} title={t('utmConfigure')}>
+                <TbSettings size={14} />
+                {savedUtmParams.length > 0 ? <span className='sr-only'>{t('utmConfigure')}</span> : t('utmAddParams')}
+            </button>
         </div>
     );
 
@@ -606,9 +622,8 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
                                 {longUrlBlock}
                                 <div className='flex flex-wrap items-center gap-2'>
                                     {statusBlock}
-                                    {utmToggle}
+                                    {utmActions}
                                 </div>
-                                {utmQuickPanel}
                             </div>
                             <div className='hidden sm:block'>{qrBlock}</div>
                         </div>
@@ -726,6 +741,7 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
                                     onClick={() => {
                                         setShowStatusBar("none");
                                         setNewLink({ ...link });
+                                        setUtmRows(rowsFromParams(link.utmParams));
                                         setSuffixError('');
                                         setEditingShortUrl(false);
                                         setEditingLongUrl(false);
