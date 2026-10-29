@@ -312,7 +312,7 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
     }, [newLink, link, hasRulesChanges, hasQRChanges, hasMetadataChanges]);
 
     return (
-        <div className={isPage ? 'flex flex-col' : 'contents'}>
+        <div className={isPage ? 'flex flex-col min-h-[calc(100dvh-9rem)]' : 'contents'}>
             <LinkDrawerTabs tab={tab} onChange={setTab} isGuest={isGuest} fullWidth={isPage} />
 
                 <div className={isPage ? 'flex-1 flex flex-col gap-2 py-4' : 'flex-1 overflow-auto flex flex-col gap-2 p-4'}>
@@ -508,6 +508,7 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
                                     >
                                         <Switch
                                             size='sm'
+                                            className='flex-shrink-0'
                                             checked={newLink.forwardParams ?? false}
                                             onChange={(checked) => setNewLink({ ...newLink, forwardParams: checked })}
                                         />
@@ -618,7 +619,7 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 100 }}
                         transition={{ duration: 0.3, ease: "backOut" }}
-                        className={isPage ? 'sticky bottom-0 z-20 w-full bg-light border-t border-dark/10 p-4' : 'w-full bg-dark/5 border-t p-4'}
+                        className={isPage ? 'sticky bottom-24 md:bottom-0 mt-auto z-20 w-full bg-light border border-dark/10 rounded-2xl md:rounded-none md:border-x-0 md:border-b-0 p-4' : 'w-full bg-dark/5 border-t p-4'}
                     >
                         <div className='flex flex-col gap-3 max-w-4xl mx-auto'>
                             <div className='flex items-start gap-2'>

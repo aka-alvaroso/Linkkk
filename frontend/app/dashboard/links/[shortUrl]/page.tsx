@@ -36,7 +36,7 @@ export default function LinkDetailPage() {
     <RouteGuard type="guest-or-user" title={`${shortUrl} - Linkkk`}>
       <Navigation />
 
-      <div className="relative p-2 md:p-4 md:mt-20 md:max-w-3/4 mx-auto flex flex-col gap-4">
+      <div className="relative p-2 pb-28 md:p-4 md:mt-20 md:max-w-3/4 mx-auto flex flex-col gap-4">
         <Link
           href="/dashboard"
           className="flex items-center gap-1.5 text-sm font-semibold text-dark/60 hover:text-dark w-fit"
