@@ -156,7 +156,7 @@ export default function LinkMetadataEditor({
   }
 
   return (
-    <div className="w-full flex flex-col gap-6">
+    <div className="@container w-full flex flex-col gap-6">
       {/* Enable toggle */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -176,6 +176,7 @@ export default function LinkMetadataEditor({
       </motion.div>
 
       <div className={config.enabled ? '' : 'opacity-50 pointer-events-none'}>
+        <div className="grid grid-cols-1 @3xl:grid-cols-[minmax(0,1fr)_20rem] gap-6 items-start">
         <div className="flex flex-col gap-4">
           {/* Title */}
           <motion.div
@@ -238,16 +239,17 @@ export default function LinkMetadataEditor({
               }
             }}
           />
+        </div>
 
-          {/* Live preview */}
+          {/* Live preview: beside the form on wide containers, below it otherwise */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.4, ease: "backInOut" }}
-            className="flex flex-col gap-1.5"
+            className="flex flex-col gap-1.5 @3xl:sticky @3xl:top-24"
           >
             <label className="text-sm font-medium text-dark/70">{t('previewLabel')}</label>
-            <div className="border border-dark/10 rounded-xl overflow-hidden max-w-sm bg-white">
+            <div className="border border-dark/10 rounded-xl overflow-hidden w-full max-w-sm bg-white">
               {config.ogImageUrl ? (
                 <img
                   src={config.ogImageUrl}

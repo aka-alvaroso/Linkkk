@@ -82,14 +82,16 @@ export function RuleAction({
         return (
           <div className="flex items-center gap-2">
             <span className="text-xs text-dark/50">{t('to')}</span>
-            <Input
-              placeholder={t('redirectPlaceholder')}
-              value={redirectSettings.url || ''}
-              onChange={(e) => handleSettingChange('url', e.target.value)}
-              size="sm"
-              rounded="lg"
-              className='bg-light border border-dark/10 px-2 py-1 rounded-lg hover:border-dark/20'
-            />
+            <div className="w-64 sm:w-96 max-w-full">
+              <Input
+                placeholder={t('redirectPlaceholder')}
+                value={redirectSettings.url || ''}
+                onChange={(e) => handleSettingChange('url', e.target.value)}
+                size="sm"
+                rounded="lg"
+                className='bg-light border border-dark/10 px-2 py-1 rounded-lg hover:border-dark/20'
+              />
+            </div>
           </div>
         );
 
@@ -97,14 +99,16 @@ export function RuleAction({
         const blockSettings = actionSettings as BlockAccessSettings;
         return (
           <div className="flex items-center gap-2">
-            <Input
-              placeholder={t('blockReasonPlaceholder')}
-              value={blockSettings.reason || ''}
-              onChange={(e) => handleSettingChange('reason', e.target.value)}
-              size="sm"
-              rounded="lg"
-              className='bg-light border border-dark/10 px-2 py-1 rounded-lg hover:border-dark/20'
-            />
+            <div className="w-64 sm:w-96 max-w-full">
+              <Input
+                placeholder={t('blockReasonPlaceholder')}
+                value={blockSettings.reason || ''}
+                onChange={(e) => handleSettingChange('reason', e.target.value)}
+                size="sm"
+                rounded="lg"
+                className='bg-light border border-dark/10 px-2 py-1 rounded-lg hover:border-dark/20'
+              />
+            </div>
           </div>
         );
 
@@ -112,22 +116,26 @@ export function RuleAction({
         const passwordSettings = actionSettings as PasswordGateSettings;
         return (
           <div className="flex items-center gap-2">
-            <Input
-              placeholder={t('passwordPlaceholder')}
-              value={passwordSettings.passwordHash || ''}
-              onChange={(e) => handleSettingChange('passwordHash', e.target.value)}
-              size="sm"
-              rounded="lg"
-              className='bg-light border border-dark/10 px-2 py-1 rounded-lg hover:border-dark/20'
-            />
-            <Input
-              placeholder={t('hintPlaceholder')}
-              value={passwordSettings.hint || ''}
-              onChange={(e) => handleSettingChange('hint', e.target.value)}
-              size="sm"
-              rounded="lg"
-              className='bg-light border border-dark/10 px-2 py-1 rounded-lg hover:border-dark/20'
-            />
+            <div className="w-44 sm:w-56 max-w-full">
+              <Input
+                placeholder={t('passwordPlaceholder')}
+                value={passwordSettings.passwordHash || ''}
+                onChange={(e) => handleSettingChange('passwordHash', e.target.value)}
+                size="sm"
+                rounded="lg"
+                className='bg-light border border-dark/10 px-2 py-1 rounded-lg hover:border-dark/20'
+              />
+            </div>
+            <div className="w-44 sm:w-64 max-w-full">
+              <Input
+                placeholder={t('hintPlaceholder')}
+                value={passwordSettings.hint || ''}
+                onChange={(e) => handleSettingChange('hint', e.target.value)}
+                size="sm"
+                rounded="lg"
+                className='bg-light border border-dark/10 px-2 py-1 rounded-lg hover:border-dark/20'
+              />
+            </div>
           </div>
         );
 
@@ -186,25 +194,29 @@ export function RuleAction({
 
             {/* Webhook URL — only when webhook selected */}
             {notifyType === 'webhook' && (
+              <div className="w-64 sm:w-96 max-w-full">
+                <Input
+                  placeholder={t('webhookPlaceholder')}
+                  value={notifySettings.webhookUrl || ''}
+                  onChange={(e) => handleSettingChange('webhookUrl', e.target.value)}
+                  size="sm"
+                  rounded="lg"
+                  className='bg-light border border-dark/10 px-2 py-1 rounded-lg hover:border-dark/20'
+                />
+              </div>
+            )}
+
+            {/* Message — shared between both channels */}
+            <div className="w-64 sm:w-96 max-w-full">
               <Input
-                placeholder={t('webhookPlaceholder')}
-                value={notifySettings.webhookUrl || ''}
-                onChange={(e) => handleSettingChange('webhookUrl', e.target.value)}
+                placeholder={t('messagePlaceholder')}
+                value={notifySettings.message || ''}
+                onChange={(e) => handleSettingChange('message', e.target.value)}
                 size="sm"
                 rounded="lg"
                 className='bg-light border border-dark/10 px-2 py-1 rounded-lg hover:border-dark/20'
               />
-            )}
-
-            {/* Message — shared between both channels */}
-            <Input
-              placeholder={t('messagePlaceholder')}
-              value={notifySettings.message || ''}
-              onChange={(e) => handleSettingChange('message', e.target.value)}
-              size="sm"
-              rounded="lg"
-              className='bg-light border border-dark/10 px-2 py-1 rounded-lg hover:border-dark/20'
-            />
+            </div>
 
             {/* Query params info */}
             <Link
