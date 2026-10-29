@@ -8,7 +8,7 @@ import { useToast } from '@/app/hooks/useToast';
 import * as motion from 'motion/react-client';
 import { AnimatePresence } from 'motion/react';
 import { useLinkRules } from '@/app/hooks';
-import { LinkRule as LinkRuleType, RuleCondition } from '@/app/types/linkRules';
+import { LinkRule as LinkRuleType, RuleCondition, QueryParamValue } from '@/app/types/linkRules';
 import { LinkRule } from '../LinkRules/LinkRule';
 import { useAuth } from '@/app/hooks';
 import { PLAN_LIMITS } from '@/app/constants/limits';
@@ -103,6 +103,20 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
                         .map((c: string) => c.trim())
                         .filter((c: string) => c.length > 0);
                     return { ...condition, value: ips };
+                }
+                if (condition.field === 'query_param' && typeof condition.value === 'object' && condition.value !== null && 'key' in condition.value) {
+                    const param = condition.value as QueryParamValue;
+                    const raw = Array.isArray(param.value) ? param.value.join(',') : param.value;
+                    const isList = condition.operator === 'in' || condition.operator === 'not_in';
+                    return {
+                        ...condition,
+                        value: {
+                            key: param.key.trim(),
+                            value: isList
+                                ? raw.split(',').map((v: string) => v.trim()).filter((v: string) => v.length > 0)
+                                : raw.trim(),
+                        },
+                    };
                 }
                 return condition;
             });
