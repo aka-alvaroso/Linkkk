@@ -4,6 +4,14 @@ export interface ParamRow {
   value: string;
 }
 
+let rowCounter = 0;
+/** A new empty row; ids only need to be unique within the page. */
+export const createParamRow = (key = ""): ParamRow => ({ id: `row-${rowCounter++}`, key, value: "" });
+
+/** Starting rows of the builder: the three UTM params people use most. */
+export const defaultParamRows = (): ParamRow[] =>
+  ['utm_source', 'utm_medium', 'utm_campaign'].map((key) => createParamRow(key));
+
 export const UTM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'] as const;
 
 // Common values offered as suggestions; the user can still type anything.

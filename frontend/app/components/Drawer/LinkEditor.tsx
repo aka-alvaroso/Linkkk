@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { FiCornerDownRight } from 'react-icons/fi';
-import { TbChevronDown, TbCircleDashed, TbCircleDashedCheck, TbCopy, TbPencil, TbRobot, TbSettings } from 'react-icons/tb';
+import { TbChevronDown, TbCircleDashed, TbCircleDashedCheck, TbCopy, TbLink, TbPencil, TbRobot, TbSettings } from 'react-icons/tb';
 import Button from '../ui/Button/Button';
 import { useLinks, useAuth, useTags, useGroups } from '@/app/hooks';
 import { domainService, CustomDomain } from '@/app/services/api/domainService';
 import Switch from '@/app/components/ui/Switch/Switch';
 import UtmBuilder from './UtmBuilder';
+import InfoTip from '@/app/components/ui/InfoTip/InfoTip';
+import { defaultParamRows, type ParamRow } from '@/app/utils/utm';
 import LinkDrawerTabs from './LinkDrawerTabs';
 import LinkOrganizeFields from './LinkOrganizeFields';
 import { PLAN_LIMITS } from '@/app/constants/limits';
@@ -43,6 +45,9 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
     const [tab, setTab] = useState('overview');
     // Link settings card is collapsed on small screens (always open from md up)
     const [settingsOpen, setSettingsOpen] = useState(false);
+    // UTM builder rows, shared by the quick panel in the overview and the Share tab
+    const [utmRows, setUtmRows] = useState<ParamRow[]>(defaultParamRows);
+    const [utmQuickOpen, setUtmQuickOpen] = useState(false);
     const [statusBar, setShowStatusBar] = useState("none");
     const [newLink, setNewLink] = useState({ ...link });
     // Inline editing
@@ -498,7 +503,7 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.12, duration: 0.4, ease: "backInOut" }}
-            className='flex items-start gap-3 max-w-sm'
+            className='flex items-center gap-3 max-w-sm'
         >
             <Switch
                 size='sm'
@@ -506,9 +511,9 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
                 checked={newLink.forwardParams ?? false}
                 onChange={(checked) => setNewLink({ ...newLink, forwardParams: checked })}
             />
-            <div className='flex flex-col'>
+            <div className='flex items-center gap-1.5'>
                 <span className='text-xs font-semibold text-dark/70'>{t('forwardParamsLabel')}</span>
-                <span className='text-xs text-dark/50'>{t('forwardParamsDesc')}</span>
+                <InfoTip label={t('moreInfo')}>{t('forwardParamsDesc')}</InfoTip>
             </div>
         </motion.div>
     );
@@ -528,6 +533,29 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
             onGroupChange={handleGroupChange}
             onCustomDomainChange={(domain) => setNewLink(prev => ({ ...prev, customDomain: domain }))}
         />
+    );
+
+    const utmBaseUrl = link.customDomain
+        ? `https://${link.customDomain.domain}/${link.shortUrl}`
+        : `https://linkkk.dev/r/${link.shortUrl}`;
+
+    const utmToggle = isGuest ? null : (
+        <button
+            type='button'
+            onClick={() => setUtmQuickOpen((v) => !v)}
+            aria-expanded={utmQuickOpen}
+            className='inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-dark/5 hover:bg-dark/10 text-xs font-bold text-dark/70 cursor-pointer'
+        >
+            <TbLink size={14} />
+            {t('utmQuickTitle')}
+            <TbChevronDown size={14} className={`transition-transform ${utmQuickOpen ? 'rotate-180' : ''}`} />
+        </button>
+    );
+
+    const utmQuickPanel = isGuest || !utmQuickOpen ? null : (
+        <div className='w-full max-w-xl bg-dark/5 rounded-xl p-3'>
+            <UtmBuilder baseUrl={utmBaseUrl} rows={utmRows} onRowsChange={setUtmRows} />
+        </div>
     );
 
     const qrBlock = (
@@ -576,7 +604,11 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
                             <div className='flex-1 min-w-0 flex flex-col gap-3'>
                                 {shortUrlBlock}
                                 {longUrlBlock}
-                                {statusBlock}
+                                <div className='flex flex-wrap items-center gap-2'>
+                                    {statusBlock}
+                                    {utmToggle}
+                                </div>
+                                {utmQuickPanel}
                             </div>
                             <div className='hidden sm:block'>{qrBlock}</div>
                         </div>
@@ -651,13 +683,7 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
                     <div className='relative z-0 w-full flex flex-col gap-8'>
                         <section className='flex flex-col gap-3'>
                             <h2 className='text-base font-black italic text-dark'>{t('utmBuilderTitle')}</h2>
-                            <UtmBuilder
-                                baseUrl={
-                                    link.customDomain
-                                        ? `https://${link.customDomain.domain}/${link.shortUrl}`
-                                        : `https://linkkk.dev/r/${link.shortUrl}`
-                                }
-                            />
+                            <UtmBuilder baseUrl={utmBaseUrl} rows={utmRows} onRowsChange={setUtmRows} />
                         </section>
 
                         <section className='flex flex-col gap-3 pt-6 border-t border-dark/10'>

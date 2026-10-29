@@ -249,7 +249,7 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
         const inputClass = 'bg-light border border-dark/10 text-sm px-2 py-1 rounded-lg hover:border-dark/20';
         return (
           <div className="flex flex-wrap items-center gap-1.5">
-            <Input
+            <div className="flex-shrink-0"><Input
               placeholder={t('queryParamKeyPlaceholder')}
               aria-label={t('queryParamKeyPlaceholder')}
               value={param.key}
@@ -259,8 +259,8 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
               autoComplete="off"
               spellCheck={false}
               className={`${inputClass} w-36`}
-            />
-            <Input
+            /></div>
+            <div className="flex-shrink-0"><Input
               placeholder={isList ? t('queryParamListPlaceholder') : t('queryParamValuePlaceholder')}
               aria-label={t('queryParamValuePlaceholder')}
               value={Array.isArray(param.value) ? param.value.join(', ') : param.value}
@@ -270,7 +270,7 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
               autoComplete="off"
               spellCheck={false}
               className={`${inputClass} ${isList ? 'w-56' : 'w-40'}`}
-            />
+            /></div>
           </div>
         );
       }
@@ -293,33 +293,37 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
   };
 
   return (
-    <div className="inline-flex flex-col sm:flex-row sm:flex-wrap max-w-full items-start sm:items-center gap-1.5 text-sm">
+    <div className="inline-flex flex-wrap max-w-full items-center gap-1.5 text-sm">
       {/* Field Select */}
-      <Select
-        options={FIELD_OPTIONS}
-        value={condition.field}
-        onChange={handleFieldChange}
-        maxHeight={150}
-        useFixedPosition={true}
-        buttonClassName="w-auto rounded-lg text-sm border border-dark/10 bg-light px-2 py-1 hover:border-dark/20 whitespace-nowrap"
-        listClassName="rounded-lg min-w-48 max-w-48 shadow-lg h-48 overflow-auto"
-        optionClassName='rounded-md p-1.5 text-sm hover:color-primary group'
-      />
+      <div className="flex-shrink-0">
+        <Select
+          options={FIELD_OPTIONS}
+          value={condition.field}
+          onChange={handleFieldChange}
+          maxHeight={150}
+          useFixedPosition={true}
+          buttonClassName="w-auto rounded-lg text-sm border border-dark/10 bg-light px-2 py-1 hover:border-dark/20 whitespace-nowrap"
+          listClassName="rounded-lg min-w-48 max-w-48 shadow-lg h-48 overflow-auto"
+          optionClassName='rounded-md p-1.5 text-sm hover:color-primary group'
+        />
+      </div>
 
       {/* Operator Select - Hide for "always" */}
       {condition.field !== 'always' && (
-        <Select
-          options={OPERATOR_OPTIONS[condition.field]}
-          value={condition.operator}
-          onChange={handleOperatorChange}
-          buttonClassName="w-auto rounded-lg text-sm border border-dark/10 bg-light px-2 py-1 hover:border-dark/20 whitespace-nowrap"
-          listClassName="rounded-lg w-auto shadow-lg"
-          optionClassName='rounded-md p-1.5 text-sm'
-        />
+        <div className="flex-shrink-0">
+          <Select
+            options={OPERATOR_OPTIONS[condition.field]}
+            value={condition.operator}
+            onChange={handleOperatorChange}
+            buttonClassName="w-auto rounded-lg text-sm border border-dark/10 bg-light px-2 py-1 hover:border-dark/20 whitespace-nowrap"
+            listClassName="rounded-lg w-auto shadow-lg"
+            optionClassName='rounded-md p-1.5 text-sm'
+          />
+        </div>
       )}
 
       {/* Value Input */}
-      {renderValueInput()}
+      <div className="max-w-full">{renderValueInput()}</div>
 
       {/* Delete Button */}
       {onDelete && (

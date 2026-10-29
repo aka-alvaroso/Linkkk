@@ -1,5 +1,5 @@
 'use client';
-import { useId, useMemo, useRef, useState } from 'react';
+import { useId, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { TbCopy, TbPlus, TbX } from 'react-icons/tb';
 import Button from '../ui/Button/Button';
@@ -11,6 +11,7 @@ import {
   UTM_KEYS,
   UTM_VALUE_SUGGESTIONS,
   buildParamsUrl,
+  createParamRow,
   isUtmKey,
   normalizeKey,
   normalizeValue,
@@ -21,9 +22,10 @@ import {
 interface UtmBuilderProps {
   /** Short URL without query string, e.g. https://linkkk.dev/r/abc123 */
   baseUrl: string;
+  /** Rows are owned by the parent so the overview and the Share tab edit the same link */
+  rows: ParamRow[];
+  onRowsChange: React.Dispatch<React.SetStateAction<ParamRow[]>>;
 }
-
-const DEFAULT_KEYS = ['utm_source', 'utm_medium', 'utm_campaign'];
 
 /**
  * Builds a ready-to-share variant of the short URL from any number of
@@ -31,14 +33,10 @@ const DEFAULT_KEYS = ['utm_source', 'utm_medium', 'utm_campaign'];
  * params travel in the URL itself; the utm_* ones are recorded on each click
  * and show up under Campaigns.
  */
-export default function UtmBuilder({ baseUrl }: UtmBuilderProps) {
+export default function UtmBuilder({ baseUrl, rows, onRowsChange: setRows }: UtmBuilderProps) {
   const t = useTranslations('EditLinkDrawer');
   const toast = useToast();
   const listId = useId();
-  const nextId = useRef(0);
-  const newRow = (key = ''): ParamRow => ({ id: `row-${nextId.current++}`, key, value: '' });
-
-  const [rows, setRows] = useState<ParamRow[]>(() => DEFAULT_KEYS.map((key) => newRow(key)));
 
   const url = useMemo(() => buildParamsUrl(baseUrl, rows), [baseUrl, rows]);
   const hasParams = url !== baseUrl;
@@ -55,7 +53,7 @@ export default function UtmBuilder({ baseUrl }: UtmBuilderProps) {
       }),
     );
 
-  const addRow = (key = '') => setRows((prev) => (prev.length >= MAX_PARAMS ? prev : [...prev, newRow(key)]));
+  const addRow = (key = '') => setRows((prev) => (prev.length >= MAX_PARAMS ? prev : [...prev, createParamRow(key)]));
   const removeRow = (id: string) => setRows((prev) => prev.filter((r) => r.id !== id));
 
   const handleCopy = async () => {
