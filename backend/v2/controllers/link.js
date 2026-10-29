@@ -951,6 +951,7 @@ const verifyPasswordGate = async (req, res) => {
       recentHits: [],
       currentDate: new Date(),
       accessCount: link.accessCount,
+      queryParams,
     };
 
     // Evaluate rules to get the correct password_gate action

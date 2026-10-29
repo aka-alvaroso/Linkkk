@@ -1,4 +1,4 @@
-import { RuleCondition, ActionType, ActionSettings, RedirectSettings, NotifySettings } from '@/app/types/linkRules';
+import { RuleCondition, ActionType, ActionSettings, RedirectSettings, NotifySettings, QueryParamValue } from '@/app/types/linkRules';
 
 /**
  * Returns a human-readable summary of a single condition
@@ -38,6 +38,19 @@ export const getConditionSummary = (condition: RuleCondition): string => {
     case 'access_count': {
       const opStr = operator === 'equals' ? '=' : operator === 'greater_than' ? '>' : '<';
       return `Accesses ${opStr} ${value}`;
+    }
+    case 'query_param': {
+      const { key, value: expected } = value as QueryParamValue;
+      const shown = Array.isArray(expected) ? expected.join(', ') : expected;
+      const phrase: Record<string, string> = {
+        equals: 'is',
+        not_equals: 'is not',
+        in: 'is one of',
+        not_in: 'is not one of',
+        contains: 'contains',
+        not_contains: 'does not contain',
+      };
+      return `?${key} ${phrase[operator] ?? operator} ${shown}`;
     }
     default:
       return `${field} ${operator} ${value}`;

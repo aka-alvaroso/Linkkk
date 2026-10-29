@@ -17,6 +17,7 @@ const FieldTypeEnum = z.enum([
   "burst",
   "date",
   "access_count",
+  "query_param",
 ]);
 
 const OperatorTypeEnum = z.enum([
@@ -72,6 +73,20 @@ const ipValueSchema = z.union([
 const burstValueSchema = z.object({
   links: z.number().int().min(2).max(50),
   seconds: z.number().int().min(1).max(300),
+});
+// Query param condition: which param to look at and what it should be (or contain).
+// Keys use the charset the query-param sanitizer lets through; "src" is
+// reserved by the platform and never reaches the rule context.
+const queryParamKeySchema = z
+  .string()
+  .min(1)
+  .max(50)
+  .regex(/^[a-zA-Z0-9_-]+$/, "Only letters, digits, '_' and '-' are allowed")
+  .refine((key) => key.toLowerCase() !== "src", { message: "'src' is reserved" });
+const queryParamTextSchema = z.string().trim().min(1).max(500);
+const queryParamValueSchema = z.object({
+  key: queryParamKeySchema,
+  value: z.union([queryParamTextSchema, z.array(queryParamTextSchema).min(1).max(50)]),
 });
 const booleanValueSchema = z.boolean();
 const dateValueSchema = z.string().refine(
@@ -152,6 +167,13 @@ const accessCountConditionSchema = baseConditionSchema.extend({
   value: numberValueSchema,
 });
 
+// Query param condition (e.g. utm_source equals "instagram")
+const queryParamConditionSchema = baseConditionSchema.extend({
+  field: z.literal("query_param"),
+  operator: z.enum(["equals", "not_equals", "in", "not_in", "contains", "not_contains"]),
+  value: queryParamValueSchema,
+});
+
 // Union of all condition types
 const ruleConditionSchema = z.discriminatedUnion("field", [
   countryConditionSchema,
@@ -163,6 +185,7 @@ const ruleConditionSchema = z.discriminatedUnion("field", [
   burstConditionSchema,
   dateConditionSchema,
   accessCountConditionSchema,
+  queryParamConditionSchema,
 ]).superRefine((condition, ctx) => {
   // A list operator needs a list and a single-value operator needs a single value
   if (condition.field === "ip") {
@@ -174,6 +197,19 @@ const ruleConditionSchema = z.discriminatedUnion("field", [
         message: isList
           ? "Operators 'in'/'not_in' require a list of IPs"
           : "Operators 'equals'/'not_equals' require a single IP",
+      });
+    }
+  }
+
+  if (condition.field === "query_param") {
+    const isList = condition.operator === "in" || condition.operator === "not_in";
+    if (isList !== Array.isArray(condition.value.value)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["value", "value"],
+        message: isList
+          ? "Operators 'in'/'not_in' require a list of values"
+          : "This operator requires a single value",
       });
     }
   }
@@ -353,6 +389,7 @@ module.exports = {
   burstConditionSchema,
   dateConditionSchema,
   accessCountConditionSchema,
+  queryParamConditionSchema,
 
   // Action schemas
   actionSchema,

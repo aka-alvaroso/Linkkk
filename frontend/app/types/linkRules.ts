@@ -17,7 +17,8 @@ export type FieldType =
   | 'is_datacenter'// Hosting / cloud IP detection
   | 'burst'        // Same IP hitting several of the owner's links in a short time
   | 'date'         // Date/time
-  | 'access_count';// Number of accesses
+  | 'access_count' // Number of accesses
+  | 'query_param'; // A query param of the access URL (e.g. utm_source)
 
 export type OperatorType =
   | 'equals'       // field === value
@@ -46,11 +47,17 @@ export interface BurstValue {
   seconds: number; // window in seconds (max 300)
 }
 
+export interface QueryParamValue {
+  key: string;                // param name, e.g. utm_source
+  value: string | string[];   // expected value; a list (comma-separated in the UI) for in / not_in
+}
+
 export type ConditionValue =
   | string         // For: ip, date (ISO string)
   | string[]       // For: country codes (e.g., ['ES', 'US'])
   | number         // For: access_count
   | BurstValue     // For: burst
+  | QueryParamValue // For: query_param
   | boolean        // For: is_bot, is_vpn, is_datacenter
   | DeviceType;    // For: device
 

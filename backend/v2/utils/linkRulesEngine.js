@@ -72,6 +72,7 @@ const validateConditionStructure = (condition) => {
     "burst",
     "date",
     "access_count",
+    "query_param",
   ];
   if (!validFields.includes(field)) {
     return false;
@@ -88,6 +89,7 @@ const validateConditionStructure = (condition) => {
     burst: ["equals"],
     date: ["before", "after", "equals"],
     access_count: ["equals", "greater_than", "less_than"],
+    query_param: ["equals", "not_equals", "in", "not_in", "contains", "not_contains"],
   };
 
   if (!validOperators[field] || !validOperators[field].includes(operator)) {
@@ -128,6 +130,17 @@ const validateConditionStructure = (condition) => {
 
   if (field === "access_count" && typeof value !== "number") {
     return false;
+  }
+
+  if (field === "query_param") {
+    const isList = operator === "in" || operator === "not_in";
+    const { key, value: expected } = value || {};
+    if (typeof key !== "string" || key.length === 0) return false;
+    if (isList) {
+      if (!Array.isArray(expected) || !expected.every((v) => typeof v === "string")) return false;
+    } else if (typeof expected !== "string") {
+      return false;
+    }
   }
 
   return true;
@@ -179,6 +192,9 @@ const evaluateCondition = async (condition, context) => {
 
     case "access_count":
       return evaluateNumberCondition(operator, value, context.accessCount);
+
+    case "query_param":
+      return evaluateQueryParamCondition(operator, value, context.queryParams);
 
     default:
       console.warn(`Unknown condition field: ${field}`);
@@ -281,6 +297,38 @@ const evaluateIpCondition = (operator, value, contextIp) => {
  */
 const evaluateBurstCondition = (value, recentHits) =>
   distinctLinksWithin(recentHits, value.seconds) >= value.links;
+
+/**
+ * Evaluates a query param condition against the (already sanitized) params of
+ * the access URL. Key and value comparisons ignore case, so "Instagram" and
+ * "instagram" are the same UTM. A missing param never satisfies a positive
+ * operator (equals / in / contains) and always satisfies a negative one.
+ */
+const evaluateQueryParamCondition = (operator, value, queryParams) => {
+  const wanted = String(value.key).toLowerCase();
+  const entry = Object.entries(queryParams || {}).find(([key]) => key.toLowerCase() === wanted);
+  const actual = entry ? String(entry[1]).toLowerCase() : null;
+  const targets = (Array.isArray(value.value) ? value.value : [value.value]).map((v) =>
+    String(v).toLowerCase()
+  );
+
+  switch (operator) {
+    case "equals":
+      return actual !== null && actual === targets[0];
+    case "not_equals":
+      return actual === null || actual !== targets[0];
+    case "in":
+      return actual !== null && targets.includes(actual);
+    case "not_in":
+      return actual === null || !targets.includes(actual);
+    case "contains":
+      return actual !== null && actual.includes(targets[0]);
+    case "not_contains":
+      return actual === null || !actual.includes(targets[0]);
+    default:
+      return false;
+  }
+};
 
 /**
  * Evaluates boolean condition (VPN, Bot)

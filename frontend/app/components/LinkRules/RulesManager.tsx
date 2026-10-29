@@ -26,7 +26,7 @@ import {
   verticalListSortingStrategy
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { LinkRule as LinkRuleType, RuleCondition, UpdateRuleDTO, RedirectSettings, PasswordGateSettings } from '@/app/types/linkRules';
+import { LinkRule as LinkRuleType, RuleCondition, UpdateRuleDTO, RedirectSettings, PasswordGateSettings, QueryParamValue } from '@/app/types/linkRules';
 import { useAuth } from '@/app/hooks';
 import { PLAN_LIMITS } from '@/app/constants/limits';
 import { useTranslations } from 'next-intl';
@@ -126,6 +126,9 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
       if (condition.field === 'ip' && Array.isArray(condition.value)) {
         return { ...condition, value: condition.value.join(', ') };
       }
+      if (condition.field === 'query_param' && typeof condition.value === 'object' && condition.value !== null && 'key' in condition.value && Array.isArray(condition.value.value)) {
+        return { ...condition, value: { ...condition.value, value: condition.value.value.join(', ') } };
+      }
       if (condition.field === 'date' && typeof condition.value === 'string') {
         // Convert UTC ISO string to local datetime-local format (YYYY-MM-DDTHH:mm)
         const d = new Date(condition.value);
@@ -190,6 +193,12 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
         if (!condition.value || (condition.value as string).trim() === '') {
           return t('errorIpRequired');
         }
+      } else if (condition.field === 'query_param') {
+        const param = condition.value as QueryParamValue;
+        const text = Array.isArray(param?.value) ? param.value.join(',') : param?.value ?? '';
+        if (!param?.key || param.key.trim() === '' || text.trim() === '') {
+          return t('errorQueryParamRequired');
+        }
       }
     }
 
@@ -216,6 +225,21 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
             .map((c: string) => c.trim())
             .filter((c: string) => c.length > 0);
           return { ...condition, value: ips };
+        }
+        if (condition.field === 'query_param' && typeof condition.value === 'object' && condition.value !== null && 'key' in condition.value) {
+          const param = condition.value as QueryParamValue;
+          const raw = Array.isArray(param.value) ? param.value.join(',') : param.value;
+          const isList = condition.operator === 'in' || condition.operator === 'not_in';
+          // in / not_in take a list (comma-separated in the UI); the rest a single trimmed value
+          return {
+            ...condition,
+            value: {
+              key: param.key.trim(),
+              value: isList
+                ? raw.split(',').map((v: string) => v.trim()).filter((v: string) => v.length > 0)
+                : raw.trim(),
+            },
+          };
         }
         if (condition.field === 'date' && typeof condition.value === 'string') {
           // Convert local datetime-local to UTC ISO string

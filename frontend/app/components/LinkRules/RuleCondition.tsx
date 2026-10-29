@@ -6,8 +6,8 @@
 import React from 'react';
 import Select from '../ui/Select/Select';
 import Input from '../ui/Input/Input';
-import { TbTrash, TbCircleDashedCheck, TbWorld, TbDeviceMobile, TbRobot, TbShieldLock, TbCalendar, TbClick, TbDots, TbServer, TbBolt } from 'react-icons/tb';
-import { RuleCondition as RuleConditionType, FieldType, OperatorType, DeviceType, ConditionValue, BurstValue } from '@/app/types/linkRules';
+import { TbTrash, TbCircleDashedCheck, TbWorld, TbDeviceMobile, TbRobot, TbShieldLock, TbCalendar, TbClick, TbDots, TbServer, TbBolt, TbLink } from 'react-icons/tb';
+import { RuleCondition as RuleConditionType, FieldType, OperatorType, DeviceType, ConditionValue, BurstValue, QueryParamValue } from '@/app/types/linkRules';
 import { useTranslations } from 'next-intl';
 
 interface RuleConditionProps {
@@ -31,6 +31,7 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
     { label: t('fieldBurst'), value: 'burst', leftIcon: <TbBolt size={16} /> },
     { label: t('fieldDate'), value: 'date', leftIcon: <TbCalendar size={16} /> },
     { label: t('fieldAccessCount'), value: 'access_count', leftIcon: <TbClick size={16} /> },
+    { label: t('fieldQueryParam'), value: 'query_param', leftIcon: <TbLink size={16} /> },
   ];
 
   // Operator options per field type
@@ -62,6 +63,14 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
       { label: t('operatorEquals'), value: 'equals' },
       { label: t('operatorGreaterThan'), value: 'greater_than' },
       { label: t('operatorLessThan'), value: 'less_than' },
+    ],
+    query_param: [
+      { label: t('operatorEquals'), value: 'equals' },
+      { label: t('operatorNotEquals'), value: 'not_equals' },
+      { label: t('operatorIn'), value: 'in' },
+      { label: t('operatorNotIn'), value: 'not_in' },
+      { label: t('operatorContains'), value: 'contains' },
+      { label: t('operatorNotContains'), value: 'not_contains' },
     ],
   };
 
@@ -95,6 +104,7 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
     else if (fieldType === 'is_bot' || fieldType === 'is_vpn' || fieldType === 'is_datacenter') defaultValue = false;
     else if (fieldType === 'burst') defaultValue = { links: 3, seconds: 10 };
     else if (fieldType === 'access_count') defaultValue = 0;
+    else if (fieldType === 'query_param') defaultValue = { key: 'utm_source', value: '' };
 
     onChange({
       field: fieldType,
@@ -233,6 +243,38 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
         );
       }
 
+      case 'query_param': {
+        const param = (condition.value as QueryParamValue) ?? { key: '', value: '' };
+        const isList = condition.operator === 'in' || condition.operator === 'not_in';
+        const inputClass = 'bg-light border border-dark/10 text-sm px-2 py-1 rounded-lg hover:border-dark/20';
+        return (
+          <div className="flex flex-wrap items-center gap-1.5">
+            <Input
+              placeholder={t('queryParamKeyPlaceholder')}
+              aria-label={t('queryParamKeyPlaceholder')}
+              value={param.key}
+              onChange={(e) => handleValueChange({ ...param, key: e.target.value.replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 50) })}
+              size="sm"
+              rounded="lg"
+              autoComplete="off"
+              spellCheck={false}
+              className={`${inputClass} w-36`}
+            />
+            <Input
+              placeholder={isList ? t('queryParamListPlaceholder') : t('queryParamValuePlaceholder')}
+              aria-label={t('queryParamValuePlaceholder')}
+              value={Array.isArray(param.value) ? param.value.join(', ') : param.value}
+              onChange={(e) => handleValueChange({ ...param, value: e.target.value })}
+              size="sm"
+              rounded="lg"
+              autoComplete="off"
+              spellCheck={false}
+              className={`${inputClass} ${isList ? 'w-56' : 'w-40'}`}
+            />
+          </div>
+        );
+      }
+
       case 'ip':
         return (
           <Input
@@ -251,7 +293,7 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
   };
 
   return (
-    <div className="inline-flex flex-col sm:flex-row items-start sm:items-center gap-1.5 text-sm">
+    <div className="inline-flex flex-col sm:flex-row sm:flex-wrap max-w-full items-start sm:items-center gap-1.5 text-sm">
       {/* Field Select */}
       <Select
         options={FIELD_OPTIONS}
