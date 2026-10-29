@@ -600,6 +600,7 @@
     "time": "Hora",
     "source": "Origen",
     "direct": "Clic",
+    "campaign": "Campaña",
     "location": "Ubicación",
     "ipAddress": "Dirección IP",
     "browser": "Navegador",

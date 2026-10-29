@@ -599,6 +599,7 @@
     "time": "Time",
     "source": "Source",
     "direct": "Click",
+    "campaign": "Campaign",
     "location": "Location",
     "ipAddress": "IP Address",
     "browser": "Browser",
