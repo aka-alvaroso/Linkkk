@@ -37,13 +37,15 @@ interface LinkStatsPanelProps {
     onPeriodChange: (period: StatsPeriod) => void;
     /** STANDARD plan can't see the "all time" period */
     isStandardPlan: boolean;
+    /** Drop the top divider when the panel sits in a layout that already separates it */
+    bare?: boolean;
 }
 
-export default function LinkStatsPanel({ stats, loading: statsLoading, period: statsPeriod, onPeriodChange: setStatsPeriod, isStandardPlan }: LinkStatsPanelProps) {
+export default function LinkStatsPanel({ stats, loading: statsLoading, period: statsPeriod, onPeriodChange: setStatsPeriod, isStandardPlan, bare = false }: LinkStatsPanelProps) {
     const t = useTranslations('EditLinkDrawer');
 
     return (
-            <div className='flex flex-col gap-4 pt-4 border-t border-dark/10'>
+            <div className={bare ? 'flex flex-col gap-4' : 'flex flex-col gap-4 pt-4 border-t border-dark/10'}>
 
                 {/* Header: label + period selector */}
                 <div className='flex items-center justify-between'>

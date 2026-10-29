@@ -381,6 +381,7 @@
     "utmBuilderCopyError": "No se pudo copiar el enlace",
     "utmBuilderEmpty": "Rellena al menos un valor para añadir parámetros al enlace.",
     "utmEmptyHint": "Aún no hay datos UTM. Añade parámetros a tu enlace, por ejemplo ?utm_source=newsletter&utm_campaign=lanzamiento, para ver de dónde vienen tus clics.",
+    "settingsTitle": "Ajustes del enlace",
     "forwardParamsLabel": "Pasar parámetros al destino",
     "forwardParamsDesc": "Los parámetros como ?utm_source=email se añaden a la URL de destino. Si el destino ya tiene uno con el mismo nombre, prevalece el del destino.",
     "unsavedChanges": "Cambios Sin Guardar",

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { FiCornerDownRight } from 'react-icons/fi';
-import { TbCircleDashed, TbCircleDashedCheck, TbCopy, TbPencil, TbRobot } from 'react-icons/tb';
+import { TbChevronDown, TbCircleDashed, TbCircleDashedCheck, TbCopy, TbPencil, TbRobot, TbSettings } from 'react-icons/tb';
 import Button from '../ui/Button/Button';
 import { useLinks, useAuth, useTags, useGroups } from '@/app/hooks';
 import { domainService, CustomDomain } from '@/app/services/api/domainService';
@@ -41,6 +41,8 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
     const { isGuest, user } = useAuth();
     const toast = useToast();
     const [tab, setTab] = useState('overview');
+    // Link settings card is collapsed on small screens (always open from md up)
+    const [settingsOpen, setSettingsOpen] = useState(false);
     const [statusBar, setShowStatusBar] = useState("none");
     const [newLink, setNewLink] = useState({ ...link });
     // Inline editing
@@ -310,6 +312,256 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
         else setShowStatusBar("none");
     }, [newLink, link, hasRulesChanges, hasQRChanges, hasMetadataChanges]);
 
+    // Pieces of the overview, composed differently for the drawer and the page
+    const shortUrlBlock = (
+        <>
+            {editingShortUrl ? (
+                <div className='flex flex-col gap-1'>
+                    <div className='flex items-center gap-1'>
+                        <span className='text-xl md:text-2xl italic font-black text-dark/60 whitespace-nowrap'>
+                            {newLink.customDomain ? newLink.customDomain.domain : 'linkkk.dev/r'}/
+                        </span>
+                        <input
+                            autoFocus
+                            value={newLink.shortUrl}
+                            onChange={(e) => {
+                                setNewLink({ ...newLink, shortUrl: e.target.value });
+                                setSuffixError('');
+                            }}
+                            onBlur={() => setEditingShortUrl(false)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') setEditingShortUrl(false);
+                                if (e.key === 'Escape') {
+                                    setNewLink({ ...newLink, shortUrl: link.shortUrl });
+                                    setSuffixError('');
+                                    setEditingShortUrl(false);
+                                }
+                            }}
+                            className='text-xl md:text-2xl italic font-black bg-transparent border-b-2 border-dark outline-none min-w-0 w-36'
+                        />
+                    </div>
+                    {suffixError && <p className='text-xs text-danger'>{suffixError}</p>}
+                    <p className='text-xs text-dark/60'>{t('customSuffixHint')}</p>
+                </div>
+            ) : (
+                <div className='flex items-start md:flex-row md:items-center gap-2'>
+                    <motion.h1
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.1, duration: 0.4, ease: "backInOut" }}
+                        className='text-xl md:text-2xl italic font-black'
+                    >
+                        <AnimatedText
+                            ref={shortUrlTextRef}
+                            initialText={newLink.customDomain ? `${newLink.customDomain.domain}/${newLink.shortUrl}` : `linkkk.dev/r/${newLink.shortUrl}`}
+                            animationType="slide"
+                            triggerMode="none"
+                        />
+                    </motion.h1>
+
+                    <div className='flex items-center gap-1'>
+                        <Button
+                            iconOnly
+                            leftIcon={<TbCopy size={14} />}
+                            variant='ghost'
+                            size='xs'
+                            rounded='lg'
+                            className='text-dark/30 hover:text-dark/70'
+                            onMouseDown={(e) => {
+                                e.preventDefault();
+                                const domain = newLink.customDomain?.domain ?? 'linkkk.dev';
+                                navigator.clipboard.writeText(`https://${domain}/r/${newLink.shortUrl}`);
+                                shortUrlTextRef.current?.setText(t('copied'));
+                                setTimeout(() => shortUrlTextRef.current?.reset(), 2000);
+                            }}
+                        />
+                        {!isGuest && (
+                            <Button
+                                iconOnly
+                                leftIcon={<TbPencil size={14} />}
+                                variant='ghost'
+                                size='xs'
+                                rounded='lg'
+                                className='text-dark/30 hover:text-dark/70'
+                                onClick={() => setEditingShortUrl(true)}
+                            />
+                        )}
+                    </div>
+                </div>
+            )}
+        </>
+    );
+
+    const longUrlBlock = (
+        <>
+            {editingLongUrl ? (
+                <div className='flex items-center gap-2 max-w-sm'>
+                    <FiCornerDownRight size={16} className='flex-shrink-0 text-dark/50' />
+                    <input
+                        autoFocus
+                        value={newLink.longUrl}
+                        onChange={(e) => setNewLink({ ...newLink, longUrl: e.target.value })}
+                        onBlur={() => setEditingLongUrl(false)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') setEditingLongUrl(false);
+                            if (e.key === 'Escape') {
+                                setNewLink({ ...newLink, longUrl: link.longUrl });
+                                setEditingLongUrl(false);
+                            }
+                        }}
+                        placeholder={t('urlPlaceholder')}
+                        className='text-xs md:text-md text-dark/60 bg-transparent border-b border-dark/30 outline-none w-full'
+                    />
+                </div>
+            ) : (
+                <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.15, duration: 0.3, ease: "backOut" }}
+                    className='group inline-flex items-center gap-2 max-w-sm w-full md:w-fit text-dark/50'
+                >
+                    <FiCornerDownRight size={16} className="flex-shrink-0" />
+                    <div className="inline-flex items-center gap-2 min-w-0 max-w-sm w-full">
+                        <div
+                            className='text-xs md:text-base truncate whitespace-nowrap min-w-0 max-w-sm'
+                            title={newLink.longUrl}
+                        >
+                            <AnimatedText
+                                ref={longUrlTextRef}
+                                initialText={newLink.longUrl}
+                                animationType="slide"
+                                triggerMode="none"
+                                className="truncate block"
+                            />
+                        </div>
+                        <div className='flex items-center gap-1 flex-shrink-0'>
+                            <Button
+                                iconOnly
+                                leftIcon={<TbCopy size={14} />}
+                                variant='ghost'
+                                size='xs'
+                                rounded='lg'
+                                className="text-dark/30 hover:text-dark/70"
+                                onMouseDown={(e) => {
+                                    e.preventDefault();
+                                    navigator.clipboard.writeText(newLink.longUrl);
+                                    longUrlTextRef.current?.setText(t('copied'));
+                                    setTimeout(() => longUrlTextRef.current?.reset(), 2000);
+                                }}
+                            />
+                            <Button
+                                iconOnly
+                                leftIcon={<TbPencil size={14} />}
+                                variant='ghost'
+                                size='xs'
+                                rounded='lg'
+                                className="text-dark/30 hover:text-dark/70"
+                                onClick={() => setEditingLongUrl(true)}
+                            />
+                        </div>
+                    </div>
+                </motion.div>
+            )}
+        </>
+    );
+
+    const statusBlock = (
+        <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.1, duration: 0.4, ease: "backInOut" }}
+        >
+            <Button
+                variant='solid'
+                size='xs'
+                rounded='xl'
+                leftIcon={newLink.status ? <TbCircleDashedCheck size={16} /> : <TbCircleDashed size={16} />}
+                className={`${newLink.status ? 'bg-success text-dark' : 'bg-danger text-light'}`}
+                onClick={() => {
+                    statusButtonTextRef.current?.setText(newLink.status ? t('inactive') : t('active'));
+                    setNewLink({ ...newLink, status: !newLink.status });
+                }}
+            >
+                <AnimatedText
+                    ref={statusButtonTextRef}
+                    initialText={newLink.status ? t('active') : t('inactive')}
+                    animationType="slide"
+                    triggerMode='none'
+                    className='cursor-pointer'
+                />
+            </Button>
+        </motion.div>
+    );
+
+    const forwardBlock = (
+        <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.12, duration: 0.4, ease: "backInOut" }}
+            className='flex items-start gap-3 max-w-sm'
+        >
+            <Switch
+                size='sm'
+                className='flex-shrink-0'
+                checked={newLink.forwardParams ?? false}
+                onChange={(checked) => setNewLink({ ...newLink, forwardParams: checked })}
+            />
+            <div className='flex flex-col'>
+                <span className='text-xs font-semibold text-dark/70'>{t('forwardParamsLabel')}</span>
+                <span className='text-xs text-dark/50'>{t('forwardParamsDesc')}</span>
+            </div>
+        </motion.div>
+    );
+
+    const organizeBlock = (
+        <LinkOrganizeFields
+            isGuest={isGuest}
+            isPro={user?.role === 'PRO'}
+            stacked={isPage}
+            tags={tags}
+            groups={groups}
+            activeDomains={activeDomains}
+            selectedTagIds={selectedTagIds}
+            selectedGroupId={selectedGroupId}
+            customDomainId={newLink.customDomain?.id ?? null}
+            onTagsChange={handleTagsChange}
+            onGroupChange={handleGroupChange}
+            onCustomDomainChange={(domain) => setNewLink(prev => ({ ...prev, customDomain: domain }))}
+        />
+    );
+
+    const qrBlock = (
+        <>
+            {!isGuest && (
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.2, duration: 0.3, ease: "backOut" }}
+                    className='flex flex-shrink-0 md:flex-col items-center gap-2'
+                >
+                    <div className='p-1 bg-white rounded-xl border border-dark/5'>
+                        <QRCodePreview url={qrUrl} config={qrConfig} size={100} className='rounded-3xl' />
+                    </div>
+                </motion.div>
+            )}
+        </>
+    );
+
+    const statsBlock = (
+        <>
+            {!isGuest && (
+                <LinkStatsPanel
+                    stats={stats}
+                    loading={statsLoading}
+                    period={statsPeriod}
+                    onPeriodChange={setStatsPeriod}
+                    isStandardPlan={user?.role === 'STANDARD'}
+                    bare={isPage}
+                />
+            )}
+        </>
+    );
+
     return (
         <div className={isPage ? 'flex flex-col min-h-[calc(100dvh-9rem)]' : 'contents'}>
             <LinkDrawerTabs tab={tab} onChange={setTab} isGuest={isGuest} fullWidth={isPage} />
@@ -317,249 +569,59 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
                 <div className={isPage ? 'flex-1 flex flex-col gap-2 py-4' : 'flex-1 overflow-auto flex flex-col gap-2 p-4'}>
 
                 {/* Overview */}
-                {tab === 'overview' && (
-                    <div className='relative z-0 w-full flex flex-col gap-6'>
-                        <div className='w-full flex flex-col sm:flex-row sm:items-start gap-6 min-w-0'>
-
-                            {/* Left column */}
+                {tab === 'overview' && (isPage ? (
+                    <div className='relative z-0 w-full flex flex-col gap-4'>
+                        {/* Header card: link identity, status and QR */}
+                        <div className='flex items-start justify-between gap-4 bg-white border border-dark/10 rounded-2xl p-4'>
                             <div className='flex-1 min-w-0 flex flex-col gap-3'>
-
-                                {/* Short URL — editable inline */}
-                                {editingShortUrl ? (
-                                    <div className='flex flex-col gap-1'>
-                                        <div className='flex items-center gap-1'>
-                                            <span className='text-xl md:text-2xl italic font-black text-dark/60 whitespace-nowrap'>
-                                                {newLink.customDomain ? newLink.customDomain.domain : 'linkkk.dev/r'}/
-                                            </span>
-                                            <input
-                                                autoFocus
-                                                value={newLink.shortUrl}
-                                                onChange={(e) => {
-                                                    setNewLink({ ...newLink, shortUrl: e.target.value });
-                                                    setSuffixError('');
-                                                }}
-                                                onBlur={() => setEditingShortUrl(false)}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === 'Enter') setEditingShortUrl(false);
-                                                    if (e.key === 'Escape') {
-                                                        setNewLink({ ...newLink, shortUrl: link.shortUrl });
-                                                        setSuffixError('');
-                                                        setEditingShortUrl(false);
-                                                    }
-                                                }}
-                                                className='text-xl md:text-2xl italic font-black bg-transparent border-b-2 border-dark outline-none min-w-0 w-36'
-                                            />
-                                        </div>
-                                        {suffixError && <p className='text-xs text-danger'>{suffixError}</p>}
-                                        <p className='text-xs text-dark/60'>{t('customSuffixHint')}</p>
-                                    </div>
-                                ) : (
-                                    <div className='flex items-start md:flex-row md:items-center gap-2'>
-                                        <motion.h1
-                                            initial={{ opacity: 0, x: 20 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: 0.1, duration: 0.4, ease: "backInOut" }}
-                                            className='text-xl md:text-2xl italic font-black'
-                                        >
-                                            <AnimatedText
-                                                ref={shortUrlTextRef}
-                                                initialText={newLink.customDomain ? `${newLink.customDomain.domain}/${newLink.shortUrl}` : `linkkk.dev/r/${newLink.shortUrl}`}
-                                                animationType="slide"
-                                                triggerMode="none"
-                                            />
-                                        </motion.h1>
-
-                                        <div className='flex items-center gap-1'>
-                                            <Button
-                                                iconOnly
-                                                leftIcon={<TbCopy size={14} />}
-                                                variant='ghost'
-                                                size='xs'
-                                                rounded='lg'
-                                                className='text-dark/30 hover:text-dark/70'
-                                                onMouseDown={(e) => {
-                                                    e.preventDefault();
-                                                    const domain = newLink.customDomain?.domain ?? 'linkkk.dev';
-                                                    navigator.clipboard.writeText(`https://${domain}/r/${newLink.shortUrl}`);
-                                                    shortUrlTextRef.current?.setText(t('copied'));
-                                                    setTimeout(() => shortUrlTextRef.current?.reset(), 2000);
-                                                }}
-                                            />
-                                            {!isGuest && (
-                                                <Button
-                                                    iconOnly
-                                                    leftIcon={<TbPencil size={14} />}
-                                                    variant='ghost'
-                                                    size='xs'
-                                                    rounded='lg'
-                                                    className='text-dark/30 hover:text-dark/70'
-                                                    onClick={() => setEditingShortUrl(true)}
-                                                />
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Long URL — editable inline */}
-                                {editingLongUrl ? (
-                                    <div className='flex items-center gap-2 max-w-sm'>
-                                        <FiCornerDownRight size={16} className='flex-shrink-0 text-dark/50' />
-                                        <input
-                                            autoFocus
-                                            value={newLink.longUrl}
-                                            onChange={(e) => setNewLink({ ...newLink, longUrl: e.target.value })}
-                                            onBlur={() => setEditingLongUrl(false)}
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter') setEditingLongUrl(false);
-                                                if (e.key === 'Escape') {
-                                                    setNewLink({ ...newLink, longUrl: link.longUrl });
-                                                    setEditingLongUrl(false);
-                                                }
-                                            }}
-                                            placeholder={t('urlPlaceholder')}
-                                            className='text-xs md:text-md text-dark/60 bg-transparent border-b border-dark/30 outline-none w-full'
-                                        />
-                                    </div>
-                                ) : (
-                                    <motion.div
-                                        initial={{ opacity: 0, x: 20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: 0.15, duration: 0.3, ease: "backOut" }}
-                                        className='group inline-flex items-center gap-2 max-w-sm w-full md:w-fit text-dark/50'
-                                    >
-                                        <FiCornerDownRight size={16} className="flex-shrink-0" />
-                                        <div className="inline-flex items-center gap-2 min-w-0 max-w-sm w-full">
-                                            <div
-                                                className='text-xs md:text-base truncate whitespace-nowrap min-w-0 max-w-sm'
-                                                title={newLink.longUrl}
-                                            >
-                                                <AnimatedText
-                                                    ref={longUrlTextRef}
-                                                    initialText={newLink.longUrl}
-                                                    animationType="slide"
-                                                    triggerMode="none"
-                                                    className="truncate block"
-                                                />
-                                            </div>
-                                            <div className='flex items-center gap-1 flex-shrink-0'>
-                                                <Button
-                                                    iconOnly
-                                                    leftIcon={<TbCopy size={14} />}
-                                                    variant='ghost'
-                                                    size='xs'
-                                                    rounded='lg'
-                                                    className="text-dark/30 hover:text-dark/70"
-                                                    onMouseDown={(e) => {
-                                                        e.preventDefault();
-                                                        navigator.clipboard.writeText(newLink.longUrl);
-                                                        longUrlTextRef.current?.setText(t('copied'));
-                                                        setTimeout(() => longUrlTextRef.current?.reset(), 2000);
-                                                    }}
-                                                />
-                                                <Button
-                                                    iconOnly
-                                                    leftIcon={<TbPencil size={14} />}
-                                                    variant='ghost'
-                                                    size='xs'
-                                                    rounded='lg'
-                                                    className="text-dark/30 hover:text-dark/70"
-                                                    onClick={() => setEditingLongUrl(true)}
-                                                />
-                                            </div>
-                                        </div>
-                                    </motion.div>
-                                )}
-
-                                {/* Status + quick stats */}
-                                <div className='flex flex-col gap-3'>
-                                    <motion.div
-                                        initial={{ opacity: 0, x: 20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: 0.1, duration: 0.4, ease: "backInOut" }}
-                                    >
-                                        <Button
-                                            variant='solid'
-                                            size='xs'
-                                            rounded='xl'
-                                            leftIcon={newLink.status ? <TbCircleDashedCheck size={16} /> : <TbCircleDashed size={16} />}
-                                            className={`${newLink.status ? 'bg-success text-dark' : 'bg-danger text-light'}`}
-                                            onClick={() => {
-                                                statusButtonTextRef.current?.setText(newLink.status ? t('inactive') : t('active'));
-                                                setNewLink({ ...newLink, status: !newLink.status });
-                                            }}
-                                        >
-                                            <AnimatedText
-                                                ref={statusButtonTextRef}
-                                                initialText={newLink.status ? t('active') : t('inactive')}
-                                                animationType="slide"
-                                                triggerMode='none'
-                                                className='cursor-pointer'
-                                            />
-                                        </Button>
-                                    </motion.div>
-
-                                    {/* Forward query params to the destination */}
-                                    <motion.div
-                                        initial={{ opacity: 0, x: 20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: 0.12, duration: 0.4, ease: "backInOut" }}
-                                        className='flex items-start gap-3 max-w-sm'
-                                    >
-                                        <Switch
-                                            size='sm'
-                                            className='flex-shrink-0'
-                                            checked={newLink.forwardParams ?? false}
-                                            onChange={(checked) => setNewLink({ ...newLink, forwardParams: checked })}
-                                        />
-                                        <div className='flex flex-col'>
-                                            <span className='text-xs font-semibold text-dark/70'>{t('forwardParamsLabel')}</span>
-                                            <span className='text-xs text-dark/50'>{t('forwardParamsDesc')}</span>
-                                        </div>
-                                    </motion.div>
-
-                                    <LinkOrganizeFields
-                                        isGuest={isGuest}
-                                        isPro={user?.role === 'PRO'}
-                                        tags={tags}
-                                        groups={groups}
-                                        activeDomains={activeDomains}
-                                        selectedTagIds={selectedTagIds}
-                                        selectedGroupId={selectedGroupId}
-                                        customDomainId={newLink.customDomain?.id ?? null}
-                                        onTagsChange={handleTagsChange}
-                                        onGroupChange={handleGroupChange}
-                                        onCustomDomainChange={(domain) => setNewLink(prev => ({ ...prev, customDomain: domain }))}
-                                    />
-                                </div>
+                                {shortUrlBlock}
+                                {longUrlBlock}
+                                {statusBlock}
                             </div>
-
-                            {/* Right column — QR (non-guests, sm+ only) */}
-                            {!isGuest && (
-                                <motion.div
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    transition={{ delay: 0.2, duration: 0.3, ease: "backOut" }}
-                                    className='flex flex-shrink-0 md:flex-col items-center gap-2'
-                                >
-                                    <div className='p-1 bg-white rounded-xl border border-dark/5'>
-                                        <QRCodePreview url={qrUrl} config={qrConfig} size={100} className='rounded-3xl' />
-                                    </div>
-                                </motion.div>
-                            )}
+                            <div className='hidden sm:block'>{qrBlock}</div>
                         </div>
 
-                        {/* ── Stats section ── */}
-                        {!isGuest && (
-                            <LinkStatsPanel
-                                stats={stats}
-                                loading={statsLoading}
-                                period={statsPeriod}
-                                onPeriodChange={setStatsPeriod}
-                                isStandardPlan={user?.role === 'STANDARD'}
-                            />
-                        )}
+                        <div className='grid xl:grid-cols-[minmax(0,1fr)_20rem] gap-4 items-start'>
+                            <div className='min-w-0'>{statsBlock}</div>
+
+                            {/* Link settings: collapsible on small screens */}
+                            <section className='bg-white border border-dark/10 rounded-2xl p-4 flex flex-col gap-4 xl:sticky xl:top-24'>
+                                <button
+                                    type='button'
+                                    onClick={() => setSettingsOpen((v) => !v)}
+                                    aria-expanded={settingsOpen}
+                                    className='flex items-center justify-between gap-2 w-full md:cursor-default cursor-pointer'
+                                >
+                                    <h2 className='flex items-center gap-2 text-base font-black italic text-dark'>
+                                        <TbSettings size={18} />
+                                        {t('settingsTitle')}
+                                    </h2>
+                                    <TbChevronDown size={18} className={`md:hidden transition-transform ${settingsOpen ? 'rotate-180' : ''}`} />
+                                </button>
+                                <div className={`${settingsOpen ? 'flex' : 'hidden'} md:flex flex-col gap-4`}>
+                                    {forwardBlock}
+                                    {organizeBlock}
+                                </div>
+                            </section>
+                        </div>
                     </div>
-                )}
+                ) : (
+                    <div className='relative z-0 w-full flex flex-col gap-6'>
+                        <div className='w-full flex flex-col sm:flex-row sm:items-start gap-6 min-w-0'>
+                            <div className='flex-1 min-w-0 flex flex-col gap-3'>
+                                {shortUrlBlock}
+                                {longUrlBlock}
+                                <div className='flex flex-col gap-3'>
+                                    {statusBlock}
+                                    {forwardBlock}
+                                    {organizeBlock}
+                                </div>
+                            </div>
+                            {qrBlock}
+                        </div>
+                        {statsBlock}
+                    </div>
+                ))}
 
                 {/* Rules */}
                 {tab === 'rules' && (

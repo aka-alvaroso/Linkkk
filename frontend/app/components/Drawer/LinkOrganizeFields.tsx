@@ -8,6 +8,8 @@ import type { Group, Tag } from '@/app/types';
 interface LinkOrganizeFieldsProps {
     isGuest: boolean;
     isPro: boolean;
+    /** Full-width selectors stacked vertically (used in the page's settings card) */
+    stacked?: boolean;
     tags: Tag[];
     groups: Group[];
     activeDomains: CustomDomain[];
@@ -21,25 +23,25 @@ interface LinkOrganizeFieldsProps {
 
 /** Tags, group and custom domain selectors for a link. */
 export default function LinkOrganizeFields({
-    isGuest, isPro, tags, groups, activeDomains,
+    isGuest, isPro, stacked = false, tags, groups, activeDomains,
     selectedTagIds, selectedGroupId, customDomainId,
     onTagsChange, onGroupChange, onCustomDomainChange,
 }: LinkOrganizeFieldsProps) {
     const t = useTranslations('EditLinkDrawer');
 
     return (
-        <div className='flex items-center gap-2'>
+        <div className={stacked ? 'flex flex-col gap-3' : 'flex items-center gap-2'}>
             {/* Tags dropdown */}
             {!isGuest && tags.length > 0 && (
                 <motion.div
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.15, duration: 0.4, ease: "backInOut" }}
-                    className='flex flex-col gap-1'
+                    className={stacked ? 'flex flex-col gap-1 w-full' : 'flex flex-col gap-1'}
                 >
                     <span className='text-xs font-semibold text-dark/60 flex items-center gap-1'><TbTag size={12} /> {t('organizeTagsTitle')}</span>
                     <SelectDropdown
-                        triggerClassName=''
+                        triggerClassName={stacked ? 'w-full' : ''}
                         mode="multi"
                         options={tags.map(tag => ({ label: tag.name, value: tag.id, color: tag.color ?? '#6b7280' }))}
                         values={selectedTagIds}
@@ -55,11 +57,12 @@ export default function LinkOrganizeFields({
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.2, duration: 0.4, ease: "backInOut" }}
-                    className='flex flex-col gap-1'
+                    className={stacked ? 'flex flex-col gap-1 w-full' : 'flex flex-col gap-1'}
                 >
                     <span className='text-xs font-semibold text-dark/60 flex items-center gap-1'><TbFolder size={12} /> {t('organizeGroupTitle')}</span>
                     <SelectDropdown
                         mode="single"
+                    triggerClassName={stacked ? 'w-full' : ''}
                         options={groups.map(g => ({ label: g.name, value: g.id, color: g.color ?? '#6b7280' }))}
                         value={selectedGroupId}
                         onChange={onGroupChange}
@@ -76,11 +79,12 @@ export default function LinkOrganizeFields({
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.25, duration: 0.4, ease: "backInOut" }}
-                    className='flex flex-col gap-1'
+                    className={stacked ? 'flex flex-col gap-1 w-full' : 'flex flex-col gap-1'}
                 >
                     <span className='text-xs font-semibold text-dark/60 flex items-center gap-1'><TbWorld size={12} /> {t('customDomain')}</span>
                     <SelectDropdown
                         mode="single"
+                    triggerClassName={stacked ? 'w-full' : ''}
                         options={activeDomains.map(d => ({ label: d.domain, value: d.id }))}
                         value={customDomainId}
                         onChange={(val) => onCustomDomainChange(val ? activeDomains.find(d => d.id === val) ?? null : null)}

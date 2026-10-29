@@ -380,6 +380,7 @@
     "utmBuilderCopyError": "Couldn't copy the link",
     "utmBuilderEmpty": "Fill in at least one value to add parameters to the link.",
     "utmEmptyHint": "No UTM data yet. Add parameters to your link, e.g. ?utm_source=newsletter&utm_campaign=launch, to see where your clicks come from.",
+    "settingsTitle": "Link settings",
     "forwardParamsLabel": "Pass parameters to the destination",
     "forwardParamsDesc": "Query params like ?utm_source=email are added to the destination URL. If the destination already has one with the same name, it wins.",
     "unsavedChanges": "Unsaved Changes",
