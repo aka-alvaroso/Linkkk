@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { TbClick, TbCopy, TbCircleDashedCheck, TbCircleDashed, TbQrcode, TbSettings, TbShare3, TbTrash, TbFolder } from 'react-icons/tb'
 import { FiCornerDownRight } from "react-icons/fi";
 import Button from '@/app/components/ui/Button/Button';
 import Chip from '@/app/components/ui/Chip/Chip';
 import TagChip from '@/app/components/Tags/TagChip';
-import EditLinkDrawer from '@/app/components/Drawer/EditiLinkDrawer';
 import { useLinks } from '@/app/hooks';
 import { useLinkDrawerStore } from '@/app/stores/linkDrawerStore';
 import { Link } from '@/app/types';
@@ -20,16 +20,18 @@ interface LinkItemProps {
 export default function LinkItem({ view, data }: LinkItemProps) {
     const t = useTranslations('Dashboard');
     const { deleteLink } = useLinks();
-    const [linkDetailsDrawer, setLinkDetailsDrawer] = useState(false);
+    const router = useRouter();
+    const openLink = () => router.push(`/dashboard/links/${encodeURIComponent(data.shortUrl)}`);
     const requestedShortUrl = useLinkDrawerStore((s) => s.requestedShortUrl);
     const clearDrawerRequest = useLinkDrawerStore((s) => s.clearRequest);
 
-    // Lets a realtime toast (or anything outside this row) open this link's drawer
+    // Lets a realtime toast (or anything outside this row) open this link's page
     useEffect(() => {
         if (requestedShortUrl === data.shortUrl) {
-            setLinkDetailsDrawer(true);
+            openLink();
             clearDrawerRequest();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [requestedShortUrl, data.shortUrl, clearDrawerRequest]);
 
 
@@ -40,7 +42,7 @@ export default function LinkItem({ view, data }: LinkItemProps) {
     if (view === 'details') {
         return (
             <>
-                <div className='relative flex group' onClick={() => setLinkDetailsDrawer(true)}>
+                <div className='relative flex group' onClick={openLink}>
                     <div className='absolute top-1/2 left-0 opacity-0 grid grid-cols-2 grid-rows-2 items-center transition transform -translate-x-1/2 -translate-y-1/2 scale-0 group-hover:opacity-100 group-hover:scale-90'>
                         <Button
                             variant='ghost'
@@ -139,7 +141,6 @@ export default function LinkItem({ view, data }: LinkItemProps) {
 
                     </div>
                 </div>
-                <EditLinkDrawer open={linkDetailsDrawer} onClose={() => setLinkDetailsDrawer(false)} link={data} />
             </>
         )
     }
