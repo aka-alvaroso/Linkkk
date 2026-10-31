@@ -53,6 +53,12 @@ export interface CustomDomain {
   status: "PENDING" | "VERIFYING" | "ACTIVE" | "ERROR";
 }
 
+// Query params the owner appends when sharing a link (UTM or custom)
+export interface UtmParam {
+  key: string;
+  value: string;
+}
+
 // Link types
 export interface Link {
   id?: number;
@@ -60,6 +66,7 @@ export interface Link {
   longUrl: string;
   status: boolean;
   forwardParams?: boolean;
+  utmParams?: UtmParam[] | null;
   createdAt: string;
   accessCount?: number;
   scanCount?: number;
@@ -80,6 +87,7 @@ export interface UpdateLinkDTO {
   longUrl?: string;
   status?: boolean;
   forwardParams?: boolean;
+  utmParams?: UtmParam[];
   newShortUrl?: string;
   groupId?: number | null;
   customDomainId?: number | null;

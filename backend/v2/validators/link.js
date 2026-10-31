@@ -31,6 +31,25 @@ const customSuffixSchema = z
   .max(30, "Suffix must be at most 30 characters")
   .regex(/^[a-zA-Z0-9_-]+$/, "Suffix can only contain letters, numbers, hyphens and underscores");
 
+// Query params the owner appends when sharing a link. Keys follow the charset the
+// query-param sanitizer lets through ("src" is reserved by the platform).
+const utmParamSchema = z.object({
+  key: z
+    .string()
+    .min(1)
+    .max(50)
+    .regex(/^[a-zA-Z0-9_-]+$/, "Only letters, digits, '_' and '-' are allowed")
+    .refine((key) => key.toLowerCase() !== "src", { message: "'src' is reserved" }),
+  value: z.string().trim().min(1).max(500),
+});
+
+const utmParamsSchema = z
+  .array(utmParamSchema)
+  .max(10)
+  .refine((params) => new Set(params.map((p) => p.key.toLowerCase())).size === params.length, {
+    message: "Parameter names must be unique",
+  });
+
 // Simplified schema for beta - only essential fields
 const createLinkSchema = z.object({
   longUrl: longUrlSchema,
@@ -46,9 +65,11 @@ const updateLinkSchema = z.object({
   newShortUrl: customSuffixSchema.optional(),
   customDomainId: z.number().int().positive().optional().nullable(),
   forwardParams: z.boolean().optional(),
+  utmParams: utmParamsSchema.optional(),
 });
 
 module.exports = {
   createLinkSchema,
   updateLinkSchema,
+  utmParamsSchema,
 };

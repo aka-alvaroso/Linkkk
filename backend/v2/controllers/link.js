@@ -318,6 +318,7 @@ const getLink = async (req, res) => {
       longUrl: link.longUrl,
       status: link.status,
       forwardParams: link.forwardParams,
+      utmParams: link.utmParams ?? [],
       createdAt: link.createdAt,
       group: link.group,
       tags: link.tags.map((lt) => lt.tag),
@@ -375,6 +376,7 @@ const getAllLinks = async (req, res) => {
         longUrl: link.longUrl,
         status: link.status,
         forwardParams: link.forwardParams,
+        utmParams: link.utmParams ?? [],
         createdAt: link.createdAt,
         accessCount: link.accessCount,
         scanCount: link.scanCount || 0,
@@ -413,7 +415,7 @@ const updateLink = async (req, res) => {
     return errorResponse(res, ERRORS.INVALID_DATA, issues);
   }
 
-  const { longUrl, status, newShortUrl, customDomainId, forwardParams } = validatedData.data;
+  const { longUrl, status, newShortUrl, customDomainId, forwardParams, utmParams } = validatedData.data;
 
   // Custom suffix change only allowed for authenticated users (not guests)
   if (newShortUrl !== undefined && guest) {
@@ -466,6 +468,7 @@ const updateLink = async (req, res) => {
     if (longUrl !== undefined) updateData.longUrl = longUrl;
     if (status !== undefined) updateData.status = status;
     if (forwardParams !== undefined) updateData.forwardParams = forwardParams;
+    if (utmParams !== undefined) updateData.utmParams = utmParams;
     if (newShortUrl !== undefined) updateData.shortUrl = newShortUrl;
     if (customDomainId !== undefined) updateData.customDomainId = customDomainId ?? null;
 
@@ -492,6 +495,7 @@ const updateLink = async (req, res) => {
       longUrl: updatedLink.longUrl,
       status: updatedLink.status,
       forwardParams: updatedLink.forwardParams,
+      utmParams: updatedLink.utmParams ?? [],
       createdAt: updatedLink.createdAt,
       group: updatedLink.group,
       tags: updatedLink.tags.map((lt) => lt.tag),
