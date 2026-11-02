@@ -16,6 +16,7 @@ const { sanitizeQueryParams, extractUtm, escapeParamForHtml } = require("../util
 const { forwardedUrl } = require("../utils/forwardParams");
 const { sendRuleNotificationEmail } = require("../services/emailService");
 const { publish } = require("../realtime/broadcaster");
+const telegramService = require("../services/telegramService");
 const {
   DEFAULT_OG_TITLE,
   DEFAULT_OG_DESCRIPTION,
@@ -55,6 +56,19 @@ const trackAccess = async (link, { userAgent, ip, country, isVpn, isBot, source,
       select: { accessCount: true, scanCount: true },
     });
   });
+
+  // First real visit to this link: activation signal (non-blocking)
+  if (!isBot && updatedLink.accessCount + updatedLink.scanCount === 1) {
+    (async () => {
+      const owner = link.userId
+        ? await prisma.user.findUnique({
+            where: { id: link.userId },
+            select: { username: true, email: true },
+          })
+        : null;
+      await telegramService.notifyFirstClick(owner, link.shortUrl, { source, country, device });
+    })().catch(() => {});
+  }
 
   if (link.userId) {
     publish(link.userId, {
@@ -258,6 +272,10 @@ const createLink = async (req, res) => {
       },
       include: { tags: { include: { tag: true } }, customDomain: true },
     });
+
+    // Notify Telegram (non-blocking)
+    telegramService.notifyLinkCreated(user, link.shortUrl, link.longUrl).catch(() => {});
+
     return successResponse(res, link, 201);
   } catch (error) {
     if (error.code === "P2002") {

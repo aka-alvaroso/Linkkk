@@ -291,6 +291,86 @@ async function notifyAccountDeletion(userEmail, userName, role) {
 }
 
 // ============================================================================
+// ACTIVATION NOTIFICATIONS
+// ============================================================================
+
+/**
+ * Telegram parses messages as HTML; these carry user-controlled text.
+ */
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+/**
+ * Notify a link was created. `owner` is null for guests.
+ */
+async function notifyLinkCreated(owner, shortUrl, longUrl) {
+  const who = owner
+    ? `${escapeHtml(owner.username || "N/A")} (${escapeHtml(owner.email)})`
+    : "Invitado";
+
+  const message = `
+🔗 <b>Enlace creado</b>
+
+👤 <b>Usuario:</b> ${who}
+🆔 <b>Enlace:</b> <code>${escapeHtml(shortUrl)}</code>
+➡️ <b>Destino:</b> ${escapeHtml(longUrl)}
+🕐 ${formatDate(new Date())}
+  `.trim();
+
+  return sendMessage(message);
+}
+
+/**
+ * Notify a rule was added to a link.
+ */
+async function notifyRuleCreated(owner, shortUrl, actionType, conditionCount) {
+  const who = owner
+    ? `${escapeHtml(owner.username || "N/A")} (${escapeHtml(owner.email)})`
+    : "Invitado";
+
+  const message = `
+🎯 <b>Regla añadida</b>
+
+👤 <b>Usuario:</b> ${who}
+🆔 <b>Enlace:</b> <code>${escapeHtml(shortUrl)}</code>
+⚙️ <b>Acción:</b> ${escapeHtml(actionType)}
+🔢 <b>Condiciones:</b> ${conditionCount}
+🕐 ${formatDate(new Date())}
+  `.trim();
+
+  return sendMessage(message);
+}
+
+/**
+ * Notify the first real (non-bot) visit to a link. It can be the owner
+ * testing their own link; the redirect is public so there is no way to tell.
+ */
+async function notifyFirstClick(owner, shortUrl, { source, country, device }) {
+  const who = owner
+    ? `${escapeHtml(owner.username || "N/A")} (${escapeHtml(owner.email)})`
+    : "Invitado";
+
+  const message = `
+👆 <b>Primer clic en un enlace</b>
+
+👤 <b>Dueño:</b> ${who}
+🆔 <b>Enlace:</b> <code>${escapeHtml(shortUrl)}</code>
+📍 <b>País:</b> ${escapeHtml(country || "N/A")}
+📱 <b>Dispositivo:</b> ${escapeHtml(device || "N/A")}
+🔳 <b>Origen:</b> ${source === "qr" ? "QR" : "Enlace"}
+🕐 ${formatDate(new Date())}
+
+⚠️ Puede ser el propio dueño probándolo.
+  `.trim();
+
+  return sendMessage(message);
+}
+
+// ============================================================================
 // WEBHOOK NOTIFICATIONS
 // ============================================================================
 
@@ -485,6 +565,11 @@ module.exports = {
   notifyLogin,
   notifyRegistration,
   notifyAccountDeletion,
+
+  // Activation notifications
+  notifyLinkCreated,
+  notifyRuleCreated,
+  notifyFirstClick,
 
   // Webhook notifications
   notifyWebhookReceived,

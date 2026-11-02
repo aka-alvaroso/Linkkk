@@ -8,6 +8,7 @@ const { successResponse, errorResponse } = require("../utils/response");
 const ERRORS = require("../constants/errorCodes");
 const { getLimitsForUser } = require("../utils/limits");
 const { hashPassword } = require("../utils/password");
+const telegramService = require("../services/telegramService");
 
 // Helper: Check link access
 const checkLinkAccess = async (shortUrl, user, guest) => {
@@ -140,6 +141,11 @@ const createLinkRule = async (req, res) => {
         conditions: true,
       },
     });
+
+    // Notify Telegram (non-blocking)
+    telegramService
+      .notifyRuleCreated(user, shortUrl, action.type, conditions?.length ?? 0)
+      .catch(() => {});
 
     return successResponse(res, completeRule, 201);
   } catch (error) {
