@@ -5,7 +5,8 @@ import { usePathname } from "next/navigation";
 import CreateLinkDrawer from "../Drawer/CreateLinkDrawer";
 import { useAuth } from "@/app/hooks";
 import { useToast } from "@/app/hooks/useToast";
-import { TbPlus, TbLogin, TbUser, TbSparkles, TbBook } from "react-icons/tb";
+import { TbPlus, TbLogin, TbUser, TbSparkles, TbBook, TbMessageCircle } from "react-icons/tb";
+import FeedbackModal from "../Modal/FeedbackModal";
 import * as motion from "motion/react-client";
 import { AnimatePresence } from "motion/react";
 import Button from "../ui/Button/Button";
@@ -21,6 +22,7 @@ export default function TopNavbar({ showCreate = false }: TopNavbarProps) {
   const pathname = usePathname();
   const isLandingPage = pathname === "/";
   const [createLinkDrawer, setCreateLinkDrawer] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
   const toast = useToast();
   const t = useTranslations('Navigation');
 
@@ -103,6 +105,21 @@ export default function TopNavbar({ showCreate = false }: TopNavbarProps) {
             </Button>
           )}
 
+          {/* Feedback - quiet, always available for signed-in users */}
+          {user && (
+            <Button
+              variant='solid'
+              size='md'
+              rounded='xl'
+              leftIcon={<TbMessageCircle size={20} />}
+              expandOnHover="text"
+              className="hover:bg-info hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)] leading-5"
+              onClick={() => setFeedbackOpen(true)}
+            >
+              {t('feedback')}
+            </Button>
+          )}
+
           {/* User or Login button */}
           {user ? (
             <a href="/settings" className="relative">
@@ -145,6 +162,10 @@ export default function TopNavbar({ showCreate = false }: TopNavbarProps) {
         open={createLinkDrawer}
         onClose={() => setCreateLinkDrawer(false)}
       />
+
+      {user && (
+        <FeedbackModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
+      )}
 
     </>
   );

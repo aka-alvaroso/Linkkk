@@ -6,7 +6,8 @@
     "docs": "Docs",
     "create": "Create",
     "login": "Login",
-    "upgradeToPro": "Upgrade to PRO"
+    "upgradeToPro": "Upgrade to PRO",
+    "feedback": "Feedback"
   },
   "Landing": {
     "Hero": {
@@ -837,10 +838,13 @@
     "continueButton": "Continue to Payment"
   },
   "Feedback": {
-    "title": "Hey, what brought you to Linkkk?",
-    "description": "I'm Álvaro, I build this alone. Knowing what you were looking for helps me more than anything.",
+    "title": "What's missing for you?",
+    "description": "I'm Álvaro, I build this alone. Tell me what you're missing, what gets in your way, or what you use Linkkk for.",
+    "navLabel": "Feedback",
+    "button": "Send feedback",
+    "settingsDescription": "Tell me what's missing, what gets in your way, or what you use Linkkk for.",
     "emailButton": "Or tell me via email",
-    "placeholder": "I was looking for a way to... / I found Linkkk on... / I needed...",
+    "placeholder": "I'm missing... / It annoys me that... / I use Linkkk to...",
     "anonymous": "Send anonymously",
     "send": "Send",
     "sending": "Sending...",

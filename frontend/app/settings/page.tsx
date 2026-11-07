@@ -18,7 +18,9 @@ import {
   TbEyeOff,
   TbStar,
   TbSparkles,
+  TbMessageCircle,
 } from "react-icons/tb";
+import FeedbackModal from "@/app/components/Modal/FeedbackModal";
 import { csrfService } from "@/app/services/api/csrfService";
 import { subscriptionService } from "@/app/services/api/subscriptionService";
 import { userService } from "@/app/services/api/userService";
@@ -49,6 +51,8 @@ const settingsTabs: SettingsTabConfig[] = [
 
 export default function SettingsPage() {
   const t = useTranslations('SettingsPage');
+  const tFeedback = useTranslations('Feedback');
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
   const { user, logout, checkSession } = useAuth();
   const { setUser } = useAuthStore();
   const toast = useToast();
@@ -448,6 +452,13 @@ export default function SettingsPage() {
                       <LanguageSwitcher />
                     </div>,
 
+                    /* Feedback (also the way to reach it on mobile) */
+                    <div key="feedback" className="p-4 bg-dark/5 rounded-2xl">
+                      <div className="flex items-center gap-2 mb-3"><TbMessageCircle size={20} /><h3 className="text-xl font-bold">{tFeedback('navLabel')}</h3></div>
+                      <p className="text-sm text-dark/60 mb-3">{tFeedback('settingsDescription')}</p>
+                      <Button variant="outline" size="sm" rounded="xl" leftIcon={<TbMessageCircle size={20} />} onClick={() => setFeedbackOpen(true)} className="mt-3 bg-transparent hover:bg-info hover:text-dark border border-dark">{tFeedback('button')}</Button>
+                    </div>,
+
                     /* Logout */
                     <div key="logout" className="p-4 bg-dark/5 rounded-2xl">
                       <div className="flex items-center gap-2 mb-3"><TbLogout size={20} /><h3 className="text-xl font-bold">{t('signOut')}</h3></div>
@@ -600,6 +611,8 @@ export default function SettingsPage() {
         onConfirm={confirmCancelSubscription}
         loading={loading}
       />
+
+      <FeedbackModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
 
     </RouteGuard>
   );
