@@ -7,7 +7,6 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { cookies } from 'next/headers';
 import { locales, defaultLocale, type Locale } from '@/i18n/request';
-import FeedbackBanner from "./components/FeedbackBanner/FeedbackBanner";
 import Script from "next/script";
 
 export const metadata: Metadata = {
@@ -177,7 +176,6 @@ export default async function RootLayout({
             <SessionProvider>
               <RealtimeProvider>{children}</RealtimeProvider>
             </SessionProvider>
-            <FeedbackBanner />
           </ToastProvider>
         </NextIntlClientProvider>
         {/* Umami: cookieless analytics. data-domains keeps localhost out of the stats. */}

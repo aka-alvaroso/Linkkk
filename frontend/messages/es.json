@@ -6,7 +6,8 @@
     "docs": "Docs",
     "create": "Crear",
     "login": "Entrar",
-    "upgradeToPro": "Hazte PRO"
+    "upgradeToPro": "Hazte PRO",
+    "feedback": "Feedback"
   },
   "Landing": {
     "Hero": {
@@ -838,10 +839,13 @@
     "continueButton": "Continuar al Pago"
   },
   "Feedback": {
-    "title": "Hey, ¿qué te trajo a Linkkk?",
-    "description": "Soy Álvaro, construyo esto solo. Saber qué buscabas me ayuda más que cualquier otra cosa.",
+    "title": "¿Qué echas en falta?",
+    "description": "Soy Álvaro, construyo esto solo. Cuéntame qué te falta, qué te estorba o para qué usas Linkkk.",
+    "navLabel": "Feedback",
+    "button": "Enviar feedback",
+    "settingsDescription": "Dime qué te falta, qué te estorba o para qué usas Linkkk.",
     "emailButton": "O cuéntamelo por email",
-    "placeholder": "Buscaba una forma de... / Vi Linkkk en... / Necesitaba...",
+    "placeholder": "Me falta... / Me estorba... / Uso Linkkk para...",
     "anonymous": "Enviar de forma anónima",
     "send": "Enviar",
     "sending": "Enviando...",
