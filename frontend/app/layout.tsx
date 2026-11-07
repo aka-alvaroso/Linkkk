@@ -8,6 +8,7 @@ import { getMessages } from 'next-intl/server';
 import { cookies } from 'next/headers';
 import { locales, defaultLocale, type Locale } from '@/i18n/request';
 import FeedbackBanner from "./components/FeedbackBanner/FeedbackBanner";
+import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "Linkkk - Smart Link Management Platform",
@@ -179,6 +180,14 @@ export default async function RootLayout({
             <FeedbackBanner />
           </ToastProvider>
         </NextIntlClientProvider>
+        {/* Umami: cookieless analytics. data-domains keeps localhost out of the stats. */}
+        <Script
+          defer
+          src="https://cloud.umami.is/script.js"
+          data-website-id="52a082b3-4eb2-4332-bf10-3a0c2c452b71"
+          data-domains="linkkk.dev"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
