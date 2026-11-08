@@ -50,7 +50,10 @@ gsap.registerPlugin(ScrollTrigger);
 export default function Landing() {
   const t = useTranslations("Landing");
   const [createLinkDrawer, setCreateLinkDrawer] = useState(false);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isGuest } = useAuth();
+  // RouteGuard renders nothing until a user/guest session exists, so the
+  // landing DOM (and the refs GSAP needs) only exist once this is true.
+  const contentReady = isAuthenticated || isGuest;
 
   // Hero zoom refs
   const triggerRef = useRef<HTMLDivElement>(null);
@@ -103,6 +106,16 @@ export default function Landing() {
   };
 
   useEffect(() => {
+    // Wait until RouteGuard has actually rendered the page; otherwise refs are
+    // null, the setup bails out and no ScrollTrigger is ever created.
+    if (!contentReady) return;
+
+    const root = document.documentElement;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // Words start hidden only while GSAP is in charge (see globals.css), so a
+    // failed setup never leaves titles invisible.
+    if (!reduce) root.classList.add("gsap-armed");
+
     const ctx = gsap.context(() => {
       // Respect prefers-reduced-motion: skip all animations and leave content
       // in its final, visible state (no residual opacity:0 / transforms).
@@ -475,8 +488,20 @@ export default function Landing() {
       });
     });
 
-    return () => ctx.revert();
-  }, []);
+    // Layout can shift after setup (fonts, images, session loader unmounting):
+    // recompute trigger positions once everything has settled.
+    const refresh = () => ScrollTrigger.refresh();
+    const raf = requestAnimationFrame(refresh);
+    window.addEventListener("load", refresh);
+    document.fonts?.ready.then(refresh);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("load", refresh);
+      ctx.revert();
+      root.classList.remove("gsap-armed");
+    };
+  }, [contentReady]);
 
   return (
     <RouteGuard type="guest-or-user">
@@ -551,7 +576,6 @@ export default function Landing() {
           <span className="inline-block overflow-hidden">
             <span
               className="anim-word inline-block bg-danger px-2 text-light text-shadow-[4px_4px_0_var(--color-dark)]"
-              style={{ opacity: 0, transform: "translateY(40px)" }}
             >
               {t("Problems.titleHighlight")}
             </span>

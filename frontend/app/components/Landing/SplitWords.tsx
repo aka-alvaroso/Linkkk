@@ -1,6 +1,6 @@
 /**
  * Splits text into words wrapped in spans for staggered GSAP animation.
- * Each word gets the class "anim-word" and starts hidden + offset.
+ * Each word gets the class "anim-word" and is hidden + offset via `.gsap-armed .anim-word` in globals.css.
  */
 export default function SplitWords({
   children,
@@ -15,7 +15,6 @@ export default function SplitWords({
         <span key={i} className="inline-block overflow-hidden">
           <span
             className="anim-word inline-block"
-            style={{ opacity: 0, transform: "translateY(40px)" }}
           >
             {word}
           </span>

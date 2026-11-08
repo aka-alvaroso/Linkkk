@@ -65,6 +65,14 @@ body {
   animation: slide-up 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
+/* Landing word-reveal initial state. Only applied while the landing's GSAP
+   setup is active (class toggled in app/page.tsx) so content is never left
+   invisible if animations fail to initialise. */
+.gsap-armed .anim-word {
+  opacity: 0;
+  transform: translateY(40px);
+}
+
 /* Hide scrollbar utility */
 .scrollbar-hide {
   -ms-overflow-style: none;  /* Internet Explorer 10+ */
