@@ -9,6 +9,7 @@ import { LinkRule } from './LinkRule';
 import Button from '../ui/Button/Button';
 import { TbPlus, TbRocket, TbCube } from 'react-icons/tb';
 import { useLinkRules } from '@/app/hooks';
+import { useLinkRulesStore } from '@/app/stores/linkRulesStore';
 import {
   DndContext,
   closestCenter,
@@ -83,7 +84,7 @@ function SortableLinkRule(props: {
 
 export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
   const t = useTranslations('RulesManager');
-  const { rules: fetchedRules, isLoading, error, fetchRules, createRule, updateRule, deleteRule } = useLinkRules();
+  const { isLoading, error, fetchRules, createRule, updateRule, deleteRule } = useLinkRules();
   const { isGuest, user } = useAuth();
 
   const [originalRules, setOriginalRules] = useState<LinkRuleType[]>([]);
@@ -104,13 +105,6 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
       coordinateGetter: sortableKeyboardCoordinates
     })
   );
-
-  // Fetch rules on mount
-  useEffect(() => {
-    if (shortUrl) {
-      fetchRules(shortUrl);
-    }
-  }, [shortUrl, fetchRules]);
 
   // Convert conditions from backend format (array) to UI format (string for countries)
   const normalizeConditionsForUI = (conditions: RuleCondition[]) => {
@@ -142,15 +136,30 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
     });
   };
 
-  // Update local state when fetched rules change
+  // Rules as last saved on the server, in UI format and evaluation order
+  const readSavedRules = (): LinkRuleType[] =>
+    [...useLinkRulesStore.getState().rules]
+      .sort((a, b) => a.priority - b.priority)
+      .map(rule => ({
+        ...rule,
+        conditions: normalizeConditionsForUI(rule.conditions)
+      }));
+
+  // Fetch rules on mount. The local copy is taken from the store only here and
+  // at the end of a save: syncing on every store change would overwrite what
+  // the user is editing whenever a save succeeds only in part.
   useEffect(() => {
-    const normalizedRules = fetchedRules.map(rule => ({
-      ...rule,
-      conditions: normalizeConditionsForUI(rule.conditions)
-    }));
-    setOriginalRules(normalizedRules);
-    setLocalRules(normalizedRules);
-  }, [fetchedRules]);
+    if (!shortUrl) return;
+    let cancelled = false;
+    fetchRules(shortUrl).then(() => {
+      if (cancelled || useLinkRulesStore.getState().error) return;
+      const saved = readSavedRules();
+      setOriginalRules(saved);
+      setLocalRules(saved);
+    });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shortUrl, fetchRules]);
 
   // Detect changes
   const hasChanges = JSON.stringify(originalRules) !== JSON.stringify(localRules);
@@ -251,6 +260,19 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
 
   // Save callback
   const saveRules = useCallback(async () => {
+    // What is on screen, with each entry swapped for the server's version as it is saved
+    const working = [...localRules];
+    let started = false;
+    const markSaved = (index: number, savedId: number) => {
+      const saved = readSavedRules().find(r => r.id === savedId);
+      if (!saved) return;
+      const previousId = working[index].id;
+      if (previousId !== savedId) {
+        setExpandedRuleId(current => (current === previousId ? savedId : current));
+      }
+      working[index] = saved;
+    };
+
     try {
       // Validate limits
       if (limits.rulesPerLink !== null && localRules.length > limits.rulesPerLink) {
@@ -272,12 +294,15 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
         }
       }
 
+      started = true;
+
       // Update all modified rules
-      for (const localRule of localRules) {
+      for (let i = 0; i < localRules.length; i++) {
+        const localRule = localRules[i];
         const originalRule = originalRules.find(r => r.id === localRule.id);
         if (!originalRule) {
           // New rule (created locally)
-          await createRule(shortUrl, {
+          const created = await createRule(shortUrl, {
             name: localRule.name || undefined,
             priority: localRule.priority,
             enabled: localRule.enabled,
@@ -294,6 +319,7 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
               }
             })
           });
+          markSaved(i, created.id);
         } else if (JSON.stringify(originalRule) !== JSON.stringify(localRule)) {
           // Modified rule
           const updatePayload: UpdateRuleDTO = {
@@ -318,6 +344,7 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
           }
 
           await updateRule(shortUrl, localRule.id, updatePayload);
+          markSaved(i, localRule.id);
         }
       }
 
@@ -328,10 +355,19 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
         }
       }
 
-      // Update original to match local (saved state)
-      setOriginalRules(localRules);
+      // Everything saved: screen and saved state are the same again
+      const saved = readSavedRules();
+      setOriginalRules(saved);
+      setLocalRules(saved);
     } catch (err) {
       console.error('Failed to save rules:', err);
+      if (started) {
+        // Some requests may have gone through. Keep the user's edits on screen and
+        // compare them against what the server really has, so the save bar stays
+        // and a retry only sends what is still pending.
+        setOriginalRules(readSavedRules());
+        setLocalRules(working);
+      }
       throw err;
     }
   }, [localRules, originalRules, shortUrl, createRule, updateRule, deleteRule, limits, t]);
@@ -339,6 +375,8 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
   // Cancel callback
   const cancelRules = useCallback(() => {
     setLocalRules(originalRules);
+    // A failed save leaves its error in the store; discarding the edits makes it stale
+    useLinkRulesStore.getState().setError(null);
   }, [originalRules]);
 
   // Notify parent of changes

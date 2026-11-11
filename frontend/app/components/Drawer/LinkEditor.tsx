@@ -48,6 +48,8 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
     // Params appended when sharing the link; edited in the Share tab and saved with the link
     const [utmRows, setUtmRows] = useState<ParamRow[]>(() => rowsFromParams(link.utmParams));
     const [statusBar, setShowStatusBar] = useState("none");
+    // Last failed save. Shown inside the unsaved-changes bar, which stays up so the user can retry.
+    const [saveError, setSaveError] = useState<string | null>(null);
     const [newLink, setNewLink] = useState({ ...link });
     // Inline editing
     const [editingShortUrl, setEditingShortUrl] = useState(false);
@@ -223,6 +225,7 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
     const utmDirty = JSON.stringify(paramsFromRows(utmRows)) !== JSON.stringify(savedUtmParams);
 
     const handleUpdateLink = useCallback(async () => {
+        setSaveError(null);
         if (newLink.shortUrl !== link.shortUrl && !suffixRegex.test(newLink.shortUrl)) {
             setSuffixError(t('customSuffixInvalid'));
             setShowStatusBar("confirm");
@@ -242,19 +245,27 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
             });
 
             if (!response.success) {
+                let reason: string;
                 if (response.errorCode === 'SHORT_URL_EXISTS') {
                     setNewLink(prev => ({ ...prev, shortUrl: link.shortUrl }));
-                    toast.error(t('toastSuffixTaken'), { description: t('toastSuffixTakenDesc') });
+                    reason = t('toastSuffixTakenDesc');
+                    toast.error(t('toastSuffixTaken'), { description: reason });
                 } else if (response.errorCode === 'LINK_NOT_FOUND') {
-                    toast.error(t('toastLinkNotFound'), { description: t('toastLinkNotFoundDesc') });
+                    reason = t('toastLinkNotFoundDesc');
+                    toast.error(t('toastLinkNotFound'), { description: reason });
                 } else if (response.errorCode === 'LINK_ACCESS_DENIED') {
-                    toast.error(t('toastAccessDenied'), { description: t('toastAccessDeniedDesc') });
+                    reason = t('toastAccessDeniedDesc');
+                    toast.error(t('toastAccessDenied'), { description: reason });
                 } else if (response.errorCode === 'UNAUTHORIZED') {
-                    toast.error(t('toastSessionExpired'), { description: t('toastSessionExpiredDesc') });
+                    reason = t('toastSessionExpiredDesc');
+                    toast.error(t('toastSessionExpired'), { description: reason });
                 } else {
-                    toast.error(t('toastUpdateFailed'), { description: response.error || t('toastUnexpectedError') });
+                    reason = response.error || t('toastUnexpectedError');
+                    toast.error(t('toastUpdateFailed'), { description: reason });
                 }
-                setShowStatusBar("none");
+                // Nothing was saved: keep the bar so the changes can be fixed and retried
+                setSaveError(reason);
+                setShowStatusBar("confirm");
                 return;
             }
 
@@ -271,7 +282,9 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred.';
             toast.error(t('toastSaveFailed'), { description: errorMessage });
-            setShowStatusBar("none");
+            // The edits are still on screen and still unsaved: keep the bar so they can be retried
+            setSaveError(errorMessage);
+            setShowStatusBar("confirm");
         }
     }, [link, newLink, utmDirty, utmRows, updateLink, fetchLinks, onClose, isPage, onSaved, hasRulesChanges, hasQRChanges, hasMetadataChanges, toast, t]);
 
@@ -320,7 +333,10 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
         const hasChanges = hasLinkChanges || hasRulesChanges || hasQRChanges || hasMetadataChanges;
 
         if (hasChanges) setShowStatusBar("confirm");
-        else setShowStatusBar("none");
+        else {
+            setShowStatusBar("none");
+            setSaveError(null);
+        }
     }, [newLink, link, utmDirty, hasRulesChanges, hasQRChanges, hasMetadataChanges]);
 
     // Pieces of the overview, composed differently for the drawer and the page
@@ -734,12 +750,18 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
                                     <p className='text-sm text-dark/70'>{t('unsavedChangesDesc')}</p>
                                 </div>
                             </div>
+                            {saveError && (
+                                <p role='alert' className='text-sm text-dark bg-danger/10 border border-danger/40 rounded-xl px-3 py-2'>
+                                    <span className='font-bold'>{t('toastSaveFailed')}.</span> {saveError}
+                                </p>
+                            )}
                             <div className='flex gap-2 justify-end'>
                                 <Button
                                     variant='outline' size='md' rounded='2xl' className='border-dark/30'
                                     disabled={statusBar === "loading"}
                                     onClick={() => {
                                         setShowStatusBar("none");
+                                        setSaveError(null);
                                         setNewLink({ ...link });
                                         setUtmRows(rowsFromParams(link.utmParams));
                                         setSuffixError('');
