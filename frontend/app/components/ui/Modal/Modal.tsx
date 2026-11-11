@@ -25,6 +25,9 @@ interface ModalProps {
 
   // Animation
   animationDuration?: number;
+
+  // Accessibility: id of the element that titles the dialog
+  labelledBy?: string;
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -41,6 +44,7 @@ const Modal: React.FC<ModalProps> = ({
   showCloseButton = true,
   preventScroll = true,
   animationDuration = 300,
+  labelledBy,
 }) => {
   const [show, setShow] = useState(open);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -141,7 +145,7 @@ const Modal: React.FC<ModalProps> = ({
         className={overlayClasses}
         onClick={closeOnOverlayClick ? onClose : undefined}
       />
-      <div className={modalClasses}>
+      <div className={modalClasses} role="dialog" aria-modal="true" aria-labelledby={labelledBy}>
         {showCloseButton && (
           <button
             onClick={onClose}
