@@ -38,7 +38,7 @@ export default function CancelSubscriptionModal({
             </div>
             <div>
               <h2 className="text-2xl font-black italic">{t('title')}</h2>
-              <p className="text-sm text-dark/60">{t('subtitle')}</p>
+              <p className="text-sm text-dark/70">{t('subtitle')}</p>
             </div>
           </div>
           {!loading && (

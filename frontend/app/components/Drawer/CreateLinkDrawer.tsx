@@ -368,7 +368,7 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
                         transition={{ delay: 0.2, duration: 0.4, ease: "backInOut" }}
                         className='w-full flex flex-col gap-1.5'
                     >
-                        <p className='text-xs font-semibold text-dark/60 uppercase tracking-wide'>
+                        <p className='text-xs font-semibold text-dark/70 uppercase tracking-wide'>
                             {t('customSuffix')} <span className='normal-case font-normal'>({t('customSuffixOptional')})</span>
                         </p>
                         <Input
@@ -385,7 +385,7 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
                         {suffixError ? (
                             <p className='text-xs text-danger'>{suffixError}</p>
                         ) : (
-                            <p className='text-xs text-dark/60 font-mono'>
+                            <p className='text-xs text-dark/70 font-mono'>
                                 {newLink.customDomainId
                                     ? activeDomains.find(d => d.id === newLink.customDomainId)?.domain
                                     : 'linkkk.dev'}/r/<span className='text-dark/70'>{newLink.customSuffix || t('customSuffixPlaceholder')}</span>
@@ -402,7 +402,7 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
                         transition={{ delay: 0.25, duration: 0.4, ease: "backInOut" }}
                         className='w-full flex flex-col gap-1.5'
                     >
-                        <p className='text-xs font-semibold text-dark/60 uppercase tracking-wide'>
+                        <p className='text-xs font-semibold text-dark/70 uppercase tracking-wide'>
                             {t('customDomain')} <span className='normal-case font-normal'>({t('customDomainOptional')})</span>
                         </p>
                         <SelectDropdown
@@ -425,7 +425,7 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
                         transition={{ delay: 0.28, duration: 0.4, ease: "backInOut" }}
                         className='w-full flex flex-col gap-1.5'
                     >
-                        <p className='text-xs font-semibold text-dark/60 uppercase tracking-wide flex items-center gap-1'>
+                        <p className='text-xs font-semibold text-dark/70 uppercase tracking-wide flex items-center gap-1'>
                             <TbFolder size={13} /> {t('group')} <span className='normal-case font-normal'>({t('groupOptional')})</span>
                         </p>
                         <SelectDropdown
@@ -448,7 +448,7 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
                         transition={{ delay: 0.3, duration: 0.4, ease: "backInOut" }}
                         className='w-full flex flex-col gap-1.5'
                     >
-                        <p className='text-xs font-semibold text-dark/60 uppercase tracking-wide flex items-center gap-1'>
+                        <p className='text-xs font-semibold text-dark/70 uppercase tracking-wide flex items-center gap-1'>
                             <TbTag size={13} /> {t('tags')} <span className='normal-case font-normal'>({t('tagsOptional')})</span>
                         </p>
                         <SelectDropdown
@@ -481,7 +481,7 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
                             <div className='flex items-center gap-2'>
                                 <TbRocket size={20} />
                                 <span className='font-black italic'>{t('linkRules')}</span>
-                                <span className='text-xs text-dark/50'>
+                                <span className='text-xs text-dark/70'>
                                     ({localRules.length}/{limits.rulesPerLink ?? '∞'})
                                 </span>
                             </div>
@@ -517,7 +517,7 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
                                 >
                                     {t('addRule')}
                                 </Button>
-                                <p className='text-xs text-dark/50 text-center'>
+                                <p className='text-xs text-dark/70 text-center'>
                                     {t('rulesEvaluationNote')}
                                 </p>
                             </>
@@ -533,7 +533,7 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
                                 >
                                     {t('createFirstRule')}
                                 </Button>
-                                <p className='text-xs text-dark/50 text-center'>
+                                <p className='text-xs text-dark/70 text-center'>
                                     {t('rulesEvaluationNote')}
                                 </p>
                             </>
@@ -564,9 +564,9 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
                                     <p className='text-lg font-black italic text-dark mb-1'>
                                         {statusBar === "loading" ? t('creatingLink') : t('readyToCreate')}
                                     </p>
-                                    <p className='text-sm text-dark/70'>
-                                        {statusBar === "loading" ? t('creatingLinkDesc') : t('readyToCreateDesc')}
-                                    </p>
+                                    {statusBar === "loading" && (
+                                        <p className='text-sm text-dark/70'>{t('creatingLinkDesc')}</p>
+                                    )}
                                 </div>
                             </div>
                             {statusBar === "confirm" && (

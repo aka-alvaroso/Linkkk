@@ -112,7 +112,7 @@ export default function DemoAnalyticsPage() {
           <h1 className="text-4xl md:text-5xl font-black italic mb-3">
             {t('title')}
           </h1>
-          <p className="text-lg text-dark/60">
+          <p className="text-lg text-dark/70">
             {t('subtitle')}
           </p>
         </motion.div>
@@ -127,13 +127,13 @@ export default function DemoAnalyticsPage() {
           {isLoading ? (
             <div className="w-full py-12 text-center">
               <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-warning border-r-transparent"></div>
-              <p className="mt-4 text-dark/50 font-medium">{t('loading')}</p>
+              <p className="mt-4 text-dark/70 font-medium">{t('loading')}</p>
             </div>
           ) : accesses.length === 0 ? (
             <div className="w-full py-12 text-center">
               <TbLocationOff size={32} className="mx-auto text-dark/30 mb-3" />
               <h3 className="text-xl font-black italic mb-2">{t('noAccessesYet')}</h3>
-              <p className="text-dark/60">{t('noAccessesDescription')}</p>
+              <p className="text-dark/70">{t('noAccessesDescription')}</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -170,7 +170,7 @@ export default function DemoAnalyticsPage() {
                             <div className="flex items-center gap-2">
                               <div className="flex flex-col">
                                 <span className="font-bold text-sm">{formatDate(access.createdAt)}</span>
-                                <span className="text-xs text-dark/50">{formatFullDate(access.createdAt)}</span>
+                                <span className="text-xs text-dark/70">{formatFullDate(access.createdAt)}</span>
                               </div>
                               {isFirst && (
                                 <span className="px-2 py-0.5 bg-warning rounded-full text-[10px] font-black uppercase">
@@ -261,7 +261,7 @@ export default function DemoAnalyticsPage() {
           transition={{ delay: 0.5, duration: 0.5 }}
           className="mt-8 text-center"
         >
-          <p className="text-sm text-dark/50 mb-3">{t('ctaDescription')}</p>
+          <p className="text-sm text-dark/70 mb-3">{t('ctaDescription')}</p>
           <Link href="/dashboard">
             <Button
               variant="solid"
@@ -282,7 +282,7 @@ export default function DemoAnalyticsPage() {
           transition={{ delay: 0.7, duration: 0.3 }}
           className="mt-6 text-center"
         >
-          <Link href="/" className="text-sm text-dark/50">
+          <Link href="/" className="text-sm text-dark/70">
             Powered by <span className="font-black italic">Linkkk.</span>
           </Link>
         </motion.div>

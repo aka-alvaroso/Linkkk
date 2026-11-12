@@ -12,7 +12,7 @@ export default function PrivacyPolicy() {
 
                 <div className="bg-light border-l-4 border-dark/20 p-4 mb-8 rounded-r-xl">
                     <p className="font-bold italic m-0 text-dark/80">
-                        Última actualización: {new Date().toLocaleDateString('es-ES')}
+                        Última actualización: 9/4/2026
                     </p>
                 </div>
 
@@ -56,7 +56,7 @@ export default function PrivacyPolicy() {
                             <li>País de origen.</li>
                             <li>Detección de VPN o Bots.</li>
                         </ul>
-                        <p className="text-sm mt-3 italic text-dark/60">
+                        <p className="text-sm mt-3 italic text-dark/70">
                             Estos datos son estrictamente necesarios para proporcionar las analíticas avanzadas y las reglas de redirección, que son la funcionalidad principal del servicio.
                             Las direcciones IP se muestran de forma anonimizada (último octeto enmascarado) a los creadores de los enlaces en el panel de analíticas.
                         </p>
@@ -179,7 +179,7 @@ export default function PrivacyPolicy() {
 
             <div className="bg-light border-l-4 border-dark/20 p-4 mb-8 rounded-r-xl">
                 <p className="font-bold italic m-0 text-dark/80">
-                    Last updated: {new Date().toLocaleDateString('en-US')}
+                    Last updated: April 9, 2026
                 </p>
             </div>
 
@@ -223,7 +223,7 @@ export default function PrivacyPolicy() {
                         <li>Country of origin.</li>
                         <li>VPN or Bot detection status.</li>
                     </ul>
-                    <p className="text-sm mt-3 italic text-dark/60">
+                    <p className="text-sm mt-3 italic text-dark/70">
                         These data are strictly necessary to provide advanced analytics and redirection rules, which are the core functionality of the service.
                         IP addresses are shown in anonymized form (last octet masked) to link creators in the analytics panel.
                     </p>

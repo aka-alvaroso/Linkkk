@@ -160,7 +160,7 @@ export default function CustomDomains() {
         className="text-center space-y-1"
       >
         <p className="font-black italic text-xl">{t("empty")}</p>
-        <p className="text-sm text-dark/50">{t("emptyDescription")}</p>
+        <p className="text-sm text-dark/70">{t("emptyDescription")}</p>
       </motion.div>
       <motion.div
         initial={{ opacity: 0, y: 12 }}
@@ -202,7 +202,7 @@ export default function CustomDomains() {
             <TbAlertTriangle size={20} className="text-warning flex-shrink-0 mt-0.5" />
             <div className="min-w-0">
               <p className="font-bold text-sm">{t("pendingBannerTitle")}</p>
-              <p className="text-sm text-dark/60 mt-0.5">{t("pendingBannerDesc")}</p>
+              <p className="text-sm text-dark/70 mt-0.5">{t("pendingBannerDesc")}</p>
             </div>
           </motion.div>
         )}
@@ -210,7 +210,7 @@ export default function CustomDomains() {
 
       {/* Content */}
       {loading ? (
-        <div className="flex items-center justify-center py-16 text-dark/60">
+        <div className="flex items-center justify-center py-16 text-dark/70">
           <TbLoader2 className="animate-spin mr-2" size={20} />
           <span>{t("loading")}</span>
         </div>
@@ -232,7 +232,7 @@ export default function CustomDomains() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0, duration: 0.4, ease: "backOut" }}
-            className="text-sm font-black italic text-dark/50 px-1"
+            className="text-sm font-black italic text-dark/70 px-1"
           >
             {t("myDomains")}
           </motion.p>
@@ -353,11 +353,11 @@ export default function CustomDomains() {
                   </div>
                   <div>
                     <h2 className="text-xl font-black italic">{t("modalStep1Title")}</h2>
-                    <p className="text-sm text-dark/50">{t("modalStep1Desc")}</p>
+                    <p className="text-sm text-dark/70">{t("modalStep1Desc")}</p>
                   </div>
                 </div>
 
-                <p className="text-sm text-dark/60">{t("subdomainNote")}</p>
+                <p className="text-sm text-dark/70">{t("subdomainNote")}</p>
 
                 <input
                   type="text"
@@ -370,7 +370,7 @@ export default function CustomDomains() {
                 />
 
                 <div className="flex justify-between items-center pt-1">
-                  <Button variant="ghost" size="sm" rounded="xl" onClick={closeModal} className="text-dark/50">
+                  <Button variant="ghost" size="sm" rounded="xl" onClick={closeModal} className="text-dark/70">
                     {t("dnsModalClose")}
                   </Button>
                   <Button
@@ -402,26 +402,26 @@ export default function CustomDomains() {
                   </div>
                   <div>
                     <h2 className="text-xl font-black italic">{t("dnsModalTitle")}</h2>
-                    <p className="text-sm text-dark/50 font-mono">{newDomain}</p>
+                    <p className="text-sm text-dark/70 font-mono">{newDomain}</p>
                   </div>
                 </div>
 
-                <p className="text-sm text-dark/60">
+                <p className="text-sm text-dark/70">
                   {t("dnsModalDesc", { domain: newDomain })}
                 </p>
 
                 {/* DNS record table */}
                 <div className="p-4 bg-dark/5 rounded-2xl border border-dashed border-dark/20 font-mono text-sm grid grid-cols-3 gap-4">
                   <div>
-                    <p className="text-dark/60 text-xs mb-1">{t("dnsType")}</p>
+                    <p className="text-dark/70 text-xs mb-1">{t("dnsType")}</p>
                     <p className="font-bold">CNAME</p>
                   </div>
                   <div>
-                    <p className="text-dark/60 text-xs mb-1">{t("dnsName")}</p>
+                    <p className="text-dark/70 text-xs mb-1">{t("dnsName")}</p>
                     <p className="font-bold truncate">{dnsNameLabel}</p>
                   </div>
                   <div>
-                    <p className="text-dark/60 text-xs mb-1">{t("dnsValue")}</p>
+                    <p className="text-dark/70 text-xs mb-1">{t("dnsValue")}</p>
                     <div className="flex items-center gap-1">
                       <p className="font-bold">{CNAME_TARGET}</p>
                       <button
@@ -434,7 +434,7 @@ export default function CustomDomains() {
                   </div>
                 </div>
 
-                <p className="text-xs text-dark/50">{t("dnsModalNote")}</p>
+                <p className="text-xs text-dark/70">{t("dnsModalNote")}</p>
 
                 <div className="flex justify-between items-center pt-1">
                   <Button
@@ -443,7 +443,7 @@ export default function CustomDomains() {
                     rounded="xl"
                     leftIcon={<TbArrowLeft size={16} />}
                     onClick={() => setModalStep(1)}
-                    className="text-dark/50"
+                    className="text-dark/70"
                   >
                     {t("modalBack")}
                   </Button>

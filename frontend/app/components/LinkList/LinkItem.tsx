@@ -1,9 +1,10 @@
 import React, { useEffect, useId, useRef, useState } from 'react'
+import NextLink from 'next/link'
 import { useRouter } from 'next/navigation'
-import { TbClick, TbCopy, TbCircleDashedCheck, TbCircleDashed, TbQrcode, TbSettings, TbShare3, TbTrash, TbFolder } from 'react-icons/tb'
-import { FiCornerDownRight } from "react-icons/fi";
+import { TbCheck, TbClick, TbCopy, TbCircleDashedCheck, TbCircleDashed, TbCornerDownRight, TbDots, TbExternalLink, TbQrcode, TbShare3, TbTrash, TbFolder } from 'react-icons/tb'
 import Button from '@/app/components/ui/Button/Button';
 import Chip from '@/app/components/ui/Chip/Chip';
+import Dropdown, { DropdownItem } from '@/app/components/ui/Dropdown/Dropdown';
 import Modal from '@/app/components/ui/Modal/Modal';
 import { useToast } from '@/app/hooks/useToast';
 import TagChip from '@/app/components/Tags/TagChip';
@@ -23,12 +24,43 @@ export default function LinkItem({ view, data }: LinkItemProps) {
     const t = useTranslations('Dashboard');
     const { deleteLink } = useLinks();
     const router = useRouter();
-    const openLink = () => router.push(`/dashboard/links/${encodeURIComponent(data.shortUrl)}`);
+    const detailHref = `/dashboard/links/${encodeURIComponent(data.shortUrl)}`;
+    const openLink = () => router.push(detailHref);
     const requestedShortUrl = useLinkDrawerStore((s) => s.requestedShortUrl);
     const clearDrawerRequest = useLinkDrawerStore((s) => s.clearRequest);
     const toast = useToast();
 
     const displayUrl = `${data.customDomain ? data.customDomain.domain : 'linkkk.dev/r'}/${data.shortUrl}`;
+    const fullUrl = `https://${displayUrl}`;
+
+    // Copy is the most repeated action in the product: always visible, and it
+    // says so when it worked.
+    const [copied, setCopied] = useState(false);
+    const copiedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+    useEffect(() => () => {
+        if (copiedTimer.current) clearTimeout(copiedTimer.current);
+    }, []);
+
+    const copyLink = async () => {
+        try {
+            await navigator.clipboard.writeText(fullUrl);
+            setCopied(true);
+            toast.success(t('rowCopied'), { description: displayUrl });
+            if (copiedTimer.current) clearTimeout(copiedTimer.current);
+            copiedTimer.current = setTimeout(() => setCopied(false), 2000);
+        } catch {
+            toast.error(t('rowCopyFailed'));
+        }
+    };
+
+    const canShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function';
+    const shareLink = async () => {
+        try {
+            await navigator.share({ url: fullUrl });
+        } catch {
+            // Dismissing the share sheet rejects too; nothing to report.
+        }
+    };
 
     // Deleting breaks every place the link is already used (printed QR codes
     // included), so it always goes through a confirmation that names the link.
@@ -73,61 +105,14 @@ export default function LinkItem({ view, data }: LinkItemProps) {
     if (view === 'details') {
         return (
             <>
-                <div className='relative flex group' onClick={openLink}>
-                    <div className='absolute top-1/2 left-0 opacity-0 grid grid-cols-2 grid-rows-2 items-center transition transform -translate-x-1/2 -translate-y-1/2 scale-0 group-hover:opacity-100 group-hover:scale-90 group-focus-within:opacity-100 group-focus-within:scale-90'>
-                        <Button
-                            variant='ghost'
-                            iconOnly
-                            leftIcon={<TbCopy size={20} />}
-                            rounded='xl'
-                            size='md'
-                            className='text-dark/40 hover:text-info hover:bg-info/10'
-                            aria-label={t('copyLinkLabel', { url: displayUrl })}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                navigator.clipboard.writeText(`https://${displayUrl}`);
-                            }}
-                        />
-                        <Button
-                            variant='ghost'
-                            iconOnly
-                            leftIcon={<TbShare3 size={20} />}
-                            rounded='xl'
-                            size='md'
-                            className='text-dark/40 hover:text-success hover:bg-success/10'
-                        />
-                        <Button
-                            variant='ghost'
-                            iconOnly
-                            leftIcon={<TbSettings size={20} />}
-                            rounded='xl'
-                            size='md'
-                            className='text-dark/40 hover:text-warning hover:bg-warning/10'
-                        />
-                        <Button
-                            variant='ghost'
-                            iconOnly
-                            leftIcon={<TbTrash size={20} />}
-                            rounded='xl'
-                            size='md'
-                            className='text-dark/40 hover:text-danger hover:bg-danger/10'
-                            ref={deleteButtonRef}
-                            aria-label={t('deleteLinkLabel', { url: displayUrl })}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setConfirmingDelete(true);
-                            }}
-                        />
-
-                    </div>
-
-                    <div className='w-full flex flex-col gap-4 items-start justify-between py-2 px-4 bg-dark/5 rounded-2xl transition transform hover:cursor-pointer hover:bg-dark/10 group-hover:translate-x-12 group-focus-within:translate-x-12'>
+                <div className='flex items-stretch bg-dark/5 rounded-2xl transition-colors hover:bg-dark/10 focus-within:bg-dark/10'>
+                    <NextLink href={detailHref} className='flex-1 min-w-0 flex flex-col gap-4 items-start justify-between py-2 pl-4 pr-2 rounded-2xl'>
 
                         <div className='flex flex-col justify-between sm:flex-row gap-2 w-full'>
                             {/* URLs */}
-                            <div className='flex flex-col w-full sm:max-w-1/2 gap-1'>
-                                <div className='flex items-center gap-2'>
-                                    <p className='text-lg italic'>
+                            <div className='flex flex-col w-full sm:max-w-1/2 gap-1 min-w-0'>
+                                <div className='flex flex-wrap items-center gap-2'>
+                                    <p className='text-lg italic break-all'>
                                         {data.customDomain ? data.customDomain.domain : 'linkkk.dev/r'}/<span className='font-bold'>{data.shortUrl}</span>
                                     </p>
                                     {/* Group badge */}
@@ -138,8 +123,8 @@ export default function LinkItem({ view, data }: LinkItemProps) {
                                         </div>
                                     )}
                                 </div>
-                                <div className='flex items-center gap-2 text-dark/50'>
-                                    <FiCornerDownRight size={20} />
+                                <div className='flex items-center gap-2 text-dark/70'>
+                                    <TbCornerDownRight size={20} className='shrink-0' />
                                     <p className='flex-1 truncate'>{data.longUrl}</p>
                                 </div>
                                 {/* Tag chips */}
@@ -172,6 +157,42 @@ export default function LinkItem({ view, data }: LinkItemProps) {
                             </div>
                         </div>
 
+                    </NextLink>
+
+                    {/* Actions sit in a fixed place and never depend on hover, so
+                        they work the same with a finger, a mouse or the keyboard. */}
+                    <div className='flex items-center gap-1 pr-2 shrink-0'>
+                        <Button
+                            variant='ghost'
+                            iconOnly
+                            leftIcon={copied ? <TbCheck size={22} /> : <TbCopy size={22} />}
+                            rounded='xl'
+                            size='md'
+                            className='size-11 hover:bg-dark/10'
+                            aria-label={t('copyLinkLabel', { url: displayUrl })}
+                            onClick={copyLink}
+                        />
+                        <Dropdown
+                            placement='bottom-right'
+                            trigger={
+                                <Button
+                                    variant='ghost'
+                                    iconOnly
+                                    leftIcon={<TbDots size={22} />}
+                                    rounded='xl'
+                                    size='md'
+                                    className='size-11 hover:bg-dark/10'
+                                    ref={deleteButtonRef}
+                                    aria-haspopup='menu'
+                                    aria-label={t('rowActionsLabel', { url: displayUrl })}
+                                />
+                            }
+                            items={[
+                                { label: t('rowOpen'), value: 'open', icon: <TbExternalLink size={18} />, onClick: openLink },
+                                ...(canShare ? [{ label: t('rowShare'), value: 'share', icon: <TbShare3 size={18} />, onClick: shareLink } as DropdownItem] : []),
+                                { label: t('rowDelete'), value: 'delete', icon: <TbTrash size={18} />, separator: true, danger: true, onClick: () => setConfirmingDelete(true) },
+                            ]}
+                        />
                     </div>
                 </div>
 

@@ -25,6 +25,7 @@ import { csrfService } from "@/app/services/api/csrfService";
 import { subscriptionService } from "@/app/services/api/subscriptionService";
 import { userService } from "@/app/services/api/userService";
 import { useTranslations } from 'next-intl';
+import Link from 'next/link';
 import CancelSubscriptionModal from "@/app/components/Modal/CancelSubscriptionModal";
 import { HttpError } from "@/app/utils/errors";
 import LanguageSwitcher from "@/app/components/ui/LanguageSwitcher/LanguageSwitcher";
@@ -73,6 +74,7 @@ export default function SettingsPage() {
   const [email, setEmail] = useState(user?.email || "");
 
   // Security form states
+  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -180,14 +182,22 @@ export default function SettingsPage() {
 
     setLoading(true);
     try {
-      await userService.updateUser({ password: newPassword });
+      await userService.updateUser({
+        password: newPassword,
+        ...(currentPassword ? { currentPassword } : {}),
+      });
 
       toast.success(t('toastPasswordUpdated'));
+      setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
       // No need to update user state for password change
     } catch (error) {
-      if (error instanceof HttpError) {
+      if (error instanceof HttpError && error.code === 'CURRENT_PASSWORD_REQUIRED') {
+        toast.error(t('toastCurrentPasswordRequired'));
+      } else if (error instanceof HttpError && error.code === 'CURRENT_PASSWORD_INVALID') {
+        toast.error(t('toastCurrentPasswordInvalid'));
+      } else if (error instanceof HttpError) {
         toast.error(error.message);
       } else {
         toast.error(t('toastError'));
@@ -413,7 +423,7 @@ export default function SettingsPage() {
                       <div className="flex items-center gap-2 mb-3">
                         {user?.role === 'PRO' ? <TbSparkles size={20} /> : <TbStar size={20} />}
                         <h3 className="text-xl font-bold">{t('plan')}</h3>
-                        <span className={`px-2 py-0.5 text-xs font-black italic rounded-full border border-dark shadow-[2px_2px_0_var(--color-dark)] ${user?.role === 'PRO' ? 'bg-secondary text-light' : 'bg-dark/10 text-dark'}`}>{user?.role === 'PRO' ? 'PRO' : 'STANDARD'}</span>
+                        <span className={`px-2 py-0.5 text-xs font-black italic rounded-full border border-dark shadow-[2px_2px_0_var(--color-dark)] ${user?.role === 'PRO' ? 'bg-secondary text-light' : 'bg-dark/10 text-dark'}`}>{user?.role === 'PRO' ? 'PRO' : t('planFreeName')}</span>
                       </div>
                       {user?.role === 'STANDARD' ? (
                         <Button variant="solid" size="md" rounded="xl" leftIcon={<TbSparkles size={20} />} onClick={handleUpgradeToPro} disabled={loading} className="bg-warning hover:bg-warning/90 text-dark border border-dark hover:shadow-[4px_4px_0_var(--color-dark)] font-bold">
@@ -435,7 +445,7 @@ export default function SettingsPage() {
                                 <div>
                                   <p className="text-sm font-bold text-dark/70 mb-1">{t('renewsOn')}</p>
                                   <p className="text-base font-bold">{new Date(subscriptionInfo.currentPeriodEnd).toLocaleDateString()}</p>
-                                  <p className="text-sm text-dark/60 mt-1">{t('daysUntilRenewal', { days: Math.ceil((new Date(subscriptionInfo.currentPeriodEnd).getTime() - Date.now()) / (1000 * 60 * 60 * 24)) })}</p>
+                                  <p className="text-sm text-dark/70 mt-1">{t('daysUntilRenewal', { days: Math.ceil((new Date(subscriptionInfo.currentPeriodEnd).getTime() - Date.now()) / (1000 * 60 * 60 * 24)) })}</p>
                                 </div>
                               )}
                             </div>
@@ -448,21 +458,21 @@ export default function SettingsPage() {
                     /* Language */
                     <div key="language" className="p-4 bg-dark/5 rounded-2xl">
                       <div className="flex items-center gap-2 mb-3"><h3 className="text-xl font-bold">{t('language')}</h3></div>
-                      <p className="text-sm text-dark/60 mb-3">{t('languageDescription')}</p>
+                      <p className="text-sm text-dark/70 mb-3">{t('languageDescription')}</p>
                       <LanguageSwitcher />
                     </div>,
 
                     /* Feedback (also the way to reach it on mobile) */
                     <div key="feedback" className="p-4 bg-dark/5 rounded-2xl">
                       <div className="flex items-center gap-2 mb-3"><TbMessageCircle size={20} /><h3 className="text-xl font-bold">{tFeedback('navLabel')}</h3></div>
-                      <p className="text-sm text-dark/60 mb-3">{tFeedback('settingsDescription')}</p>
+                      <p className="text-sm text-dark/70 mb-3">{tFeedback('settingsDescription')}</p>
                       <Button variant="outline" size="sm" rounded="xl" leftIcon={<TbMessageCircle size={20} />} onClick={() => setFeedbackOpen(true)} className="mt-3 bg-transparent hover:bg-info hover:text-dark border border-dark">{tFeedback('button')}</Button>
                     </div>,
 
                     /* Logout */
                     <div key="logout" className="p-4 bg-dark/5 rounded-2xl">
                       <div className="flex items-center gap-2 mb-3"><TbLogout size={20} /><h3 className="text-xl font-bold">{t('signOut')}</h3></div>
-                      <p className="text-sm text-dark/60 mb-3">{t('signOutDescription')}</p>
+                      <p className="text-sm text-dark/70 mb-3">{t('signOutDescription')}</p>
                       <Button variant="outline" size="sm" rounded="xl" leftIcon={<TbLogout size={20} />} onClick={handleLogout} className="mt-3 bg-dark text-light hover:bg-danger hover:text-light border border-dark">{t('logout')}</Button>
                     </div>,
                   ].map((block, i) => (
@@ -488,6 +498,24 @@ export default function SettingsPage() {
                     </div>
 
                     <div className="space-y-3">
+                      {/* Current Password */}
+                      <div>
+                        <input
+                          type="password"
+                          value={currentPassword}
+                          onChange={(e) => setCurrentPassword(e.target.value)}
+                          placeholder={t('currentPassword')}
+                          aria-label={t('currentPassword')}
+                          aria-describedby="current-password-hint"
+                          autoComplete="current-password"
+                          className="w-full p-3 bg-dark/5 rounded-xl border-2 border-dashed border-transparent focus:border-dark outline-none transition-colors"
+                        />
+                        <p id="current-password-hint" className="mt-1 text-sm text-dark/70">
+                          {t('currentPasswordHint')}{' '}
+                          <Link href="/auth/forgot-password" className="font-bold underline">{t('forgotPasswordLink')}</Link>
+                        </p>
+                      </div>
+
                       {/* New Password */}
                       <div className="relative">
                         <input
@@ -495,12 +523,14 @@ export default function SettingsPage() {
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
                           placeholder={t('newPassword')}
+                          aria-label={t('newPassword')}
+                          autoComplete="new-password"
                           className="w-full p-3 pr-12 bg-dark/5 rounded-xl border-2 border-dashed border-transparent focus:border-dark outline-none transition-colors"
                         />
                         <button
                           type="button"
                           onClick={() => setShowNewPassword(!showNewPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-dark/60 hover:text-dark"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-dark/70 hover:text-dark"
                         >
                           {showNewPassword ? <TbEyeOff size={20} /> : <TbEye size={20} />}
                         </button>
@@ -513,12 +543,14 @@ export default function SettingsPage() {
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
                           placeholder={t('confirmNewPassword')}
+                          aria-label={t('confirmNewPassword')}
+                          autoComplete="new-password"
                           className="w-full p-3 pr-12 bg-dark/5 rounded-xl border-2 border-dashed border-transparent focus:border-dark outline-none transition-colors"
                         />
                         <button
                           type="button"
                           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-dark/60 hover:text-dark"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-dark/70 hover:text-dark"
                         >
                           {showConfirmPassword ? <TbEyeOff size={20} /> : <TbEye size={20} />}
                         </button>

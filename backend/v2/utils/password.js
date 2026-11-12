@@ -22,7 +22,20 @@ const comparePassword = async (password, hashedPassword) => {
   return await bcryptjs.compare(password, hashedPassword);
 };
 
+/**
+ * Cut-off to store in User.passwordChangedAt when a password changes.
+ * JWT `iat` only has one-second resolution, so the cut-off is the start of
+ * the next second: every token issued up to now is strictly older than it,
+ * including one issued in this same second.
+ * @returns {{ date: Date, seconds: number }}
+ */
+const passwordChangeCutoff = () => {
+  const seconds = Math.floor(Date.now() / 1000) + 1;
+  return { date: new Date(seconds * 1000), seconds };
+};
+
 module.exports = {
   hashPassword,
   comparePassword,
+  passwordChangeCutoff,
 };

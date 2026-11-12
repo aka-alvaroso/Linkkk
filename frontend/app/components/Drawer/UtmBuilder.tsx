@@ -67,7 +67,7 @@ export default function UtmBuilder({ baseUrl, rows, onRowsChange: setRows }: Utm
 
   return (
     <div className='flex flex-col gap-3'>
-      <p className='text-xs text-dark/50'>{t('utmBuilderHint')}</p>
+      <p className='text-xs text-dark/70'>{t('utmBuilderHint')}</p>
 
       <div className='flex flex-col gap-2'>
         {rows.map((row) => {
@@ -143,7 +143,7 @@ export default function UtmBuilder({ baseUrl, rows, onRowsChange: setRows }: Utm
             type='button'
             disabled={atLimit}
             onClick={() => addRow(k)}
-            className='flex items-center gap-1 px-2 py-1 rounded-full bg-dark/5 text-xs text-dark/60 hover:bg-dark/10 hover:text-dark disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed'
+            className='flex items-center gap-1 px-2 py-1 rounded-full bg-dark/5 text-xs text-dark/70 hover:bg-dark/10 hover:text-dark disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed'
           >
             <TbPlus size={12} />
             {k}
@@ -153,7 +153,7 @@ export default function UtmBuilder({ baseUrl, rows, onRowsChange: setRows }: Utm
           type='button'
           disabled={atLimit}
           onClick={() => addRow()}
-          className='flex items-center gap-1 px-2 py-1 rounded-full border border-dashed border-dark/30 text-xs text-dark/60 hover:text-dark hover:border-dark/60 disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed'
+          className='flex items-center gap-1 px-2 py-1 rounded-full border border-dashed border-dark/30 text-xs text-dark/70 hover:text-dark hover:border-dark/60 disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed'
         >
           <TbPlus size={12} />
           {t('utmAddParam')}
@@ -173,7 +173,7 @@ export default function UtmBuilder({ baseUrl, rows, onRowsChange: setRows }: Utm
             variant='ghost'
             size='sm'
             rounded='lg'
-            className='text-dark/50 hover:text-dark/80 flex-shrink-0'
+            className='text-dark/70 hover:text-dark/80 flex-shrink-0'
             onClick={handleCopy}
             aria-label={t('utmBuilderCopy')}
           />

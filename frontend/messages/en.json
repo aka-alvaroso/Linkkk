@@ -114,8 +114,8 @@
       "title": "Start free, scale whenever.",
       "monthly": "Monthly",
       "yearly": "Yearly",
-      "freeLabel": "Guest",
-      "freePrice": "FREE",
+      "freeLabel": "Free",
+      "freePrice": "€0",
       "freeDesc": "Forever, seriously. No card, no account if you don't want one.",
       "includes": "Includes:",
       "freeFeature1": "Up to 50 links",
@@ -191,7 +191,7 @@
     "deleteLinkSuccess": "Link deleted",
     "deleteLinkFailed": "The link could not be deleted",
     "guestAlert": "Your links will be automatically deleted after 7 days. Create an account to keep your links forever and unlock more features!",
-    "subscriptionCancelAlert": "Your PRO plan ends on {date}. Your account will revert to the STANDARD plan in {days} days.",
+    "subscriptionCancelAlert": "Your PRO plan ends on {date}. Your account will revert to the Free plan in {days} days.",
     "totalLinks": "Total links",
     "totalClicks": "Total clicks",
     "activeLinks": "Active links",
@@ -207,7 +207,13 @@
     "createLink": "Create link",
     "active": "Active",
     "inactive": "Inactive",
-    "totalScans": "QR scans"
+    "totalScans": "QR scans",
+    "rowCopied": "Link copied",
+    "rowCopyFailed": "The link could not be copied",
+    "rowActionsLabel": "More actions for {url}",
+    "rowOpen": "View details",
+    "rowShare": "Share",
+    "rowDelete": "Delete"
   },
   "Auth": {
     "home": "Home",
@@ -244,7 +250,8 @@
       "loginFailed": "Login failed",
       "invalidCredentials": "Invalid credentials",
       "noAccount": "Don't have an account?",
-      "signUp": "Sign Up"
+      "signUp": "Sign Up",
+      "forgotPassword": "Forgot your password?"
     },
     "Signup": {
       "emailPlaceholder": "Email",
@@ -280,6 +287,38 @@
       "errorIncorrectPassword": "Incorrect password",
       "errorGeneric": "An error occurred. Please try again.",
       "poweredBy": "Powered by"
+    },
+    "ForgotPassword": {
+      "title": "Recover your password",
+      "description": "Enter your account's email and we'll send you a link to choose a new password.",
+      "emailLabel": "Email",
+      "submit": "Send link",
+      "backToLogin": "Back to log in",
+      "errorInvalidEmail": "Enter a valid email, for example name@domain.com.",
+      "errorTooManyRequests": "Too many attempts. Wait a while and try again.",
+      "errorGeneric": "We couldn't send the request. Check your connection and try again.",
+      "sentTitle": "Check your email",
+      "sentBody": "If there's an account for <b>{email}</b>, we've just sent it a link to reset the password. It expires in 1 hour.",
+      "sentHint": "Not there? Check your spam folder. If you signed up with Google or GitHub, use that account's email."
+    },
+    "ResetPassword": {
+      "title": "Choose a new password",
+      "description": "Saving it will sign you out on all your devices.",
+      "passwordLabel": "New password",
+      "passwordHint": "At least 8 characters, with a letter, a number and a symbol.",
+      "confirmLabel": "Repeat the password",
+      "showPasswords": "Show passwords",
+      "submit": "Save password",
+      "backToLogin": "Back to log in",
+      "errorWeakPassword": "The password needs at least 8 characters, with a letter, a number and a symbol.",
+      "errorMismatch": "The two passwords don't match.",
+      "errorTooManyRequests": "Too many attempts. Wait a while and try again.",
+      "errorGeneric": "We couldn't save the password. Try again.",
+      "invalidTitle": "This link no longer works",
+      "invalidBody": "The password reset link has expired or has already been used. Request a new one and we'll send it right away.",
+      "requestNew": "Request a new link",
+      "successTitle": "Password updated",
+      "successBody": "You can now log in with the new one."
     }
   },
   "CreateLinkDrawer": {
@@ -452,7 +491,8 @@
     "organizeNoGroups": "No groups yet. Create groups from the dashboard.",
     "organizeNoGroup": "None",
     "organizeSave": "Save",
-    "organizeTagsLimit": "Tag limit reached for this link"
+    "organizeTagsLimit": "Tag limit reached for this link",
+    "weekOf": "Week of {date}"
   },
   "FilterModal": {
     "title": "Filter Links",
@@ -518,7 +558,8 @@
     "errorIpRequired": "IP address is required",
     "errorRulePrefix": "Rule {ruleNumber}: {error}",
     "cancel": "Cancel",
-    "save": "Save"
+    "save": "Save",
+    "errorRules": "There was a problem with the rules: {error}"
   },
   "LinkRule": {
     "rule": "Rule",
@@ -626,7 +667,7 @@
     "browser": "Browser",
     "vpn": "VPN",
     "bot": "Bot",
-    "flags": "Flags",
+    "flags": "Traffic",
     "yes": "Yes",
     "no": "No",
     "justNow": "Just now",
@@ -677,7 +718,7 @@
     "renewsOn": "Renews on",
     "daysUntilRenewal": "{days} days until renewal",
     "cancellationNoticeBefore": "Your subscription will be canceled on",
-    "cancellationNoticeAfter": ". After that date, your account will revert to the STANDARD plan.",
+    "cancellationNoticeAfter": ". After that date, your account will revert to the Free plan.",
     "paymentIssue": "There's an issue with your payment. Please update your payment method to maintain PRO access.",
     "manageSubscription": "Manage Subscription",
     "upgradeToPro": "Upgrade to PRO",
@@ -716,7 +757,13 @@
     "toastAccountDeleted": "Account deleted successfully",
     "toastAccountDeleteFailed": "Failed to delete account",
     "toastError": "An error occurred",
-    "tabDomains": "Domains"
+    "tabDomains": "Domains",
+    "planFreeName": "Free",
+    "currentPassword": "Current password",
+    "currentPasswordHint": "If you signed in with Google or GitHub and don't have a password yet, leave it blank.",
+    "forgotPasswordLink": "Forgot it?",
+    "toastCurrentPasswordRequired": "Enter your current password to change it",
+    "toastCurrentPasswordInvalid": "The current password is incorrect"
   },
   "CustomDomains": {
     "title": "Custom Domain",
@@ -780,7 +827,7 @@
     "title": "Access Blocked",
     "restrictedMessage": "Access to {link} has been restricted.",
     "reason": "Reason:",
-    "goToHome": "Go to Home",
+    "goToHome": "Go to home",
     "errorContactOwner": "If you believe this is an error, please contact the link owner.",
     "poweredBy": "Powered by"
   },
@@ -794,7 +841,7 @@
     "title": "Link Disabled",
     "ownerDisabled": "This link has been temporarily disabled by its owner.",
     "infoBox": "The link owner has paused this short link. It may be re-enabled in the future.",
-    "goToHome": "Go to Home",
+    "goToHome": "Go to home",
     "ownerReEnable": "If you're the link owner, you can re-enable it from your dashboard.",
     "poweredBy": "Powered by"
   },
@@ -820,12 +867,13 @@
     "loading": "Loading...",
     "dismissAlert": "Dismiss alert",
     "closeToast": "Close toast",
-    "closeDrawer": "Close drawer"
+    "closeDrawer": "Close drawer",
+    "closeModal": "Close window"
   },
   "CancelSubscriptionModal": {
     "title": "Cancel PRO Subscription",
-    "subtitle": "Switch to STANDARD plan",
-    "warningMessage": "This action will change your account to the STANDARD plan immediately.",
+    "subtitle": "Switch to Free plan",
+    "warningMessage": "This action will change your account to the Free plan immediately.",
     "whatWillHappen": "What will happen:",
     "consequence1": "If you have more than 50 links, the oldest links will be permanently deleted",
     "consequence2": "If you have more than 3 rules per link, excess rules will be permanently deleted",
@@ -894,7 +942,10 @@
       "invalidUrl": "Please enter a valid URL",
       "apply": "Apply",
       "remove": "Remove logo"
-    }
+    },
+    "styleSquare": "Square",
+    "styleRounded": "Rounded",
+    "styleDots": "Dots"
   },
   "LinkMetadataEditor": {
     "enabledLabel": "Custom social preview",
@@ -920,7 +971,8 @@
       "httpsRequired": "Image URL must use HTTPS",
       "invalidUrl": "Please enter a valid URL",
       "apply": "Apply",
-      "remove": "Remove image"
+      "remove": "Remove image",
+      "formats": "PNG, JPG, GIF or WEBP · Max 2 MB · Recommended: 1200 × 630 px"
     },
     "previewLabel": "Preview",
     "previewFallbackTitle": "Your link title will appear here",
@@ -946,7 +998,7 @@
       "previous": "Previous",
       "next": "Next",
       "planGuest": "Guest",
-      "planStandard": "Standard",
+      "planStandard": "Free",
       "planPro": "PRO"
     },
     "gettingStarted": {
@@ -1204,7 +1256,7 @@
       "comparisonTitle": "Comparison",
       "tableColFeature": "Feature",
       "tableColGuest": "Guest",
-      "tableColStandard": "Standard",
+      "tableColStandard": "Free",
       "tableColPro": "PRO",
       "featureLinks": "Links",
       "featureDuration": "Link duration",
@@ -1236,18 +1288,18 @@
       "proAnalytics": "No limit",
       "pricingTitle": "PRO pricing",
       "monthlyLabel": "Monthly",
-      "monthlyPrice": "3.50€",
+      "monthlyPrice": "€3.50",
       "monthlyPer": "/month",
       "annualLabel": "Annual",
-      "annualPrice": "2.90€",
+      "annualPrice": "€2.90",
       "annualPer": "/month",
-      "annualBilled": "34.80€ billed annually",
+      "annualBilled": "€34.80 billed annually",
       "faqTitle": "Frequently asked questions",
       "faq1Q": "What happens if I exceed the limits?",
       "faq1A": "You get a warning. Existing links keep working, we never break active links. You simply won't be able to create new ones until you upgrade.",
       "faq2Q": "Can I cancel PRO at any time?",
-      "faq2A": "Yes. When you cancel, you keep PRO until the end of the paid period. After that you switch to Standard automatically. Your links remain.",
-      "faq3Q": "Can I go from guest to Standard?",
+      "faq2A": "Yes. When you cancel, you keep PRO until the end of the paid period. After that you switch to Free automatically. Your links remain.",
+      "faq3Q": "Can I go from guest to Free?",
       "faq3A": "Yes, you just need to register. Your guest links are migrated to your new account and no longer have an expiration date.",
       "faq4Q": "What payment methods do you accept?",
       "faq4A": "Payment is processed through Stripe. We accept credit/debit cards and other methods depending on your country. Linkkk never stores your card data.",
@@ -1314,7 +1366,7 @@
     "guestFeature2": "7-day link duration",
     "guestFeature3": "Basic QR codes",
     "guestFeature4": "7 days analytics",
-    "standardLabel": "Standard",
+    "standardLabel": "Free",
     "standardPrice": "Free",
     "standardDesc": "More power, still free. Forever.",
     "standardCTA": "Create account",
@@ -1332,12 +1384,20 @@
     "proAnnualNote": "€34.80 billed annually",
     "proDesc": "Unlimited everything. Your own domain.",
     "proCTA": "Go PRO",
-    "proFeature1": "Everything in Standard",
+    "proFeature1": "Everything in Free",
     "proFeature2": "Unlimited links",
     "proFeature3": "Unlimited rules & conditions",
     "proFeature4": "Full analytics history",
     "proFeature5": "Custom domains",
     "proFeature6": "Priority support",
     "docsLink": "Questions? Check the docs"
+  },
+  "PageLinkNotFound": {
+    "title": "Link not found",
+    "description": "The link you're looking for doesn't exist or has been deleted.",
+    "descriptionWithLink": "The short link <b>{link}</b> doesn't exist or has been deleted.",
+    "hint": "Check that the address is typed correctly, or ask whoever sent it for a new link.",
+    "goToHome": "Go to home",
+    "poweredBy": "Powered by"
   }
 }

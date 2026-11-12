@@ -95,6 +95,8 @@ export default function Login() {
                                     type="text"
                                     name="email"
                                     id="email"
+                                    autoComplete="username"
+                                    aria-label={tLogin('emailPlaceholder')}
                                     placeholder={tLogin('emailPlaceholder')}
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
@@ -112,6 +114,8 @@ export default function Login() {
                                     type={showPassword ? "text" : "password"}
                                     name="password"
                                     id="password"
+                                    autoComplete="current-password"
+                                    aria-label={tLogin('passwordPlaceholder')}
                                     placeholder={tLogin('passwordPlaceholder')}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
@@ -120,12 +124,19 @@ export default function Login() {
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-dark/50 hover:text-info hover:cursor-pointer transition-colors"
+                                    className="absolute right-0 top-1/2 -translate-y-1/2 size-11 flex items-center justify-center text-dark/70 hover:text-dark hover:cursor-pointer transition-colors"
                                     title={tLogin('togglePasswordTitle')}
+                                    aria-label={tLogin('togglePasswordTitle')}
+                                    aria-pressed={showPassword}
                                 >
                                     {showPassword ? <TbEyeOff size={20} /> : <TbEye size={20} />}
                                 </button>
                             </motion.div>
+                            <div className="-mt-2 text-right">
+                                <Link href="/auth/forgot-password" className="inline-flex items-center min-h-11 text-sm font-bold underline">
+                                    {tLogin('forgotPassword')}
+                                </Link>
+                            </div>
                             <motion.div
                                 initial={{ opacity: 0, y: -20 }}
                                 animate={{ opacity: 1, y: 0 }}
@@ -139,7 +150,7 @@ export default function Login() {
                                     type="submit"
                                     leftIcon={<TbLogin size={20} />}
                                     expandOnHover="icon"
-                                    className="w-full mt-4 transition-all duration-300 ease-in-out hover:bg-primary hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)]"
+                                    className="w-full transition-all duration-300 ease-in-out hover:bg-primary hover:text-dark hover:shadow-[_4px_4px_0_var(--color-dark)]"
                                 >
                                     <p className="text-xl font-black italic">{tLogin('loginButton')}</p>
                                 </Button>

@@ -120,3 +120,28 @@ body {
   padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
 }
 
+
+/* Keyboard focus. Unlayered on purpose so it wins over the `focus:outline-none`
+   utilities scattered through the app: every focusable element gets the same
+   ring. Fields that already switch to a dark border on focus keep just that. */
+:focus-visible:not(.focus\:border-dark) {
+  outline: 2px solid var(--color-dark);
+  outline-offset: 2px;
+}
+
+.bg-dark :focus-visible,
+.bg-dark\/95 :focus-visible,
+.focus-ring-light :focus-visible,
+.focus-ring-light:focus-visible {
+  outline-color: var(--color-light);
+}
+
+/* Touch devices: iOS Safari zooms the page when a focused field uses a font
+   smaller than 16px. Fields that are already larger are left alone. */
+@media (pointer: coarse) {
+  input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='color']):not(.text-lg):not(.text-xl):not(.text-2xl):not(.text-3xl):not(.text-4xl),
+  textarea:not(.text-lg):not(.text-xl):not(.text-2xl),
+  select:not(.text-lg):not(.text-xl) {
+    font-size: 16px;
+  }
+}

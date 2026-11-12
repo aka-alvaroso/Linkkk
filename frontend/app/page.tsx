@@ -549,7 +549,7 @@ export default function Landing() {
               </Button>
             </div>
 
-            <p className="hero-fade text-xs text-dark/65 mt-4">
+            <p className="hero-fade text-xs text-dark/70 mt-4">
               {t("Hero.note")}
             </p>
           </motion.div>
@@ -608,7 +608,7 @@ export default function Landing() {
                     {t("Problems.slide1Title")}
                   </SplitWords>
                 </p>
-                <p className="font-bold italic text-light/60 text-lg md:text-xl mt-4">
+                <p className="font-bold italic text-light/70 text-lg md:text-xl mt-4">
                   <SplitWords>{t("Problems.slide1Subtitle")}</SplitWords>
                 </p>
               </div>
@@ -641,7 +641,7 @@ export default function Landing() {
                     {t("Problems.slide2Title")}
                   </SplitWords>
                 </p>
-                <p className="font-bold italic text-light/60 text-lg md:text-xl mt-4">
+                <p className="font-bold italic text-light/70 text-lg md:text-xl mt-4">
                   <SplitWords>{t("Problems.slide2Subtitle")}</SplitWords>
                 </p>
               </div>
@@ -667,7 +667,7 @@ export default function Landing() {
                     {t("Problems.slide3Title")}
                   </SplitWords>
                 </p>
-                <p className="font-bold italic text-light/60 text-lg md:text-xl mt-4">
+                <p className="font-bold italic text-light/70 text-lg md:text-xl mt-4">
                   <SplitWords>{t("Problems.slide3Subtitle")}</SplitWords>
                 </p>
               </div>
@@ -693,7 +693,7 @@ export default function Landing() {
                     {t("Problems.slide4Title")}
                   </SplitWords>
                 </p>
-                <p className="font-bold italic text-light/60 text-lg md:text-xl mt-4">
+                <p className="font-bold italic text-light/70 text-lg md:text-xl mt-4">
                   <SplitWords>{t("Problems.slide4Subtitle")}</SplitWords>
                 </p>
               </div>
@@ -894,7 +894,7 @@ export default function Landing() {
           </h2>
 
           {/* Subtitle */}
-          <p className="rules-subtitle text-sm md:text-xl italic font-black text-dark/65 mb-16 md:mb-20 max-w-2xl mx-auto">
+          <p className="rules-subtitle text-sm md:text-xl italic font-black text-dark/70 mb-16 md:mb-20 max-w-2xl mx-auto">
             {t("RulesSection.subtitle")}
           </p>
 
@@ -924,7 +924,7 @@ export default function Landing() {
           </div>
 
           {/* Hint */}
-          <p className="text-sm text-dark/60 italic mt-12">
+          <p className="text-sm text-dark/70 italic mt-12">
             {t("RulesSection.hint")}
           </p>
         </div>
@@ -1043,7 +1043,7 @@ export default function Landing() {
                 className={`px-5 py-2 rounded-full text-sm font-black italic transition-all duration-200 cursor-pointer ${
                   billingPeriod === "monthly"
                     ? "bg-dark text-light shadow-sm"
-                    : "text-dark/60 hover:text-dark"
+                    : "text-dark/70 hover:text-dark"
                 }`}
               >
                 <span className="font-black italic">{t("Pricing.monthly")}</span>
@@ -1053,7 +1053,7 @@ export default function Landing() {
                 className={`px-5 py-2 rounded-full text-sm  transition-all duration-200 cursor-pointer ${
                   billingPeriod === "yearly"
                     ? "bg-dark text-light shadow-sm"
-                    : "text-dark/60 hover:text-dark"
+                    : "text-dark/70 hover:text-dark"
                 }`}
               >
                 <span className="font-black italic">{t("Pricing.yearly")}</span>
@@ -1067,9 +1067,9 @@ export default function Landing() {
             {/* STANDARD / Free */}
             <div className="pricing-card flex-1 max-w-md bg-dark/10 rounded-3xl p-4 flex flex-col justify-between">
               <div>
-                <p className="text-sm md:text-base font-black italic text-dark/65 uppercase tracking-wider mb-1">{t("Pricing.freeLabel")}</p>
+                <p className="text-sm md:text-base font-black italic text-dark/70 uppercase tracking-wider mb-1">{t("Pricing.freeLabel")}</p>
                 <h3 className="text-3xl font-black italic text-dark mb-3">{t("Pricing.freePrice")}</h3>
-                <p className="text-xs md:text-sm text-dark/65 mb-6">
+                <p className="text-xs md:text-sm text-dark/70 mb-6">
                   {t("Pricing.freeDesc")}
                 </p>
 
@@ -1102,12 +1102,12 @@ export default function Landing() {
             {/* PRO */}
             <div className="pricing-card flex-1 max-w-md bg-primary rounded-3xl p-4 flex flex-col justify-between">
               <div>
-                <p className="text-sm md:text-base font-black italic text-dark/65 uppercase tracking-wider mb-1">{t("Pricing.proLabel")}</p>
+                <p className="text-sm md:text-base font-black italic text-dark/70 uppercase tracking-wider mb-1">{t("Pricing.proLabel")}</p>
                 <h3 className="text-3xl font-black italic text-dark mb-3">
                   {billingPeriod === "monthly" ? t("Pricing.proPriceMonthly") : t("Pricing.proPriceYearly")}
-                  <span className="text-lg font-bold text-dark/65 ml-1">{t("Pricing.proPeriod")}</span>
+                  <span className="text-lg font-bold text-dark/70 ml-1">{t("Pricing.proPeriod")}</span>
                 </h3>
-                <p className="text-xs md:text-sm text-dark/65 mb-6">
+                <p className="text-xs md:text-sm text-dark/70 mb-6">
                   {t("Pricing.proDesc")}
                 </p>
 
@@ -1218,12 +1218,12 @@ export default function Landing() {
                 <h3 className="text-lg font-black italic text-light mb-4">{t("Footer.productHeading")}</h3>
                 <ul className="flex flex-col gap-2">
                   <li>
-                    <Link href="/" className="text-sm text-light/60 hover:text-light transition-colors">
+                    <Link href="/" className="text-sm text-light/70 hover:text-light transition-colors">
                       {t("Footer.productLink1")}
                     </Link>
                   </li>
                   <li>
-                    <Link href="/dashboard" className="text-sm text-light/60 hover:text-light transition-colors">
+                    <Link href="/dashboard" className="text-sm text-light/70 hover:text-light transition-colors">
                       {t("Footer.productLink2")}
                     </Link>
                   </li>
@@ -1239,7 +1239,7 @@ export default function Landing() {
                       href="https://github.com/aka-alvaroso/Linkkk"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm text-light/60 hover:text-light transition-colors"
+                      className="text-sm text-light/70 hover:text-light transition-colors"
                     >
                       {t("Footer.resourcesLink1")}
                     </a>
@@ -1253,22 +1253,22 @@ export default function Landing() {
               <h3 className="text-lg font-black italic text-light mb-4">{t("Footer.legalHeading")}</h3>
               <ul className="flex flex-col gap-2">
                 <li>
-                  <Link href="/legal/privacy" className="text-sm text-light/60 hover:text-light transition-colors">
+                  <Link href="/legal/privacy-policy" className="text-sm text-light/70 hover:text-light transition-colors">
                     {t("Footer.legalLink1")}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/legal/terms" className="text-sm text-light/60 hover:text-light transition-colors">
+                  <Link href="/legal/terms-of-service" className="text-sm text-light/70 hover:text-light transition-colors">
                     {t("Footer.legalLink2")}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/legal/cookies" className="text-sm text-light/60 hover:text-light transition-colors">
+                  <Link href="/legal/cookies" className="text-sm text-light/70 hover:text-light transition-colors">
                     {t("Footer.legalLink3")}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/legal/notice" className="text-sm text-light/60 hover:text-light transition-colors">
+                  <Link href="/legal/legal-notice" className="text-sm text-light/70 hover:text-light transition-colors">
                     {t("Footer.legalLink4")}
                   </Link>
                 </li>
@@ -1278,7 +1278,7 @@ export default function Landing() {
 
           {/* Bottom row: credit + language switcher */}
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-xs text-light/50">
+            <p className="text-xs text-light/70">
               {t("Footer.madeWith")}{" "}
               <TbHeartFilled className="inline text-primary align-text-bottom" size={16} />
               {" "}{t("Footer.madeBy")}{" "}

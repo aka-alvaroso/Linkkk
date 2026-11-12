@@ -22,7 +22,7 @@ export default function LinksDoc() {
 
       <motion.div {...fadeUp} transition={s(0)}>
         <h1 className="text-3xl md:text-4xl font-black italic text-dark mb-3">{t("title")}</h1>
-        <p className="text-dark/60 text-sm md:text-base leading-relaxed">{t("subtitle")}</p>
+        <p className="text-dark/70 text-sm md:text-base leading-relaxed">{t("subtitle")}</p>
       </motion.div>
 
       {/* Create a link */}
@@ -46,7 +46,7 @@ export default function LinksDoc() {
         <div className="bg-dark/5 rounded-2xl p-4 font-mono text-sm">
           <p className="font-bold">linkkk.dev/r/<span className="text-primary">my-offer</span></p>
         </div>
-        <p className="text-xs text-dark/60 mt-3 italic">{t("suffixNote")}</p>
+        <p className="text-xs text-dark/70 mt-3 italic">{t("suffixNote")}</p>
       </motion.div>
 
       {/* Link states */}
@@ -58,7 +58,7 @@ export default function LinksDoc() {
               <span className={`shrink-0 w-2.5 h-2.5 rounded-full self-center ${state.color}`} />
               <div>
                 <p className="font-bold text-sm text-dark">{t(state.titleKey)}</p>
-                <p className="text-xs text-dark/60">{t(state.descKey)}</p>
+                <p className="text-xs text-dark/70">{t(state.descKey)}</p>
               </div>
             </div>
           ))}
@@ -78,10 +78,10 @@ export default function LinksDoc() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-dark/10">
-                <th className="text-left py-2 pr-4 font-black italic text-dark/50">{t("tableColPlan")}</th>
-                <th className="text-left py-2 pr-4 font-black italic text-dark/50">{t("tableColLinks")}</th>
-                <th className="text-left py-2 pr-4 font-black italic text-dark/50">{t("tableColDuration")}</th>
-                <th className="text-left py-2 font-black italic text-dark/50">{t("tableColSuffix")}</th>
+                <th className="text-left py-2 pr-4 font-black italic text-dark/70">{t("tableColPlan")}</th>
+                <th className="text-left py-2 pr-4 font-black italic text-dark/70">{t("tableColLinks")}</th>
+                <th className="text-left py-2 pr-4 font-black italic text-dark/70">{t("tableColDuration")}</th>
+                <th className="text-left py-2 font-black italic text-dark/70">{t("tableColSuffix")}</th>
               </tr>
             </thead>
             <tbody>
@@ -120,9 +120,9 @@ export default function LinksDoc() {
         </div>
         <p className="text-sm text-dark/70 leading-relaxed mb-4">{t("customDomainsDesc")}</p>
         <div className="bg-dark/5 rounded-2xl p-4 font-mono text-sm mb-4">
-          <p className="text-dark/60 text-xs mb-1">{t("customDomainsBefore")}</p>
-          <p className="font-bold text-dark/65">linkkk.dev/<span className="text-dark/60">xyz</span></p>
-          <p className="text-dark/60 text-xs mt-3 mb-1">{t("customDomainsWithDomain")}</p>
+          <p className="text-dark/70 text-xs mb-1">{t("customDomainsBefore")}</p>
+          <p className="font-bold text-dark/70">linkkk.dev/<span className="text-dark/70">xyz</span></p>
+          <p className="text-dark/70 text-xs mt-3 mb-1">{t("customDomainsWithDomain")}</p>
           <p className="font-bold">{t("customDomainsExampleDomain")}/<span className="text-primary">xyz</span></p>
         </div>
         <h3 className="font-black italic text-dark mb-3">{t("customDomainsSetupTitle")}</h3>
@@ -134,7 +134,7 @@ export default function LinksDoc() {
             </li>
           ))}
         </ol>
-        <p className="text-xs text-dark/60 mt-4 italic">{t("customDomainsNote")}</p>
+        <p className="text-xs text-dark/70 mt-4 italic">{t("customDomainsNote")}</p>
       </motion.div>
 
       {/* Groups & Tags */}
@@ -144,11 +144,11 @@ export default function LinksDoc() {
         <div className="grid md:grid-cols-2 gap-4">
           <div className="p-4 rounded-2xl border border-dark/10">
             <p className="font-black italic text-dark mb-1">{t("groupsTitle")}</p>
-            <p className="text-sm text-dark/60">{t("groupsDesc")}</p>
+            <p className="text-sm text-dark/70">{t("groupsDesc")}</p>
           </div>
           <div className="p-4 rounded-2xl border border-dark/10">
             <p className="font-black italic text-dark mb-1">{t("tagsTitle")}</p>
-            <p className="text-sm text-dark/60">{t("tagsDesc")}</p>
+            <p className="text-sm text-dark/70">{t("tagsDesc")}</p>
           </div>
         </div>
       </motion.div>
@@ -159,14 +159,14 @@ export default function LinksDoc() {
           className="flex items-center gap-2 p-4 rounded-xl bg-dark/5 hover:bg-dark/10 transition-colors group">
           <TbArrowLeft size={18} className="text-dark/30 group-hover:text-dark group-hover:-translate-x-1 transition-all" />
           <div>
-            <p className="text-xs text-dark/60">{ts("previous")}</p>
+            <p className="text-xs text-dark/70">{ts("previous")}</p>
             <p className="font-black italic text-sm text-dark">{t("navPrevTitle")}</p>
           </div>
         </Link>
         <Link href="/docs/rules"
           className="flex items-center gap-2 p-4 rounded-xl bg-dark/5 hover:bg-dark/10 transition-colors group text-right">
           <div>
-            <p className="text-xs text-dark/60">{ts("next")}</p>
+            <p className="text-xs text-dark/70">{ts("next")}</p>
             <p className="font-black italic text-sm text-dark">{t("navNextTitle")}</p>
           </div>
           <TbArrowRight size={18} className="text-dark/30 group-hover:text-dark group-hover:translate-x-1 transition-all" />

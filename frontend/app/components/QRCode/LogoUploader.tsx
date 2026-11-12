@@ -168,7 +168,7 @@ export default function LogoUploader({
             'flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg text-sm font-medium transition-all',
             activeTab === 'upload'
               ? 'bg-white text-dark shadow-sm'
-              : 'text-dark/50 hover:text-dark/70'
+              : 'text-dark/70 hover:text-dark/70'
           )}
         >
           <TbUpload size={18} />
@@ -181,7 +181,7 @@ export default function LogoUploader({
             'flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg text-sm font-medium transition-all',
             activeTab === 'url'
               ? 'bg-white text-dark shadow-sm'
-              : 'text-dark/50 hover:text-dark/70'
+              : 'text-dark/70 hover:text-dark/70'
           )}
         >
           <TbLink size={18} />
@@ -223,7 +223,7 @@ export default function LogoUploader({
                 className="w-20 h-20 object-contain rounded-lg"
               />
               {isUploading && (
-                <div className="flex items-center gap-2 text-sm text-dark/50">
+                <div className="flex items-center gap-2 text-sm text-dark/70">
                   <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                   {t('logoUpload.uploading')}
                 </div>
@@ -238,7 +238,7 @@ export default function LogoUploader({
                 <p className="text-sm font-medium text-dark/70">
                   {t('logoUpload.dragDrop')}
                 </p>
-                <p className="text-xs text-dark/50 mt-1">
+                <p className="text-xs text-dark/70 mt-1">
                   {t('logoUpload.or')}{' '}
                   <button
                     type="button"
@@ -249,7 +249,7 @@ export default function LogoUploader({
                   </button>
                 </p>
               </div>
-              <p className="text-xs text-dark/60">
+              <p className="text-xs text-dark/70">
                 PNG, JPG, GIF, WEBP - Max 2MB - Min 150x150px
               </p>
             </div>
@@ -287,7 +287,7 @@ export default function LogoUploader({
               {t('logoUpload.apply')}
             </Button>
           </motion.div>
-          <p className="text-xs text-dark/50">{t('logoUrlHint')}</p>
+          <p className="text-xs text-dark/70">{t('logoUrlHint')}</p>
         </div>
       )}
 
@@ -329,7 +329,7 @@ export default function LogoUploader({
             className="p-2 hover:bg-dark/10 rounded-lg transition-colors"
             title={t('logoUpload.remove')}
           >
-            <TbX size={18} className="text-dark/50" />
+            <TbX size={18} className="text-dark/70" />
           </motion.button>
         </div>
       )}

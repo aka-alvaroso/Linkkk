@@ -11,7 +11,7 @@ export default function CookiePolicy() {
                 <h1 className="text-4xl md:text-5xl font-black italic mb-8">Política de Cookies</h1>
                 <div className="bg-light border-l-4 border-dark/20 p-4 mb-8 rounded-r-xl">
                     <p className="font-bold italic m-0 text-dark/80">
-                        Última actualización: {new Date().toLocaleDateString('es-ES')}
+                        Última actualización: 25/12/2025
                     </p>
                 </div>
 
@@ -45,17 +45,17 @@ export default function CookiePolicy() {
                             <tr className="border-b border-dashed border-dark/10 hover:bg-light/50 transition-colors">
                                 <td className="p-4 font-mono font-bold text-dark">NEXT_LOCALE</td>
                                 <td className="p-4">Almacena la preferencia de idioma del usuario.</td>
-                                <td className="p-4 text-center bg-gray-50 font-bold text-dark/60">1 año</td>
+                                <td className="p-4 text-center bg-gray-50 font-bold text-dark/70">1 año</td>
                             </tr>
                             <tr className="border-b border-dashed border-dark/10 hover:bg-light/50 transition-colors">
                                 <td className="p-4 font-mono font-bold text-dark">token</td>
                                 <td className="p-4">Gestiona la sesión del usuario autenticado registrado.</td>
-                                <td className="p-4 text-center bg-gray-50 font-bold text-dark/60">7 días</td>
+                                <td className="p-4 text-center bg-gray-50 font-bold text-dark/70">7 días</td>
                             </tr>
                             <tr className="hover:bg-light/50 transition-colors">
                                 <td className="p-4 font-mono font-bold text-dark">guestToken</td>
                                 <td className="p-4">Gestiona la sesión del usuario invitado (no registrado).</td>
-                                <td className="p-4 text-center bg-gray-50 font-bold text-dark/60">7 días</td>
+                                <td className="p-4 text-center bg-gray-50 font-bold text-dark/70">7 días</td>
                             </tr>
                         </tbody>
                     </table>
@@ -83,7 +83,7 @@ export default function CookiePolicy() {
             <h1 className="text-4xl md:text-5xl font-black italic mb-8">Cookie Policy</h1>
             <div className="bg-light border-l-4 border-dark/20 p-4 mb-8 rounded-r-xl">
                 <p className="font-bold italic m-0 text-dark/80">
-                    Last updated: {new Date().toLocaleDateString('en-US')}
+                    Last updated: December 25, 2025
                 </p>
             </div>
 
@@ -117,17 +117,17 @@ export default function CookiePolicy() {
                         <tr className="border-b border-dashed border-dark/10 hover:bg-light/50 transition-colors">
                             <td className="p-4 font-mono font-bold text-dark">NEXT_LOCALE</td>
                             <td className="p-4">Stores the user&apos;s language preference.</td>
-                            <td className="p-4 text-center bg-gray-50 font-bold text-dark/60">1 year</td>
+                            <td className="p-4 text-center bg-gray-50 font-bold text-dark/70">1 year</td>
                         </tr>
                         <tr className="border-b border-dashed border-dark/10 hover:bg-light/50 transition-colors">
                             <td className="p-4 font-mono font-bold text-dark">token</td>
                             <td className="p-4">Manages the session for authenticated registered users.</td>
-                            <td className="p-4 text-center bg-gray-50 font-bold text-dark/60">7 days</td>
+                            <td className="p-4 text-center bg-gray-50 font-bold text-dark/70">7 days</td>
                         </tr>
                         <tr className="hover:bg-light/50 transition-colors">
                             <td className="p-4 font-mono font-bold text-dark">guestToken</td>
                             <td className="p-4">Manages the session for guest users (non-registered).</td>
-                            <td className="p-4 text-center bg-gray-50 font-bold text-dark/60">7 days</td>
+                            <td className="p-4 text-center bg-gray-50 font-bold text-dark/70">7 days</td>
                         </tr>
                     </tbody>
                 </table>

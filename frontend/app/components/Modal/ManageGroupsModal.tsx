@@ -79,7 +79,7 @@ export default function ManageGroupsModal({ open, onClose }: ManageGroupsModalPr
             transition={{ delay: 0.05, ease: "backInOut" }}
             className="flex flex-col gap-2"
           >
-            <p className="text-sm font-semibold text-dark/60">{t("newGroup")}</p>
+            <p className="text-sm font-semibold text-dark/70">{t("newGroup")}</p>
             <div className="flex gap-2 items-center">
               <Input
                 value={newName}
@@ -121,10 +121,10 @@ export default function ManageGroupsModal({ open, onClose }: ManageGroupsModalPr
         <div className="max-h-72 overflow-y-auto overflow-x-hidden scrollbar-hide">
           <div className="flex flex-col gap-2">
             {isLoading && groups.length === 0 && (
-              <p className="text-sm text-dark/60">{t("loading")}</p>
+              <p className="text-sm text-dark/70">{t("loading")}</p>
             )}
             {!isLoading && groups.length === 0 && (
-              <p className="text-sm text-dark/60 text-center py-4">{t("empty")}</p>
+              <p className="text-sm text-dark/70 text-center py-4">{t("empty")}</p>
             )}
             <AnimatePresence mode="popLayout">
               {groups.map((group, i) => (
@@ -183,11 +183,11 @@ export default function ManageGroupsModal({ open, onClose }: ManageGroupsModalPr
                           style={{ backgroundColor: group.color ?? "#6b7280" }}
                         />
                         <span className="font-medium text-sm flex-1 truncate text-left">{group.name}</span>
-                        <span className="text-xs text-dark/60">{group._count?.links ?? 0} links</span>
+                        <span className="text-xs text-dark/70">{group._count?.links ?? 0} links</span>
                         {/* Gear — expands on hover */}
                         <span className="grid grid-cols-[0fr] group-hover:grid-cols-[1fr] transition-[grid-template-columns] duration-200 ease-out overflow-hidden">
                           <span className="overflow-hidden flex items-center justify-end">
-                            <TbSettings size={15} className="text-dark/30 group-hover:text-dark/60 transition-colors shrink-0 mr-0.5" />
+                            <TbSettings size={15} className="text-dark/30 group-hover:text-dark/70 transition-colors shrink-0 mr-0.5" />
                           </span>
                         </span>
                       </motion.button>

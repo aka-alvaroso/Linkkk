@@ -16,8 +16,7 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
     const id = `toast-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const newToast: ToastData = {
       ...toast,
-      id,
-      duration: toast.duration || 4000
+      id
     };
 
     setToasts((prev) => [...prev, newToast]);

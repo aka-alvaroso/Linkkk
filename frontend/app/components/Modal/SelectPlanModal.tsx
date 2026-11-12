@@ -52,7 +52,7 @@ export default function SelectPlanModal({
             </div>
             <div>
               <h2 className="text-2xl font-black italic">{t('title')}</h2>
-              <p className="text-sm text-dark/60">{t('subtitle')}</p>
+              <p className="text-sm text-dark/70">{t('subtitle')}</p>
             </div>
           </div>
           {!loading && (
@@ -99,7 +99,7 @@ export default function SelectPlanModal({
                 <span className="text-3xl font-black italic text-dark">
                   {t('monthlyPrice')}
                 </span>
-                <span className="text-base text-dark/60">
+                <span className="text-base text-dark/70">
                   {t('monthlyPeriod')}
                 </span>
               </div>
@@ -145,7 +145,7 @@ export default function SelectPlanModal({
                   <span className="text-3xl font-black italic text-dark">
                     {t('yearlyPrice')}
                   </span>
-                  <span className="text-base text-dark/60">
+                  <span className="text-base text-dark/70">
                     {t('yearlyPeriod')}
                   </span>
                 </div>

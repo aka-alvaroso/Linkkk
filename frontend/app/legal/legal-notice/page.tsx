@@ -11,7 +11,7 @@ export default function LegalNotice() {
                 <h1 className="text-4xl md:text-5xl font-black italic mb-8">Aviso Legal</h1>
                 <div className="bg-light border-l-4 border-dark/20 p-4 mb-8 rounded-r-xl">
                     <p className="font-bold italic m-0 text-dark/80">
-                        Última actualización: {new Date().toLocaleDateString('es-ES')}
+                        Última actualización: 25/12/2025
                     </p>
                 </div>
 
@@ -70,7 +70,7 @@ export default function LegalNotice() {
             <h1 className="text-4xl md:text-5xl font-black italic mb-8">Legal Notice</h1>
             <div className="bg-light border-l-4 border-dark/20 p-4 mb-8 rounded-r-xl">
                 <p className="font-bold italic m-0 text-dark/80">
-                    Last updated: {new Date().toLocaleDateString('en-US')}
+                    Last updated: December 25, 2025
                 </p>
             </div>
 

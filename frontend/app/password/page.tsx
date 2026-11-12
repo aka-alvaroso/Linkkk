@@ -70,7 +70,7 @@ export default function PasswordPage() {
   };
 
   return (
-    <RouteGuard type="public" title="Password Protected Link - Linkkk">
+    <RouteGuard type="public" title={`${t('title')} - Linkkk`}>
       <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-primary/5 via-light to-info/5">
         <motion.div
           initial={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -138,7 +138,7 @@ export default function PasswordPage() {
                 className="flex items-center gap-2 justify-center"
               >
                 <TbKey size={14} className='text-dark/40' />
-                <p className="text-xs text-dark/65 italic">{hint}</p>
+                <p className="text-xs text-dark/70 italic">{hint}</p>
               </motion.div>
             )}
 
@@ -189,7 +189,7 @@ export default function PasswordPage() {
             transition={{ delay: 0.7, duration: 0.3 }}
             className="mt-4 pt-6 text-center"
           >
-            <Link href="/" className="text-sm text-dark/65">
+            <Link href="/" className="text-sm text-dark/70">
               {t('poweredBy')} <span className="font-black italic">Linkkk.</span>
             </Link>
           </motion.div>

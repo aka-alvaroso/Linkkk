@@ -9,6 +9,9 @@ const {
   guestLimiter,
   oauthLimiter,
   feedbackLimiter,
+  forgotPasswordLimiter,
+  forgotPasswordEmailLimiter,
+  resetPasswordLimiter,
 } = require("../middlewares/security");
 const {
   validateSession,
@@ -22,6 +25,8 @@ const {
   githubCallback,
   linkOAuthAccount,
   sendFeedback,
+  forgotPassword,
+  resetPassword,
 } = require("../controllers/auth");
 
 router.get("/validate", validateLimiter, optionalAuth, validateSession);
@@ -30,6 +35,15 @@ router.post("/logout", authLimiter, auth, logout);
 router.post("/guest", guestLimiter, createGuestSession);
 router.post("/register", registerLimiter, optionalGuest, register);
 router.post("/login", loginLimiter, optionalGuest, login);
+
+// Password recovery
+router.post(
+  "/forgot-password",
+  forgotPasswordLimiter,
+  forgotPasswordEmailLimiter,
+  forgotPassword
+);
+router.post("/reset-password", resetPasswordLimiter, resetPassword);
 
 // OAuth routes
 router.get("/oauth/google", oauthLimiter, googleAuth);
