@@ -73,7 +73,7 @@ export default function DocsLayout({
     <div className="min-h-screen bg-light text-dark">
       <Navigation />
 
-      <div className="w-full md:max-w-3/4 mx-auto px-4 md:px-8 pt-24 md:pt-32 pb-20">
+      <div className="w-full md:max-w-3/4 mx-auto px-4 md:px-8 pt-8 md:pt-32 pb-20">
         {/* Mobile sidebar toggle */}
         <motion.button
           initial={{ opacity: 0, y: -8 }}
@@ -108,7 +108,7 @@ export default function DocsLayout({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.05, duration: 0.4 }}
-              className="text-xs font-black italic text-dark/60 uppercase tracking-wider mb-4 px-4"
+              className="text-xs font-black italic text-dark/70 uppercase tracking-wider mb-4 px-4"
             >
               {t("documents")}
             </motion.p>

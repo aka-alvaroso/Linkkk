@@ -23,8 +23,25 @@ model User {
   groups        Group[]
   tags          Tag[]
   customDomains CustomDomain[]
+  // Sessions issued before this moment are rejected (set on password change/reset)
+  passwordChangedAt   DateTime?
+  passwordResetTokens PasswordResetToken[]
 
   @@unique([oauthProvider, oauthId])
+}
+
+// Single-use password reset tokens. Only the SHA-256 hash is stored, so a
+// database leak does not expose usable reset links.
+model PasswordResetToken {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
 }
 
 model GuestSession {

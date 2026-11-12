@@ -457,7 +457,7 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
         <div className='flex items-center gap-2'>
           <TbRocket size={22} />
           <span className='text-xl font-black italic'>{t('linkRules')}</span>
-          <span className='text-xs text-dark/50'>
+          <span className='text-xs text-dark/70'>
             ({localRules.length}/{limits.rulesPerLink ?? '∞'})
           </span>
         </div>
@@ -465,12 +465,12 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
 
       {/* Error Message */}
       {error && (
-        <div className="p-4 bg-danger/10 border border-danger/20 rounded-2xl">
-          <div className="flex items-center gap-2 text-danger text-sm">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div role="alert" className="p-4 bg-danger/10 border border-danger rounded-2xl">
+          <div className="flex items-center gap-2 text-dark text-sm">
+            <svg className="w-5 h-5 shrink-0 text-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span>{t('errorLoading', { error })}</span>
+            <span>{t('errorRules', { error })}</span>
           </div>
         </div>
       )}
@@ -531,7 +531,7 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.15, duration: 0.3, ease: 'easeOut' }}
-            className='text-xs text-dark/50 text-center'
+            className='text-xs text-dark/70 text-center'
           >
             {t('rulesEvaluationNote')}
           </motion.p>
@@ -566,7 +566,7 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.15, duration: 0.3, ease: 'easeOut' }}
-            className='text-xs text-dark/50 text-center'
+            className='text-xs text-dark/70 text-center'
           >
             {t('rulesEvaluationNote')}
           </motion.p>

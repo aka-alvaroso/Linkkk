@@ -36,7 +36,7 @@ export default function RulesDoc() {
 
       <motion.div {...fadeUp} transition={s(0)}>
         <h1 className="text-3xl md:text-4xl font-black italic text-dark mb-3">{t("title")}</h1>
-        <p className="text-dark/60 text-sm md:text-base leading-relaxed">{t("subtitle")}</p>
+        <p className="text-dark/70 text-sm md:text-base leading-relaxed">{t("subtitle")}</p>
       </motion.div>
 
       {/* How rules work */}
@@ -65,7 +65,7 @@ export default function RulesDoc() {
                   <span className="text-dark font-black italic mr-2">{t(c.nameKey)}:</span>
                   {t(c.descKey)}
                 </p>
-                <p className="text-xs text-dark/60 mt-1">{t("conditionOperatorsLabel")}: {t(c.opsKey)}</p>
+                <p className="text-xs text-dark/70 mt-1">{t("conditionOperatorsLabel")}: {t(c.opsKey)}</p>
               </div>
             </div>
           ))}
@@ -79,11 +79,11 @@ export default function RulesDoc() {
         <div className="grid md:grid-cols-2 gap-4">
           <div className="bg-primary/10 rounded-2xl p-4">
             <p className="font-black italic text-dark mb-1">{t("logicAndTitle")}</p>
-            <p className="text-sm text-dark/60">{t("logicAndDesc")}</p>
+            <p className="text-sm text-dark/70">{t("logicAndDesc")}</p>
           </div>
           <div className="bg-warning/10 rounded-2xl p-4">
             <p className="font-black italic text-dark mb-1">{t("logicOrTitle")}</p>
-            <p className="text-sm text-dark/60">{t("logicOrDesc")}</p>
+            <p className="text-sm text-dark/70">{t("logicOrDesc")}</p>
           </div>
         </div>
       </motion.div>
@@ -111,17 +111,17 @@ export default function RulesDoc() {
         <h2 className="text-xl font-black italic text-dark mb-3">{t("queryParamsTitle")}</h2>
         <p className="text-sm text-dark/70 leading-relaxed mb-4">{t("queryParamsDesc")}</p>
         <div className="bg-dark/5 rounded-2xl p-4 font-mono text-sm mb-4">
-          <p className="text-dark/60 text-xs mb-1">e.g.</p>
+          <p className="text-dark/70 text-xs mb-1">e.g.</p>
           <p className="font-bold text-dark/70 break-all">{t("queryParamsExample")}</p>
         </div>
         <div className="grid md:grid-cols-2 gap-4">
           <div className="p-4 rounded-2xl border border-dark/10">
             <p className="font-black italic text-dark mb-1">{t("queryParamsWebhookLabel")}</p>
-            <p className="text-sm text-dark/60">{t("queryParamsWebhookDesc")}</p>
+            <p className="text-sm text-dark/70">{t("queryParamsWebhookDesc")}</p>
           </div>
           <div className="p-4 rounded-2xl border border-dark/10">
             <p className="font-black italic text-dark mb-1">{t("queryParamsEmailLabel")}</p>
-            <p className="text-sm text-dark/60">{t("queryParamsEmailDesc")}</p>
+            <p className="text-sm text-dark/70">{t("queryParamsEmailDesc")}</p>
           </div>
         </div>
       </motion.div>
@@ -139,9 +139,9 @@ export default function RulesDoc() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-dark/10">
-                <th className="text-left py-2 pr-4 font-black italic text-dark/50">{t("tableColPlan")}</th>
-                <th className="text-left py-2 pr-4 font-black italic text-dark/50">{t("tableColRules")}</th>
-                <th className="text-left py-2 font-black italic text-dark/50">{t("tableColConditions")}</th>
+                <th className="text-left py-2 pr-4 font-black italic text-dark/70">{t("tableColPlan")}</th>
+                <th className="text-left py-2 pr-4 font-black italic text-dark/70">{t("tableColRules")}</th>
+                <th className="text-left py-2 font-black italic text-dark/70">{t("tableColConditions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -171,14 +171,14 @@ export default function RulesDoc() {
           className="flex items-center gap-2 p-4 rounded-xl bg-dark/5 hover:bg-dark/10 transition-colors group">
           <TbArrowLeft size={18} className="text-dark/30 group-hover:text-dark group-hover:-translate-x-1 transition-all" />
           <div>
-            <p className="text-xs text-dark/60">{ts("previous")}</p>
+            <p className="text-xs text-dark/70">{ts("previous")}</p>
             <p className="font-black italic text-sm text-dark">{t("navPrevTitle")}</p>
           </div>
         </Link>
         <Link href="/docs/analytics"
           className="flex items-center gap-2 p-4 rounded-xl bg-dark/5 hover:bg-dark/10 transition-colors group text-right">
           <div>
-            <p className="text-xs text-dark/60">{ts("next")}</p>
+            <p className="text-xs text-dark/70">{ts("next")}</p>
             <p className="font-black italic text-sm text-dark">{t("navNextTitle")}</p>
           </div>
           <TbArrowRight size={18} className="text-dark/30 group-hover:text-dark group-hover:translate-x-1 transition-all" />

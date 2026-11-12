@@ -74,6 +74,8 @@ const updateUserSchema = z.object({
       "Password must contain at least one letter, one number, and one special character"
     )
     .optional(),
+  // Required by the controller whenever `password` changes on an account that already has one
+  currentPassword: z.string().max(128).optional(),
   avatarUrl: z
     .string()
     .url()

@@ -81,7 +81,7 @@ export default function ManageTagsModal({ open, onClose }: ManageTagsModalProps)
             transition={{ delay: 0.05, ease: "backInOut" }}
             className="flex flex-col gap-2"
           >
-            <p className="text-sm font-semibold text-dark/60">{t("newTag")}</p>
+            <p className="text-sm font-semibold text-dark/70">{t("newTag")}</p>
             <div className="flex gap-2 items-center">
               <Input
                 value={newName}
@@ -112,7 +112,7 @@ export default function ManageTagsModal({ open, onClose }: ManageTagsModalProps)
               ))}
             </div>
             {newName && (
-              <div className="flex items-center gap-2 text-sm text-dark/50">
+              <div className="flex items-center gap-2 text-sm text-dark/70">
                 <span>{t("preview")}:</span>
                 <TagChip tag={{ id: 0, userId: 0, name: newName, color: newColor, createdAt: "" }} size="sm" variant="solid" />
               </div>
@@ -129,9 +129,9 @@ export default function ManageTagsModal({ open, onClose }: ManageTagsModalProps)
         {/* Tag list */}
         <div className="max-h-72 overflow-y-auto overflow-x-hidden scrollbar-hide">
           <div className={`flex flex-wrap gap-2 ${editingId === null ? 'py-2 px-1' : ''}`}>
-          {isLoading && tags.length === 0 && <p className="text-sm text-dark/60">{t("loading")}</p>}
+          {isLoading && tags.length === 0 && <p className="text-sm text-dark/70">{t("loading")}</p>}
           {!isLoading && tags.length === 0 && (
-            <p className="text-sm text-dark/60 text-center py-4 w-full">{t("empty")}</p>
+            <p className="text-sm text-dark/70 text-center py-4 w-full">{t("empty")}</p>
           )}
           <AnimatePresence mode="popLayout">
             {tags.map((tag, i) => (

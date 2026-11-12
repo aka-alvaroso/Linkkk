@@ -1,13 +1,16 @@
 const prisma = require("../prisma/client");
 const { updateUserSchema } = require("../validators/user");
 const bcryptjs = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const config = require("../config/environment");
+const { passwordChangeCutoff } = require("../utils/password");
 
 const { successResponse, errorResponse } = require("../utils/response");
 const ERRORS = require("../constants/errorCodes");
 
 const updateUser = async (req, res) => {
   const user = req.user;
-  const { email, username, password } = req.body;
+  const { email, username, password, currentPassword } = req.body;
 
   const validate = updateUserSchema.safeParse(req.body);
 
@@ -23,14 +26,37 @@ const updateUser = async (req, res) => {
   }
 
   try {
+    let passwordCutoff = null;
+
     // SECURITY: Explicitly build update object with only allowed fields (prevents Mass Assignment)
     const updateData = {};
 
     if (email !== undefined) updateData.email = validate.data.email;
     if (username !== undefined) updateData.username = validate.data.username;
     if (password !== undefined) {
+      // SECURITY: changing the password requires knowing the current one, so
+      // an unattended open session is not enough to take the account over.
+      // Accounts created through OAuth have no password yet and may set one.
+      const stored = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: { password: true },
+      });
+
+      if (stored?.password) {
+        if (!currentPassword) {
+          return errorResponse(res, ERRORS.CURRENT_PASSWORD_REQUIRED);
+        }
+        const matches = await bcryptjs.compare(currentPassword, stored.password);
+        if (!matches) {
+          return errorResponse(res, ERRORS.CURRENT_PASSWORD_INVALID);
+        }
+      }
+
       // SECURITY: Use bcrypt with 12 rounds (OWASP recommendation)
       updateData.password = await bcryptjs.hash(validate.data.password, 12);
+      // Signs out every other session (see middlewares/auth.js)
+      passwordCutoff = passwordChangeCutoff();
+      updateData.passwordChangedAt = passwordCutoff.date;
     }
 
     const updatedUser = await prisma.user.update({
@@ -46,6 +72,24 @@ const updateUser = async (req, res) => {
         // Don't return password or apiKey
       },
     });
+
+    if (passwordCutoff) {
+      // Keep this browser signed in: its old token is no longer accepted.
+      // `iat` is set to the cut-off itself so the new token is not older than it.
+      const token = jwt.sign({ id: user.id, iat: passwordCutoff.seconds }, config.security.jwt.authSecret, {
+        expiresIn: config.security.jwt.authExpiresIn,
+        algorithm: "HS256",
+        issuer: "linkkk-api",
+        audience: "linkkk-users",
+      });
+
+      res.cookie("token", token, {
+        maxAge: config.security.cookies.authMaxAge,
+        httpOnly: config.security.cookies.httpOnly,
+        secure: config.security.cookies.secure,
+        sameSite: config.security.cookies.sameSite,
+      });
+    }
 
     return successResponse(res, updatedUser);
   } catch (error) {

@@ -1,4 +1,4 @@
-import React, { InputHTMLAttributes, TextareaHTMLAttributes, ReactNode } from 'react';
+import React, { InputHTMLAttributes, TextareaHTMLAttributes, ReactNode, useId } from 'react';
 import { cn } from '@/app/utils/cn';
 
 interface BaseInputProps {
@@ -55,13 +55,15 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
     },
     ref
   ) => {
-    const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
+    const generatedId = useId();
+    const inputId = id || generatedId;
     const hasError = Boolean(error);
 
     const commonClasses = cn(
-      'block w-full bg-dark/5 border border-transparent disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none',
+      'block w-full bg-dark/5 border border-transparent disabled:opacity-50 disabled:cursor-not-allowed focus:border-dark focus:outline-none',
       sizeStyles[size],
       roundedStyles[rounded],
+      hasError && 'border-danger',
       leftIcon ? 'pl-10' : '',
       rightIcon ? 'pr-10' : '',
       className
@@ -70,7 +72,7 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
     return (
       <div className="w-full">
         {label && (
-          <label htmlFor={inputId} className="block mb-1 text-gray-700">
+          <label htmlFor={inputId} className="block mb-1 text-sm font-medium text-dark">
             {label}
           </label>
         )}
@@ -92,12 +94,12 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
           {rightIcon && <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">{rightIcon}</div>}
         </div>
         {description && !hasError && (
-          <p id={`${inputId}-desc`} className="mt-1 text-xs text-gray-500">
+          <p id={`${inputId}-desc`} className="mt-1 text-sm text-dark/70">
             {description}
           </p>
         )}
         {hasError && (
-          <p id={`${inputId}-error`} className="mt-1 text-xs text-red-600">
+          <p id={`${inputId}-error`} role="alert" className="mt-1 text-sm font-medium text-dark flex items-center gap-1.5 before:content-[''] before:size-2 before:rounded-full before:bg-danger before:shrink-0">
             {error}
           </p>
         )}

@@ -224,25 +224,18 @@ export function LinkRule({ rule, priority, onChange, onDelete, maxConditions, is
         ) : (
           <div className='flex items-center gap-1.5 flex-1 min-w-0'>
             <span className="font-black italic text-dark truncate">{displayName}</span>
-            <button onClick={startEditingName} className='text-dark/30 hover:text-dark/60 flex-shrink-0'>
+            <button onClick={startEditingName} className='text-dark/30 hover:text-dark/70 flex-shrink-0'>
               <TbPencil size={13} />
             </button>
           </div>
         )}
-        <motion.div
-          animate={{ rotate: isExpanded ? 180 : 0 }}
-          transition={{ duration: 0.2 }}
-          className="text-dark/30 flex-shrink-0"
-        >
-          <TbChevronDown size={20} />
-        </motion.div>
       </div>
       <div className="flex items-center gap-3">
         {/* Drag Handle */}
         <button
           {...dragHandleProps}
           onClick={(e) => e.stopPropagation()}
-          className="cursor-grab active:cursor-grabbing text-dark/30 hover:text-dark/50 transition-colors flex-shrink-0"
+          className="cursor-grab active:cursor-grabbing text-dark/30 hover:text-dark/70 transition-colors flex-shrink-0"
         >
           <TbGripVertical size={20} />
         </button>
@@ -269,7 +262,7 @@ export function LinkRule({ rule, priority, onChange, onDelete, maxConditions, is
                 <span className="font-black italic text-dark truncate">{displayName}</span>
                 <button
                   onClick={startEditingName}
-                  className='text-dark/30 hover:text-dark/60 flex-shrink-0'
+                  className='text-dark/30 hover:text-dark/70 flex-shrink-0'
                 >
                   <TbPencil size={13} />
                 </button>
@@ -277,14 +270,14 @@ export function LinkRule({ rule, priority, onChange, onDelete, maxConditions, is
             )}
           </div>
           {!isExpanded && (
-            <div className="ml-2 text-sm text-dark/60 truncate">
+            <div className="ml-2 text-sm text-dark/70 truncate">
               <span>{conditionsSummary}</span>
               <span className="mx-1">→</span>
               <span>{actionSummary}</span>
               {elseActionSummary && (
                 <>
-                  <span className="mx-1 text-dark/60">|</span>
-                  <span className="text-dark/60">{t('else')}: {elseActionSummary}</span>
+                  <span className="mx-1 text-dark/70">|</span>
+                  <span className="text-dark/70">{t('else')}: {elseActionSummary}</span>
                 </>
               )}
             </div>
@@ -311,7 +304,7 @@ export function LinkRule({ rule, priority, onChange, onDelete, maxConditions, is
             <motion.div
               animate={{ rotate: isExpanded ? 180 : 0 }}
               transition={{ duration: 0.2 }}
-              className="text-dark/30 p-1.5 hover:cursor-pointer hover:text-dark/50 transition-colors h"
+              className="text-dark/30 p-1.5 hover:cursor-pointer hover:text-dark/70 transition-colors h"
             >
               <TbChevronDown size={20} />
             </motion.div>
@@ -379,7 +372,7 @@ export function LinkRule({ rule, priority, onChange, onDelete, maxConditions, is
                             optionClassName="rounded-md p-1.5 text-sm"
                           />
                         ) : (
-                          <span className="text-sm font-medium text-dark/50 w-12 text-center">
+                          <span className="text-sm font-medium text-dark/70 w-12 text-center">
                             {rule.match}
                           </span>
                         )}
@@ -408,7 +401,7 @@ export function LinkRule({ rule, priority, onChange, onDelete, maxConditions, is
                       </button>
                       <button
                         onClick={handleAlwaysDeny}
-                        className="px-2 py-0.5 text-xs rounded-md bg-dark/5 text-dark/50 hover:bg-dark/10 transition-colors"
+                        className="px-2 py-0.5 text-xs rounded-md bg-dark/5 text-dark/70 hover:bg-dark/10 transition-colors"
                       >
                         {t('alwaysConfirmDeny')}
                       </button>
@@ -417,7 +410,7 @@ export function LinkRule({ rule, priority, onChange, onDelete, maxConditions, is
                     <button
                       onClick={handleAddCondition}
                       disabled={maxConditions !== null && rule.conditions.length >= maxConditions}
-                      className="inline-flex items-center gap-1 ml-6 px-3 py-1 text-sm text-dark/60 hover:text-dark/70 border border-dashed border-dark/20 rounded-lg hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:bg-dark/5 transition-colors"
+                      className="inline-flex items-center gap-1 ml-6 px-3 py-1 text-sm text-dark/70 hover:text-dark/70 border border-dashed border-dark/20 rounded-lg hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:bg-dark/5 transition-colors"
                       title={maxConditions !== null && rule.conditions.length >= maxConditions ? t('maxConditionsTitle', { count: maxConditions, plural: maxConditions === 1 ? t('condition') : t('conditions') }) : ''}
                     >
                       <TbPlus size={14} />
@@ -467,7 +460,7 @@ export function LinkRule({ rule, priority, onChange, onDelete, maxConditions, is
                 ) : (
                   <button
                     onClick={handleAddElseAction}
-                    className="inline-flex items-center gap-1 ml-6 px-3 py-1 text-sm text-dark/60 hover:text-dark/70 border border-dashed border-dark/20 rounded-lg hover:cursor-pointer hover:bg-dark/5 transition-colors"
+                    className="inline-flex items-center gap-1 ml-6 px-3 py-1 text-sm text-dark/70 hover:text-dark/70 border border-dashed border-dark/20 rounded-lg hover:cursor-pointer hover:bg-dark/5 transition-colors"
                   >
                     <TbPlus size={14} />
                     <span>{t('addElseAction')}</span>

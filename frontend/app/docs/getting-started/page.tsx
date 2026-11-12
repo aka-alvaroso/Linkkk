@@ -18,7 +18,7 @@ export default function GettingStarted() {
       {/* Header */}
       <motion.div {...fadeUp} transition={s(0)}>
         <h1 className="text-3xl md:text-4xl font-black italic text-dark mb-3">{t("title")}</h1>
-        <p className="text-dark/60 text-sm md:text-base leading-relaxed">{t("subtitle")}</p>
+        <p className="text-dark/70 text-sm md:text-base leading-relaxed">{t("subtitle")}</p>
       </motion.div>
 
       {/* What makes it different */}
@@ -36,14 +36,14 @@ export default function GettingStarted() {
               <TbUser size={24} className="text-warning" />
             </div>
             <h3 className="font-black italic text-lg">{t("guestTitle")}</h3>
-            <p className="text-sm text-dark/60 leading-relaxed">{t("guestDesc")}</p>
+            <p className="text-sm text-dark/70 leading-relaxed">{t("guestDesc")}</p>
           </div>
           <div className="border border-dark/10 rounded-2xl p-5 space-y-3">
             <div className="inline-flex p-2 size-10 rounded-xl bg-primary/10 items-center justify-center">
               <TbUserPlus size={24} className="text-primary" />
             </div>
             <h3 className="font-black italic text-lg">{t("registeredTitle")}</h3>
-            <p className="text-sm text-dark/60 leading-relaxed">{t("registeredDesc")}</p>
+            <p className="text-sm text-dark/70 leading-relaxed">{t("registeredDesc")}</p>
           </div>
         </div>
       </motion.div>
@@ -56,21 +56,21 @@ export default function GettingStarted() {
             <span className="shrink-0 w-8 h-8 rounded-full bg-dark text-light inline-flex items-center justify-center text-sm font-black">1</span>
             <div>
               <p className="font-bold text-dark">{t("step1Title")}</p>
-              <p className="text-sm text-dark/60">{t("step1Desc")}</p>
+              <p className="text-sm text-dark/70">{t("step1Desc")}</p>
             </div>
           </li>
           <li className="flex gap-4 items-start">
             <span className="shrink-0 w-8 h-8 rounded-full bg-dark text-light inline-flex items-center justify-center text-sm font-black">2</span>
             <div>
               <p className="font-bold text-dark">{t("step2Title")}</p>
-              <p className="text-sm text-dark/60">{t("step2Desc")}</p>
+              <p className="text-sm text-dark/70">{t("step2Desc")}</p>
             </div>
           </li>
           <li className="flex gap-4 items-start">
             <span className="shrink-0 w-8 h-8 rounded-full bg-dark text-light inline-flex items-center justify-center text-sm font-black">3</span>
             <div>
               <p className="font-bold text-dark">{t("step3Title")}</p>
-              <p className="text-sm text-dark/60">{t("step3Desc")}</p>
+              <p className="text-sm text-dark/70">{t("step3Desc")}</p>
             </div>
           </li>
         </ol>
@@ -82,12 +82,12 @@ export default function GettingStarted() {
 
       {/* Next steps */}
       <motion.div {...fadeUp} transition={s(4)} className="border-t border-dark/10 pt-6">
-        <p className="text-xs font-black italic text-dark/60 uppercase tracking-wider mb-3">{ts("next")}</p>
+        <p className="text-xs font-black italic text-dark/70 uppercase tracking-wider mb-3">{ts("next")}</p>
         <Link href="/docs/links"
           className="flex items-center justify-between p-4 rounded-xl bg-dark/5 hover:bg-dark/10 transition-colors group">
           <div>
             <p className="font-black italic text-dark">{t("navNextTitle")}</p>
-            <p className="text-sm text-dark/50">{t("navNextDesc")}</p>
+            <p className="text-sm text-dark/70">{t("navNextDesc")}</p>
           </div>
           <TbArrowRight size={20} className="text-dark/30 group-hover:text-dark group-hover:translate-x-1 transition-all" />
         </Link>

@@ -93,7 +93,7 @@ export default function FilterModal({
         onClick={() => onChange('include')}
         className={`px-2.5 py-1 rounded-xl border text-xs font-medium transition-all duration-200 hover:cursor-pointer ${mode === 'include'
           ? 'bg-primary border-dark hover:shadow-[2px_2px_0_var(--color-dark)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]'
-          : 'bg-transparent border-transparent text-dark/50 hover:text-dark'
+          : 'bg-transparent border-transparent text-dark/70 hover:text-dark'
           }`}
       >
         {t('include')}
@@ -103,7 +103,7 @@ export default function FilterModal({
         onClick={() => onChange('exclude')}
         className={`px-2.5 py-1 rounded-xl border text-xs font-medium transition-all duration-200 hover:cursor-pointer ${mode === 'exclude'
           ? 'bg-danger border-dark text-light hover:shadow-[2px_2px_0_var(--color-dark)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]'
-          : 'bg-transparent border-transparent text-dark/50 hover:text-dark'
+          : 'bg-transparent border-transparent text-dark/70 hover:text-dark'
           }`}
       >
         {t('except')}
@@ -183,7 +183,7 @@ export default function FilterModal({
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1, ease: "backInOut" }}
-            className="text-sm text-dark/50">
+            className="text-sm text-dark/70">
             {t('searchHint')}
           </motion.p>
         </div>

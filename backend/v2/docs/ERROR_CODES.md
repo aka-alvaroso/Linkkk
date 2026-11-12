@@ -36,6 +36,9 @@ Para errores de validación:
 | `UNAUTHORIZED` | 401 | Sin autenticación |
 | `INVALID_CREDENTIALS` | 401 | Login incorrecto |
 | `USER_NOT_FOUND` | 404 | Usuario no existe |
+| `CURRENT_PASSWORD_REQUIRED` | 400 | Falta la contraseña actual al cambiarla |
+| `CURRENT_PASSWORD_INVALID` | 400 | La contraseña actual no coincide |
+| `INVALID_RESET_TOKEN` | 400 | Enlace de recuperación inválido, usado o caducado |
 | `USER_EXISTS` | 400 | Usuario ya existe |
 | `INVALID_DATA` | 400 | Datos incorrectos |
 | `GUEST_SESSION_EXISTS` | 400 | Sesión guest ya existe |

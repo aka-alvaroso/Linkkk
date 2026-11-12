@@ -5,7 +5,14 @@ const crypto = require("crypto");
 
 const { successResponse, errorResponse } = require("../utils/response");
 const ERRORS = require("../constants/errorCodes");
-const { registerSchema, loginSchema } = require("../validators/auth");
+const {
+  registerSchema,
+  loginSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
+} = require("../validators/auth");
+const { hashPassword, passwordChangeCutoff } = require("../utils/password");
+const { sendPasswordResetEmail } = require("../services/emailService");
 const config = require("../config/environment");
 const telegramService = require("../services/telegramService");
 const logger = require("../utils/logger");
@@ -268,6 +275,167 @@ const login = async (req, res) => {
     });
     sentryService.captureException(error, {
       tags: { type: "login" },
+    });
+    return errorResponse(res, ERRORS.INTERNAL_ERROR);
+  }
+};
+
+// ============================================================================
+// PASSWORD RECOVERY
+// ============================================================================
+
+const RESET_TOKEN_TTL_MS = 60 * 60 * 1000; // 1 hour
+const RESET_REQUEST_COOLDOWN_MS = 2 * 60 * 1000; // one email every 2 minutes per account
+
+const hashResetToken = (token) =>
+  crypto.createHash("sha256").update(token).digest("hex");
+
+/**
+ * POST /auth/forgot-password
+ * Always answers the same way, whether or not the address has an account,
+ * so the endpoint cannot be used to find out who is registered.
+ */
+const forgotPassword = async (req, res) => {
+  const validate = forgotPasswordSchema.safeParse(req.body);
+  if (!validate.success) {
+    return errorResponse(res, ERRORS.INVALID_DATA);
+  }
+
+  const { email, locale } = validate.data;
+
+  // The work happens after the response is decided, off the request path:
+  // response time must not depend on whether the account exists.
+  const issueToken = async () => {
+    const user = await prisma.user.findFirst({
+      where: { email: { equals: email, mode: "insensitive" } },
+      select: { id: true, email: true },
+    });
+    if (!user) return;
+
+    const recent = await prisma.passwordResetToken.findFirst({
+      where: {
+        userId: user.id,
+        createdAt: { gt: new Date(Date.now() - RESET_REQUEST_COOLDOWN_MS) },
+      },
+      select: { id: true },
+    });
+    if (recent) return;
+
+    const token = crypto.randomBytes(32).toString("hex");
+
+    // A new request replaces any earlier link
+    await prisma.$transaction([
+      prisma.passwordResetToken.deleteMany({ where: { userId: user.id } }),
+      prisma.passwordResetToken.create({
+        data: {
+          userId: user.id,
+          tokenHash: hashResetToken(token),
+          expiresAt: new Date(Date.now() + RESET_TOKEN_TTL_MS),
+        },
+      }),
+    ]);
+
+    const resetUrl = `${config.frontend.url}/auth/reset-password?token=${token}`;
+    await sendPasswordResetEmail({ toEmail: user.email, resetUrl, locale });
+
+    logger.info("Password reset requested", {
+      type: "AUTH",
+      userId: user.id,
+      ip: req.ip,
+    });
+  };
+
+  issueToken().catch((error) => {
+    logger.error("Error issuing password reset token", {
+      type: "AUTH",
+      error: error.message,
+      stack: error.stack,
+    });
+    sentryService.captureException(error, {
+      tags: { type: "forgot_password" },
+    });
+  });
+
+  return successResponse(res, { requested: true });
+};
+
+/**
+ * POST /auth/reset-password
+ * Consumes a reset token and sets the new password. Every existing session
+ * of the account stops working; the user signs in again with the new one.
+ */
+const resetPassword = async (req, res) => {
+  const validate = resetPasswordSchema.safeParse(req.body);
+  if (!validate.success) {
+    const issues = validate.error.issues.map((issue) => ({
+      field: issue.path[0],
+      message: issue.message,
+    }));
+    // A malformed token is reported exactly like an unknown one
+    if (issues.some((issue) => issue.field === "token")) {
+      return errorResponse(res, ERRORS.INVALID_RESET_TOKEN);
+    }
+    return errorResponse(res, ERRORS.INVALID_DATA, issues);
+  }
+
+  try {
+    const { token, password } = validate.data;
+    const tokenHash = hashResetToken(token);
+    const hashedPassword = await hashPassword(password);
+    const now = new Date();
+    const cutoff = passwordChangeCutoff();
+
+    const userId = await prisma.$transaction(async (tx) => {
+      // Claiming the token and checking it is one atomic statement, so two
+      // simultaneous requests cannot both use the same link.
+      const claimed = await tx.passwordResetToken.updateMany({
+        where: { tokenHash, usedAt: null, expiresAt: { gt: now } },
+        data: { usedAt: now },
+      });
+      if (claimed.count !== 1) return null;
+
+      const record = await tx.passwordResetToken.findUnique({
+        where: { tokenHash },
+        select: { userId: true },
+      });
+
+      await tx.user.update({
+        where: { id: record.userId },
+        data: { password: hashedPassword, passwordChangedAt: cutoff.date },
+      });
+      await tx.passwordResetToken.deleteMany({
+        where: { userId: record.userId },
+      });
+
+      return record.userId;
+    });
+
+    if (!userId) {
+      return errorResponse(res, ERRORS.INVALID_RESET_TOKEN);
+    }
+
+    // The browser that reset the password may hold an old session too
+    res.clearCookie("token", {
+      httpOnly: config.security.cookies.httpOnly,
+      secure: config.security.cookies.secure,
+      sameSite: config.security.cookies.sameSite,
+    });
+
+    logger.info("Password reset completed", {
+      type: "AUTH",
+      userId,
+      ip: req.ip,
+    });
+
+    return successResponse(res, { reset: true });
+  } catch (error) {
+    logger.error("Error resetting password", {
+      type: "AUTH",
+      error: error.message,
+      stack: error.stack,
+    });
+    sentryService.captureException(error, {
+      tags: { type: "reset_password" },
     });
     return errorResponse(res, ERRORS.INTERNAL_ERROR);
   }
@@ -997,4 +1165,6 @@ module.exports = {
   githubCallback,
   linkOAuthAccount,
   sendFeedback,
+  forgotPassword,
+  resetPassword,
 };

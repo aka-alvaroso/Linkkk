@@ -345,7 +345,7 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
             {editingShortUrl ? (
                 <div className='flex flex-col gap-1'>
                     <div className='flex items-center gap-1'>
-                        <span className='text-xl md:text-2xl italic font-black text-dark/60 whitespace-nowrap'>
+                        <span className='text-xl md:text-2xl italic font-black text-dark/70 whitespace-nowrap'>
                             {newLink.customDomain ? newLink.customDomain.domain : 'linkkk.dev/r'}/
                         </span>
                         <input
@@ -368,7 +368,7 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
                         />
                     </div>
                     {suffixError && <p className='text-xs text-danger'>{suffixError}</p>}
-                    <p className='text-xs text-dark/60'>{t('customSuffixHint')}</p>
+                    <p className='text-xs text-dark/70'>{t('customSuffixHint')}</p>
                 </div>
             ) : (
                 <div className='flex items-start md:flex-row md:items-center gap-2'>
@@ -423,7 +423,7 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
         <>
             {editingLongUrl ? (
                 <div className='flex items-center gap-2 max-w-sm'>
-                    <FiCornerDownRight size={16} className='flex-shrink-0 text-dark/50' />
+                    <FiCornerDownRight size={16} className='flex-shrink-0 text-dark/70' />
                     <input
                         autoFocus
                         value={newLink.longUrl}
@@ -437,7 +437,7 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
                             }
                         }}
                         placeholder={t('urlPlaceholder')}
-                        className='text-xs md:text-md text-dark/60 bg-transparent border-b border-dark/30 outline-none w-full'
+                        className='text-xs md:text-md text-dark/70 bg-transparent border-b border-dark/30 outline-none w-full'
                     />
                 </div>
             ) : (
@@ -445,7 +445,7 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.15, duration: 0.3, ease: "backOut" }}
-                    className='group inline-flex items-center gap-2 max-w-sm w-full md:w-fit text-dark/50'
+                    className='group inline-flex items-center gap-2 max-w-sm w-full md:w-fit text-dark/70'
                 >
                     <FiCornerDownRight size={16} className="flex-shrink-0" />
                     <div className="inline-flex items-center gap-2 min-w-0 max-w-sm w-full">
@@ -698,9 +698,9 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
                     <div className='relative z-0 w-full flex flex-col gap-4 items-center'>
                         {user && user.role === 'STANDARD' && (
                             <div className='w-full bg-dark/5 border border-dark/10 rounded-xl p-2.5'>
-                                <p className='text-xs text-dark/60'>
+                                <p className='text-xs text-dark/70'>
                                     <span className='font-semibold'>{t('limitedViewTitle')}</span> {t('limitedViewMessage')}
-                                    <span className='text-dark/50'> {t('limitedViewUpgrade')}</span>
+                                    <span className='text-dark/70'> {t('limitedViewUpgrade')}</span>
                                 </p>
                             </div>
                         )}

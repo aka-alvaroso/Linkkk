@@ -86,15 +86,16 @@ interface QRCodeEditorProps {
   ) => void;
 }
 
-const DOTS_STYLES: { value: DotsStyle; label: string }[] = [
-  { value: 'square', label: 'Square' },
-  { value: 'rounded', label: 'Rounded' },
-  { value: 'dots', label: 'Dots' },
+// `label` is a key in the QRCodeEditor messages
+const DOTS_STYLES: { value: DotsStyle; label: 'styleSquare' | 'styleRounded' | 'styleDots' }[] = [
+  { value: 'square', label: 'styleSquare' },
+  { value: 'rounded', label: 'styleRounded' },
+  { value: 'dots', label: 'styleDots' },
 ];
 
-const CORNERS_STYLES: { value: CornersStyle; label: string }[] = [
-  { value: 'square', label: 'Square' },
-  { value: 'rounded', label: 'Rounded' },
+const CORNERS_STYLES: { value: CornersStyle; label: 'styleSquare' | 'styleRounded' }[] = [
+  { value: 'square', label: 'styleSquare' },
+  { value: 'rounded', label: 'styleRounded' },
 ];
 
 export default function QRCodeEditor({
@@ -298,7 +299,7 @@ export default function QRCodeEditor({
                     : 'bg-dark/5 text-dark/70 hover:bg-dark/10'
                     }`}
                 >
-                  {style.label}
+                  {t(style.label)}
                 </motion.button>
               ))}
             </div>
@@ -326,7 +327,7 @@ export default function QRCodeEditor({
                     : 'bg-dark/5 text-dark/70 hover:bg-dark/10'
                     }`}
                 >
-                  {style.label}
+                  {t(style.label)}
                 </motion.button>
               ))}
             </div>
@@ -357,7 +358,7 @@ export default function QRCodeEditor({
             size="sm"
             rounded="xl"
             leftIcon={<TbRefresh size={18} />}
-            className="self-start text-dark/50 hover:text-dark"
+            className="self-start text-dark/70 hover:text-dark"
             onClick={handleReset}
           >
             {t('resetDefaults')}

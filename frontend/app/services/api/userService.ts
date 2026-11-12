@@ -8,6 +8,8 @@ interface UpdateUserDTO {
   email?: string;
   username?: string;
   password?: string;
+  /** Required by the server when changing the password of an account that has one */
+  currentPassword?: string;
 }
 
 class UserService {

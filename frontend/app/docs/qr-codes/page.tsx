@@ -32,7 +32,7 @@ export default function QRCodesDoc() {
 
       <motion.div {...fadeUp} transition={s(0)}>
         <h1 className="text-3xl md:text-4xl font-black italic text-dark mb-3">{t("title")}</h1>
-        <p className="text-dark/60 text-sm md:text-base leading-relaxed">{t("subtitle")}</p>
+        <p className="text-dark/70 text-sm md:text-base leading-relaxed">{t("subtitle")}</p>
       </motion.div>
 
       {/* Style examples */}
@@ -52,7 +52,7 @@ export default function QRCodesDoc() {
               </div>
               <div className="text-center">
                 <p className="text-xs font-bold text-dark">{t(style.labelKey)}</p>
-                <p className="text-xs text-dark/50">{t(style.descKey)}</p>
+                <p className="text-xs text-dark/70">{t(style.descKey)}</p>
               </div>
             </div>
           ))}
@@ -67,7 +67,7 @@ export default function QRCodesDoc() {
           {customizations.map((item) => (
             <div key={item.labelKey} className="p-4 rounded-2xl border border-dark/10">
               <p className="font-bold text-sm text-dark">{t(item.labelKey)}</p>
-              <p className="text-xs text-dark/60 mt-1">{t(item.descKey)}</p>
+              <p className="text-xs text-dark/70 mt-1">{t(item.descKey)}</p>
             </div>
           ))}
         </div>
@@ -92,9 +92,9 @@ export default function QRCodesDoc() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-dark/10">
-                <th className="text-left py-2 pr-4 font-black italic text-dark/50">{t("tableColPlan")}</th>
-                <th className="text-left py-2 pr-4 font-black italic text-dark/50">{t("tableColBasicQr")}</th>
-                <th className="text-left py-2 font-black italic text-dark/50">{t("tableColCustom")}</th>
+                <th className="text-left py-2 pr-4 font-black italic text-dark/70">{t("tableColPlan")}</th>
+                <th className="text-left py-2 pr-4 font-black italic text-dark/70">{t("tableColBasicQr")}</th>
+                <th className="text-left py-2 font-black italic text-dark/70">{t("tableColCustom")}</th>
               </tr>
             </thead>
             <tbody>
@@ -124,14 +124,14 @@ export default function QRCodesDoc() {
           className="flex items-center gap-2 p-4 rounded-xl bg-dark/5 hover:bg-dark/10 transition-colors group">
           <TbArrowLeft size={18} className="text-dark/30 group-hover:text-dark group-hover:-translate-x-1 transition-all" />
           <div>
-            <p className="text-xs text-dark/60">{ts("previous")}</p>
+            <p className="text-xs text-dark/70">{ts("previous")}</p>
             <p className="font-black italic text-sm text-dark">{t("navPrevTitle")}</p>
           </div>
         </Link>
         <Link href="/pricing"
           className="flex items-center gap-2 p-4 rounded-xl bg-dark/5 hover:bg-dark/10 transition-colors group text-right">
           <div>
-            <p className="text-xs text-dark/60">{ts("next")}</p>
+            <p className="text-xs text-dark/70">{ts("next")}</p>
             <p className="font-black italic text-sm text-dark">{t("navNextTitle")}</p>
           </div>
           <TbArrowRight size={18} className="text-dark/30 group-hover:text-dark group-hover:translate-x-1 transition-all" />

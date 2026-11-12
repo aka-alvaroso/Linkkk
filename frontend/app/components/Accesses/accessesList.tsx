@@ -5,7 +5,7 @@ import * as motion from 'motion/react-client';
 import Button from '../ui/Button/Button';
 import { useToast } from "@/app/hooks/useToast";
 import { useLinkAccessEvent } from "@/app/hooks/useLinkAccessEvent";
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 interface Access {
     id: number;
@@ -28,6 +28,7 @@ interface AccessesListProps {
 
 export const AccessesList = ({ shortUrl }: AccessesListProps) => {
     const t = useTranslations('AccessesList');
+    const locale = useLocale();
     const toast = useToast();
     const [accesses, setAccesses] = useState<Access[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -73,7 +74,7 @@ export const AccessesList = ({ shortUrl }: AccessesListProps) => {
         if (diffHours < 24) return t('hoursAgo', { count: diffHours });
         if (diffDays < 7) return t('daysAgo', { count: diffDays });
 
-        return date.toLocaleDateString('en-US', {
+        return date.toLocaleDateString(locale, {
             day: '2-digit',
             month: 'short',
             year: 'numeric',
@@ -82,7 +83,7 @@ export const AccessesList = ({ shortUrl }: AccessesListProps) => {
 
     const formatFullDate = (dateString: string) => {
         const date = new Date(dateString);
-        return date.toLocaleString('en-US', {
+        return date.toLocaleString(locale, {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
@@ -212,7 +213,7 @@ export const AccessesList = ({ shortUrl }: AccessesListProps) => {
         return (
             <div className="flex flex-col min-w-0">
                 {access.utmCampaign && <span className="text-xs font-bold truncate">{access.utmCampaign}</span>}
-                {channel && <span className="text-[11px] text-dark/50 truncate">{channel}</span>}
+                {channel && <span className="text-[11px] text-dark/70 truncate">{channel}</span>}
             </div>
         );
     };
@@ -221,7 +222,7 @@ export const AccessesList = ({ shortUrl }: AccessesListProps) => {
         return (
             <div className="w-full py-12 text-center">
                 <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
-                <p className="mt-4 text-dark/50 font-medium">{t('loadingAccesses')}</p>
+                <p className="mt-4 text-dark/70 font-medium">{t('loadingAccesses')}</p>
             </div>
         );
     }
@@ -240,7 +241,7 @@ export const AccessesList = ({ shortUrl }: AccessesListProps) => {
                         <TbLocationOff size={32} className="text-secondary" />
                     </div>
                     <h3 className="text-xl md:text-2xl font-black italic mb-2">{t('noClicksYet')}</h3>
-                    <p className="text-dark/60 text-sm md:text-base">{t('shareYourLink')}</p>
+                    <p className="text-dark/70 text-sm md:text-base">{t('shareYourLink')}</p>
                     <Button
                         variant='solid'
                         size='md'

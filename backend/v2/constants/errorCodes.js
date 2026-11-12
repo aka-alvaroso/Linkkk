@@ -34,6 +34,28 @@ const ERRORS = {
     statusCode: 404,
     retryable: false,
   },
+  // 400 (not 401) so clients do not mistake them for an expired session
+  CURRENT_PASSWORD_REQUIRED: {
+    code: "CURRENT_PASSWORD_REQUIRED",
+    message: "Current password required",
+    userMessage: "Enter your current password to change it",
+    statusCode: 400,
+    retryable: false,
+  },
+  CURRENT_PASSWORD_INVALID: {
+    code: "CURRENT_PASSWORD_INVALID",
+    message: "Current password is incorrect",
+    userMessage: "The current password is incorrect",
+    statusCode: 400,
+    retryable: false,
+  },
+  INVALID_RESET_TOKEN: {
+    code: "INVALID_RESET_TOKEN",
+    message: "Invalid or expired password reset token",
+    userMessage: "This reset link is invalid or has expired. Request a new one.",
+    statusCode: 400,
+    retryable: false,
+  },
 
   // ============================================================================
   // REGISTRATION/LOGIN ERRORS
@@ -377,7 +399,14 @@ ERRORS.isRetryable = (code) => {
  * Error categories for analytics and filtering
  */
 ERRORS.categories = {
-  AUTH: ["UNAUTHORIZED", "INVALID_CREDENTIALS", "USER_NOT_FOUND"],
+  AUTH: [
+    "UNAUTHORIZED",
+    "INVALID_CREDENTIALS",
+    "USER_NOT_FOUND",
+    "CURRENT_PASSWORD_REQUIRED",
+    "CURRENT_PASSWORD_INVALID",
+    "INVALID_RESET_TOKEN",
+  ],
   USER: ["USER_EXISTS", "INVALID_DATA"],
   GUEST: ["GUEST_SESSION_EXISTS", "GUEST_SESSION_NOT_FOUND"],
   LINK: [

@@ -39,7 +39,7 @@ export default function LinkOrganizeFields({
                     transition={{ delay: 0.15, duration: 0.4, ease: "backInOut" }}
                     className={stacked ? 'flex flex-col gap-1 w-full' : 'flex flex-col gap-1'}
                 >
-                    <span className='text-xs font-semibold text-dark/60 flex items-center gap-1'><TbTag size={12} /> {t('organizeTagsTitle')}</span>
+                    <span className='text-xs font-semibold text-dark/70 flex items-center gap-1'><TbTag size={12} /> {t('organizeTagsTitle')}</span>
                     <SelectDropdown
                         triggerClassName={stacked ? 'w-full' : ''}
                         mode="multi"
@@ -59,7 +59,7 @@ export default function LinkOrganizeFields({
                     transition={{ delay: 0.2, duration: 0.4, ease: "backInOut" }}
                     className={stacked ? 'flex flex-col gap-1 w-full' : 'flex flex-col gap-1'}
                 >
-                    <span className='text-xs font-semibold text-dark/60 flex items-center gap-1'><TbFolder size={12} /> {t('organizeGroupTitle')}</span>
+                    <span className='text-xs font-semibold text-dark/70 flex items-center gap-1'><TbFolder size={12} /> {t('organizeGroupTitle')}</span>
                     <SelectDropdown
                         mode="single"
                     triggerClassName={stacked ? 'w-full' : ''}
@@ -81,7 +81,7 @@ export default function LinkOrganizeFields({
                     transition={{ delay: 0.25, duration: 0.4, ease: "backInOut" }}
                     className={stacked ? 'flex flex-col gap-1 w-full' : 'flex flex-col gap-1'}
                 >
-                    <span className='text-xs font-semibold text-dark/60 flex items-center gap-1'><TbWorld size={12} /> {t('customDomain')}</span>
+                    <span className='text-xs font-semibold text-dark/70 flex items-center gap-1'><TbWorld size={12} /> {t('customDomain')}</span>
                     <SelectDropdown
                         mode="single"
                     triggerClassName={stacked ? 'w-full' : ''}

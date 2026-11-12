@@ -75,6 +75,7 @@ describe("User Operations", () => {
         .set("Cookie", `token=${token}`)
         .send({
           password: newPassword,
+          currentPassword: "Test123!",
         })
         .expect(200);
 
@@ -100,6 +101,7 @@ describe("User Operations", () => {
         email: `multi_${timestamp}@example.com`,
         username: `multi_user_${timestamp}`,
         password: "MultiPass123!@",
+        currentPassword: "Test123!",
       };
 
       const response = await request(app)

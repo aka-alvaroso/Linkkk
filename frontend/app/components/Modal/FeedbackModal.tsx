@@ -51,7 +51,7 @@ export default function FeedbackModal({ open, onClose }: FeedbackModalProps) {
       <h3 className="font-black text-dark text-xl italic leading-6 pr-10">
         {t("title")}
       </h3>
-      <p className="text-dark/65 text-sm mt-2 mb-4 leading-relaxed">
+      <p className="text-dark/70 text-sm mt-2 mb-4 leading-relaxed">
         {t("description")}
       </p>
 
@@ -63,7 +63,7 @@ export default function FeedbackModal({ open, onClose }: FeedbackModalProps) {
         rows={4}
         maxLength={1000}
         aria-label={t("title")}
-        className="w-full text-sm bg-dark/5 border-2 border-transparent focus:border-dark rounded-xl p-3 resize-none focus:outline-none transition-colors placeholder:text-dark/50"
+        className="w-full text-sm bg-dark/5 border-2 border-transparent focus:border-dark rounded-xl p-3 resize-none focus:outline-none transition-colors placeholder:text-dark/70"
       />
 
       <label className="flex items-center gap-2 mt-3 cursor-pointer group w-fit">
@@ -73,7 +73,7 @@ export default function FeedbackModal({ open, onClose }: FeedbackModalProps) {
           onChange={(e) => setAnonymous(e.target.checked)}
           className="w-4 h-4 cursor-pointer accent-dark"
         />
-        <span className="text-sm text-dark/60 group-hover:text-dark transition-colors">
+        <span className="text-sm text-dark/70 group-hover:text-dark transition-colors">
           {t("anonymous")}
         </span>
       </label>

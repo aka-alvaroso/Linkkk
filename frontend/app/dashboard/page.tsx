@@ -175,7 +175,7 @@ export default function Dashboard() {
               <p className='text-end text-5xl font-black italic flex items-end justify-end gap-1'>
                 <AnimatedCounter value={totalLinks} delay={0.15} />
                 {linkLimit !== null && (
-                  <span className='text-lg text-dark/60 font-normal'>/{linkLimit}</span>
+                  <span className='text-lg text-dark/70 font-normal'>/{linkLimit}</span>
                 )}
               </p>
             </motion.div>
@@ -258,10 +258,8 @@ export default function Dashboard() {
                         rounded="xl"
                         leftIcon={<TbFolder size={20} />}
                         rightIcon={<TbChevronDown size={18} />}
-                        className="relative border border-secondary"
                       >
                         {t('organize')}
-                        <span className="absolute -top-2 -right-2 text-xs bg-secondary text-light rounded-full py-0.5 px-2">{t('organizeBadge')}</span>
                       </Button>
                     }
                     items={[

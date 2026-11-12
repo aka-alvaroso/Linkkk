@@ -89,12 +89,13 @@ export default function Dropdown({
         {open && (
           <motion.div
             key="dropdown-menu"
+            role="menu"
             initial={{ opacity: 0, scale: 0.95, y: -6 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -6 }}
             transition={{ duration: 0.15, ease: "backOut" }}
             className={cn(
-              "absolute z-50 min-w-40 py-1 bg-light border border-dark/10 rounded-2xl overflow-hidden",
+              "absolute z-50 min-w-48 py-1 bg-light border border-dark rounded-2xl overflow-hidden shadow-[3px_3px_0_var(--color-dark)]",
               placementClasses[placement],
               menuClassName
             )}
@@ -109,19 +110,20 @@ export default function Dropdown({
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.04 + index * 0.04, ease: "backOut" }}
                   type="button"
+                  role="menuitem"
                   onClick={() => handleItemClick(item)}
                   disabled={item.disabled}
                   className={cn(
-                    "w-full flex items-center gap-2.5 px-4 py-2.5 text-left text-sm transition-colors cursor-pointer",
+                    "w-full min-h-11 flex items-center gap-2.5 px-4 py-2.5 text-left text-sm transition-colors cursor-pointer",
                     "hover:bg-dark/5",
-                    item.danger && "text-danger hover:bg-danger/10",
+                    item.danger && "font-medium hover:bg-danger/15",
                     item.disabled && "opacity-50 cursor-not-allowed hover:bg-transparent",
                     itemClassName,
                     item.customClassName
                   )}
                 >
                   {item.icon && (
-                    <span className="flex-shrink-0 text-dark/50">{item.icon}</span>
+                    <span className={cn("flex-shrink-0", item.danger ? "text-danger" : "text-dark/70")}>{item.icon}</span>
                   )}
                   <span className="flex-1 truncate">{item.label}</span>
                 </motion.button>

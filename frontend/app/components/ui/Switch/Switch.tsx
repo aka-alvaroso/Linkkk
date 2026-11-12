@@ -8,6 +8,8 @@ interface SwitchProps {
   disabled?: boolean;
   className?: string;
   size?: 'sm' | 'md' | 'lg';
+  'aria-label'?: string;
+  'aria-labelledby'?: string;
 }
 
 const sizeClasses = {
@@ -30,6 +32,8 @@ const Switch = React.forwardRef<HTMLButtonElement, SwitchProps>(
       disabled = false,
       className = '',
       size = 'md',
+      'aria-label': ariaLabel,
+      'aria-labelledby': ariaLabelledBy,
     },
     ref
   ) => {
@@ -39,15 +43,18 @@ const Switch = React.forwardRef<HTMLButtonElement, SwitchProps>(
         type="button"
         role="switch"
         aria-checked={checked}
+        aria-label={ariaLabel}
+        aria-labelledby={ariaLabelledBy}
         disabled={disabled}
         onClick={() => !disabled && onChange(!checked)}
         className={cn(
-          'rounded-full flex items-center justify-center transition-all duration-200 ease-in-out',
-          'focus:outline-none shadow-[_2px_2px_0_var(--color-dark)] border border-dark',
+          'relative rounded-full flex items-center justify-center transition-all duration-200 ease-in-out',
+          "[@media(pointer:coarse)]:after:content-[''] [@media(pointer:coarse)]:after:absolute [@media(pointer:coarse)]:after:top-1/2 [@media(pointer:coarse)]:after:left-1/2 [@media(pointer:coarse)]:after:size-11 [@media(pointer:coarse)]:after:-translate-x-1/2 [@media(pointer:coarse)]:after:-translate-y-1/2",
+          'shadow-[_2px_2px_0_var(--color-dark)] border border-dark',
           sizeClasses[size],
           checked
             ? 'bg-success text-dark hover:bg-success/90 '
-            : 'bg-dark/10 text-dark/60 hover:bg-dark/20',
+            : 'bg-dark/10 text-dark/70 hover:bg-dark/20',
           disabled && 'opacity-50 cursor-not-allowed',
           !disabled && 'cursor-pointer',
           className

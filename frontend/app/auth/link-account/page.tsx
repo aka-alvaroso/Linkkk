@@ -187,7 +187,7 @@ export default function LinkAccount() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-dark/50 hover:text-info hover:cursor-pointer transition-colors disabled:opacity-50"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-dark/70 hover:text-info hover:cursor-pointer transition-colors disabled:opacity-50"
                 title={tLink('togglePasswordTitle')}
                 disabled={isLinking}
               >
@@ -200,7 +200,7 @@ export default function LinkAccount() {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, ease: "backInOut" }}
-              className="flex items-center gap-2 text-xs text-dark/60"
+              className="flex items-center gap-2 text-xs text-dark/70"
             >
               <TbShieldLock size={16} />
               <span>{tLink('securityNote')}</span>
