@@ -115,6 +115,27 @@ const cancelSubscriptionAtPeriodEnd = async (subscriptionId) => {
 };
 
 /**
+ * Cancel a subscription immediately (no further charges, no proration invoice).
+ * Used when the account is being deleted, so billing stops with it.
+ * An already canceled or unknown subscription counts as success.
+ * @param {string} subscriptionId - Stripe Subscription ID
+ * @returns {Promise<void>}
+ */
+const cancelSubscriptionImmediately = async (subscriptionId) => {
+  const stripeInstance = initializeStripe();
+
+  try {
+    await stripeInstance.subscriptions.cancel(subscriptionId, {
+      invoice_now: false,
+      prorate: false,
+    });
+  } catch (error) {
+    if (error.code === 'resource_missing') return;
+    throw error;
+  }
+};
+
+/**
  * Reactivate a canceled subscription
  * @param {string} subscriptionId - Stripe Subscription ID
  * @returns {Promise<Object>} Updated subscription
@@ -135,5 +156,6 @@ module.exports = {
   createCustomerPortalSession,
   constructWebhookEvent,
   cancelSubscriptionAtPeriodEnd,
+  cancelSubscriptionImmediately,
   reactivateSubscription,
 };

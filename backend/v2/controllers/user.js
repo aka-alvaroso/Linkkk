@@ -1,6 +1,7 @@
 const prisma = require("../prisma/client");
 const { updateUserSchema } = require("../validators/user");
 const bcryptjs = require("bcryptjs");
+const stripeService = require("../services/stripe");
 
 const { successResponse, errorResponse } = require("../utils/response");
 const ERRORS = require("../constants/errorCodes");
@@ -84,6 +85,20 @@ const deleteUser = async (req, res) => {
   const user = req.user;
 
   try {
+    // Stop billing before the account (and its subscription row) disappears.
+    // If Stripe fails we abort: deleting the user now would leave an active
+    // subscription that keeps charging with nobody able to cancel it.
+    const subscription = await prisma.subscription.findUnique({
+      where: { userId: user.id },
+      select: { stripeSubscriptionId: true },
+    });
+
+    if (subscription?.stripeSubscriptionId) {
+      await stripeService.cancelSubscriptionImmediately(
+        subscription.stripeSubscriptionId
+      );
+    }
+
     // Delete all links first (if not using cascade delete)
     await prisma.link.deleteMany({
       where: {
