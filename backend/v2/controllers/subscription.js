@@ -263,109 +263,37 @@ const executeDowngrade = async (userId) => {
   const ACCESS_RETENTION_DAYS =
     STANDARD_LIMITS.linkAnalytics.linkAccessesDuration;
 
-  // Track statistics for audit log
-  let stats = {
-    linksDeleted: 0,
-    rulesDeleted: 0,
-    conditionsDeleted: 0,
-    accessesDeleted: 0,
-  };
+  // Links, rules and conditions are NEVER deleted on downgrade: a QR printed
+  // months ago must keep working after the owner stops paying, and the public
+  // FAQ promises existing links keep working. The plan limits only block
+  // creating more (enforced where links and rules are created), so someone over
+  // the limit keeps what they have and can only reduce it themselves.
+  //
+  // KNOWN ABUSE RISK (accepted for now, revisit once there are paying users):
+  // someone can subscribe for a month, create far more than the free limits and
+  // cancel, keeping all of it for free. If that ever happens, freeze editing of
+  // whatever exceeds the limits instead of deleting it.
+  const stats = { accessesDeleted: 0 };
 
-  // Start transaction for atomic operations
   await prisma.$transaction(async (tx) => {
-    // 1. Get user's links (ordered by oldest first for deletion)
-    const userLinks = await tx.link.findMany({
-      where: { userId },
-      include: {
-        rules: {
-          include: {
-            conditions: true,
-          },
-        },
-      },
-      orderBy: { createdAt: "asc" }, // Oldest first
-    });
-
-    // 2. Delete old access records (>30 days)
+    // Access history is the one thing trimmed: the free plan only keeps 30 days.
     const accessExpirationDate = new Date(
       Date.now() - ACCESS_RETENTION_DAYS * 24 * 60 * 60 * 1000
     );
 
-    const userLinkIds = userLinks.map((link) => link.id);
-
     const deletedAccesses = await tx.access.deleteMany({
       where: {
-        linkId: { in: userLinkIds },
+        link: { userId },
         createdAt: { lt: accessExpirationDate },
       },
     });
     stats.accessesDeleted = deletedAccesses.count;
 
-    // 3. Handle links over limit (50) - DELETE oldest links
-    if (userLinks.length > STANDARD_LIMITS.links) {
-      const linksToDelete = userLinks.slice(
-        0,
-        userLinks.length - STANDARD_LIMITS.links
-      );
-      const linkIdsToDelete = linksToDelete.map((link) => link.id);
-
-      // Delete oldest links over limit (cascade will delete rules, conditions, and accesses)
-      await tx.link.deleteMany({
-        where: { id: { in: linkIdsToDelete } },
-      });
-      stats.linksDeleted = linksToDelete.length;
-    }
-
-    // 4. Get remaining links after deletion
-    const remainingLinks = userLinks.slice(
-      Math.max(0, userLinks.length - STANDARD_LIMITS.links)
-    );
-
-    // 5. Handle rules over limit - DELETE extra rules
-    for (const link of remainingLinks) {
-      if (link.rules.length > STANDARD_LIMITS.rulesPerLink) {
-        // Delete extra rules (keep only first 3 by priority)
-        const rulesToDelete = link.rules
-          .sort((a, b) => a.priority - b.priority)
-          .slice(STANDARD_LIMITS.rulesPerLink);
-
-        const ruleIdsToDelete = rulesToDelete.map((rule) => rule.id);
-
-        // Delete extra rules (cascade will delete conditions)
-        await tx.linkRule.deleteMany({
-          where: { id: { in: ruleIdsToDelete } },
-        });
-        stats.rulesDeleted += rulesToDelete.length;
-      }
-
-      // 6. Handle conditions over limit - DELETE extra conditions
-      const keptRules = link.rules
-        .sort((a, b) => a.priority - b.priority)
-        .slice(0, STANDARD_LIMITS.rulesPerLink);
-
-      for (const rule of keptRules) {
-        if (rule.conditions.length > STANDARD_LIMITS.conditionsPerRule) {
-          // Delete extra conditions (keep only first 2)
-          const conditionsToDelete = rule.conditions.slice(
-            STANDARD_LIMITS.conditionsPerRule
-          );
-          const conditionIdsToDelete = conditionsToDelete.map((c) => c.id);
-
-          await tx.ruleCondition.deleteMany({
-            where: { id: { in: conditionIdsToDelete } },
-          });
-          stats.conditionsDeleted += conditionsToDelete.length;
-        }
-      }
-    }
-
-    // 7. Update user role to STANDARD
     await tx.user.update({
       where: { id: userId },
       data: { role: "STANDARD" },
     });
 
-    // 8. Update subscription status
     await tx.subscription.update({
       where: { userId },
       data: {
@@ -376,12 +304,8 @@ const executeDowngrade = async (userId) => {
     });
   });
 
-  // Log the downgrade with statistics
   await auditLog.logSubscriptionDowngraded(userId, {
     reason: "subscription_canceled",
-    linksDeleted: stats.linksDeleted,
-    rulesDeleted: stats.rulesDeleted,
-    conditionsDeleted: stats.conditionsDeleted,
     accessesDeleted: stats.accessesDeleted,
   });
 
