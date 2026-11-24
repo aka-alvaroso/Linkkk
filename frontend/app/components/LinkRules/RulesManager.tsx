@@ -274,8 +274,14 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
     };
 
     try {
-      // Validate limits
-      if (limits.rulesPerLink !== null && localRules.length > limits.rulesPerLink) {
+      // Validate limits. Rules and conditions already over a limit (kept after
+      // a PRO plan ended) stay editable as long as the edit does not add to
+      // them, so the owner can still change the destination of a printed QR.
+      if (
+        limits.rulesPerLink !== null &&
+        localRules.length > limits.rulesPerLink &&
+        localRules.length > originalRules.length
+      ) {
         throw new Error(t('errorMaxRules', { count: limits.rulesPerLink, plural: limits.rulesPerLink === 1 ? t('rule') : t('rules') }));
       }
 
@@ -284,7 +290,12 @@ export function RulesManager({ shortUrl, onRulesChange }: RulesManagerProps) {
         const rule = localRules[i];
 
         // Validate conditions limit
-        if (limits.conditionsPerRule !== null && rule.conditions.length > limits.conditionsPerRule) {
+        const savedConditionCount = originalRules.find(r => r.id === rule.id)?.conditions.length ?? 0;
+        if (
+          limits.conditionsPerRule !== null &&
+          rule.conditions.length > limits.conditionsPerRule &&
+          rule.conditions.length > savedConditionCount
+        ) {
           throw new Error(t('errorMaxConditions', { ruleNumber: i + 1, count: limits.conditionsPerRule, plural: limits.conditionsPerRule === 1 ? t('condition') : t('conditions') }));
         }
 
