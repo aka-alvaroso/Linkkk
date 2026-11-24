@@ -738,7 +738,7 @@ const handleCheckoutSessionCompleted = async (session) => {
   // Send welcome email to user
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { email: true, username: true, locale: true },
+    select: { email: true, username: true },
   });
 
   if (user) {
