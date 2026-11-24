@@ -240,15 +240,8 @@ const updateLinkRule = async (req, res) => {
     return errorResponse(res, ERRORS.INVALID_DATA, issues);
   }
 
-  const { conditions } = validate.data;
-
   // Check limits based on user type
   const limits = getLimitsForUser(user, guest);
-
-  // Check conditions count limit if conditions are being updated (skip if limit is null/unlimited)
-  if (limits.conditionsPerRule !== null && conditions && conditions.length > limits.conditionsPerRule) {
-    return errorResponse(res, ERRORS.CONDITION_LIMIT_EXCEEDED);
-  }
 
   try {
     // Check rule exists and belongs to link
@@ -261,6 +254,24 @@ const updateLinkRule = async (req, res) => {
 
     if (!existingRule) {
       return errorResponse(res, ERRORS.RULE_NOT_FOUND);
+    }
+
+    // Conditions limit (skipped if unlimited). A rule that is already over the
+    // limit, for example one created on PRO and kept after the plan ended, stays
+    // editable as long as the edit does not ADD conditions. Otherwise the owner
+    // could not even change the destination of a QR that is already printed.
+    const newConditions = validate.data.conditions;
+    if (
+      limits.conditionsPerRule !== null &&
+      newConditions &&
+      newConditions.length > limits.conditionsPerRule
+    ) {
+      const currentCount = await prisma.ruleCondition.count({
+        where: { ruleId: existingRule.id },
+      });
+      if (newConditions.length > currentCount) {
+        return errorResponse(res, ERRORS.CONDITION_LIMIT_EXCEEDED);
+      }
     }
 
     const { name, priority, enabled, match, conditions, action, elseAction } = validate.data;

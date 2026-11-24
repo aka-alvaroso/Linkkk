@@ -279,6 +279,78 @@ describe('Subscription Downgrade - Comprehensive Tests', () => {
     });
   });
 
+  // A rule kept over the free limit must stay editable (e.g. to change the
+  // destination of a printed QR) as long as the edit does not add conditions.
+  describe('Editing an over-limit rule after downgrade', () => {
+    const threeConditions = [
+      { field: 'device', operator: 'equals', value: 'tablet' },
+      { field: 'device', operator: 'equals', value: 'mobile' },
+      { field: 'device', operator: 'equals', value: 'desktop' },
+    ];
+
+    const setup = async (name, shortUrl) => {
+      const { proUser, token } = await createProUser(name);
+      const link = await prisma.link.create({
+        data: { userId: proUser.id, shortUrl, longUrl: 'https://example.com/long' },
+      });
+      const rule = await prisma.linkRule.create({
+        data: {
+          linkId: link.id,
+          priority: 0,
+          actionType: 'redirect',
+          actionSettings: { url: 'https://example.com/old' },
+          conditions: { create: threeConditions },
+        },
+      });
+      await downgrade(token);
+      return { link, rule, token };
+    };
+
+    const putRule = (token, link, rule, body) =>
+      request(app)
+        .put(`/link/${link.shortUrl}/rules/${rule.id}`)
+        .set('Cookie', `token=${token}`)
+        .send(body);
+
+    it('lets the owner change the destination while keeping the 3 conditions', async () => {
+      const { link, rule, token } = await setup('test_over_edit_ok', 'overeditok');
+
+      const res = await putRule(token, link, rule, {
+        action: { type: 'redirect', settings: { url: 'https://example.com/new' } },
+        conditions: threeConditions,
+      });
+
+      expect(res.status).toBe(200);
+      const updated = await prisma.linkRule.findUnique({
+        where: { id: rule.id },
+        include: { conditions: true },
+      });
+      expect(updated.actionSettings.url).toBe('https://example.com/new');
+      expect(updated.conditions).toHaveLength(3);
+    });
+
+    it('still refuses adding a 4th condition', async () => {
+      const { link, rule, token } = await setup('test_over_edit_add', 'overeditadd');
+
+      const res = await putRule(token, link, rule, {
+        conditions: [...threeConditions, { field: 'country', operator: 'in', value: ['ES'] }],
+      });
+
+      expect(res.status).toBe(403);
+      expect(res.body.code).toBe('CONDITION_LIMIT_EXCEEDED');
+      expect(await prisma.ruleCondition.count({ where: { ruleId: rule.id } })).toBe(3);
+    });
+
+    it('allows reducing the rule to the free limit', async () => {
+      const { link, rule, token } = await setup('test_over_edit_reduce', 'overeditreduce');
+
+      const res = await putRule(token, link, rule, { conditions: threeConditions.slice(0, 2) });
+
+      expect(res.status).toBe(200);
+      expect(await prisma.ruleCondition.count({ where: { ruleId: rule.id } })).toBe(2);
+    });
+  });
+
   describe('Upgrade Tests', () => {
     it('should successfully upgrade STANDARD user to PRO', async () => {
       const standard = await createTestUser('test_upgrade_test', 'test_upgrade_test@test.com');
