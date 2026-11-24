@@ -42,7 +42,7 @@ export default function SecurityDoc() {
 
       <motion.div {...fadeUp} transition={s(0)}>
         <h1 className="text-3xl md:text-4xl font-black italic text-dark mb-3">{t("title")}</h1>
-        <p className="text-dark/60 text-sm md:text-base leading-relaxed">{t("subtitle")}</p>
+        <p className="text-dark/70 text-sm md:text-base leading-relaxed">{t("subtitle")}</p>
       </motion.div>
 
       {/* Data protection */}
@@ -52,7 +52,7 @@ export default function SecurityDoc() {
           {dataItems.map((item) => (
             <div key={item.titleKey} className="p-4 rounded-2xl border border-dark/10">
               <p className="font-bold text-sm text-dark mb-1">{t(item.titleKey)}</p>
-              <p className="text-xs text-dark/60">{t(item.descKey)}</p>
+              <p className="text-xs text-dark/70">{t(item.descKey)}</p>
             </div>
           ))}
         </div>
@@ -65,7 +65,7 @@ export default function SecurityDoc() {
           {authItems.map((item) => (
             <div key={item.titleKey} className="p-4 rounded-2xl border border-dark/10">
               <p className="font-bold text-sm text-dark mb-1">{t(item.titleKey)}</p>
-              <p className="text-xs text-dark/60">{t(item.descKey)}</p>
+              <p className="text-xs text-dark/70">{t(item.descKey)}</p>
             </div>
           ))}
         </div>
@@ -77,11 +77,11 @@ export default function SecurityDoc() {
         <div className="grid md:grid-cols-2 gap-4">
           <div className="bg-danger/10 rounded-2xl p-5">
             <p className="font-black italic text-dark mb-2">{t("detectionBotTitle")}</p>
-            <p className="text-sm text-dark/60">{t("detectionBotDesc")}</p>
+            <p className="text-sm text-dark/70">{t("detectionBotDesc")}</p>
           </div>
           <div className="bg-info/10 rounded-2xl p-5">
             <p className="font-black italic text-dark mb-2">{t("detectionVpnTitle")}</p>
-            <p className="text-sm text-dark/60">{t("detectionVpnDesc")}</p>
+            <p className="text-sm text-dark/70">{t("detectionVpnDesc")}</p>
           </div>
         </div>
       </motion.div>
@@ -93,7 +93,7 @@ export default function SecurityDoc() {
           {infraItems.map((item) => (
             <div key={item.titleKey} className="p-4 rounded-2xl border border-dark/10">
               <p className="font-bold text-sm text-dark mb-1">{t(item.titleKey)}</p>
-              <p className="text-xs text-dark/60">{t(item.descKey)}</p>
+              <p className="text-xs text-dark/70">{t(item.descKey)}</p>
             </div>
           ))}
         </div>
@@ -125,7 +125,7 @@ export default function SecurityDoc() {
           className="flex items-center gap-2 p-4 rounded-xl bg-dark/5 hover:bg-dark/10 transition-colors group">
           <TbArrowLeft size={18} className="text-dark/30 group-hover:text-dark group-hover:-translate-x-1 transition-all" />
           <div>
-            <p className="text-xs text-dark/60">{ts("previous")}</p>
+            <p className="text-xs text-dark/70">{ts("previous")}</p>
             <p className="font-black italic text-sm text-dark">{t("navPrevTitle")}</p>
           </div>
         </Link>

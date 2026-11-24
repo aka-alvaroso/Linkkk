@@ -153,7 +153,7 @@ export default function SelectDropdown({
   return (
     <div ref={containerRef} className={cn("relative inline-block", className)}>
       {label && (
-        <span className="block mb-1 text-xs font-semibold text-dark/60">{label}</span>
+        <span className="block mb-1 text-xs font-semibold text-dark/70">{label}</span>
       )}
 
       {/* ── Trigger ── */}
@@ -198,14 +198,14 @@ export default function SelectDropdown({
                 <button
                   type="button"
                   onClick={handleSelectAll}
-                  className="flex-1 px-4 py-1.5 text-xs text-dark/50 hover:text-dark hover:bg-dark/5 transition-colors text-left"
+                  className="flex-1 px-4 py-1.5 text-xs text-dark/70 hover:text-dark hover:bg-dark/5 transition-colors text-left"
                 >
                   {(modeProps as MultiProps).allLabel ?? "All"}
                 </button>
                 <button
                   type="button"
                   onClick={handleClearAll}
-                  className="flex-1 px-4 py-1.5 text-xs text-dark/50 hover:text-dark hover:bg-dark/5 transition-colors text-left"
+                  className="flex-1 px-4 py-1.5 text-xs text-dark/70 hover:text-dark hover:bg-dark/5 transition-colors text-left"
                 >
                   {noneLabel}
                 </button>
@@ -218,7 +218,7 @@ export default function SelectDropdown({
                 type="button"
                 onClick={() => handleSingleSelect(null)}
                 className={cn(
-                  "w-full flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-dark/5 transition-colors text-dark/60",
+                  "w-full flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-dark/5 transition-colors text-dark/70",
                   "border-b border-dark/5 mb-1"
                 )}
               >
@@ -281,7 +281,7 @@ export default function SelectDropdown({
 
                     {/* Icon */}
                     {opt.icon && !opt.color && (
-                      <span className="flex-shrink-0 text-dark/50">{opt.icon}</span>
+                      <span className="flex-shrink-0 text-dark/70">{opt.icon}</span>
                     )}
 
                     {/* Label */}
@@ -289,7 +289,7 @@ export default function SelectDropdown({
 
                     {/* Single: check on right */}
                     {!isMulti && isSelected && (
-                      <TbCheck size={14} className="flex-shrink-0 text-dark/60" />
+                      <TbCheck size={14} className="flex-shrink-0 text-dark/70" />
                     )}
                   </motion.button>
                 );

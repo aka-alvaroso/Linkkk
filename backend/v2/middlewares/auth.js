@@ -7,6 +7,38 @@ const { verifyWithRotation } = require("../utils/jwtSecrets");
 const logger = require("../utils/logger");
 const config = require("../config/environment");
 
+/**
+ * Loads the user a verified auth token belongs to.
+ * Throws when the token was issued before the user's last password change:
+ * changing or resetting a password signs every older session out.
+ */
+const loadSessionUser = async (decoded) => {
+  const user = await prisma.user.findUnique({
+    where: { id: decoded.id },
+    select: {
+      id: true,
+      username: true,
+      email: true,
+      role: true,
+      createdAt: true,
+      passwordChangedAt: true,
+    },
+  });
+
+  if (!user) return user;
+
+  const { passwordChangedAt, ...sessionUser } = user;
+  if (
+    passwordChangedAt &&
+    typeof decoded.iat === "number" &&
+    decoded.iat < Math.floor(passwordChangedAt.getTime() / 1000)
+  ) {
+    throw new Error("Token issued before the last password change");
+  }
+
+  return sessionUser;
+};
+
 // Must be authenticated as user or guest
 const auth = async (req, res, next) => {
   let token = req.cookies.token;
@@ -35,19 +67,7 @@ const auth = async (req, res, next) => {
         audience: "linkkk-users",
       });
 
-      // Fetch full user data from database
-      const user = await prisma.user.findUnique({
-        where: { id: userDecoded.id },
-        select: {
-          id: true,
-          username: true,
-          email: true,
-          role: true,
-          createdAt: true,
-        },
-      });
-
-      req.user = user;
+      req.user = await loadSessionUser(userDecoded);
     } catch (error) {
       // Token invalid or expired - log but don't throw
       // We check req.user later, so just leave it undefined
@@ -188,19 +208,7 @@ const optionalAuth = async (req, res, next) => {
         audience: "linkkk-users",
       });
 
-      // Fetch full user data from database
-      const user = await prisma.user.findUnique({
-        where: { id: decoded.id },
-        select: {
-          id: true,
-          username: true,
-          email: true,
-          role: true,
-          createdAt: true,
-        },
-      });
-
-      req.user = user;
+      req.user = await loadSessionUser(decoded);
     } catch (error) {
       // Optional auth - token validation failed but that's ok
       req.user = null;

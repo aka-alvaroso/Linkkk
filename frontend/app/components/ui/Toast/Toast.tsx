@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import * as motion from 'motion/react-client';
 import { ToastData, ToastType } from './types';
 import { TbX, TbCircleCheck, TbCircleX, TbAlertTriangle, TbInfoCircle } from 'react-icons/tb';
@@ -10,56 +10,51 @@ interface ToastProps {
   onRemove: (id: string) => void;
 }
 
+// Errors and warnings have to be read, so they stay longer than confirmations.
+const DEFAULT_DURATION: Record<ToastType, number> = {
+  success: 4000,
+  info: 5000,
+  warning: 7000,
+  error: 8000,
+};
+
+// Dark text on every colour: light text on the red and the blue fails AA contrast.
+const BACKGROUNDS: Record<ToastType, string> = {
+  success: 'bg-success',
+  error: 'bg-danger',
+  warning: 'bg-warning',
+  info: 'bg-info',
+};
+
 const Toast: React.FC<ToastProps> = ({ toast, onRemove }) => {
   const t = useTranslations('Common');
-  const [progress, setProgress] = useState(100);
-  const duration = toast.duration || 4000;
+  const duration = toast.duration ?? DEFAULT_DURATION[toast.type];
+  const remainingRef = useRef(duration);
+  const startedAtRef = useRef(0);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Hovering or focusing the toast pauses its countdown.
+  const stopTimer = () => {
+    if (timerRef.current === null) return;
+    clearTimeout(timerRef.current);
+    timerRef.current = null;
+    remainingRef.current -= Date.now() - startedAtRef.current;
+  };
+
+  const startTimer = () => {
+    if (timerRef.current !== null) return;
+    startedAtRef.current = Date.now();
+    timerRef.current = setTimeout(() => onRemove(toast.id), Math.max(remainingRef.current, 1000));
+  };
 
   useEffect(() => {
-    // Progress bar animation
-    const startTime = Date.now();
-    const timer = setInterval(() => {
-      const elapsed = Date.now() - startTime;
-      const remaining = Math.max(0, 100 - (elapsed / duration) * 100);
-      setProgress(remaining);
-    }, 16); // ~60fps
-
-    // Auto remove
-    const removeTimer = setTimeout(() => {
-      onRemove(toast.id);
-    }, duration);
-
+    startTimer();
     return () => {
-      clearInterval(timer);
-      clearTimeout(removeTimer);
+      if (timerRef.current !== null) clearTimeout(timerRef.current);
+      timerRef.current = null;
     };
-  }, [toast.id, duration, onRemove]);
-
-  const getToastStyles = (type: ToastType) => {
-    switch (type) {
-      case 'success':
-        return {
-          bg: 'bg-success',
-          text: 'text-dark'
-        };
-      case 'error':
-        return {
-          bg: 'bg-danger',
-          text: 'text-light',
-        };
-      case 'warning':
-        return {
-          bg: 'bg-warning',
-          text: 'text-dark'
-        };
-      case 'info':
-        return {
-          bg: 'bg-info',
-          text: 'text-light'
-
-        };
-    }
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [toast.id, onRemove]);
 
   const getIcon = (type: ToastType) => {
     const iconSize = 24;
@@ -75,40 +70,45 @@ const Toast: React.FC<ToastProps> = ({ toast, onRemove }) => {
     }
   };
 
-  const styles = getToastStyles(toast.type);
+  const isUrgent = toast.type === 'error' || toast.type === 'warning';
 
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, y: -100 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -100 }}
-      transition={{ duration: 0.3, ease: "backInOut" }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
+      role={isUrgent ? 'alert' : 'status'}
       className={`
         relative w-full max-w-md
-        ${styles.bg}
+        ${BACKGROUNDS[toast.type]}
+        text-dark
         border border-dark
         shadow-[4px_4px_0_var(--color-dark)]
         rounded-xl
         overflow-hidden
-        cursor-pointer
+        ${toast.onClick ? 'cursor-pointer' : ''}
       `}
+      onMouseEnter={stopTimer}
+      onMouseLeave={startTimer}
+      onFocus={stopTimer}
+      onBlur={startTimer}
       onClick={() => {
-        toast.onClick?.();
+        if (!toast.onClick) return;
+        toast.onClick();
         onRemove(toast.id);
       }}
     >
-      <div className="p-4 flex items-start gap-3">
-        {/* Icon */}
+      <div className="p-4 pr-2 flex items-start gap-3">
         {toast.showIcon !== false && (
-          <div className={`flex-shrink-0 ${styles.text}`}>
+          <div className="flex-shrink-0" aria-hidden="true">
             {getIcon(toast.type)}
           </div>
         )}
 
-        {/* Content */}
-        <div className={`flex-1 min-w-0 ${styles.text}`}>
-          <p className="font-black italic  text-base leading-tight">
+        <div className="flex-1 min-w-0">
+          <p className="font-black italic text-base leading-tight">
             {toast.title}
           </p>
           {toast.description && (
@@ -118,13 +118,12 @@ const Toast: React.FC<ToastProps> = ({ toast, onRemove }) => {
           )}
         </div>
 
-        {/* Close button */}
         <button
           onClick={(e) => {
             e.stopPropagation();
             onRemove(toast.id);
           }}
-          className={`flex-shrink-0 transition-colors ${styles.text}`}
+          className="flex-shrink-0 -my-2 size-11 flex items-center justify-center rounded-lg cursor-pointer hover:bg-dark/10 transition-colors"
           aria-label={t('closeToast')}
         >
           <TbX size={20} />

@@ -178,6 +178,27 @@ class AuthService {
   }
 
   /**
+   * Ask for a password reset email. The server answers the same way whether
+   * or not the address has an account.
+   */
+  async requestPasswordReset(email: string, locale: string): Promise<{ requested: boolean }> {
+    return this.request<{ requested: boolean }>(`${this.baseUrl}/forgot-password`, {
+      method: "POST",
+      body: JSON.stringify({ email, locale: locale === "en" ? "en" : "es" }),
+    });
+  }
+
+  /**
+   * Set a new password with the token from the reset email
+   */
+  async resetPassword(token: string, password: string): Promise<{ reset: boolean }> {
+    return this.request<{ reset: boolean }>(`${this.baseUrl}/reset-password`, {
+      method: "POST",
+      body: JSON.stringify({ token, password }),
+    });
+  }
+
+  /**
    * Send user feedback
    */
   async sendFeedback(data: { message: string; anonymous: boolean }): Promise<{ message: string }> {

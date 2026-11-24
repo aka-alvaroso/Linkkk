@@ -116,7 +116,7 @@ export default function NotFound() {
           transition={{ delay: 0.8, duration: 0.4 }}
           className="mt-8 pt-6 border-t-2 border-dark/10"
         >
-          <p className="text-sm text-dark/50 font-medium">
+          <p className="text-sm text-dark/70 font-medium">
             {t("poweredBy")}{" "}
             <Link href="/" className="font-black italic hover:underline">
               Linkkk

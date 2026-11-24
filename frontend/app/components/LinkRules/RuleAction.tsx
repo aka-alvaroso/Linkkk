@@ -81,7 +81,7 @@ export function RuleAction({
         const redirectSettings = actionSettings as RedirectSettings;
         return (
           <div className="flex items-center gap-2">
-            <span className="text-xs text-dark/50">{t('to')}</span>
+            <span className="text-xs text-dark/70">{t('to')}</span>
             <div className="w-64 sm:w-96 max-w-full">
               <Input
                 placeholder={t('redirectPlaceholder')}
@@ -172,7 +172,7 @@ export function RuleAction({
                 className={`flex items-center gap-1 px-2 py-1 transition-colors whitespace-nowrap ${
                   notifyType === 'webhook'
                     ? 'bg-dark text-light'
-                    : 'bg-light text-dark/50 hover:text-dark/80'
+                    : 'bg-light text-dark/70 hover:text-dark/80'
                 }`}
               >
                 <TbWebhook size={13} />
@@ -184,7 +184,7 @@ export function RuleAction({
                 className={`flex items-center gap-1 px-2 py-1 transition-colors whitespace-nowrap ${
                   notifyType === 'email'
                     ? 'bg-dark text-light'
-                    : 'bg-light text-dark/50 hover:text-dark/80'
+                    : 'bg-light text-dark/70 hover:text-dark/80'
                 }`}
               >
                 <TbMail size={13} />
@@ -221,7 +221,7 @@ export function RuleAction({
             {/* Query params info */}
             <Link
               href="/docs/rules#query-params"
-              className="flex items-center gap-1 text-xs text-dark/60 hover:text-dark/70 whitespace-nowrap underline underline-offset-2 transition-colors"
+              className="flex items-center gap-1 text-xs text-dark/70 hover:text-dark/70 whitespace-nowrap underline underline-offset-2 transition-colors"
             >
               <TbInfoCircle size={13} />
               {t('queryParamsInfo')}

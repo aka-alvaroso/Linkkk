@@ -33,7 +33,7 @@ export default function LinkDrawerTabs({ tab, onChange: setTab, isGuest, fullWid
         >
             <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: "backInOut" }} className="flex-shrink-0">
                 <Button variant='ghost' size='sm' rounded='2xl'
-                    className={`rounded-2xl ${tab === 'overview' ? 'bg-dark text-light hover:bg-dark/90' : 'bg-dark/5 text-dark/50'}`}
+                    className={`rounded-2xl ${tab === 'overview' ? 'bg-dark text-light hover:bg-dark/90' : 'bg-dark/5 text-dark/70'}`}
                     onClick={() => setTab('overview')}
                 >
                     <TabLabel icon={<TbCategory size={20} />}>{t('tabOverview')}</TabLabel>
@@ -41,7 +41,7 @@ export default function LinkDrawerTabs({ tab, onChange: setTab, isGuest, fullWid
             </motion.div>
             <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05, duration: 0.4, ease: "backInOut" }} className="flex-shrink-0">
                 <Button variant='ghost' size='sm' rounded='2xl'
-                    className={`rounded-2xl ${tab === 'rules' ? 'bg-dark text-light hover:bg-dark/90' : 'bg-dark/5 text-dark/50'}`}
+                    className={`rounded-2xl ${tab === 'rules' ? 'bg-dark text-light hover:bg-dark/90' : 'bg-dark/5 text-dark/70'}`}
                     onClick={() => setTab('rules')}
                 >
                     <TabLabel icon={<TbPuzzle size={20} />}>{t('tabRules')}</TabLabel>
@@ -49,7 +49,7 @@ export default function LinkDrawerTabs({ tab, onChange: setTab, isGuest, fullWid
             </motion.div>
             <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.4, ease: "backInOut" }} className="flex-shrink-0">
                 <Button variant='ghost' size='sm' rounded='2xl'
-                    className={`rounded-2xl ${tab === 'history' ? 'bg-dark text-light hover:bg-dark/90' : 'bg-dark/5 text-dark/50'}`}
+                    className={`rounded-2xl ${tab === 'history' ? 'bg-dark text-light hover:bg-dark/90' : 'bg-dark/5 text-dark/70'}`}
                     onClick={() => setTab('history')}
                     disabled={isGuest}
                 >
@@ -58,7 +58,7 @@ export default function LinkDrawerTabs({ tab, onChange: setTab, isGuest, fullWid
             </motion.div>
             <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15, duration: 0.4, ease: "backInOut" }} className="flex-shrink-0">
                 <Button variant='ghost' size='sm' rounded='2xl'
-                    className={`rounded-2xl ${tab === 'share' ? 'bg-dark text-light hover:bg-dark/90' : 'bg-dark/5 text-dark/50'}`}
+                    className={`rounded-2xl ${tab === 'share' ? 'bg-dark text-light hover:bg-dark/90' : 'bg-dark/5 text-dark/70'}`}
                     onClick={() => setTab('share')}
                     disabled={isGuest}
                 >

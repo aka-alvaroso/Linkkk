@@ -35,7 +35,7 @@ function StatusBadge({ status }: { status: 'ok' | 'degraded' | 'error' | 'loadin
     ok: { label: 'All systems operational', color: 'bg-success/10 border-success/20 text-success' },
     degraded: { label: 'Partial outage', color: 'bg-warning/10 border-warning/20 text-warning' },
     error: { label: 'Major outage', color: 'bg-danger/10 border-danger/20 text-danger' },
-    loading: { label: 'Checking status...', color: 'bg-dark/5 border-dark/10 text-dark/50' },
+    loading: { label: 'Checking status...', color: 'bg-dark/5 border-dark/10 text-dark/70' },
   };
   const { label, color } = map[status];
   return (
@@ -61,12 +61,12 @@ function ServiceRow({ name, icon, service, delay }: {
       className="flex items-center justify-between py-4 border-b border-dark/8 last:border-0"
     >
       <div className="flex items-center gap-3">
-        <span className="text-dark/50">{icon}</span>
+        <span className="text-dark/70">{icon}</span>
         <span className="font-semibold text-dark">{name}</span>
       </div>
       <div className="flex items-center gap-3">
         {service?.latency != null && (
-          <span className="text-xs text-dark/60 font-mono">{service.latency}ms</span>
+          <span className="text-xs text-dark/70 font-mono">{service.latency}ms</span>
         )}
         {service === null ? (
           <span className="w-5 h-5 rounded-full bg-dark/10 animate-pulse" />
@@ -132,7 +132,7 @@ export default function StatusPage() {
             <Link href="/" className="text-2xl font-black italic text-dark">
               Linkkk
             </Link>
-            <p className="text-dark/50 text-sm mt-1">System Status</p>
+            <p className="text-dark/70 text-sm mt-1">System Status</p>
           </motion.div>
 
           {/* Overall badge */}
@@ -172,7 +172,7 @@ export default function StatusPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5, duration: 0.3 }}
-              className="flex items-center gap-5 text-sm text-dark/60 mb-6"
+              className="flex items-center gap-5 text-sm text-dark/70 mb-6"
             >
               <span className="flex items-center gap-1.5">
                 <TbClock size={15} />
@@ -195,7 +195,7 @@ export default function StatusPage() {
             <button
               onClick={fetchStatus}
               disabled={loading}
-              className="flex items-center gap-2 text-sm text-dark/50 hover:text-dark transition-colors disabled:opacity-40"
+              className="flex items-center gap-2 text-sm text-dark/70 hover:text-dark transition-colors disabled:opacity-40"
             >
               <TbRefresh size={16} className={loading ? 'animate-spin' : ''} />
               Refresh

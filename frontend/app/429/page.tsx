@@ -71,7 +71,7 @@ export default function TooManyRequestsPage() {
             transition={{ delay: 0.6, duration: 0.3 }}
             className="mt-8 pt-6"
           >
-            <Link href="/" className="text-sm text-dark/50">
+            <Link href="/" className="text-sm text-dark/70">
               {t('poweredBy')} <span className="font-black italic">Linkkk.</span>
             </Link>
           </motion.div>

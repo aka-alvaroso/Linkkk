@@ -259,8 +259,42 @@ const logoUploadLimiter = rateLimit({
   handler: rateLimitHandler,
 });
 
+// Password recovery: requesting a reset sends an email, so it is limited both
+// per IP and per target address (stops using the endpoint to flood an inbox).
+const forgotPasswordLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: config.env.isDevelopment ? 1000 : 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => req.ip,
+  handler: rateLimitHandler,
+});
+
+const forgotPasswordEmailLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: config.env.isDevelopment ? 1000 : 3,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) =>
+    "forgot:" + String(req.body?.email || "").trim().toLowerCase().slice(0, 254),
+  handler: rateLimitHandler,
+});
+
+// Tokens are 256 random bits, so this only needs to stop abuse, not guessing.
+const resetPasswordLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: config.env.isDevelopment ? 1000 : 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => req.ip,
+  handler: rateLimitHandler,
+});
+
 module.exports = {
   authLimiter,
+  forgotPasswordLimiter,
+  forgotPasswordEmailLimiter,
+  resetPasswordLimiter,
   validateLimiter,
   loginLimiter,
   registerLimiter,

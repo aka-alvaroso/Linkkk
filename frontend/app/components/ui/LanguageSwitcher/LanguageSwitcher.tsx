@@ -15,8 +15,8 @@ export default function LanguageSwitcher({ variant = 'light' }: LanguageSwitcher
   const { currentLocale, changeLanguage, availableLocales } = useLanguage();
 
   const languageLabels: Record<Locale, string> = {
-    es: '🇪🇸 ES',
-    en: '🇬🇧 EN',
+    es: 'Español',
+    en: 'English',
   };
 
   return (
@@ -26,15 +26,18 @@ export default function LanguageSwitcher({ variant = 'light' }: LanguageSwitcher
         return (
           <button
             key={locale}
+            type="button"
+            lang={locale}
+            aria-pressed={isActive}
             onClick={() => !isActive && changeLanguage(locale)}
-            className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+            className={`min-h-11 px-3 rounded-lg text-sm font-bold transition-all cursor-pointer ${
               isActive
                 ? variant === 'dark'
                   ? 'bg-light/15 text-light'
                   : 'bg-dark/10 text-dark'
                 : variant === 'dark'
-                  ? 'text-light/60 hover:text-light/70'
-                  : 'text-dark/60 hover:text-dark/70'
+                  ? 'text-light/70 hover:text-light'
+                  : 'text-dark/70 hover:text-dark'
             }`}
           >
             {languageLabels[locale]}

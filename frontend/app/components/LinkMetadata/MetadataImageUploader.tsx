@@ -168,7 +168,7 @@ export default function MetadataImageUploader({
             'flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg text-sm font-medium transition-all',
             activeTab === 'upload'
               ? 'bg-white text-dark shadow-sm'
-              : 'text-dark/50 hover:text-dark/70'
+              : 'text-dark/70 hover:text-dark/70'
           )}
         >
           <TbUpload size={18} />
@@ -181,7 +181,7 @@ export default function MetadataImageUploader({
             'flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg text-sm font-medium transition-all',
             activeTab === 'url'
               ? 'bg-white text-dark shadow-sm'
-              : 'text-dark/50 hover:text-dark/70'
+              : 'text-dark/70 hover:text-dark/70'
           )}
         >
           <TbLink size={18} />
@@ -223,7 +223,7 @@ export default function MetadataImageUploader({
                 className="w-32 h-16 object-cover rounded-lg"
               />
               {isUploading && (
-                <div className="flex items-center gap-2 text-sm text-dark/50">
+                <div className="flex items-center gap-2 text-sm text-dark/70">
                   <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                   {t('imageUpload.uploading')}
                 </div>
@@ -238,7 +238,7 @@ export default function MetadataImageUploader({
                 <p className="text-sm font-medium text-dark/70">
                   {t('imageUpload.dragDrop')}
                 </p>
-                <p className="text-xs text-dark/50 mt-1">
+                <p className="text-xs text-dark/70 mt-1">
                   {t('imageUpload.or')}{' '}
                   <button
                     type="button"
@@ -249,8 +249,8 @@ export default function MetadataImageUploader({
                   </button>
                 </p>
               </div>
-              <p className="text-xs text-dark/60">
-                PNG, JPG, GIF, WEBP - Max 2MB - Recommended 1200x630px
+              <p className="text-xs text-dark/70">
+                {t('imageUpload.formats')}
               </p>
             </div>
           )}
@@ -328,7 +328,7 @@ export default function MetadataImageUploader({
             className="p-2 hover:bg-dark/10 rounded-lg transition-colors"
             title={t('imageUpload.remove')}
           >
-            <TbX size={18} className="text-dark/50" />
+            <TbX size={18} className="text-dark/70" />
           </motion.button>
         </div>
       )}

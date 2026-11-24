@@ -60,7 +60,7 @@ export default function PricingPage() {
         {/* Header */}
         <motion.div {...fadeUp} transition={s(0)} className="text-center mb-10">
           <h1 className="text-4xl md:text-5xl font-black italic text-dark mb-3">{t("title")}</h1>
-          <p className="text-dark/60 text-base md:text-lg">{t("subtitle")}</p>
+          <p className="text-dark/70 text-base md:text-lg">{t("subtitle")}</p>
         </motion.div>
 
         {/* Billing toggle */}
@@ -71,7 +71,7 @@ export default function PricingPage() {
               className={`px-4 py-2 rounded-xl text-sm font-bold transition-all duration-150 cursor-pointer ${
                 billing === "monthly"
                   ? "bg-dark text-light shadow-sm"
-                  : "text-dark/60 hover:text-dark"
+                  : "text-dark/70 hover:text-dark"
               }`}
             >
               {t("monthly")}
@@ -81,7 +81,7 @@ export default function PricingPage() {
               className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all duration-150 cursor-pointer ${
                 billing === "yearly"
                   ? "bg-dark text-light shadow-sm"
-                  : "text-dark/60 hover:text-dark"
+                  : "text-dark/70 hover:text-dark"
               }`}
             >
               {t("yearly")}
@@ -106,7 +106,7 @@ export default function PricingPage() {
               <div className="mb-2">
                 <span className="text-3xl font-black italic text-dark">{t("guestPrice")}</span>
               </div>
-              <p className="text-sm text-dark/60 mb-6">{t("guestDesc")}</p>
+              <p className="text-sm text-dark/70 mb-6">{t("guestDesc")}</p>
               <ul className="space-y-2.5 mb-6">
                 {guestFeatures.map((f) => (
                   <li key={f} className="flex items-center gap-2.5 text-sm text-dark/70">
@@ -136,7 +136,7 @@ export default function PricingPage() {
               <div className="mb-2">
                 <span className="text-3xl font-black italic text-dark">{t("standardPrice")}</span>
               </div>
-              <p className="text-sm text-dark/60 mb-6">{t("standardDesc")}</p>
+              <p className="text-sm text-dark/70 mb-6">{t("standardDesc")}</p>
               <ul className="space-y-2.5 mb-6">
                 {standardFeatures.map((f) => (
                   <li key={f} className="flex items-center gap-2.5 text-sm text-dark/70">
@@ -170,10 +170,10 @@ export default function PricingPage() {
                 <span className="text-3xl font-black italic text-dark">
                   {billing === "monthly" ? t("proPriceMonthly") : t("proPriceYearly")}
                 </span>
-                <span className="text-sm font-bold text-dark/60 mb-1">{t("proPeriod")}</span>
+                <span className="text-sm font-bold text-dark/70 mb-1">{t("proPeriod")}</span>
               </div>
               {billing === "yearly" && (
-                <p className="text-xs text-dark/60 mb-3">{t("proAnnualNote")}</p>
+                <p className="text-xs text-dark/70 mb-3">{t("proAnnualNote")}</p>
               )}
               <p className="text-sm text-dark/70 mb-6">{t("proDesc")}</p>
               <ul className="space-y-2.5 mb-6">

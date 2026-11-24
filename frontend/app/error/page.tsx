@@ -96,7 +96,7 @@ export default function ErrorPage() {
               </Button>
             </Link>
 
-            <p className="text-xs text-dark/50 mt-2">
+            <p className="text-xs text-dark/70 mt-2">
               {t('footerText')}
             </p>
           </motion.div>
@@ -108,7 +108,7 @@ export default function ErrorPage() {
             transition={{ delay: 0.7, duration: 0.3 }}
             className="mt-8 pt-6 border-t border-dark/10"
           >
-            <p className="text-sm text-dark/50">
+            <p className="text-sm text-dark/70">
               {t('poweredBy')} <span className="font-black italic">Linkkk</span>
             </p>
           </motion.div>

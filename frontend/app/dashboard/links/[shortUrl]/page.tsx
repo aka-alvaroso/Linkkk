@@ -39,7 +39,7 @@ export default function LinkDetailPage() {
       <div className="relative p-2 pb-28 md:p-4 md:mt-20 md:max-w-3/4 mx-auto flex flex-col gap-4">
         <Link
           href="/dashboard"
-          className="flex items-center gap-1.5 text-sm font-semibold text-dark/60 hover:text-dark w-fit"
+          className="flex items-center gap-1.5 text-sm font-semibold text-dark/70 hover:text-dark w-fit"
         >
           <TbArrowLeft size={18} />
           {t("backToDashboard")}
@@ -64,7 +64,7 @@ export default function LinkDetailPage() {
         ) : (
           <div className="py-16 text-center">
             <p className="text-lg font-black italic text-dark">{t("linkNotFound")}</p>
-            <p className="text-sm text-dark/60">{t("linkNotFoundDesc")}</p>
+            <p className="text-sm text-dark/70">{t("linkNotFoundDesc")}</p>
           </div>
         )}
       </div>

@@ -1,7 +1,7 @@
 /**
  * Email Service — Resend
  *
- * Sends transactional emails for link rule notifications.
+ * Sends transactional emails: link rule notifications and password recovery.
  * All user-supplied values (query params, custom messages) are HTML-escaped
  * before being embedded in the template.
  */
@@ -351,4 +351,139 @@ const sendRuleNotificationEmail = async (opts) => {
   }
 };
 
-module.exports = { sendRuleNotificationEmail };
+// ============================================
+// PASSWORD RESET
+// ============================================
+
+const RESET_COPY = {
+  es: {
+    subject: "Restablece tu contraseña de Linkkk",
+    preheader: "El enlace caduca en 1 hora.",
+    title: "Restablece tu contraseña",
+    intro: "Hemos recibido una solicitud para cambiar la contraseña de tu cuenta de Linkkk.",
+    button: "Elegir una contraseña nueva",
+    expiry: "El enlace caduca en 1 hora y solo se puede usar una vez.",
+    fallback: "Si el botón no funciona, copia esta dirección en tu navegador:",
+    ignore: "Si no lo has pedido tú, puedes ignorar este correo: tu contraseña no cambiará.",
+  },
+  en: {
+    subject: "Reset your Linkkk password",
+    preheader: "The link expires in 1 hour.",
+    title: "Reset your password",
+    intro: "We received a request to change the password of your Linkkk account.",
+    button: "Choose a new password",
+    expiry: "The link expires in 1 hour and can only be used once.",
+    fallback: "If the button does not work, copy this address into your browser:",
+    ignore: "If you did not ask for this, you can ignore this email: your password will not change.",
+  },
+};
+
+// Same palette as the product: light #F2F3F4, dark #1B1B1B, green #72d763.
+const buildPasswordResetHtml = ({ resetUrl, locale }) => {
+  const c = RESET_COPY[locale] || RESET_COPY.es;
+  const safeUrl = esc(resetUrl);
+  const font = "Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+
+  return `<!DOCTYPE html>
+<html lang="${locale === "en" ? "en" : "es"}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${c.subject}</title>
+</head>
+<body style="margin:0;padding:0;background:#F2F3F4;font-family:${font};color:#1B1B1B;">
+<span style="display:none;max-height:0;overflow:hidden;opacity:0;">${c.preheader}</span>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F2F3F4;">
+  <tr>
+    <td align="center" style="padding:32px 16px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;">
+        <tr>
+          <td style="padding:0 4px 20px;font-size:24px;font-weight:900;font-style:italic;color:#1B1B1B;">Linkkk.</td>
+        </tr>
+        <tr>
+          <td style="background:#FFFFFF;border:2px solid #1B1B1B;border-radius:16px;padding:32px 28px;">
+            <h1 style="margin:0 0 16px;font-size:24px;line-height:1.2;font-weight:900;font-style:italic;color:#1B1B1B;">${c.title}</h1>
+            <p style="margin:0 0 24px;font-size:16px;line-height:1.5;color:#1B1B1B;">${c.intro}</p>
+            <table role="presentation" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="background:#72d763;border:2px solid #1B1B1B;border-radius:12px;">
+                  <a href="${safeUrl}" style="display:inline-block;padding:14px 24px;font-size:16px;font-weight:800;font-style:italic;color:#1B1B1B;text-decoration:none;">${c.button}</a>
+                </td>
+              </tr>
+            </table>
+            <p style="margin:24px 0 0;font-size:14px;line-height:1.5;color:#1B1B1B;">${c.expiry}</p>
+            <p style="margin:16px 0 4px;font-size:14px;line-height:1.5;color:#4a4a4a;">${c.fallback}</p>
+            <p style="margin:0;font-size:13px;line-height:1.5;word-break:break-all;"><a href="${safeUrl}" style="color:#1B1B1B;">${safeUrl}</a></p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:20px 4px 0;font-size:14px;line-height:1.5;color:#4a4a4a;">${c.ignore}</td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>`;
+};
+
+const buildPasswordResetText = ({ resetUrl, locale }) => {
+  const c = RESET_COPY[locale] || RESET_COPY.es;
+  return `${c.title}\n\n${c.intro}\n\n${resetUrl}\n\n${c.expiry}\n\n${c.ignore}`;
+};
+
+/**
+ * Sends the password recovery email.
+ *
+ * @param {object} opts
+ * @param {string} opts.toEmail
+ * @param {string} opts.resetUrl - Contains the one-time token: never log it in production
+ * @param {string} [opts.locale] - "es" (default) or "en"
+ * @returns {Promise<boolean>} true if handed to the provider
+ */
+const sendPasswordResetEmail = async ({ toEmail, resetUrl, locale = "es" }) => {
+  const client = getClient();
+  if (!client) {
+    if (config.env.isDevelopment && !config.env.isTest) {
+      // Local development without an email provider: surface the link so the
+      // flow can still be exercised.
+      logger.info(`[EMAIL] RESEND_API_KEY missing. Password reset link (dev only): ${resetUrl}`);
+    } else {
+      logger.warn("[EMAIL] Resend client not initialised — password reset email not sent");
+    }
+    return false;
+  }
+
+  const copy = RESET_COPY[locale] || RESET_COPY.es;
+
+  try {
+    const { error } = await client.emails.send({
+      from: config.resend.fromEmail,
+      to: toEmail,
+      subject: copy.subject,
+      html: buildPasswordResetHtml({ resetUrl, locale }),
+      text: buildPasswordResetText({ resetUrl, locale }),
+    });
+
+    if (error) {
+      logger.warn("[EMAIL] Resend returned error for password reset", {
+        error: error.message,
+      });
+      return false;
+    }
+
+    logger.info("[EMAIL] Password reset email sent");
+    return true;
+  } catch (err) {
+    logger.warn("[EMAIL] Failed to send password reset email", {
+      error: err.message,
+    });
+    return false;
+  }
+};
+
+module.exports = {
+  sendRuleNotificationEmail,
+  sendPasswordResetEmail,
+  buildPasswordResetHtml,
+};

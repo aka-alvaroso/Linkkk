@@ -49,13 +49,13 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     const baseClasses = [
+      'relative',
       'inline-flex',
       'items-center',
       'justify-center',
       'font-medium',
       'transition-all',
       'duration-200',
-      'focus:outline-none',
       'cursor-pointer',
       'disabled:opacity-50',
       'disabled:cursor-not-allowed',
@@ -114,8 +114,17 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         : ['px-8', 'py-4', 'text-xl'],
     };
 
+    // Small buttons keep their look but get a 44px hit area on touch screens.
+    const needsTouchTarget = size === 'xs' || size === 'sm' || size === 'md';
+    const touchTargetClasses = needsTouchTarget
+      ? iconOnly
+        ? "[@media(pointer:coarse)]:after:content-[''] [@media(pointer:coarse)]:after:absolute [@media(pointer:coarse)]:after:top-1/2 [@media(pointer:coarse)]:after:left-1/2 [@media(pointer:coarse)]:after:size-11 [@media(pointer:coarse)]:after:-translate-x-1/2 [@media(pointer:coarse)]:after:-translate-y-1/2"
+        : "[@media(pointer:coarse)]:after:content-[''] [@media(pointer:coarse)]:after:absolute [@media(pointer:coarse)]:after:inset-x-0 [@media(pointer:coarse)]:after:top-1/2 [@media(pointer:coarse)]:after:h-11 [@media(pointer:coarse)]:after:-translate-y-1/2"
+      : false;
+
     const additionalClasses = [
-      loading && 'cursor-wait'
+      loading && 'cursor-wait',
+      touchTargetClasses
     ].filter(Boolean);
 
     const buttonClasses = cn(

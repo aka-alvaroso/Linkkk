@@ -84,12 +84,12 @@ export default function BlockedPage() {
                 className="w-full bg-primary border border-dark text-dark hover:bg-primary/90 hover:shadow-[4px_4px_0_var(--color-dark)] transition-all"
               >
                 <p className='font-black italic'>
-                  Go to Home
+                  {t('goToHome')}
                 </p>
               </Button>
             </Link>
 
-            <p className="text-xs text-dark/65 mt-2">
+            <p className="text-xs text-dark/70 mt-2">
               {t('errorContactOwner')}
             </p>
           </motion.div>
@@ -101,7 +101,7 @@ export default function BlockedPage() {
             transition={{ delay: 0.7, duration: 0.3 }}
             className="mt-8 pt-6"
           >
-            <Link href="/" className="text-sm text-dark/65">
+            <Link href="/" className="text-sm text-dark/70">
               {t('poweredBy')} <span className="font-black italic">Linkkk.</span>
             </Link>
           </motion.div>

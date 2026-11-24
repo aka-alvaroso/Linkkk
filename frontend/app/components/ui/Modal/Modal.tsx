@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { TbX } from 'react-icons/tb';
 import { cn } from '@/app/utils/cn';
+import { useTranslations } from 'next-intl';
+import { useDialogFocus } from '@/app/hooks/useDialogFocus';
 
 interface ModalProps {
   open: boolean;
@@ -25,6 +27,9 @@ interface ModalProps {
 
   // Animation
   animationDuration?: number;
+
+  // Accessibility: id of the element that titles the dialog
+  labelledBy?: string;
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -41,7 +46,10 @@ const Modal: React.FC<ModalProps> = ({
   showCloseButton = true,
   preventScroll = true,
   animationDuration = 300,
+  labelledBy,
 }) => {
+  const t = useTranslations('Common');
+  const dialogRef = useRef<HTMLDivElement>(null);
   const [show, setShow] = useState(open);
   const [isAnimating, setIsAnimating] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -92,6 +100,8 @@ const Modal: React.FC<ModalProps> = ({
     }
   }, [open, closeOnEsc, onClose, preventScroll, animationDuration]);
 
+  useDialogFocus(dialogRef, open, open && show && mounted);
+
   if (!show || !mounted) return null;
 
   const sizeClasses = {
@@ -141,12 +151,12 @@ const Modal: React.FC<ModalProps> = ({
         className={overlayClasses}
         onClick={closeOnOverlayClick ? onClose : undefined}
       />
-      <div className={modalClasses}>
+      <div ref={dialogRef} tabIndex={-1} className={modalClasses} role="dialog" aria-modal="true" aria-labelledby={labelledBy}>
         {showCloseButton && (
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-xl hover:bg-dark/5 transition-colors z-10 hover:cursor-pointer"
-            aria-label="Close modal"
+            className="absolute top-3 right-3 size-11 flex items-center justify-center rounded-xl hover:bg-dark/5 transition-colors z-10 hover:cursor-pointer"
+            aria-label={t('closeModal')}
           >
             <TbX size={24} className="text-dark/70" />
           </button>

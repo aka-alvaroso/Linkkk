@@ -11,7 +11,7 @@ export default function TermsOfService() {
                 <h1 className="text-4xl md:text-5xl font-black italic mb-8">Términos y Condiciones</h1>
                 <div className="bg-light border-l-4 border-dark/20 p-4 mb-8 rounded-r-xl">
                     <p className="font-bold italic m-0 text-dark/80">
-                        Última actualización: {new Date().toLocaleDateString('es-ES')}
+                        Última actualización: 10/4/2026
                     </p>
                 </div>
 
@@ -201,7 +201,7 @@ export default function TermsOfService() {
             <h1 className="text-4xl md:text-5xl font-black italic mb-8">Terms of Service</h1>
             <div className="bg-light border-l-4 border-dark/20 p-4 mb-8 rounded-r-xl">
                 <p className="font-bold italic m-0 text-dark/80">
-                    Last updated: {new Date().toLocaleDateString('en-US')}
+                    Last updated: April 10, 2026
                 </p>
             </div>
 

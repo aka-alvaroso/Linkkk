@@ -8,7 +8,7 @@ export default function OAuthDivider() {
   return (
     <div className="flex items-center justify-center gap-4 my-6">
       <div className="flex-1 h-[2px] bg-dark/10" />
-      <span className="text-dark/50 font-bold text-sm uppercase tracking-wider">
+      <span className="text-dark/70 font-bold text-sm uppercase tracking-wider">
         {t('or')}
       </span>
       <div className="flex-1 h-[2px] bg-dark/10" />

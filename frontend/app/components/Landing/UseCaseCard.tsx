@@ -23,9 +23,9 @@ export default function UseCaseCard({
   className?: string;
 }) {
   const text = light ? "text-light" : "text-dark";
-  const textMuted = light ? "text-light/50" : "text-dark/50";
+  const textMuted = light ? "text-light/70" : "text-dark/70";
   const textBody = light ? "text-light/75" : "text-dark/75";
-  const textTagline = light ? "text-light/60" : "text-dark/60";
+  const textTagline = light ? "text-light/70" : "text-dark/70";
   const border = light ? "border-light/15" : "border-dark/15";
   const iconColor = light ? "text-light/10" : "text-dark/10";
 

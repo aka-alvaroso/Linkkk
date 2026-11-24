@@ -1,4 +1,4 @@
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import * as motion from 'motion/react-client';
 import { TbClick, TbQrcode, TbWorld, TbShieldX, TbTag } from 'react-icons/tb';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area, CartesianGrid } from 'recharts';
@@ -43,13 +43,14 @@ interface LinkStatsPanelProps {
 
 export default function LinkStatsPanel({ stats, loading: statsLoading, period: statsPeriod, onPeriodChange: setStatsPeriod, isStandardPlan, bare = false }: LinkStatsPanelProps) {
     const t = useTranslations('EditLinkDrawer');
+    const locale = useLocale();
 
     return (
             <div className={bare ? 'flex flex-col gap-4' : 'flex flex-col gap-4 pt-4 border-t border-dark/10'}>
 
                 {/* Header: label + period selector */}
                 <div className='flex items-center justify-between'>
-                    <motion.span initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3, ease: 'easeOut' }} className='text-sm font-bold text-dark/50'>{t('stats')}</motion.span>
+                    <motion.span initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3, ease: 'easeOut' }} className='text-sm font-bold text-dark/70'>{t('stats')}</motion.span>
                     <div className='flex items-center gap-1  rounded-xl p-1'>
                         {(['7d', '30d', 'all'] as StatsPeriod[]).map((p, i) => (
                             <motion.button
@@ -62,7 +63,7 @@ export default function LinkStatsPanel({ stats, loading: statsLoading, period: s
                                 className={`px-3 py-1.5 rounded-3xl text-xs font-bold transition-all ${
                                     statsPeriod === p
                                         ? 'bg-dark text-light'
-                                        : 'text-dark/50 hover:text-dark disabled:opacity-30 disabled:cursor-not-allowed'
+                                        : 'text-dark/70 hover:text-dark disabled:opacity-30 disabled:cursor-not-allowed'
                                 }`}
                             >
                                 {p === 'all' ? t('periodAll') : p}
@@ -109,21 +110,21 @@ export default function LinkStatsPanel({ stats, loading: statsLoading, period: s
                             const formatTick = (d: string) => {
                                 if (isMonthly) {
                                     const [y, m] = d.split('-');
-                                    return new Date(parseInt(y), parseInt(m) - 1).toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+                                    return new Date(parseInt(y), parseInt(m) - 1).toLocaleDateString(locale, { month: 'short', year: '2-digit' });
                                 }
                                 const dt = new Date(d + 'T00:00:00');
-                                return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                                return dt.toLocaleDateString(locale, { month: 'short', day: 'numeric' });
                             };
                             const formatTooltipLabel = (d: unknown) => {
                                 if (typeof d !== 'string') return String(d ?? '');
                                 if (isMonthly) {
                                     const [y, m] = d.split('-');
-                                    return new Date(parseInt(y), parseInt(m) - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                                    return new Date(parseInt(y), parseInt(m) - 1).toLocaleDateString(locale, { month: 'long', year: 'numeric' });
                                 }
                                 const dt = new Date(d + 'T00:00:00');
                                 return isWeekly
-                                    ? `Week of ${dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
-                                    : dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                                    ? t('weekOf', { date: dt.toLocaleDateString(locale, { month: 'short', day: 'numeric' }) })
+                                    : dt.toLocaleDateString(locale, { month: 'short', day: 'numeric' });
                             };
                             return (
                                 <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05, duration: 0.3, ease: 'easeOut' }} className='bg-white border border-dark/10 rounded-xl p-4'>
@@ -141,7 +142,7 @@ export default function LinkStatsPanel({ stats, loading: statsLoading, period: s
                                     </div>
                                     {lowData ? (
                                         <div className='flex items-center justify-center text-center' style={{ height: 110 }}>
-                                            <p className='text-xs text-dark/60 max-w-[220px]'>{t('lowDataHint', { count: stats.totalClicks })}</p>
+                                            <p className='text-xs text-dark/70 max-w-[220px]'>{t('lowDataHint', { count: stats.totalClicks })}</p>
                                         </div>
                                     ) : (
                                     <ResponsiveContainer width='100%' height={110}>
@@ -194,7 +195,7 @@ export default function LinkStatsPanel({ stats, loading: statsLoading, period: s
                                                                 className={`h-full rounded-full ${idx === 0 ? 'bg-primary' : 'bg-dark/70'}`}
                                                             />
                                                         </div>
-                                                        <span className='text-xs font-bold text-dark/50 w-5 text-right flex-shrink-0 tabular-nums'>{count}</span>
+                                                        <span className='text-xs font-bold text-dark/70 w-5 text-right flex-shrink-0 tabular-nums'>{count}</span>
                                                     </div>
                                                 );
                                             })}
@@ -234,12 +235,12 @@ export default function LinkStatsPanel({ stats, loading: statsLoading, period: s
                                                 <div className='w-full flex-1 flex flex-col gap-1.5'>
                                                     {segments.map(({ key, label, color, count }) => (
                                                         <div key={key} className='flex items-center justify-between'>
-                                                            <span className='flex items-center gap-1.5 text-xs text-dark/50'>
+                                                            <span className='flex items-center gap-1.5 text-xs text-dark/70'>
                                                                 <span className='w-1.5 h-1.5 rounded-full flex-shrink-0' style={{ backgroundColor: color }} />
                                                                 {label}
                                                             </span>
                                                             <div className='flex items-center gap-1'>
-                                                                <span className='text-xs font-bold text-dark/60 tabular-nums'>{count}</span>
+                                                                <span className='text-xs font-bold text-dark/70 tabular-nums'>{count}</span>
                                                                 <span className='text-[10px] text-dark/30'>({Math.round(count / total * 100)}%)</span>
                                                             </div>
                                                         </div>
@@ -279,7 +280,7 @@ export default function LinkStatsPanel({ stats, loading: statsLoading, period: s
                                                     const logoUrl = browser !== 'Unknown' ? `https://cdn.simpleicons.org/${slug}` : null;
                                                     return (
                                                         <div key={browser} className='flex items-center justify-between'>
-                                                            <span className='flex items-center gap-1.5 text-xs text-dark/50 truncate'>
+                                                            <span className='flex items-center gap-1.5 text-xs text-dark/70 truncate'>
                                                                 {logoUrl ? (
                                                                     <img src={logoUrl} alt={browser} width={12} height={12} className='flex-shrink-0 object-contain' style={{ filter: 'grayscale(0.2)' }} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                                                                 ) : (
@@ -287,7 +288,7 @@ export default function LinkStatsPanel({ stats, loading: statsLoading, period: s
                                                                 )}
                                                                 {browser}
                                                             </span>
-                                                            <span className='text-xs font-bold text-dark/60 tabular-nums flex-shrink-0 ml-1'>{pct}%</span>
+                                                            <span className='text-xs font-bold text-dark/70 tabular-nums flex-shrink-0 ml-1'>{pct}%</span>
                                                         </div>
                                                     );
                                                 })}
@@ -308,7 +309,7 @@ export default function LinkStatsPanel({ stats, loading: statsLoading, period: s
                                     <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25, duration: 0.3, ease: 'easeOut' }} className='bg-white border border-dark/10 rounded-xl px-3 py-3 flex flex-col gap-2.5'>
                                         <p className='text-xs font-bold text-dark/40 flex items-center gap-1.5'><TbTag size={16} />{t('utmTitle')}</p>
                                         {groups.length === 0 ? (
-                                            <p className='text-xs text-dark/50'>{t('utmEmptyHint')}</p>
+                                            <p className='text-xs text-dark/70'>{t('utmEmptyHint')}</p>
                                         ) : (
                                             <>
                                                 <p className='text-[10px] text-dark/40'>{t('utmShare', { count: utm.withUtm, total: stats.totalClicks })}</p>
@@ -328,7 +329,7 @@ export default function LinkStatsPanel({ stats, loading: statsLoading, period: s
                                                                             className={`h-full rounded-full ${idx === 0 ? 'bg-primary' : 'bg-dark/70'}`}
                                                                         />
                                                                     </div>
-                                                                    <span className='text-xs font-bold text-dark/50 w-6 text-right flex-shrink-0 tabular-nums'>{count}</span>
+                                                                    <span className='text-xs font-bold text-dark/70 w-6 text-right flex-shrink-0 tabular-nums'>{count}</span>
                                                                 </div>
                                                             );
                                                         })}

@@ -1,7 +1,7 @@
 "use client";
 import RouteGuard from "../../components/RouteGuard/RouteGuard";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/app/hooks";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/app/hooks/useToast";
@@ -16,8 +16,12 @@ import { useTranslations } from 'next-intl';
 export default function Register() {
   const t = useTranslations('Auth');
   const tSignup = useTranslations('Auth.Signup');
-  const { register } = useAuth();
+  const { register, isAuthenticated } = useAuth();
   const router = useRouter();
+
+  useEffect(() => {
+    if (isAuthenticated) router.replace('/dashboard');
+  }, [isAuthenticated, router]);
   const toast = useToast();
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
@@ -140,6 +144,8 @@ export default function Register() {
                 type="email"
                 name="email"
                 id="email"
+                autoComplete="email"
+                aria-label={tSignup('emailPlaceholder')}
                 placeholder={tSignup('emailPlaceholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -157,6 +163,7 @@ export default function Register() {
                 type="text"
                 name="username"
                 id="username"
+                autoComplete="username"
                 placeholder={tSignup('usernamePlaceholder')}
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
@@ -174,6 +181,7 @@ export default function Register() {
                 type={showPassword ? "text" : "password"}
                 name="password"
                 id="password"
+                autoComplete="new-password"
                 placeholder={tSignup('passwordPlaceholder')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -183,7 +191,7 @@ export default function Register() {
                 <button
                   type="button"
                   onClick={generatePassword}
-                  className="text-dark/50 hover:text-secondary transition-colors hover:cursor-pointer"
+                  className="text-dark/70 hover:text-secondary transition-colors hover:cursor-pointer"
                   title={tSignup('generatePasswordTitle')}
                 >
                   <TbRefresh size={20} />
@@ -191,7 +199,7 @@ export default function Register() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="text-dark/50 hover:text-info transition-colors hover:cursor-pointer"
+                  className="text-dark/70 hover:text-info transition-colors hover:cursor-pointer"
                   title={tSignup('togglePasswordTitle')}
                 >
                   {showPassword ? <TbEyeOff size={20} /> : <TbEye size={20} />}

@@ -143,7 +143,7 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
     switch (condition.field) {
       case 'always':
         return (
-          <p className="w-auto text-xs text-dark/50 italic whitespace-nowrap">
+          <p className="w-auto text-xs text-dark/70 italic whitespace-nowrap">
             {t('noConditionsRequired')}
           </p>
         );
@@ -228,7 +228,7 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
               rounded="lg"
               className={numberInputClass}
             />
-            <span className="text-xs text-dark/60">{t('burstLinksIn')}</span>
+            <span className="text-xs text-dark/70">{t('burstLinksIn')}</span>
             <Input
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               {...({ type: "number", min: "1", max: "300" } as any)}
@@ -238,7 +238,7 @@ export function RuleCondition({ condition, onChange, onDelete }: RuleConditionPr
               rounded="lg"
               className={numberInputClass}
             />
-            <span className="text-xs text-dark/60">{t('burstSeconds')}</span>
+            <span className="text-xs text-dark/70">{t('burstSeconds')}</span>
           </div>
         );
       }

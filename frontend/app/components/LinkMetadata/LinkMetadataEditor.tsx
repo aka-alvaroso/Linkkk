@@ -166,7 +166,7 @@ export default function LinkMetadataEditor({
       >
         <div className="flex flex-col">
           <span className="text-sm font-medium text-dark">{t('enabledLabel')}</span>
-          <span className="text-xs text-dark/65">{t('enabledHint')}</span>
+          <span className="text-xs text-dark/70">{t('enabledHint')}</span>
         </div>
         <Switch
           checked={config.enabled}
@@ -187,7 +187,7 @@ export default function LinkMetadataEditor({
           >
             <div className="flex items-center justify-between">
               <label className="text-sm font-medium text-dark/70">{t('ogTitleLabel')}</label>
-              <span className="text-xs text-dark/60">
+              <span className="text-xs text-dark/70">
                 {(config.ogTitle?.length ?? 0)}/{OG_TITLE_MAX}
               </span>
             </div>
@@ -199,7 +199,7 @@ export default function LinkMetadataEditor({
               rounded="xl"
               maxLength={OG_TITLE_MAX}
             />
-            <p className="text-xs text-dark/65">{t('ogTitleHint')}</p>
+            <p className="text-xs text-dark/70">{t('ogTitleHint')}</p>
           </motion.div>
 
           {/* Description */}
@@ -211,7 +211,7 @@ export default function LinkMetadataEditor({
           >
             <div className="flex items-center justify-between">
               <label className="text-sm font-medium text-dark/70">{t('ogDescriptionLabel')}</label>
-              <span className="text-xs text-dark/60">
+              <span className="text-xs text-dark/70">
                 {(config.ogDescription?.length ?? 0)}/{OG_DESCRIPTION_MAX}
               </span>
             </div>
@@ -225,7 +225,7 @@ export default function LinkMetadataEditor({
               maxLength={OG_DESCRIPTION_MAX}
               rows={3}
             />
-            <p className="text-xs text-dark/65">{t('ogDescriptionHint')}</p>
+            <p className="text-xs text-dark/70">{t('ogDescriptionHint')}</p>
           </motion.div>
 
           {/* Image */}
@@ -265,7 +265,7 @@ export default function LinkMetadataEditor({
                 <span className="text-[10px] uppercase tracking-wide text-dark/40">linkkk.dev</span>
                 <span className="text-sm font-semibold text-dark truncate">{previewTitle}</span>
                 {previewDescription && (
-                  <span className="text-xs text-dark/50 line-clamp-2">{previewDescription}</span>
+                  <span className="text-xs text-dark/70 line-clamp-2">{previewDescription}</span>
                 )}
               </div>
             </div>
