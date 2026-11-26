@@ -124,6 +124,14 @@ const ERRORS = {
     statusCode: 400,
     retryable: false,
   },
+  UNSAFE_DESTINATION_URL: {
+    code: "UNSAFE_DESTINATION_URL",
+    message: "Destination URL is flagged as unsafe",
+    userMessage:
+      "This destination has been flagged as phishing or malware and can't be shortened",
+    statusCode: 400,
+    retryable: false,
+  },
   LINK_LIMIT_EXCEEDED: {
     code: "LINK_LIMIT_EXCEEDED",
     message: "Link limit exceeded",
@@ -414,6 +422,7 @@ ERRORS.categories = {
     "LINK_ACCESS_DENIED",
     "SHORT_URL_EXISTS",
     "LINK_LIMIT_EXCEEDED",
+    "UNSAFE_DESTINATION_URL",
     "LINK_NO_PASSWORD",
     "LINK_DISABLED",
     "LINK_EXPIRED",

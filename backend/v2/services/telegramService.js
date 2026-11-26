@@ -371,6 +371,85 @@ async function notifyFirstClick(owner, shortUrl, { source, country, device }) {
 }
 
 // ============================================================================
+// ABUSE NOTIFICATIONS
+// ============================================================================
+
+const describeOwner = (owner) =>
+  owner
+    ? `${escapeHtml(owner.username || "N/A")} (${escapeHtml(owner.email)})`
+    : "Invitado";
+
+/**
+ * A destination flagged by Google Safe Browsing was refused (create/update)
+ * or stopped at redirect time. `stage` is "create", "update" or "redirect".
+ */
+async function notifyUnsafeUrl(owner, { stage, shortUrl, longUrl, threats = [] }) {
+  const stageText = {
+    create: "Creación rechazada",
+    update: "Edición rechazada",
+    redirect: "Redirección bloqueada",
+  }[stage] || escapeHtml(stage);
+
+  const message = `
+🛑 <b>URL marcada por Safe Browsing</b>
+
+⚙️ <b>Acción:</b> ${stageText}
+👤 <b>Usuario:</b> ${describeOwner(owner)}
+${shortUrl ? `🆔 <b>Enlace:</b> <code>${escapeHtml(shortUrl)}</code>\n` : ""}➡️ <b>Destino:</b> <code>${escapeHtml(longUrl)}</code>
+☣️ <b>Amenazas:</b> ${escapeHtml(threats.join(", ") || "N/A")}
+🕐 ${formatDate(new Date())}
+  `.trim();
+
+  return sendMessage(message);
+}
+
+/**
+ * A young account pointed a link at a free hosting subdomain often used for
+ * phishing. Only a warning: the link was created.
+ */
+async function notifySuspiciousDestination(owner, { shortUrl, longUrl, suffix, accountAgeDays, stage }) {
+  const message = `
+👀 <b>Destino sospechoso (cuenta nueva)</b>
+
+👤 <b>Usuario:</b> ${describeOwner(owner)}
+📆 <b>Antigüedad cuenta:</b> ${accountAgeDays} día(s)
+🆔 <b>Enlace:</b> <code>${escapeHtml(shortUrl)}</code>
+➡️ <b>Destino:</b> <code>${escapeHtml(longUrl)}</code>
+🏷️ <b>Hosting:</b> *.${escapeHtml(suffix)}
+⚙️ <b>Acción:</b> ${stage === "update" ? "Edición" : "Creación"}
+🕐 ${formatDate(new Date())}
+
+ℹ️ No se ha bloqueado. Revisa el destino.
+  `.trim();
+
+  return sendMessage(message);
+}
+
+/**
+ * A link owned by a young account (or a guest) got a burst of accesses.
+ */
+async function notifyLinkBurst(owner, { shortUrl, longUrl, count, botCount, topCountries = [], accountAgeDays }) {
+  const countriesText =
+    topCountries.map((c) => `${escapeHtml(c.country)} (${c.count})`).join(", ") || "N/A";
+
+  const message = `
+📈 <b>Pico de tráfico en enlace de cuenta nueva</b>
+
+👤 <b>Usuario:</b> ${describeOwner(owner)}
+📆 <b>Antigüedad cuenta:</b> ${accountAgeDays} día(s)
+🆔 <b>Enlace:</b> <code>${escapeHtml(shortUrl)}</code>
+➡️ <b>Destino:</b> <code>${escapeHtml(longUrl)}</code>
+🔢 <b>Accesos última hora:</b> ${count} (bots detectados: ${botCount})
+🌍 <b>Top países:</b> ${countriesText}
+🕐 ${formatDate(new Date())}
+
+⚠️ Posible campaña de phishing/spam. Revisa el destino.
+  `.trim();
+
+  return sendMessage(message);
+}
+
+// ============================================================================
 // WEBHOOK NOTIFICATIONS
 // ============================================================================
 
@@ -570,6 +649,11 @@ module.exports = {
   notifyLinkCreated,
   notifyRuleCreated,
   notifyFirstClick,
+
+  // Abuse notifications
+  notifyUnsafeUrl,
+  notifySuspiciousDestination,
+  notifyLinkBurst,
 
   // Webhook notifications
   notifyWebhookReceived,

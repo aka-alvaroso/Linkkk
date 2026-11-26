@@ -17,6 +17,9 @@ const { forwardedUrl } = require("../utils/forwardParams");
 const { sendRuleNotificationEmail } = require("../services/emailService");
 const { publish } = require("../realtime/broadcaster");
 const telegramService = require("../services/telegramService");
+const safeBrowsing = require("../services/safeBrowsing");
+const { freeHostWarning, accountAgeDays } = require("../utils/linkAbuse");
+const { recordLinkHit } = require("../utils/linkBurstAlert");
 const {
   DEFAULT_OG_TITLE,
   DEFAULT_OG_DESCRIPTION,
@@ -178,6 +181,39 @@ const sendNotifications = (
   }
 };
 
+/**
+ * Checks a destination against Google Safe Browsing before it is saved.
+ * Returns the threats when the URL is flagged (and alerts the admin), or null
+ * when it's clean or the check couldn't run (fail-open).
+ */
+const findDestinationThreats = async (longUrl, { owner, stage, shortUrl }) => {
+  const result = await safeBrowsing.checkUrl(longUrl);
+  if (!result.flagged) return null;
+
+  logger.warn("[SECURITY] Unsafe destination refused", {
+    stage,
+    shortUrl,
+    userId: owner?.id ?? null,
+    threats: result.threats,
+  });
+  telegramService
+    .notifyUnsafeUrl(owner, { stage, shortUrl, longUrl, threats: result.threats })
+    .catch(() => {});
+  return result.threats;
+};
+
+/**
+ * Warns the admin (never blocks) when a young account or a guest points a
+ * link at a free hosting subdomain popular with phishers.
+ */
+const warnIfSuspiciousDestination = (owner, { shortUrl, longUrl, stage }) => {
+  const warning = freeHostWarning(longUrl, owner?.createdAt ?? null);
+  if (!warning) return;
+  telegramService
+    .notifySuspiciousDestination(owner, { shortUrl, longUrl, stage, ...warning })
+    .catch(() => {});
+};
+
 // 1. Create link
 const createLink = async (req, res) => {
   const user = req.user;
@@ -246,6 +282,10 @@ const createLink = async (req, res) => {
     }
   }
 
+  if (await findDestinationThreats(longUrl, { owner: user, stage: "create" })) {
+    return errorResponse(res, ERRORS.UNSAFE_DESTINATION_URL);
+  }
+
   const shortUrl = customSuffix || (await generateShortCode());
 
   // groupId only allowed for authenticated users
@@ -275,6 +315,7 @@ const createLink = async (req, res) => {
 
     // Notify Telegram (non-blocking)
     telegramService.notifyLinkCreated(user, link.shortUrl, link.longUrl).catch(() => {});
+    warnIfSuspiciousDestination(user, { shortUrl: link.shortUrl, longUrl: link.longUrl, stage: "create" });
 
     return successResponse(res, link, 201);
   } catch (error) {
@@ -482,6 +523,14 @@ const updateLink = async (req, res) => {
       return errorResponse(res, ERRORS.LINK_ACCESS_DENIED);
     }
 
+    const destinationChanged = longUrl !== undefined && longUrl !== existingLink.longUrl;
+    if (
+      destinationChanged &&
+      (await findDestinationThreats(longUrl, { owner: user, stage: "update", shortUrl }))
+    ) {
+      return errorResponse(res, ERRORS.UNSAFE_DESTINATION_URL);
+    }
+
     const updateData = {};
     if (longUrl !== undefined) updateData.longUrl = longUrl;
     if (status !== undefined) updateData.status = status;
@@ -507,6 +556,14 @@ const updateLink = async (req, res) => {
       data: updateData,
       include: { tags: { include: { tag: true } }, group: true, customDomain: true },
     });
+
+    if (destinationChanged) {
+      warnIfSuspiciousDestination(user, {
+        shortUrl: updatedLink.shortUrl,
+        longUrl: updatedLink.longUrl,
+        stage: "update",
+      });
+    }
 
     return successResponse(res, {
       shortUrl: updatedLink.shortUrl,
@@ -610,6 +667,40 @@ const generateShortCode = async () => {
 // Keys the password page already uses for its own state
 const GATE_PAGE_KEYS = new Set(["shortUrl", "hint"]);
 
+/**
+ * Redirect-time Safe Browsing check. Alerts the admin at most once per
+ * link per cooldown, so a flagged link being hammered doesn't flood Telegram.
+ */
+const UNSAFE_REDIRECT_ALERT_COOLDOWN_MS = 6 * 60 * 60 * 1000;
+const unsafeRedirectAlertedAt = new Map();
+
+const findRedirectThreats = async (link, target) => {
+  if (process.env.SAFE_BROWSING_CHECK_ON_REDIRECT === "false") return null;
+  const timeoutMs = parseInt(process.env.SAFE_BROWSING_REDIRECT_TIMEOUT_MS, 10) || 800;
+  const result = await safeBrowsing.checkUrl(target, { timeoutMs });
+  if (!result.flagged) return null;
+
+  const now = Date.now();
+  const last = unsafeRedirectAlertedAt.get(link.id);
+  if (!last || now - last >= UNSAFE_REDIRECT_ALERT_COOLDOWN_MS) {
+    if (unsafeRedirectAlertedAt.size >= 5000) unsafeRedirectAlertedAt.clear();
+    unsafeRedirectAlertedAt.set(link.id, now);
+    logger.warn("[SECURITY] Redirect to unsafe destination blocked", {
+      shortUrl: link.shortUrl,
+      threats: result.threats,
+    });
+    telegramService
+      .notifyUnsafeUrl(link.userId ? link.user : null, {
+        stage: "redirect",
+        shortUrl: link.shortUrl,
+        longUrl: target,
+        threats: result.threats,
+      })
+      .catch(() => {});
+  }
+  return result.threats;
+};
+
 // 5. Link redirect
 const redirectLink = async (req, res) => {
   const { shortUrl } = req.params;
@@ -648,8 +739,10 @@ const redirectLink = async (req, res) => {
         },
         customDomain: true,
         metadata: true,
-        // email is for notifications; blockedAt stops a banned owner's links
-        user: { select: { email: true, blockedAt: true } },
+        // email for rule notifications, blockedAt stops a banned owner's links,
+        // username/createdAt for abuse alerts
+        user: { select: { email: true, blockedAt: true, username: true, createdAt: true } },
+        guestSession: { select: { createdAt: true } },
       },
     });
 
@@ -682,6 +775,20 @@ const redirectLink = async (req, res) => {
     const isBot = isbot(userAgent);
     // Hits from this IP on this owner's links, including the current one
     const recentHits = recordHit(link, ip);
+
+    // Traffic burst on a young account's link → one admin alert per cooldown
+    const ownerCreatedAt = link.user?.createdAt ?? link.guestSession?.createdAt ?? null;
+    const burst = recordLinkHit(link, { ownerCreatedAt, country, isBot });
+    if (burst) {
+      telegramService
+        .notifyLinkBurst(link.userId ? link.user : null, {
+          shortUrl,
+          longUrl: link.longUrl,
+          ...burst,
+          accountAgeDays: accountAgeDays(ownerCreatedAt),
+        })
+        .catch(() => {});
+    }
 
     // Sanitize query params before including in context.
     // 'src' is reserved and filtered out by the sanitizer automatically.
@@ -743,6 +850,22 @@ const redirectLink = async (req, res) => {
         type: "redirect",
         url: link.longUrl,
       };
+    }
+
+    // Re-check the destination we're about to send the visitor to: it may
+    // have been flagged after the link was saved, or come from a rule. Cached
+    // per URL, short timeout, fail-open. Applies to bots too, since link
+    // scanners judge our domain by where it leads.
+    if (action.type !== "block" && action.type !== "password_gate") {
+      const target = action.type === "redirect" && action.url ? action.url : link.longUrl;
+      const threats = await findRedirectThreats(link, target);
+      if (threats) {
+        return res.redirect(
+          `${config.frontend.url}/blocked?url=${shortUrl}&reason=${encodeURIComponent(
+            "This link leads to a site flagged as unsafe",
+          )}`,
+        );
+      }
     }
 
     // Bots/crawlers never get redirected — they get a metadata preview page
@@ -942,8 +1065,9 @@ const verifyPasswordGate = async (req, res) => {
           include: { conditions: true },
           orderBy: { priority: "asc" },
         },
-        // email is for notify rules; blockedAt rejects a banned owner's links
-        user: { select: { email: true, blockedAt: true } },
+        // email for notify rules, blockedAt rejects a banned owner's links,
+        // username for the unsafe-destination alert
+        user: { select: { email: true, blockedAt: true, username: true } },
       },
     });
 
@@ -1060,6 +1184,14 @@ const verifyPasswordGate = async (req, res) => {
         },
       );
       // Fallback to longUrl on error
+    }
+
+    // Same Safe Browsing re-check as the plain redirect
+    if (accessAllowed && (await findRedirectThreats(link, finalUrl))) {
+      accessAllowed = false;
+      finalUrl = `${config.frontend.url}/blocked?url=${shortUrl}&reason=${encodeURIComponent(
+        "This link leads to a site flagged as unsafe",
+      )}`;
     }
 
     // Only track access and increment counter if not blocked
