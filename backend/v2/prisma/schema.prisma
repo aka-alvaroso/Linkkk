@@ -26,6 +26,11 @@ model User {
   // Sessions issued before this moment are rejected (set on password change/reset)
   passwordChangedAt   DateTime?
   passwordResetTokens PasswordResetToken[]
+  // Banned accounts (abuse, phishing...). When set, the account cannot sign
+  // in by any method, existing sessions stop working and its links stop
+  // redirecting. blockedReason is internal only and never shown to the user.
+  blockedAt     DateTime?
+  blockedReason String?
 
   @@unique([oauthProvider, oauthId])
 }

@@ -219,6 +219,17 @@ const login = async (req, res) => {
       return errorResponse(res, ERRORS.INVALID_CREDENTIALS);
     }
 
+    // Banned accounts get the same answer as a wrong password, so a login
+    // probe cannot tell a ban apart from bad credentials.
+    if (user.blockedAt) {
+      logger.warn("Login attempt on blocked account", {
+        type: "AUTH",
+        userId: user.id,
+        ip: req.ip,
+      });
+      return errorResponse(res, ERRORS.INVALID_CREDENTIALS);
+    }
+
     // Transferir links y limpiar sesión guest si existe
     if (guest && guest.guestSessionId) {
       await transferLinks(guest.guestSessionId, user.id);
@@ -308,9 +319,19 @@ const forgotPassword = async (req, res) => {
   const issueToken = async () => {
     const user = await prisma.user.findFirst({
       where: { email: { equals: email, mode: "insensitive" } },
-      select: { id: true, email: true },
+      select: { id: true, email: true, blockedAt: true },
     });
     if (!user) return;
+    // A banned account must not be able to set a password and sign in.
+    // The response is already the generic one, so nothing is revealed.
+    if (user.blockedAt) {
+      logger.warn("Password reset requested for blocked account", {
+        type: "AUTH",
+        userId: user.id,
+        ip: req.ip,
+      });
+      return;
+    }
 
     const recent = await prisma.passwordResetToken.findFirst({
       where: {
@@ -396,8 +417,17 @@ const resetPassword = async (req, res) => {
 
       const record = await tx.passwordResetToken.findUnique({
         where: { tokenHash },
-        select: { userId: true },
+        select: { userId: true, user: { select: { blockedAt: true } } },
       });
+
+      // A link issued before the ban must not be usable afterwards. The
+      // token stays consumed and the answer is the same as for a bad link.
+      if (record.user.blockedAt) {
+        await tx.passwordResetToken.deleteMany({
+          where: { userId: record.userId },
+        });
+        return null;
+      }
 
       await tx.user.update({
         where: { id: record.userId },
@@ -488,6 +518,17 @@ const deleteGuestSession = async (id) => {
   }
 };
 
+// OAuth sign-in of a banned account ends like any other failed OAuth
+// attempt, with nothing that tells a ban apart from a provider error.
+const rejectBlockedOAuth = (res, user, provider) => {
+  logger.warn("OAuth login attempt on blocked account", {
+    type: "OAUTH",
+    userId: user.id,
+    provider,
+  });
+  return res.redirect(`${config.frontend.url}/auth/login?error=oauth_failed`);
+};
+
 // Redirects user to Google's authorization page
 const googleAuth = async (req, res) => {
   try {
@@ -572,6 +613,10 @@ const googleCallback = async (req, res) => {
     });
 
     if (user) {
+      if (user.blockedAt) {
+        return rejectBlockedOAuth(res, user, "google");
+      }
+
       // User exists with this Google account - log them in
       logger.info("User logged in via Google OAuth", {
         type: "OAUTH",
@@ -590,6 +635,11 @@ const googleCallback = async (req, res) => {
       });
 
       if (existingUser) {
+        // A banned account must not be reachable by linking a new provider
+        if (existingUser.blockedAt) {
+          return rejectBlockedOAuth(res, existingUser, "google");
+        }
+
         // Email exists - redirect to account linking confirmation page
         // Store pending OAuth data in a temporary cookie for linking
         const linkingToken = jwt.sign(
@@ -796,6 +846,10 @@ const githubCallback = async (req, res) => {
     });
 
     if (user) {
+      if (user.blockedAt) {
+        return rejectBlockedOAuth(res, user, "github");
+      }
+
       // User exists with this GitHub account - log them in
       logger.info("User logged in via GitHub OAuth", {
         type: "OAUTH",
@@ -814,6 +868,11 @@ const githubCallback = async (req, res) => {
       });
 
       if (existingUser) {
+        // A banned account must not be reachable by linking a new provider
+        if (existingUser.blockedAt) {
+          return rejectBlockedOAuth(res, existingUser, "github");
+        }
+
         // Email exists - redirect to account linking confirmation page
         // Store pending OAuth data in a temporary cookie for linking
         const linkingToken = jwt.sign(
@@ -1011,6 +1070,15 @@ const linkOAuthAccount = async (req, res) => {
         type: "OAUTH",
         userId: user.id,
       });
+      return errorResponse(res, ERRORS.INVALID_CREDENTIALS);
+    }
+
+    if (user.blockedAt) {
+      logger.warn("OAuth linking attempt on blocked account", {
+        type: "OAUTH",
+        userId: user.id,
+      });
+      res.clearCookie("oauth_link_token");
       return errorResponse(res, ERRORS.INVALID_CREDENTIALS);
     }
 
