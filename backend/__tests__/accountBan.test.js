@@ -270,16 +270,37 @@ describe("Account ban", () => {
     });
 
     it("refuses the password gate of a banned account's link", async () => {
-      const { user } = await uniqueUser();
+      const { user, token } = await uniqueUser();
       const link = await createTestLink(user.id, null, "https://phish.example");
+      await request(app)
+        .post(`/link/${link.shortUrl}/rules`)
+        .set("Cookie", `token=${token}`)
+        .send({
+          priority: 1,
+          conditions: [],
+          action: {
+            type: "password_gate",
+            settings: { passwordHash: "secret123" },
+          },
+        })
+        .expect(201);
+
+      // The right password opens the gate before the ban...
+      await request(app)
+        .post(`/link/${link.shortUrl}/verify-password`)
+        .send({ password: "secret123" })
+        .expect(200);
+
       await ban(user.id);
 
+      // ...and not after it
       const response = await request(app)
         .post(`/link/${link.shortUrl}/verify-password`)
-        .send({ password: "anything" })
+        .send({ password: "secret123" })
         .expect(403);
 
       expect(response.body.code).toBe("ACCESS_DENIED");
+      expect(response.body.data?.url).toBeUndefined();
     });
   });
 });
