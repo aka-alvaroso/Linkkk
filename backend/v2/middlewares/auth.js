@@ -9,8 +9,9 @@ const config = require("../config/environment");
 
 /**
  * Loads the user a verified auth token belongs to.
- * Throws when the token was issued before the user's last password change:
- * changing or resetting a password signs every older session out.
+ * Throws when the token was issued before the user's last password change
+ * (changing or resetting a password signs every older session out) or when
+ * the account is banned (every session stops working at once).
  */
 const loadSessionUser = async (decoded) => {
   const user = await prisma.user.findUnique({
@@ -22,12 +23,16 @@ const loadSessionUser = async (decoded) => {
       role: true,
       createdAt: true,
       passwordChangedAt: true,
+      blockedAt: true,
     },
   });
 
   if (!user) return user;
 
-  const { passwordChangedAt, ...sessionUser } = user;
+  const { passwordChangedAt, blockedAt, ...sessionUser } = user;
+  if (blockedAt) {
+    throw new Error("Account is blocked");
+  }
   if (
     passwordChangedAt &&
     typeof decoded.iat === "number" &&

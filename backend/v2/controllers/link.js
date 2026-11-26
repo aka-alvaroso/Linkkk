@@ -648,13 +648,19 @@ const redirectLink = async (req, res) => {
         },
         customDomain: true,
         metadata: true,
-        // Only select email — nothing else is needed for notifications
-        user: { select: { email: true } },
+        // email is for notifications; blockedAt stops a banned owner's links
+        user: { select: { email: true, blockedAt: true } },
       },
     });
 
     if (!link) {
       return res.redirect(`${config.frontend.url}/404?url=${shortUrl}`);
+    }
+
+    // Links of a banned account never reach their destination. Checked before
+    // the custom-domain canonical redirect so nothing about them is followed.
+    if (link.user?.blockedAt) {
+      return res.redirect(`${config.frontend.url}/disabled`);
     }
 
     // If the link has a custom domain assigned but the request came through
@@ -936,8 +942,8 @@ const verifyPasswordGate = async (req, res) => {
           include: { conditions: true },
           orderBy: { priority: "asc" },
         },
-        // Only select email — needed for notify rules that send email
-        user: { select: { email: true } },
+        // email is for notify rules; blockedAt rejects a banned owner's links
+        user: { select: { email: true, blockedAt: true } },
       },
     });
 
@@ -950,8 +956,8 @@ const verifyPasswordGate = async (req, res) => {
       retryable: false,
     };
 
-    if (!link || !link.status) {
-      // Don't reveal if link exists or is disabled - use generic error
+    if (!link || !link.status || link.user?.blockedAt) {
+      // Don't reveal if link exists, is disabled or its owner is banned
       return errorResponse(res, GENERIC_ACCESS_DENIED);
     }
 
