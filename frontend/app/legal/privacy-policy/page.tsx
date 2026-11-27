@@ -12,7 +12,7 @@ export default function PrivacyPolicy() {
 
                 <div className="bg-light border-l-4 border-dark/20 p-4 mb-8 rounded-r-xl">
                     <p className="font-bold italic m-0 text-dark/80">
-                        Última actualización: 9/4/2026
+                        Última actualización: 27/11/2026
                     </p>
                 </div>
 
@@ -129,6 +129,15 @@ export default function PrivacyPolicy() {
                         </p>
                     </div>
                     <div className="bg-white p-6 rounded-2xl border-2 border-dark/20">
+                        <p className="font-bold mb-2">Protección contra phishing y malware (Google Safe Browsing)</p>
+                        <p className="mb-2">
+                            Para proteger a quienes visitan los enlaces, comprobamos las URLs de destino con <strong>Google Safe Browsing</strong>, de Google LLC, al crear o editar un enlace y al redirigir a sus visitantes. Si un destino está marcado como phishing o malware, no se puede acortar y sus visitas no se redirigen.
+                        </p>
+                        <p className="text-sm text-dark/70 m-0">
+                            Google solo recibe la URL de destino. No le enviamos datos de su cuenta ni de los visitantes, como su dirección IP. Le recomendamos no incluir datos personales en las URLs que acorte. Google puede tratar estos datos en Estados Unidos y está certificado bajo el <strong>Data Privacy Framework</strong> (DPF) de la UE-EE.UU. Política de privacidad de Google: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="underline decoration-2 decoration-primary hover:text-primary">policies.google.com/privacy</a>
+                        </p>
+                    </div>
+                    <div className="bg-white p-6 rounded-2xl border-2 border-dark/20">
                         <p className="font-bold mb-2">Alojamiento (OVH)</p>
                         <p className="mb-2">
                             Nuestros servidores están alojados en <strong>OVH</strong>, en centros de datos ubicados en <strong>Canadá</strong>.
@@ -179,7 +188,7 @@ export default function PrivacyPolicy() {
 
             <div className="bg-light border-l-4 border-dark/20 p-4 mb-8 rounded-r-xl">
                 <p className="font-bold italic m-0 text-dark/80">
-                    Last updated: April 9, 2026
+                    Last updated: November 27, 2026
                 </p>
             </div>
 
@@ -293,6 +302,15 @@ export default function PrivacyPolicy() {
                     <p className="font-bold mb-2">Geolocation and VPN Detection (ipquery.io)</p>
                     <p className="text-sm text-dark/70 m-0">
                         To determine the country of origin and detect VPN/proxy connections from link visitors, we send the IP address to the <strong>ipquery.io</strong> API. This service only receives the IP and returns geolocation and detection data. We do not share any other personal data with this provider.
+                    </p>
+                </div>
+                <div className="bg-white p-6 rounded-2xl border-2 border-dark/20">
+                    <p className="font-bold mb-2">Phishing and Malware Protection (Google Safe Browsing)</p>
+                    <p className="mb-2">
+                        To protect link visitors, we check destination URLs with <strong>Google Safe Browsing</strong>, by Google LLC, when a link is created or edited and when its visitors are redirected. If a destination is flagged as phishing or malware, it cannot be shortened and its visits are not redirected.
+                    </p>
+                    <p className="text-sm text-dark/70 m-0">
+                        Google only receives the destination URL. We do not send it your account data or visitor data such as IP addresses. We recommend not including personal data in the URLs you shorten. Google may process this data in the United States and is certified under the <strong>EU-U.S. Data Privacy Framework</strong> (DPF). Google&apos;s privacy policy: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="underline decoration-2 decoration-primary hover:text-primary">policies.google.com/privacy</a>
                     </p>
                 </div>
                 <div className="bg-white p-6 rounded-2xl border-2 border-dark/20">
