@@ -225,6 +225,11 @@ export default function CreateLinkDrawer({ open, onClose, onSuccess }: CreateLin
                     showIcon: false,
                     description: t('toastUnauthorized'),
                 });
+            } else if (response.errorCode === 'UNSAFE_DESTINATION_URL') {
+                toast.error(t('toastErrorCreating'), {
+                    showIcon: false,
+                    description: t('toastUnsafeDestination'),
+                });
             } else if (response.errorCode === 'INVALID_DATA') {
                 toast.error(t('toastErrorCreating'), {
                     showIcon: false,
