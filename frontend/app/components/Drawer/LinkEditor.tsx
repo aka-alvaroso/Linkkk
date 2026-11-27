@@ -256,6 +256,9 @@ export default function LinkEditor({ open, onClose, link, variant = 'drawer', on
                 } else if (response.errorCode === 'LINK_ACCESS_DENIED') {
                     reason = t('toastAccessDeniedDesc');
                     toast.error(t('toastAccessDenied'), { description: reason });
+                } else if (response.errorCode === 'UNSAFE_DESTINATION_URL') {
+                    reason = t('toastUnsafeDestination');
+                    toast.error(t('toastUpdateFailed'), { description: reason });
                 } else if (response.errorCode === 'UNAUTHORIZED') {
                     reason = t('toastSessionExpiredDesc');
                     toast.error(t('toastSessionExpired'), { description: reason });
